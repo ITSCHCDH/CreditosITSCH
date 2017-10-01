@@ -20,6 +20,7 @@ class AddTableEvidencia extends Migration
             $table->string('responsable',20);
             $table->string('valida',20);
             $table->integer('id_nom_actividad')->unsigned();
+            $table->string('slug')->nullable();
 
             $table->foreign('id_nom_actividad')->references('id')->on('nom_actividad')->ondelete('cascade');
 
