@@ -31,17 +31,19 @@
         </ol>
         <div class="row">
             <div class="col-12">
-                <h1>Blank</h1>
-                <p>This is an example of a blank page that you can use as a starting point for creating new ones.</p>
+                <h1>Sistema de creditos complementarios CREDITSCH</h1>
+
             </div>
         </div>
     </div>
     <!-- /.container-fluid-->
+
+
     <!-- /.content-wrapper-->
     <footer class="sticky-footer">
         <div class="container">
             <div class="text-center">
-                <small>Copyright © Your Website 2017</small>
+                <small>Copyright © ITSCH 2017</small>
             </div>
         </div>
     </footer>
@@ -62,7 +64,7 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <a class="btn btn-primary" href="login.html">Salir</a>
                 </div>
             </div>
         </div>
