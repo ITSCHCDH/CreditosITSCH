@@ -9,9 +9,9 @@
     <meta name="author" content="">
     <title>Mi template</title>
     <!-- Bootstrap core CSS-->
-    <link href="{{asset('plugins/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{asset('plugins/vendorTem/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
     <!-- Custom fonts for this template-->
-    <link href="{{asset('plugins/vendor/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet">
+    <link href="{{asset('plugins/vendorTem/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet">
     <!-- Custom styles for this template-->
     <link href="{{asset('plugins/css/sb-admin.css')}}" rel="stylesheet">
 </head>
@@ -70,11 +70,11 @@
         </div>
     </div>
     <!-- Bootstrap core JavaScript-->
-    <script src="{{asset('plugins/vendor/jquery/jquery.min.js')}}"></script>
-    <script src="{{asset('plugins/vendor/popper/popper.min.js')}}"></script>
-    <script src="{{asset('plugins/vendor/bootstrap/js/bootstrap.min.js')}}"></script>
+    <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
+    <script src="{{asset('plugins/vendorTem/popper/popper.min.js')}}"></script>
+    <script src="{{asset('plugins/vendorTem/bootstrap/js/bootstrap.min.js')}}"></script>
     <!-- Core plugin JavaScript-->
-    <script src="{{asset('plugins/vendor/jquery-easing/jquery.easing.min.js')}}"></script>
+    <script src="{{asset('plugins/vendorTem/jquery-easing/jquery.easing.min.js')}}"></script>
     <!-- Custom scripts for all pages-->
     <script src=""></script>
     <script src="{{asset('plugins/js/sb-admin.min.js')}}"></script>
