@@ -1,0 +1,186 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+main{
+    width: 100%;
+    height: auto;
+    background: #ffffff;
+    position: absolute;
+}
+
+header{
+    width: 100%;
+    max-width: 100%;
+    height: 60px;
+    position: fixed;
+    margin: auto;
+    top: 0;
+    background:  #2d3e50;
+
+}
+
+.content-all{
+    background: #FFFFFF;
+    margin: auto;
+    margin-top: 80px;
+}
+
+.content-all label{
+    position: fixed;
+    margin-left: 1%;
+    top: 14px;
+    font-size: 17px;
+    color: white;
+    cursor: pointer;
+    z-index: 10;
+}
+
+/*CSS  busqueda de la pagina*/
+.alertas{
+    position: fixed;
+    top:5px;
+    max-width: 80%;
+    left: 40%;
+    height: 100%;
+    z-index: 1000;
+}
+
+/*CSS  para linck de salir en caso de resoluciones pequeñas*/
+.salir{
+    position: fixed;
+    top:5px;
+    max-width: 80%;
+    left: 60%;
+    height: 100%;
+    z-index: 1000;
+}
+
+#navbarDropdownMenuLink{
+    font-size: 13px;
+    text-align: center;
+    color: #e4e4e4;
+}
+
+#check{
+    display: none;
+}
+
+#check:checked ~ .menu{
+    /*Es el maximo del ancho del menu al car click*/
+    width: 300px;
+}
+
+.menu{
+    position: fixed;
+    top: 60px;
+    /*Es el minimo que reduce al dar click*/
+    width: 50px;
+    /*Para que ocupe toda la pantalla en lo alto*/
+    height: 85%;
+    background: #2d3e50;
+    opacity: 0.9;
+    filter: alpha(opacity=60);
+    /*Para que el cambio no sea tan brusco*/
+    transition: all 500ms cubic-bezier(1,0,0,1);
+    /*Para cambiar la animacion cambiamos el ultimo numero*/
+    transition-timing-function: cubic-bezier(1,0,0,2);
+    /*para que no se vean las letras fuera del menu*/
+    overflow: hidden;
+    /*Para mantener siempre por encima*/
+    z-index: 10;
+}
+.spaMenu{
+    visibility: hidden;
+}
+
+.etSubMenu{
+    visibility: hidden;
+}
+
+.menu li{
+    list-style: none;
+    padding: 16px;
+    color: white;
+    cursor: pointer;
+    transition: all 300ms;
+    /*Para quitar el que cuando no quepan las palabras, se cambie de renglon*/
+    display: block;
+    width: 400px;
+    /*****/
+}
+
+.menu li a{
+    color: #ededed;
+    font-size: 15px;
+    font-family: sans-serif;
+    /*Quitar subrayado*/
+    text-decoration: none;
+}
+
+/* Cambio de color cuando pasa el raton por encima del menu*/
+.menu li:hover{
+    background: rgba(0,0,0,0.3);
+}
+
+/*Oculta el texto de los submenus*/
+.subMenu{
+    display: none;
+}
+
+/*Imagen de flecha para el menu con submenus*/
+#fleSub{
+    position: relative;
+   justify-content: flex-end;
+}
+
+/*Alineacion del div para que no lo deje llegar hasta la izquierdda*/
+#divPrincipal{
+    margin-left: 10%;
+}
+
+/*Css de el area del contenido del sistema*/
+#contenido{
+    background: #f4f4f4;
+    max-width: 100%;
+    box-shadow: 2px 2px 7px #999;
+    text-align: center;
+}
+
+/*Pie de pagina*/
+footer{
+    background-color: rgba(147, 0, 0, 0.89);
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    color: white;
+    text-align: center;
+}
+
+/*Imagenes de iconos del sistema*/
+i{
+    color: #e2e2e2;
+}
+
+/*Css del pie de pagina*/
+footer div p{
+   align-content: center;
+}
+
+/*Mantener oculto boton de cerrar sesion en caso de resoluciones mayores a 800px*/
+#divSalir{
+    display: none;
+}
+
+/*Ocultar tabla de alertas en caso de resolucuines menores a 800px y mostrar solo boton de cerrar sesion*/
+@media screen and (max-width: 800px) {
+    #tabAlertas{
+        display:none;
+    }
+    #divSalir{
+        display: block;
+    }
+}
