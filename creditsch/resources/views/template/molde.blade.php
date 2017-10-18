@@ -79,6 +79,8 @@
     <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
     <script src="{{asset('complementos/js/bootstrap.js')}}"></script>
     <script src="{{asset('js2/js2.js')}}"> </script>
+    <!-- Paquete para los mensajes tipo bootstrap, para notificaciones en formularios -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 
 </body>
 </html>

@@ -20,3 +20,11 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+
+/*Rutas para el controlador de alumnos*/
+
+Route::get('alumnos/index', function () {
+    //return view('welcome');
+    return view('Alumnos.index');
+});
