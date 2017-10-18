@@ -165,6 +165,10 @@ i{
     color: #e2e2e2;
 }
 
+#indAlert{
+    color: orangered;
+}
+
 /*Css del pie de pagina*/
 footer div p{
    align-content: center;

@@ -23,7 +23,7 @@
             <a class="etMenu" href="" data-parent="">
                 <i class="fa fa-fw fa-wrench"></i>
                 <span class="spaMenu">Actividades</span>
-                <i class="fa fa-chevron-right" id="fleSub"></i>
+                <i class="fa fa-chevron-right flesub"></i>
             </a>
             <ul class="subMenu" >
                 <li>
@@ -50,7 +50,7 @@
             <a class="etMenu" href="" data-parent="">
                 <i class="fa fa-pie-chart"></i>
                 <span class="spaMenu">Avance</span>
-                <i class="fa fa-chevron-right" id="fleSub"></i>
+                <i class="fa fa-chevron-right flesub"></i>
             </a>
             <ul class="subMenu" id="">
                 <li>
@@ -77,7 +77,7 @@
             <a class="etMenu"  href="#">
                 <i class="fa fa-lock"></i>
                 <span class="spaMenu">Administración</span>
-                <i class="fa fa-chevron-right" id="fleSub"></i>
+                <i class="fa fa-chevron-right flesub"></i>
             </a>
             <ul class="subMenu" id="">
                 <li>

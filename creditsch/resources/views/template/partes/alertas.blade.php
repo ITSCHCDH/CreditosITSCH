@@ -52,7 +52,7 @@
                                                     <span class="badge badge-pill badge-warning">6 New</span>
                                                 </span>
                             <span class="indicator text-warning d-none d-lg-block">
-                                                    <i class="fa fa-fw fa-circle"></i>
+                                                    <i class="fa fa-fw fa-circle" id="indAlert"></i>
                                                 </span>
                         </a>
                         <!--Mensajes de las alertas -->
