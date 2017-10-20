@@ -8,7 +8,7 @@
             </a>
         </li>
         <li class="botMen">
-            <a class="etMenu" href="#">
+            <a class="etMenu" href="{{route('alumnos.index')}}">
                 <i class="fa fa-graduation-cap"></i>
                 <span class="spaMenu">Alumnos</span>
             </a>

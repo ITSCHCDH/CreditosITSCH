@@ -22,9 +22,17 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 
-/*Rutas para el controlador de alumnos*/
 
-Route::get('alumnos/index', function () {
-    //return view('welcome');
-    return view('Alumnos.index');
+/****Rutas para el controlador de alumnos, con el group::resource, nos crean todas las rutas, para el controlador especificado*****/
+
+Route::group(['prefix'=>'admin'],function(){
+
+    Route::resource('alumnos','AlumnosController');
+
+     //La siguiente nos crea la ruta para las
+    Route::get('alumnos/{id}/destroy',[
+        'uses'=>'AlumnosController@destroy',
+        'as'=> 'admin.alumnos.destroy'
+    ]);
 });
+/******************************/

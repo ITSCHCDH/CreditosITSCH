@@ -44,8 +44,8 @@ header{
     top:5px;
     max-width: 80%;
     left: 40%;
-    height: 100%;
-    z-index: 1000;
+    height: auto;
+    /*z-index: 1000;*/
 }
 
 /*CSS  para linck de salir en caso de resoluciones pequeñas*/
@@ -55,7 +55,7 @@ header{
     max-width: 80%;
     left: 60%;
     height: 100%;
-    z-index: 1000;
+    z-index: 100;
 }
 
 #navbarDropdownMenuLink{
@@ -146,6 +146,10 @@ header{
     background: #f4f4f4;
     max-width: 100%;
     box-shadow: 2px 2px 7px #999;
+    text-align: center;
+}
+
+table th ,table td{
     text-align: center;
 }
 

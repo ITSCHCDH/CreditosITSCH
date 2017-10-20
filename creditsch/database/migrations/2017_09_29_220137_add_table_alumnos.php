@@ -16,7 +16,7 @@ class AddTableAlumnos extends Migration
         Schema::create('alumnos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('no_control',20)->unique();
-            $table->string('password',50);
+            $table->string('password',255);
             $table->string('nombre',70);
             $table->string('carrera',70);
             $table->string('status',35);

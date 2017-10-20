@@ -11,6 +11,7 @@ class Alumno extends Model
     //Datos visibles para los objetos json
     protected $fillable=['no_control','password','nombre','carrera','status'];
 
+
     //Relacion con la tablas de alumno(uno) a participante(muchos)
     public function participantes()
     {

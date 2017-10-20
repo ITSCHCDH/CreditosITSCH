@@ -49,17 +49,16 @@
         <div class="container" id="divPrincipal">
             <div class="container-fluid">
                 <!-- Breadcrumbs-->
-                <ol class="breadcrumb">
+                <ol class="breadcrumb" style="box-shadow: 2px 2px 7px #999;">
                     <li class="breadcrumb-item">
-                        <a href="#">Inicio</a>
+                        <a href="{{ url('/home') }}">Inicio</a>
                     </li>
                     <li class="breadcrumb-item active"> @yield('ruta','Default')
                     </li>
                 </ol>
                 <div class="container" id="contenido">
                     <div class="col-md-12">
-                        <h1>Sistema de creditos complementarios CREDITSCH</h1>
-                        <h3>Contenido del sistema</h3>
+                        <h2>Sistema de creditos complementarios CREDITSCH</h2>
                         <section>
                             @include('flash::message') <!-- Esto es para mostrar los mensajes en los formularios -->
                         </section>
@@ -81,6 +80,7 @@
     <script src="{{asset('js2/js2.js')}}"> </script>
     <!-- Paquete para los mensajes tipo bootstrap, para notificaciones en formularios -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
 
 </body>
 </html>
