@@ -2,7 +2,7 @@
 <nav class="menu">
     <ul>
         <li class="botMen">
-            <a class="etMenu" href="#">
+            <a class="etMenu" href="/home">
                 <i class="fa fa-home"></i>
                 <span class="spaMenu">Inicio</span>
             </a>

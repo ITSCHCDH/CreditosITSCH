@@ -10,11 +10,11 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle mr-lg-2" id="messagesDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-fw fa-envelope"></i>
-                            <span class="d-lg-none">Mensajes
+                            <span class="d-lg-none txt">Mensajes
                                                         <span class="badge badge-pill badge-primary">5 Nuevos</span>
                                                     </span>
                             <span class="indicator text-primary d-none d-lg-block">
-                                                        <i class="fa fa-fw fa-circle"></i>
+                                                        <i class="fa fa-fw fa-circle" id="indMensajes"></i>
                                                     </span>
                         </a>
 
@@ -48,7 +48,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-fw fa-bell"></i>
-                            <span class="d-lg-none">Alerts
+                            <span class="d-lg-none txt">Alerts
                                                     <span class="badge badge-pill badge-warning">6 New</span>
                                                 </span>
                             <span class="indicator text-warning d-none d-lg-block">

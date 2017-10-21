@@ -1,5 +1,6 @@
 
 var band;
+var band2=0;
 
 /*Abre el menu al dar click en cualquier link del menu*/
 $('.botMen').click(function() {
@@ -12,7 +13,7 @@ $('.botMen').click(function() {
 
     $(this).children('ul').fadeToggle();
 
-    return false;
+    return true;
 });
 
 /*Cundo damos click a los submenu, compacta la vista del menu*/
@@ -37,3 +38,19 @@ $('input[type=checkbox]').on('change', function() {
         $('.flesub').css('visibility', 'hidden');
     }
 });
+
+/*Expande la tabla de las alertas*/
+$('.dropdown').click(function() {
+
+    if(band2==0){
+        $('.alertas').css('height', '100%');
+        $('.alertas').css('z-index', '1000');
+        band2=1;
+    }
+    else{
+        $('.alertas').css('height', 'auto');
+        $('.alertas').css('z-index', '0');
+        band2=0;
+    }
+});
+

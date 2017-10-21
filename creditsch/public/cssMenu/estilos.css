@@ -44,7 +44,7 @@ header{
     top:5px;
     max-width: 80%;
     left: 40%;
-    height: auto;
+    /*height: auto;*/
     /*z-index: 1000;*/
 }
 
@@ -169,8 +169,12 @@ i{
     color: #e2e2e2;
 }
 
-#indAlert{
+#indAlert,#indMensajes{
     color: orangered;
+}
+
+.txt{
+    color: yellow;
 }
 
 /*Css del pie de pagina*/

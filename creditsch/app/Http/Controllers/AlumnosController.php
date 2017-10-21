@@ -45,7 +45,7 @@ class AlumnosController extends Controller
        $alumno->password=bcrypt($request->password);
        //Comando para guardar el registro
        $alumno->save();
-       Flash::success('Se ha registrado '.$alumno->name.' de forma exitosa');
+       Flash::success('El alumno  '.$alumno->name.' se ha registrado de forma exitosa');
        return redirect()->route('alumnos.index');
     }
 
@@ -91,7 +91,7 @@ class AlumnosController extends Controller
         $alumno->password=$request->password;
         $alumno->status=$request->status;
         $alumno->save();
-        Flash::warning('El usuario '. $alumno->nombre .' a sido editado de forma exitosa');//Envia mensaje
+        Flash::warning('El alumno '. $alumno->nombre .' a sido editado de forma exitosa');//Envia mensaje
         return redirect('admin/alumnos');//llama a la pagina de consultas
     }
 
@@ -106,7 +106,7 @@ class AlumnosController extends Controller
         //Codigo de bajas
         $alumno=Alumno::find($id);//Busca el registro
         $alumno->delete();//Elimina el registro
-        Flash::error('El usuario '. $alumno->nombre .' a sido borrado de forma exitosa');//Envia mensaje
+        Flash::error('El alumno '. $alumno->nombre .' a sido borrado de forma exitosa');//Envia mensaje
         return redirect('admin/alumnos');//llama a la pagina de consultas
     }
 }

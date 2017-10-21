@@ -1,27 +1,11 @@
 @include('template.molde')
 
+@section('title','Home')
 
+@section('ruta')
+    <label for=""> / Home</label>
+@endsection
 
 @section('contenido')
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
-
-
-                <div class="panel-body">
-                    @if (session('status'))
-                        <div class="alert alert-success">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    Usted esta conectado!
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 @endsection

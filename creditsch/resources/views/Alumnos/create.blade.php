@@ -1,7 +1,11 @@
 @extends('template.molde')
 
+@section('title','Alumnos|Altas')
+
 @section('ruta')
-    <label for="">Alumnos / Altas</label>
+    <a href="{{route('alumnos.index')}}"> Alumnos </a>
+    /
+    <label class="label label-success"> Altas</label>
 @endsection
 
 @section('contenido')

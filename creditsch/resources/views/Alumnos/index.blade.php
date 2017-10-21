@@ -1,7 +1,9 @@
 @extends('template.molde')
 
+@section('title','Alumnos')
+
 @section('ruta')
-    <label for="">Alumnos</label>
+    <label class="label label-success"> Alumnos</label>
 @endsection
 
 @section('contenido')
