@@ -36,3 +36,18 @@ Route::group(['prefix'=>'admin'],function(){
     ]);
 });
 /******************************/
+
+
+/****Rutas para el controlador de creditos*****/
+
+Route::group(['prefix'=>'cred'],function(){
+
+    Route::resource('creditos','CreditosController');
+
+    //La siguiente nos crea la ruta para las
+    Route::get('creditos/{id}/destroy',[
+        'uses'=>'CreditosController@destroy',
+        'as'=> 'cred.creditos.destroy'
+    ]);
+});
+/******************************/

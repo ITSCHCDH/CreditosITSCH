@@ -14,7 +14,7 @@
             </a>
         </li>
         <li class="botMen">
-            <a class="etMenu" href="#">
+            <a class="etMenu" href="{{route('creditos.index')}}">
                 <i class="fa fa-fw fa-table"></i>
                 <span class="spaMenu">Creditos</span>
             </a>
