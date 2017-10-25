@@ -1,11 +1,11 @@
-@include('template.molde')
+@extends('template.molde')
 
 @section('title','Home')
 
 @section('ruta')
-    <label for=""> / Home</label>
+    <label class="label label-success"> Home</label>
 @endsection
 
 @section('contenido')
-
+    HOLA
 @endsection
