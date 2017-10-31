@@ -30,25 +30,22 @@ Route::group(['prefix'=>'admin'],function(){
 
     Route::resource('alumnos','AlumnosController');
 
-     //La siguiente nos crea la ruta para las
+    //La siguiente nos crea las rutas para el controlador de alumnos
     Route::get('alumnos/{id}/destroy',[
         'uses'=>'AlumnosController@destroy',
         'as'=> 'admin.alumnos.destroy'
     ]);
-});
-/******************************/
 
-
-/****Rutas para el controlador de creditos*****/
-
-Route::group(['prefix'=>'cred'],function(){
-
+    /****Rutas para el controlador de creditos*****/
     Route::resource('creditos','CreditosController');
 
-    //La siguiente nos crea la ruta para las
+    //La siguiente nos crea las rutas para el controlador de creditos
     Route::get('creditos/{id}/destroy',[
         'uses'=>'CreditosController@destroy',
         'as'=> 'cred.creditos.destroy'
     ]);
+
+      
+
 });
 /******************************/

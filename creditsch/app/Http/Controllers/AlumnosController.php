@@ -17,7 +17,7 @@ class AlumnosController extends Controller
     {
         //Aqui mandamos llamar la vista de la pagina de inicio de alumnos
         $alumno=Alumno::orderby('id','asc')->paginate(5); //Consulta todos los usuarios y los ordena, ademas pagina la consulta
-        return view('alumnos.index')->with('alumno',$alumno); //Llama a la vista y le envia los usuarios
+        return view('admin.alumnos.index')->with('alumno',$alumno); //Llama a la vista y le envia los usuarios
     }
 
     /**
@@ -28,7 +28,7 @@ class AlumnosController extends Controller
     public function create()
     {
         //Ponemos el codigo de la vista que se llamara para las altas de los alumnos
-        return view('alumnos.create');
+        return view('admin.alumnos.create');
     }
 
     /**
@@ -71,7 +71,7 @@ class AlumnosController extends Controller
         //Codigo de modificaciones
         $alumno=Alumno::find($id);//Busca el registro
 
-        return view('alumnos.edit')->with('alumno',$alumno);
+        return view('admin.alumnos.edit')->with('alumno',$alumno);
     }
 
     /**

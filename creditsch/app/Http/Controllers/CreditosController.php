@@ -17,7 +17,7 @@ class CreditosController extends Controller
     {
         //Aqui mandamos llamar la vista de la pagina de inicio de alumnos
         $credito=Credito::orderby('id','asc')->paginate(5); //Consulta todos los usuarios y los ordena, ademas pagina la consulta
-        return view('Creditos.index')->with('credito',$credito); //Llama a la vista y le envia los usuarios
+        return view('admin.creditos.index')->with('credito',$credito); //Llama a la vista y le envia los usuarios
     }
 
     /**
@@ -28,7 +28,7 @@ class CreditosController extends Controller
     public function create()
     {
         //Ponemos el codigo de la vista que se llamara para las altas de los creditos
-        return view('creditos.create');
+        return view('admin.creditos.create');
     }
 
     /**
@@ -69,7 +69,7 @@ class CreditosController extends Controller
     {
         //Codigo de modificaciones
         $credito=Credito::find($id);//Busca el registro
-        return view('creditos.edit')->with('credito',$credito);
+        return view('admin.creditos.edit')->with('credito',$credito);
     }
 
     /**
@@ -86,7 +86,7 @@ class CreditosController extends Controller
         $credito->nombre=$request->nombre;
         $credito->save();
         Flash::warning('El credito '. $credito->nombre .' a sido editado de forma exitosa');//Envia mensaje
-        return redirect('cred/creditos');//llama a la pagina de consultas
+        return redirect('admin/creditos');//llama a la pagina de consultas
     }
 
     /**
@@ -101,6 +101,6 @@ class CreditosController extends Controller
         $credito=Credito::find($id);//Busca el registro
         $credito->delete();//Elimina el registro
         Flash::error('El credito '. $credito->nombre .' a sido borrado de forma exitosa');//Envia mensaje
-        return redirect('cred/creditos');//llama a la pagina de consultas
+        return redirect('admin/creditos');//llama a la pagina de consultas
     }
 }
