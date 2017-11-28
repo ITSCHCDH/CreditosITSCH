@@ -8,7 +8,23 @@
 
 @section('contenido')
 
-    <a href="{{route('alumnos.create')}}" class="btn btn-info">Registrar nuevo usuario</a>
+    <a href="{{route('alumnos.create')}}" class="btn btn-info">Registrar nuevo alumno</a>
+    <!--BUSCADOR DE ARTICULOS  -->
+    <!-- Boton de busqueda en la pagina -->
+    {!! Form::open(['route'=>'alumnos.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right']) !!}
+
+    <div class="input-group">
+        {!! Form::text('valor',null,['class'=>'form-control','placeholder'=>'Control|Nombre|Carrera','aria-describedby'=>'search']) !!}
+        <div class="input-group-btn">
+            <button type="submit" class="btn btn-primary"> Buscar
+                <span class="badge  label label-primary glyphicon glyphicon-search">
+                      </span>
+            </button>
+        </div>
+    </div>
+    {!! Form::close() !!}
+    <!--Nota: Se tiene que agregar el (scope) que es una funcion que se agrega en el modelo y es la encargada de hacer la consulta  -->
+    <!--Fin del boton de busqueda  -->
     <table class="table table-striped">
         <thead>
         <th>ID</th>

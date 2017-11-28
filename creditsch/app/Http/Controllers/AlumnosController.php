@@ -13,10 +13,10 @@ class AlumnosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //Aqui mandamos llamar la vista de la pagina de inicio de alumnos
-        $alumno=Alumno::orderby('id','asc')->paginate(5); //Consulta todos los usuarios y los ordena, ademas pagina la consulta
+        $alumno=Alumno::Search($request->valor)->orderby('id','asc')->paginate(5); //Consulta todos los usuarios y los ordena, ademas pagina la consulta
         return view('admin.alumnos.index')->with('alumno',$alumno); //Llama a la vista y le envia los usuarios
     }
 

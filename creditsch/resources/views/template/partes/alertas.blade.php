@@ -93,10 +93,11 @@
                 </ul>
             </td>
             <td>
-                <!-- Boton de busqueda en la pagina -->
+                <!-- Boton de busqueda de paginas -->
+
                 <form class="form-inline my-2 my-lg-0 mr-lg-2" id="buscar">
                     <div class="input-group">
-                        <input class="form-control" type="text" placeholder="Buscar...">
+                        <input class="form-control" type="text" placeholder="Buscar pagina...">
                         <div class="input-group-btn">
                             <button class="btn btn-primary" type="button">
                                 <i class="fa fa-search"></i>

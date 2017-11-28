@@ -42,10 +42,17 @@ Route::group(['prefix'=>'admin'],function(){
     //La siguiente nos crea las rutas para el controlador de creditos
     Route::get('creditos/{id}/destroy',[
         'uses'=>'CreditosController@destroy',
-        'as'=> 'cred.creditos.destroy'
+        'as'=> 'admin.creditos.destroy'
     ]);
 
-      
+    /****Rutas para el controlador de actividades*****/
+    Route::resource('actividades','ActividadesController');
+
+    //La siguiente nos crea las rutas para el controlador de actividades
+    Route::get('actividades/{id}/destroy',[
+        'uses'=>'ActividadesController@destroy',
+        'as'=> 'admin.actividades.destroy'
+    ]);
 
 });
 /******************************/

@@ -27,7 +27,7 @@
             </a>
             <ul class="subMenu" >
                 <li>
-                    <a class="etSubMenu" href="#">
+                    <a class="etSubMenu" href="{{route('actividades.index')}}">
                         <i class="fa fa-futbol-o"></i>
                         <span class="etSubMenu">Crear Actividad</span>
                     </a>
