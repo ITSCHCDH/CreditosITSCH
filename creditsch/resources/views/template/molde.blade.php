@@ -18,14 +18,12 @@
     <link href="{{asset('complementos/css/bootstrap-theme.css')}}" rel="stylesheet">
 </head>
 <body>
-    <main id="acordion">
+        <!-- Seccion de menu del sistema, mensajes de alerta y elementos de busqueda -->
         <div class="content-all" >
             <header>
             </header>
             <input type="checkbox" id="check">
-            <label for="check" class="fa fa-bars">Menu</label>
-
-
+            <label for="check" class="fa fa-bars" id="menu">Menu</label>
             <!-- Imagen ITSCH -->
             <div style="position: fixed;left: 97%;top: 8px;">
                 <a  href="{{ url('/home') }}">
@@ -38,39 +36,36 @@
             <!-- Incluye sistema de alertas-->
             @include('template.partes.alertas')
 
-
-
             <!-- Incluye el menu al sistema -->
             @include('template.partes.menu')
-
         </div>
 
-        <!--Div para el contenido de todo el sistema -->
-        <div class="container" id="divPrincipal">
-            <div class="container-fluid">
-                <!-- Breadcrumbs-->
-                <ol class="breadcrumb" style="box-shadow: 2px 2px 7px #999;">
-                    <li class="breadcrumb-item">
-                        <a href="{{ url('/home') }}">Inicio</a>
-                    </li>
-                    <li class="breadcrumb-item active"> @yield('ruta','Default')
-                    </li>
-                </ol>
-                <div class="container" id="contenido">
-                    <div class="col-md-12">
-                        <h2>Sistema de creditos complementarios CREDITSCH</h2>
-                        <section>
-                            @include('flash::message') <!-- Esto es para mostrar los mensajes en los formularios -->
-                        </section>
-                        @yield('contenido','Default')<!-- Contenido general del sistema -->
+        <!--Contenido principal del sistema  -->
+        <main id="cuerpo">
+            <!--Div para el contenido de todo el sistema -->
+            <div class="container" id="divPrincipal">
+                <div class="container-fluid">
+                    <ol class="breadcrumb" style="box-shadow: 2px 2px 7px #999;">
+                        <li class="breadcrumb-item">
+                            <a href="{{ url('/home') }}">Inicio</a>
+                        </li>
+                        <li class="breadcrumb-item active"> @yield('ruta','Default')
+                        </li>
+                    </ol>
+                    <div class="container" id="contenido">
+                        <div class="col-md-12">
+                            <h2>Sistema de creditos complementarios CREDITSCH</h2>
+                            <section>
+                                @include('flash::message') <!-- Esto es para mostrar los mensajes en los formularios -->
+                            </section>
+                            @yield('contenido','Default')<!-- Contenido general del sistema -->
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
     </main>
 
-    <!-- Incluye el menu al sistema -->
+    <!-- Incluye el pie de pagina en el sistema -->
     @include('template.partes.pie')
 
 
