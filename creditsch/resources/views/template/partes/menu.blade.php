@@ -33,13 +33,13 @@
                     </a>
                 </li>
                 <li>
-                    <a class="etSubMenu" href="#">
+                    <a class="etSubMenu" href="{{route('participantes.index')}}">
                         <i class="fa fa-users"></i>
                         <span class="etSubMenu">Agregar participantes</span>
                     </a>
                 </li>
                 <li>
-                    <a class="etSubMenu" href="#">
+                    <a class="etSubMenu" href="{{route('evidencias.index')}}">
                         <i class="fa fa-camera"></i>
                         <span class="etSubMenu">Evidencia</span>
                     </a>

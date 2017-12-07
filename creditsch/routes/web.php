@@ -39,7 +39,7 @@ Route::group(['prefix'=>'admin'],function(){
     /****Rutas para el controlador de creditos*****/
     Route::resource('creditos','CreditosController');
 
-    //La siguiente nos crea las rutas para el controlador de creditos
+    //La siguiente nos crea las rutas para el controlador de creditos(Bajas)
     Route::get('creditos/{id}/destroy',[
         'uses'=>'CreditosController@destroy',
         'as'=> 'admin.creditos.destroy'
@@ -48,10 +48,28 @@ Route::group(['prefix'=>'admin'],function(){
     /****Rutas para el controlador de actividades*****/
     Route::resource('actividades','ActividadesController');
 
-    //La siguiente nos crea las rutas para el controlador de actividades
+    //La siguiente nos crea las rutas para el controlador de actividades(Bajas)
     Route::get('actividades/{id}/destroy',[
         'uses'=>'ActividadesController@destroy',
         'as'=> 'admin.actividades.destroy'
+    ]);
+
+    /****Rutas para el controlador de participantes*****/
+    Route::resource('participantes','ParticipantesController');
+
+    //La siguiente nos crea las rutas para el controlador de participantes(Bajas)
+    Route::get('participantes/{id}/destroy',[
+        'uses'=>'ParticipantesController@destroy',
+        'as'=> 'admin.participantes.destroy'
+    ]);
+
+    /****Rutas para el controlador de evidencias*****/
+    Route::resource('evidencias','EvidenciasController');
+
+    //La siguiente nos crea las rutas para el controlador de evidencias(Bajas)
+    Route::get('evidencias/{id}/destroy',[
+        'uses'=>'EvidenciasController@destroy',
+        'as'=> 'admin.evidencias.destroy'
     ]);
 
 });

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Actividad extends Model
 {
     //Nombre de la tabla
-    protected $table="nom_actividad";
+    protected $table="actividad";
     //Datos visibles para los objetos json
     protected $fillable=['nombre','por_cred_actividad','id_actividad'];
 

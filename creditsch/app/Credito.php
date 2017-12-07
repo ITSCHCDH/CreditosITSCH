@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Credito extends Model
 {
     //Nombre de la tabla
-    protected $table="nom_creditos";
+    protected $table="creditos";
     //Datos visibles para los objetos json
     protected $fillable=['nombre'];
 

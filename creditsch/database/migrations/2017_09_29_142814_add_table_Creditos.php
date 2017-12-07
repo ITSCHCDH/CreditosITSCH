@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddTableNomActividad extends Migration
+class AddTableCreditos extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,9 @@ class AddTableNomActividad extends Migration
      */
     public function up()
     {
-        Schema::create('nom_actividad', function (Blueprint $table) {
+        Schema::create('creditos', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('nombre',250)->unique();
-            $table->integer('por_cred_actividad');
-            $table->integer('id_actividad')->unsigned();
-
-            $table->foreign('id_actividad')->references('id')->on('nom_creditos')->ondelete('cascade');
-
+            $table->string('nombre',70);
             $table->timestamps();
         });
     }
@@ -32,6 +27,6 @@ class AddTableNomActividad extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('nom_actividad');
+        Schema::dropIfExists('creditos');
     }
 }

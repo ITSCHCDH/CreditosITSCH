@@ -15,14 +15,13 @@ class AddTableEvidencia extends Migration
     {
         Schema::create('evidencia', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('status');
+            $table->string('status',35);
             $table->string('nom_imagen');
-            $table->string('responsable',20);
             $table->string('valida',20);
-            $table->integer('id_nom_actividad')->unsigned();
+            $table->integer('id_asig_actividades')->unsigned();
             $table->string('slug')->nullable();
 
-            $table->foreign('id_nom_actividad')->references('id')->on('nom_actividad')->ondelete('cascade');
+            $table->foreign('id_asig_actividades')->references('id')->on('actividad_evidencia')->ondelete('cascade');
 
             $table->timestamps();
         });

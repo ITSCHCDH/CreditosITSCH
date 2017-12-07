@@ -20,7 +20,7 @@ class AddTableAvance extends Migration
             $table->integer('por_credito');
 
             $table->foreign('no_control')->references('no_control')->on('alumnos');
-            $table->foreign('id_credito')->references('id')->on('nom_creditos');
+            $table->foreign('id_credito')->references('id')->on('creditos');
 
             $table->timestamps();
         });

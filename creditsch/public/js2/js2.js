@@ -2,6 +2,7 @@
 var band=0;
 var band2=0;
 var bandSub=0;
+var obj;
 
 /*Abre el menu al dar click en cualquier link del menu*/
 $('.botMen').click(function() {
@@ -22,6 +23,7 @@ $('.botMen').click(function() {
             $(this).children('ul').fadeToggle();//Abre los submenus en caso de que el elemento los tenga
             $('.etSubMenu').css('visibility', 'visible');//Muetra el texto de los submenus
             bandSub=1; //SubMenu abierto
+            obj=this;
             return false;
         }
         else if($(this).find("li").length && bandSub==1)
@@ -86,6 +88,8 @@ $('#cuerpo').click(function(){
     $('.etSubMenu').css('visibility', 'hidden');//Oculta el texto de los submenus
     $('.spaMenu').css('visibility', 'hidden');//Oculta el texto de los menus
     $('.flesub').css('visibility', 'hidden');//Oculta las flechas de los menus que tienen submenus
+    if (bandSub==1)
+        $(obj).children('ul').fadeToggle();//Contrae los submenus en caso de que el elemento los tenga
     band=0;
     bandSub=0;
 });
