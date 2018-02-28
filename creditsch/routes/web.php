@@ -15,9 +15,12 @@ Route::get('/', function () {
     //return view('welcome');
     return view('auth.login');
 });
-
-
-Auth::routes();
+/* Agregamos la ruta al html para asignar responsables a las actividades 
++*/
+Route::get('/admin/actividades/responsables','ResponsablesController@show', function(){
+    /* Ruta del html responsables (addusers) **/
+    return view('admin.actividades.addusers');
+})->name('responsables'); /* Le asignamos un nombre a la ruta para facilitar su uso **/
 
 
 Route::get('/home', 'HomeController@index')->name('home');

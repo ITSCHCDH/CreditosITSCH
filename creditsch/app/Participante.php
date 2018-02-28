@@ -22,4 +22,10 @@ class Participante extends Model
     {
         return $this->belongsTo('App\Evidencia');
     }
+
+    //Crea el bucador de participantes (Scope)
+    public function scopeSearch($query,$valor)
+    {
+        return $query->where('no_control','LIKE',"%$valor%");
+    }
 }

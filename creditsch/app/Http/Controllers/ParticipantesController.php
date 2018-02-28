@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Participante; //Es el nombre del modelo con el que va a trabajar el controlador
+use Laracasts\Flash\Flash; //Es el paquete para poder usar los mensajes de alerta tipo bootstrap
 class ParticipantesController extends Controller
 {
     /**
@@ -11,10 +12,11 @@ class ParticipantesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //Retorna la vista de Agregar participantes
-        return view('admin.participantes.index');
+        $participante=Participante::orderby('id','asc')->paginate(5);
+        return view('admin.participantes.index')->with('participante',$participante); //Llama a la vista y le envia los usuarios
     }
 
     /**
@@ -35,7 +37,11 @@ class ParticipantesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $participante = new Participante($request->all());
+        $participante->id_evidencia=4;
+        $participante->save();
+        Flash::success('El participante se agrego correctamente');
+        return redirect()->route('participantes.index');
     }
 
     /**

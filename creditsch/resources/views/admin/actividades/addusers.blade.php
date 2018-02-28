@@ -7,9 +7,6 @@
 @endsection
 
 @section('contenido')
-
-    <a href="{{route('actividades.create')}}" class="btn btn-info">Registrar nueva actividad</a>
-
     <!--BUSCADOR DE ARTICULOS  -->
     <!-- Boton de busqueda en la pagina -->
     {!! Form::open(['route'=>'actividades.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right']) !!}
@@ -29,30 +26,20 @@
 
     <table class="table table-striped">
         <thead>
-            <th>ID</th>
-            <th>Actividad</th>
-            <th>Porcentaje crédito</th>
-            <th>Crédito</th>
-            <th>Acción</th>
+            <th>Nombre</th>
+            <th>Area</th>
         </thead>
         <tbody>
-        @foreach($actividad as $act)
+        @foreach($responsables as $res)
             <tr>
-                <td>{{$act->id}}</td>
-                <td>{{$act->nombre}}</td>
-                <td>{{$act->por_cred_actividad}}</td>
-                <td>{{$act->credito->nombre}}</td>
-
-                <td>
-                    <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
-                    <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                    <a href="{{ route('responsables') }}" class="btn btn-primary">Responsables</span></a>
-                </td>
+                <td>{{$res->name}}</td>
+                <td>{{$res->area}}</td>
+                
             </tr>
         @endforeach
         </tbody>
     </table>
 
-    {!! $actividad->render() !!}
+    {!! $responsables->render() !!}
 
 @endsection
