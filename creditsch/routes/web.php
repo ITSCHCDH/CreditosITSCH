@@ -14,13 +14,19 @@
 Route::get('/', function () {
     //return view('welcome');
     return view('auth.login');
-});
-/* Agregamos la ruta al html para asignar responsables a las actividades 
+})->name('login');
+/* Agregamos la ruta al html para listar los resposables de una actividad
 +*/
-Route::get('/admin/actividades/responsables','ResponsablesController@show', function(){
-    /* Ruta del html responsables (addusers) **/
-    return view('admin.actividades.addusers');
+Route::get('/admin/actividades/{id}/responsables','ResponsablesController@show', function(){
+    /* Ruta del html responsables (responsableshow) **/
+    return view('admin.actividades.responsableshow');
 })->name('responsables'); /* Le asignamos un nombre a la ruta para facilitar su uso **/
+
+/* Ruta para listar y asignar resposables a una actividad */
+Route::get('/admin/actividades/{id}/responsables/asignar','ResponsablesController@index', function(){
+    /* Ruta del html responsables (responsableshow) **/
+    return view('admin.actividades.responsablesindex');
+})->name('responsables.index'); /* Le asignamos un nombre a la ruta para facilitar su uso **/
 
 
 Route::get('/home', 'HomeController@index')->name('home');
@@ -74,6 +80,16 @@ Route::group(['prefix'=>'admin'],function(){
         'uses'=>'EvidenciasController@destroy',
         'as'=> 'admin.evidencias.destroy'
     ]);
-
+    /****Rutas para el controlador de actividad_evidencia *****/
+    Route::resource('actividad_evidencias','Actividad_EvidenciasController');
+    Route::get('actividad_evidencias/{id}/destroy',[
+        'uses'=>'Actividad_EvidenciasController@destroy',
+        'as'=> 'actividad_evidencias.destroy'
+    ]);
 });
 /******************************/
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+

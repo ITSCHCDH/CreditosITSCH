@@ -14,6 +14,7 @@ class User extends Authenticatable
      *
      * @var array
      */
+    protected $table ="users";
     protected $fillable = [
         'name', 'email', 'password','area',
     ];
@@ -26,4 +27,9 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+    //Relacion mucho a muchos una actividad puede terner mucho responsables y un resposables puede tener muchas acctividades
+    public function actividades(){
+        return $this->belongsToMany('App\Actividad')->withTimestamps();
+    }
+    
 }

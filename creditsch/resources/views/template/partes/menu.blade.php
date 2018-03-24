@@ -26,19 +26,19 @@
                 <i class="fa fa-chevron-right flesub"></i>
             </a>
             <ul class="subMenu" >
-                <li>
+                <li class='tamSubMenu'>
                     <a class="etSubMenu" href="{{route('actividades.index')}}">
                         <i class="fa fa-futbol-o"></i>
                         <span class="etSubMenu">Crear Actividad</span>
                     </a>
                 </li>
-                <li>
+                <li class='tamSubMenu'>
                     <a class="etSubMenu" href="{{route('participantes.index')}}">
                         <i class="fa fa-users"></i>
                         <span class="etSubMenu">Agregar participantes</span>
                     </a>
                 </li>
-                <li>
+                <li class='tamSubMenu'>
                     <a class="etSubMenu" href="{{route('evidencias.index')}}">
                         <i class="fa fa-camera"></i>
                         <span class="etSubMenu">Evidencia</span>
@@ -53,19 +53,19 @@
                 <i class="fa fa-chevron-right flesub"></i>
             </a>
             <ul class="subMenu" id="">
-                <li>
+                <li class='tamSubMenu'>
                     <a class="etSubMenu" href="#">
                         <i class="fa fa-calendar-check-o"></i>
                         <span class="etSubMenu">Verificar evidencia</span>
                     </a>
                 </li>
-                <li>
+                <li class='tamSubMenu'>
                     <a class="etSubMenu" href="#">
                         <i class="fa fa-print"></i>
                         <span class="etSubMenu">Constancias</span>
                     </a>
                 </li>
-                <li>
+                <li class='tamSubMenu'>
                     <a class="etSubMenu" href="#">
                         <i class="fa fa-file-pdf-o"></i>
                         <span class="etSubMenu">Reportes</span>
@@ -80,13 +80,13 @@
                 <i class="fa fa-chevron-right flesub"></i>
             </a>
             <ul class="subMenu" id="">
-                <li>
+                <li class='tamSubMenu'>
                     <a class="etSubMenu" href="#">
                         <i class="fa fa-users"></i>
                         <span class="etSubMenu">Usuarios</span>
                     </a>
                 </li>
-                <li>
+                <li class='tamSubMenu'>
                     <a class="etSubMenu" href="#">
                         <i class="fa fa-address-card"></i>
                         <span class="etSubMenu">Roles</span>

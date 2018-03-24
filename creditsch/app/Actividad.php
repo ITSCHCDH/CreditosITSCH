@@ -29,4 +29,8 @@ class Actividad extends Model
     {
         return $query->where('nombre','LIKE',"%$nombre%");
     }
+    //Relacion mucho a muchos una actividad puede terner mucho responsables y un resposables puede tener muchas acctividades
+    public function users(){
+        return $this->belongsToMany('App\User','actividad_evidencia')->withTimestamps();
+    }
 }

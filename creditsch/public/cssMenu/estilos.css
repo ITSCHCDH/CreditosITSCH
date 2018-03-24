@@ -89,6 +89,10 @@ header{
     transition-timing-function: cubic-bezier(1,0,0,2);
     /*para que no se vean las letras fuera del menu*/
     overflow: hidden;
+    /* Agregamos un scroll a nuestro menu */
+    overflow: scroll;
+    /*Ocultamos el scroll horizontal */
+    overflow-x: hidden;
     /*Para mantener siempre por encima*/
     z-index: 10;
 }
@@ -108,7 +112,7 @@ header{
     transition: all 300ms;
     /*Para quitar el que cuando no quepan las palabras, se cambie de renglon*/
     display: block;
-    width: 400px;
+    width: 290px;
     /*****/
 }
 
@@ -128,6 +132,10 @@ header{
 /*Oculta el texto de los submenus*/
 .subMenu{
     display: none;
+}
+/* Le asignmos un a tamaño fijo a los submenus para mejorar la aperiencia y evitar el uso de scroll */
+.tamSubMenu{
+    width: 270px !important;
 }
 
 /*Imagen de flecha para el menu con submenus*/
@@ -195,4 +203,27 @@ footer div p{
     #divSalir{
         display: block;
     }
+}
+/* El ancho de nuestro scroll */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* El fondo de la barra donde aparece nuestro scroll */
+::-webkit-scrollbar-track {
+    background: #2d3e50; 
+}
+ 
+/* El color del scroll*/
+::-webkit-scrollbar-thumb {
+    background: #1d2950; 
+}
+
+/* Manupukar ek hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #151b50; 
+}
+/* Color de la flecha que aparece en la esquina de nuestri scroll*/
+::-webkit-scrollbar-corner{
+    background: #2d3e50;    
 }

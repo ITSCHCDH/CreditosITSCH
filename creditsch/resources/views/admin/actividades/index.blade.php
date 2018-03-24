@@ -46,7 +46,7 @@
                 <td>
                     <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
                     <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                    <a href="{{ route('responsables') }}" class="btn btn-primary">Responsables</span></a>
+                    <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">Responsables</span></a>
                 </td>
             </tr>
         @endforeach

@@ -4,6 +4,14 @@ var band2=0;
 var bandSub=0;
 var obj;
 
+/* Abrimos  y cerramos el menu desde el checkbox */
+$('#check').click(function(){
+    /* Velidamos si no esta seleccionado nuestro checkbox */
+    if(!$('input#check').is(':checked')){
+        $('.botMen .subMenu').fadeOut(); //Oculamos los submenus
+        return true;
+    }
+});
 /*Abre el menu al dar click en cualquier link del menu*/
 $('.botMen').click(function() {
     //Abre el menu
