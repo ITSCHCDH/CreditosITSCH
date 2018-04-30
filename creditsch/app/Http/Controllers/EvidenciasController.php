@@ -52,10 +52,9 @@ class EvidenciasController extends Controller
     public function store(EvidenciasRequest $request)
     {
         //Guarda la evidencia
-<<<<<<< HEAD
+
     //    dd($request);
-=======
-        //dd($request);
+      //dd($request);
         $id_actividad_evidencia_consulta = DB::table('actividad_evidencia')->where([
             ['actividad_id','=',$request->id_asig_actividades],
             ['user_id','=',$request->responsable],
@@ -65,7 +64,8 @@ class EvidenciasController extends Controller
             return back()->withInput();
         }
         //dd($id_actitidad_evidencia_consulta);
->>>>>>> 5f889afd896f2facd157f22df3336d8a6c222eaf
+
+
         //Manipulacion de imagenes
         if($request->file('image'))//Validamos si existe una imagen
         {
