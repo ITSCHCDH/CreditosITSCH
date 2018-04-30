@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Participante; //Es el nombre del modelo con el que va a trabajar el controlador
 use Laracasts\Flash\Flash; //Es el paquete para poder usar los mensajes de alerta tipo bootstrap
 use App\Actividad;
+use App\Evidencia;
 use Illuminate\Support\Facades\DB;
 class ParticipantesController extends Controller
 {
@@ -33,9 +34,21 @@ class ParticipantesController extends Controller
             $id_evidencia=$par->id_evidencia;
             break;
         }
+        $id_evidencia=Evidencia::select('id_asig_actividades')->where('id_asig_actividades',"=",$id)->get();
+        //$id_evidencia=$id_evidencia->id_asig_actividades;
+        $cont=0;
+        foreach ($id_evidencia as $key) {
+            $id_evidencia=$key->id_asig_actividades;
+            $cont=1;
+            break;
+        }
+        //dd($id_evidencia);
+        if($cont==0){
+            $id_evidencia=-1;
+        }
         $participantes->id_actividad=$id_actividad;
         //dd($participantes);
-        $collection = collect(Actividad::select('id','nombre')->orderBy('nombre','ASC')->get();
+        $collection = collect(Actividad::select('id','nombre')->orderBy('nombre','ASC')->get());
         $actividades = $collection->pluck('nombre','id');
         $actividades->all();
         //Retorna la vista de Agregar participantes
@@ -61,8 +74,9 @@ class ParticipantesController extends Controller
     public function store(Request $request)
     {
         //Validamos si la id evidencia existe en caso contrario se regresa a la pestaña anterior
+        //dd($request);
         if($request->id_evidencia==-1){
-            Flash::error('no puedes registrar participantes sin evidencia');
+            Flash::error('No puedes registrar participantes sin evidencia');
             return back()->withInput();
         }
         // Validamos si el numero de control existe

@@ -18,7 +18,7 @@
 
     <div class="form-group">
         {!! Form::label('responsable','Responsable de la actividad') !!}
-        {!! Form::text('responsable',null,['class'=>'form-control','placeholder'=>'Responsable de la actividad','required']) !!}
+        {!! Form::select('responsable',$responsables,null,['class'=>'form-control select-category','placeholder'=>'Responsable de la actividad','required']) !!}
     </div>
 
     <div class="form-group">
@@ -27,8 +27,8 @@
     </div>
 
     <div class="form-group">
-        {!! Form::label('id_nom_actividad','Actividad a la que pertenece la evidencia') !!}
-        {!! Form::select('id_nom_actividad',$actividad,null,['class'=>'form-control select-category','placeholder'=>'Selecciona una actividad','required']) !!}
+        {!! Form::label('id_asig_actividades','Actividad a la que pertenece la evidencia') !!}
+        {!! Form::select('id_asig_actividades',$actividad,null,['class'=>'form-control select-category','placeholder'=>'Selecciona una actividad','required']) !!}
     </div>
 
     <div class="form-group">

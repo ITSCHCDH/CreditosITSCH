@@ -33,9 +33,11 @@ class EvidenciasController extends Controller
         //Ponemos el codigo de la vista que se llamara para las altas de los creditos
         $usuarios=User::orderBy('name','asc')->pluck('name','id');//Traemos todas las categorias que existen en la bd
         $actividad=Actividad::orderBy('nombre','asc')->pluck('nombre','id');//Traemos todas las actividades
+        /**********************************************************************************/
+        $responsables=User::select('name','id')->orderBy('name')->pluck('name','id');
         return view('admin.evidencias.create')
             ->with('usuarios',$usuarios)
-            ->with('actividad',$actividad);
+            ->with('actividad',$actividad)->with('responsables',$responsables);
     }
 
     /**
@@ -47,7 +49,7 @@ class EvidenciasController extends Controller
     public function store(EvidenciasRequest $request)
     {
         //Guarda la evidencia
-
+        //dd($request);
         //Manipulacion de imagenes
         if($request->file('image'))//Validamos si existe una imagen
         {
