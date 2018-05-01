@@ -8,6 +8,7 @@ use App\User;
 use App\Actividad;
 use App\Http\Requests\EvidenciasRequest;
 use Laracasts\Flash\Flash; //Es el paquete para poder usar los mensajes de alerta tipo bootstrap
+use Illuminate\Support\Facades\DB;
 
 class EvidenciasController extends Controller
 {
@@ -50,6 +51,15 @@ class EvidenciasController extends Controller
     {
         //Guarda la evidencia
         //dd($request);
+        $id_actividad_evidencia_consulta = DB::table('actividad_evidencia')->where([
+            ['actividad_id','=',$request->id_asig_actividades],
+            ['user_id','=',$request->responsable],
+        ])->get();
+        if($id_actividad_evidencia_consulta->count()==0){
+            Flash::error('Error');
+            return back()->withInput();
+        }
+        //dd($id_actitidad_evidencia_consulta);
         //Manipulacion de imagenes
         if($request->file('image'))//Validamos si existe una imagen
         {
@@ -62,13 +72,21 @@ class EvidenciasController extends Controller
             //Guardamos la imagen en la carpeta creada en la ruta que marcamos anteriormente
             $file->move($path,$name);
         }
-
+        //dd($id_actividad_evidencia_consulta);
+        $id_actividad_evidencia=-1;
+        foreach ($id_actividad_evidencia_consulta as $key) {
+            $id_actividad_evidencia=$key->id;
+            break;
+        }
+        ///dd($id_actividad_evidencia);
+        
         $evidencia=new Evidencia($request->all()); //Obtiene todos los datos de la evidencia de la vista create
+        $evidencia->id_asig_actividades=$id_actividad_evidencia;
         $evidencia->nom_imagen=$name;//Obtiene el nombre de la imagen para guardarlo en la bd
         $evidencia->save();//Guarda la evidencia en su tabla
 
         Flash::success('El articulo '.$evidencia->nombre.' se guardo con exito');
-        return redirect()->route('evidencias.index');
+        return redirect()->route('participantes.index');
     }
 
     /**

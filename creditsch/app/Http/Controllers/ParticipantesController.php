@@ -79,6 +79,7 @@ class ParticipantesController extends Controller
             Flash::error('No puedes registrar participantes sin evidencia');
             return back()->withInput();
         }
+
         // Validamos si el numero de control existe
         $valida = collect(DB::table('alumnos')->where('no_control','=',$request->no_control)->get());
         if($valida->count()==0){
