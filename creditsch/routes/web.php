@@ -62,7 +62,9 @@ Route::group(['prefix'=>'admin'],function(){
         'uses'=>'ActividadesController@destroy',
         'as'=> 'admin.actividades.destroy'
     ]);
-
+    //Ruta y metodo para la peticion al servidor mediante Ajax, el cual tendra como funcion consultar los participantes asignado a una evidencia
+    Route::get('participantes/peticion','ParticipantesController@peticionAjax')->name('participantes.peticion');
+    Route::post('participantes/guardar','ParticipantesController@ajaxGuardar')->name('participantes.guardar');
     /****Rutas para el controlador de participantes*****/
     Route::resource('participantes','ParticipantesController');
 
@@ -72,6 +74,8 @@ Route::group(['prefix'=>'admin'],function(){
         'as'=> 'admin.participantes.destroy'
     ]);
 
+    //Ruta y metodo para las peticiones al servidor mediante Ajax
+    Route::get('evidencias/peticion','EvidenciasController@peticionAjax')->name('evidencias.peticion');
     /****Rutas para el controlador de evidencias*****/
     Route::resource('evidencias','EvidenciasController');
 
@@ -86,6 +90,10 @@ Route::group(['prefix'=>'admin'],function(){
         'uses'=>'Actividad_EvidenciasController@destroy',
         'as'=> 'actividad_evidencias.destroy'
     ]);
+    Route::get('verifica_evidencia/descargar/{archivo}','VerificaEvidenciaController@descargar')->name('verifica_evidencia.descarga');
+    Route::get('verifica_evidencia/visualizar/{archivo}','VerificaEvidenciaController@visualizar')->name('verificar_evidencia.visualizar');
+    Route::get('verifica_evidencia/avance_alumno','VerificaEvidenciaController@avanceAlumno')->name('verifica_evidencia.avance_alumno');
+    Route::resource('verifica_evidencia','VerificaEvidenciaController');
 });
 /******************************/
 

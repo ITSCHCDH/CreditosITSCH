@@ -1,13 +1,13 @@
 <!-- Tabla para mostrar los partipantes, se hizo de esta manera para posteriormente actualizarla
     con JQuery o Ajax -->
-<thead id="mitabla">
+<thead>
     <th>ID</th>
     <th>Numero de Control</th>
     <th>Nombre</th>
     <th>Carrera</th>
     <th>Accion</th>
 </thead>
-<tbody id="mitabla">
+<tbody>
     @foreach($participantes as $par)
     <tr>
         <td>{{$par->id}}</td>

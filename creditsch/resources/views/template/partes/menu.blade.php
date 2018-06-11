@@ -1,5 +1,5 @@
 <!-- Menu del sistema -->
-<nav class="menu">
+<nav class="menu" id="idMenu">
     <ul>
         <li class="botMen">
             <a class="etMenu" href="/home">
@@ -49,12 +49,18 @@
         <li class="botMen">
             <a class="etMenu" href="" data-parent="">
                 <i class="fa fa-pie-chart"></i>
-                <span class="spaMenu">Avance</span>
+                <span class="spaMenu">Avances</span>
                 <i class="fa fa-chevron-right flesub"></i>
             </a>
             <ul class="subMenu" id="">
                 <li class='tamSubMenu'>
-                    <a class="etSubMenu" href="#">
+                    <a class="etSubMenu" href="{{ route('verifica_evidencia.avance_alumno') }}">
+                        <i class="fa fa-calendar-check-o"></i>
+                        <span class="etSubMenu">Avance</span>
+                    </a>
+                </li>
+                <li class='tamSubMenu'>
+                    <a class="etSubMenu" href="{{ route('verifica_evidencia.index') }}">
                         <i class="fa fa-calendar-check-o"></i>
                         <span class="etSubMenu">Verificar evidencia</span>
                     </a>
@@ -96,10 +102,14 @@
             </ul>
         </li>
         <li class="botMen">
-            <a class="etMenu" href="#">
+            <a class="etMenu" href="{{ route('logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <i class="fa fa-fw fa-sign-out"></i>
                 <span class="spaMenu">Cerrar sesión </span>
             </a>
+            <!-- Creamos el formulario en orden para poder cerrar sesion -->
+            <form id="logout-form" action="{{ route('logout')}}" method="POST" style="display: none;">
+                {{ csrf_field() }}
+            </form>
         </li>
     </ul>
 </nav>

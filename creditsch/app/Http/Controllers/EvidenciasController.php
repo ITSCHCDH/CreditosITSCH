@@ -9,6 +9,7 @@ use App\Actividad;
 use App\Http\Requests\EvidenciasRequest;
 use Laracasts\Flash\Flash; //Es el paquete para poder usar los mensajes de alerta tipo bootstrap
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
 class EvidenciasController extends Controller
 {
@@ -28,17 +29,27 @@ class EvidenciasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         //$evidencia->user_id=\Auth::user()->id;//Obtiene el id del usuario que esta logueado
         //Ponemos el codigo de la vista que se llamara para las altas de los creditos
-        $usuarios=User::orderBy('name','asc')->pluck('name','id');//Traemos todas las categorias que existen en la bd
-        $actividad=Actividad::orderBy('nombre','asc')->pluck('nombre','id');//Traemos todas las actividades
-        /**********************************************************************************/
-        $responsables=User::select('name','id')->orderBy('name')->pluck('name','id');
+        $dommie_actividad = new Actividad();
+        $dommie_actividad->nombre = 'Actividad actualmente no disponible';
+        $dommie_actividad->id=-1;
+        $dommie_responsable = new User();
+        $dommie_responsable->name = 'Actualmente no disponible';
+        $dommie_responsable->id=-1;
+        $usuarios = User::select('name','id')->get()->pluck('name','id');
+        $responsable = User::select('id','name')->where('id','=',$request->id_responsable)->get();
+        $actividad = Actividad::select('id','nombre')->where('id','=',$request->id_actividad)->get();
+        if($actividad->count()==0 || $responsable->count()==0){
+            Flash::error('No actividad o responsable seleccinado');
+            return redirect()->route('participantes.index');
+        }
         return view('admin.evidencias.create')
-            ->with('usuarios',$usuarios)
-            ->with('actividad',$actividad)->with('responsables',$responsables);
+            ->with('responsable',$responsable[0])
+            ->with('actividad',$actividad[0])
+            ->with('usuarios',$usuarios);
     }
 
     /**
@@ -49,17 +60,32 @@ class EvidenciasController extends Controller
      */
     public function store(EvidenciasRequest $request)
     {
-        //Guarda la evidencia
         //dd($request);
-        $id_actividad_evidencia_consulta = DB::table('actividad_evidencia')->where([
+        if($request->hasFile('image')){
+            // Creamos un arrelglo con las extemsiones validas
+            $allowedfileExtension=['pdf','jpg','png','jpeg'];
+             
+            $file = $request->file('image');
+            // Obtenmos la exetnsion original del archivo
+            $extension = $file->getClientOriginalExtension();
+            // Funcion para saber si la extension se encuentra dentro de las extensiones permitidas
+            $check=in_array($extension,$allowedfileExtension);
+            if(!$check){
+                Flash::error('Formato de archivo no valido');
+                return back()->withInput();
+            }
+        }
+        $id_actividad_evidencia = DB::table('actividad_evidencia')->where([
             ['actividad_id','=',$request->id_asig_actividades],
-            ['user_id','=',$request->responsable],
-        ])->get();
-        if($id_actividad_evidencia_consulta->count()==0){
-            Flash::error('Error');
+            ['user_id','=',$request->responsables],
+        ])->select('id')->get();
+        //Consulta para averiguar con cuantas evidencias cuenta la actividad
+        $evidencia_duplicada = DB::table('evidencia')->where('id_asig_actividades','=',$id_actividad_evidencia[0]->id)->get();
+        //Validamos que no haya evidencia guardada previamente
+        if($evidencia_duplicada->count()>=1){
+            Flash::error('Actualmente ya se cuenta con la evidencia de la actividad');
             return back()->withInput();
         }
-        //dd($id_actitidad_evidencia_consulta);
         //Manipulacion de imagenes
         if($request->file('image'))//Validamos si existe una imagen
         {
@@ -72,21 +98,21 @@ class EvidenciasController extends Controller
             //Guardamos la imagen en la carpeta creada en la ruta que marcamos anteriormente
             $file->move($path,$name);
         }
-        //dd($id_actividad_evidencia_consulta);
-        $id_actividad_evidencia=-1;
-        foreach ($id_actividad_evidencia_consulta as $key) {
-            $id_actividad_evidencia=$key->id;
-            break;
-        }
-        ///dd($id_actividad_evidencia);
         
         $evidencia=new Evidencia($request->all()); //Obtiene todos los datos de la evidencia de la vista create
-        $evidencia->id_asig_actividades=$id_actividad_evidencia;
+        $evidencia->id_asig_actividades=$id_actividad_evidencia[0]->id;
         $evidencia->nom_imagen=$name;//Obtiene el nombre de la imagen para guardarlo en la bd
         $evidencia->save();//Guarda la evidencia en su tabla
 
         Flash::success('El articulo '.$evidencia->nombre.' se guardo con exito');
         return redirect()->route('participantes.index');
+    }
+
+    public function peticionAjax(Request $request){
+        //Consultamos todos los responsables asignadoas a una activdad
+        $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->id)->select('u.id','u.name')->orderBy('u.name')->get();
+        //Retornamos los responsables en un json
+        return response()->json($responsables);
     }
 
     /**

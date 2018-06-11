@@ -4,14 +4,6 @@ var band2=0;
 var bandSub=0;
 var obj;
 
-/* Abrimos  y cerramos el menu desde el checkbox */
-$('#check').click(function(){
-    /* Velidamos si no esta seleccionado nuestro checkbox */
-    if(!$('input#check').is(':checked')){
-        $('.botMen .subMenu').fadeOut(); //Oculamos los submenus
-        return true;
-    }
-});
 /*Abre el menu al dar click en cualquier link del menu*/
 $('.botMen').click(function() {
     //Abre el menu
@@ -75,9 +67,11 @@ $('li li').click(function() {
 $('#menu').click(function() {
     if (band == 0)
     {
+        $('#check').prop('checked',true);
         $('.spaMenu').css('visibility', 'visible');//Muestra el texto de los menus
         $('.flesub').css('visibility', 'visible');//Muestra las flechas de los menus que tienen submenus
         band=1;
+        return false;
     }
     else
     {
@@ -118,3 +112,18 @@ $('.dropdown').click(function() {
     }
 });
 
+$(document).click(function(evt){
+    //Cerramos el menu, dando clic en todo menos en los links,botones,submits,etc...
+    if(evt.target.id=="idMenu" || evt.target.if=="menu" || $(evt.target).closest('a').length || $(evt.target).closest('button').length || $(evt.target).closest('input').length){
+        return;
+    }
+    $('#check').prop('checked',false);//Cierra el menu
+    $('.spaMenu').css('visibility', 'hidden');//Oculta el texto de los menus
+    $('.flesub').css('visibility', 'hidden');//Oculta las flechas de los menus que tienen submenus
+    $(this).children('ul').fadeToggle();//Cierra los submenus en caso de que el elemento los tenga
+    $('.botMen .subMenu').fadeOut(); //Ocultamos todos los menus y submenus
+    band=0; //Menu cerrado
+    bandSub=0;
+    window.open($(this).children('a').prop('href'),'_self');
+    return false;
+});

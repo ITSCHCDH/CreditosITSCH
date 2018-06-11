@@ -1,5 +1,5 @@
 <!-- Tabla para los mensajes de alerta y busqueda -->
-<div class="table-responsive alertas" id="tabAlertas">
+<div class="table-responsive alertas" id="tabAlertas"> 
     <table class="table">
         <thead>
         <tr>
@@ -107,7 +107,7 @@
                 </form>
             </td>
             <td>
-                <!-- Menu para cerrar la sesion-->
+                <!-- Menu para cerrar la sesion--> 
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -115,7 +115,12 @@
                         {{ Auth::user()->name }}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">Cerrar sesión</a>
+                        <!-- Agregamos la ruta para poder iniciar sesion -->
+                        <a class="dropdown-item" href="{{ route('logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar sesión</a>
+                        <!-- Creamos el formularios en orden para que nos podramos cerrar sesion -->
+                        <form id="logout-form" action="{{ route('logout')}}" method="POST" style="display: none;">
+                            {{ csrf_field() }}
+                        </form>
                     </div>
                 </li>
 

@@ -1,10 +1,11 @@
-<!doctype html>
+<!doctype html> 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Inicio|@yield('title','Default')</title>
     <link rel="stylesheet" href="{{asset('menu/fontello.css')}}">
     <link rel="stylesheet" href="{{asset('cssMenu/estilos.css')}}">
@@ -68,8 +69,6 @@
     <!-- Incluye el pie de pagina en el sistema -->
     @include('template.partes.pie')
 
-
-
     <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
     <script src="{{asset('complementos/js/bootstrap.js')}}"></script>
     <script src="{{asset('js2/js2.js')}}"> </script>
@@ -79,7 +78,6 @@
     </script>
     <!-- Paquete para los mensajes tipo bootstrap, para notificaciones en formularios -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-
-
+    @yield('js')
 </body>
 </html>

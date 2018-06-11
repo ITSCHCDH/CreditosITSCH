@@ -4,7 +4,7 @@
 
 @section('ruta')
     <a href="{{route('evidencias.index')}}"> Evidencias </a>
-    /
+    
     <label class="label label-success"> Altas</label>
 @endsection
 
@@ -13,22 +13,25 @@
 
     <div class="form-group">
         {!! Form::label('status','Estatus') !!}
-        {!! Form::select('status',[''=>'Seleccione un elemento',0=>'Pendiente',1=>'Liberado'],null,['class'=>'form-control']) !!}
+        {!! Form::select('status',[''=>'Seleccione un estatus',0=>'Pendiente',1=>'Liberado'],null,['class'=>'form-control']) !!}
     </div>
 
     <div class="form-group">
-        {!! Form::label('responsable','Responsable de la actividad') !!}
-        {!! Form::select('responsable',$responsables,null,['class'=>'form-control select-category','placeholder'=>'Responsable de la actividad','required']) !!}
+        {!! Form::label('id_asig_actividades','Actividad a la que pertenece la evidencia') !!}
+        {!! Form::hidden('id_asig_actividades',$actividad->id) !!}
+        {!! Form::text('id_asig_activi',$actividad->nombre,['class' => 'form-control','required','readonly']) !!}
+    </div>
+
+    <div class="form-group">
+        {!! Form::label('responsables','Responsable de la actividad') !!}
+        {!! Form::hidden('responsables',$responsable->id) !!}
+        {!! Form::text('resp',$responsable->name,['class' => 'form-control', 'required','readonly']) !!}
+
     </div>
 
     <div class="form-group">
         {!! Form::label('valida','Nombre del quien valida la evidencia') !!}
         {!! Form::select('valida',$usuarios,null,['class'=>'form-control select-category','placeholder'=>'Selecciona un validador','required']) !!}
-    </div>
-
-    <div class="form-group">
-        {!! Form::label('id_asig_actividades','Actividad a la que pertenece la evidencia') !!}
-        {!! Form::select('id_asig_actividades',$actividad,null,['class'=>'form-control select-category','placeholder'=>'Selecciona una actividad','required']) !!}
     </div>
 
     <div class="form-group">
@@ -39,9 +42,6 @@
     <div class="form-group">
         {!! Form::submit('Registrar',['class'=>'btn btn-primary']) !!}
     </div>
-
-
     {!! Form::close() !!}
-
 
 @endsection

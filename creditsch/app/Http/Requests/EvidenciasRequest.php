@@ -24,9 +24,8 @@ class EvidenciasRequest extends FormRequest
     public function rules()
     {
         return [
-            'responsable'=>'required',
+            'responsables'=>'required',
             'valida'=>'required',
-            'image'=>'image|required'
         ];
     }
 }
