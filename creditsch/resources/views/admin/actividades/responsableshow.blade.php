@@ -3,14 +3,16 @@
 @section('title','Actividades')
 
 @section('ruta')
-    <label class="label label-success"> Actividades</label>
+    <a href="{{route('actividades.index')}}">Actividades</a>
+    /
+    <label class="label label-success">Responsables</label>
 @endsection
 
 @section('contenido')
     <a href="{{route('responsables.index',$actividad->id)}}" class="btn btn-info">Asignar Responsables</a>
     <!--BUSCADOR DE ARTICULOS  -->
     <!-- Boton de busqueda en la pagina -->
-    {!! Form::open(['route'=>'actividades.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right']) !!}
+    {!! Form::open(['route'=>['responsables',$actividad->id],'method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right']) !!}
 
         <div class="input-group">
             {!! Form::text('nombre',null,['class'=>'form-control','placeholder'=>'Buscar.....','aria-describedby'=>'search']) !!}

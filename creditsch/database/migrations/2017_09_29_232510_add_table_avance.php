@@ -18,7 +18,6 @@ class AddTableAvance extends Migration
             $table->string('no_control',20);
             $table->integer('id_credito')->unsigned();
             $table->integer('por_credito');
-
             $table->foreign('no_control')->references('no_control')->on('alumnos');
             $table->foreign('id_credito')->references('id')->on('creditos');
 

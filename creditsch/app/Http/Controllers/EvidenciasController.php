@@ -10,7 +10,8 @@ use App\Http\Requests\EvidenciasRequest;
 use Laracasts\Flash\Flash; //Es el paquete para poder usar los mensajes de alerta tipo bootstrap
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
-
+use PDF;
+use Illuminate\Support\Facades\Storage;
 class EvidenciasController extends Controller
 {
     /**
@@ -20,8 +21,9 @@ class EvidenciasController extends Controller
      */
     public function index()
     {
-        //Llama al index de evidencias
-        return view('admin.evidencias.index');
+        $actividades = Actividad::select('nombre','id')->orderBy('nombre')->pluck('nombre','id');
+        return view('admin.evidencias.index')
+        ->with('actividades',$actividades);
     }
 
     /**
@@ -60,14 +62,16 @@ class EvidenciasController extends Controller
      */
     public function store(EvidenciasRequest $request)
     {
-        //dd($request);
+        if(!Storage::has('public/evidencias')){
+            Storage::makeDirectory('public/evidencias');
+        }
+        $actividad = Actividad::where('id','=',$request->actividad_id)->get();
         if($request->hasFile('image')){
             // Creamos un arrelglo con las extemsiones validas
             $allowedfileExtension=['pdf','jpg','png','jpeg'];
-             
             $file = $request->file('image');
             // Obtenmos la exetnsion original del archivo
-            $extension = $file->getClientOriginalExtension();
+            $extension = strtolower($file->getClientOriginalExtension());
             // Funcion para saber si la extension se encuentra dentro de las extensiones permitidas
             $check=in_array($extension,$allowedfileExtension);
             if(!$check){
@@ -76,16 +80,10 @@ class EvidenciasController extends Controller
             }
         }
         $id_actividad_evidencia = DB::table('actividad_evidencia')->where([
-            ['actividad_id','=',$request->id_asig_actividades],
+            ['actividad_id','=',$request->actividad_id],
             ['user_id','=',$request->responsables],
         ])->select('id')->get();
-        //Consulta para averiguar con cuantas evidencias cuenta la actividad
-        $evidencia_duplicada = DB::table('evidencia')->where('id_asig_actividades','=',$id_actividad_evidencia[0]->id)->get();
-        //Validamos que no haya evidencia guardada previamente
-        if($evidencia_duplicada->count()>=1){
-            Flash::error('Actualmente ya se cuenta con la evidencia de la actividad');
-            return back()->withInput();
-        }
+
         //Manipulacion de imagenes
         if($request->file('image'))//Validamos si existe una imagen
         {
@@ -94,7 +92,11 @@ class EvidenciasController extends Controller
             //Para evitar nombres repetidos en las imagenes, creamos un nombre antes de guardar
             $name='credITSCH_'.time().'.'.$file->getClientOriginalExtension();
             //Generamos la ruta donde se guardaran las imagenes de los articulos
-            $path=public_path().'/images/evidencias/';
+            $path=storage_path().'/app/public/evidencias/'.$actividad[0]->nombre.'/';
+            $path_to_verify = 'public/evidencias/'.$actividad[0]->nombre;
+            if(!Storage::has($path_to_verify)){
+                Storage::makeDirectory($path_to_verify);
+            }
             //Guardamos la imagen en la carpeta creada en la ruta que marcamos anteriormente
             $file->move($path,$name);
         }
@@ -103,14 +105,13 @@ class EvidenciasController extends Controller
         $evidencia->id_asig_actividades=$id_actividad_evidencia[0]->id;
         $evidencia->nom_imagen=$name;//Obtiene el nombre de la imagen para guardarlo en la bd
         $evidencia->save();//Guarda la evidencia en su tabla
-
         Flash::success('El articulo '.$evidencia->nombre.' se guardo con exito');
         return redirect()->route('participantes.index');
     }
 
     public function peticionAjax(Request $request){
         //Consultamos todos los responsables asignadoas a una activdad
-        $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->id)->select('u.id','u.name')->orderBy('u.name')->get();
+        $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->select('u.id','u.name')->orderBy('u.name')->get();
         //Retornamos los responsables en un json
         return response()->json($responsables);
     }
@@ -158,5 +159,24 @@ class EvidenciasController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function peticionGaleria(Request $request){
+        if($request->has('responsable_id') && $request->has('actividad_id')){
+            if($request->get('responsable_id')=='nulo'){
+                $evidencias = DB::table('evidencia as e')->join('actividad_evidencia as ae',function($join) use($request){
+                    $join->on('ae.id','=','e.id_asig_actividades');
+                    $join->where('ae.actividad_id','=',$request->get('actividad_id'));
+                })->join('users as u','u.id','=','ae.user_id')->join('actividad as a','a.id','=','ae.actividad_id')->select('e.nom_imagen','e.created_at','u.name as responsable_nombre','a.nombre as actividad_nombre')->get();
+                return response()->json($evidencias);
+            }
+            $evidencias = DB::table('users')->join('actividad_evidencia as ae',function($join) use($request){
+                $join->where('ae.user_id','=',$request->get('responsable_id'));
+                $join->where('ae.actividad_id','=',$request->get('actividad_id'));
+                $join->where('users.id','=',$request->get('responsable_id'));
+            })->join('actividad as a','a.id','=','ae.actividad_id')->join('evidencia as e','e.id_asig_actividades','=','ae.id')->select('users.name as responsable_nombre','a.nombre as actividad_nombre','e.nom_imagen','e.created_at')->get();
+            return response()->json($evidencias);
+        }
+        return response()->json(0);
     }
 }

@@ -3,8 +3,8 @@
 @section('title','Evidencias')
 
 @section('ruta')
-    <a href="{{route('evidencias.index')}}"> Evidencias </a>
-    
+    <a href="{{route('participantes.index')}}"> Participantes </a>
+    /
     <label class="label label-success"> Altas</label>
 @endsection
 
@@ -17,8 +17,8 @@
     </div>
 
     <div class="form-group">
-        {!! Form::label('id_asig_actividades','Actividad a la que pertenece la evidencia') !!}
-        {!! Form::hidden('id_asig_actividades',$actividad->id) !!}
+        {!! Form::label('actividad_id','Actividad a la que pertenece la evidencia') !!}
+        {!! Form::hidden('actividad_id',$actividad->id) !!}
         {!! Form::text('id_asig_activi',$actividad->nombre,['class' => 'form-control','required','readonly']) !!}
     </div>
 

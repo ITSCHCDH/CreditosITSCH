@@ -4,11 +4,12 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     use Notifiable;
-
+    use HasRoles;
     /**
      * The attributes that are mass assignable.
      *
@@ -16,7 +17,7 @@ class User extends Authenticatable
      */
     protected $table ="users";
     protected $fillable = [
-        'name', 'email', 'password','area',
+        'name', 'email', 'password','area','active',
     ];
 
     /**
@@ -31,5 +32,13 @@ class User extends Authenticatable
     public function actividades(){
         return $this->belongsToMany('App\Actividad')->withTimestamps();
     }
-    
+    //Relacion uno a muchos un usuario puede crear muchas actividades pero una actividad solo puede tener un creador
+    public function actividadesCreadas(){
+        return $this->hasMany('App\Actividad','id','id_user');
+    }
+    //Crea el bucador de actividades (Scope)
+    public function scopeSearch($query,$valor)
+    {
+        return $query->where('name','LIKE',"%$valor%");
+    }
 }

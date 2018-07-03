@@ -9,7 +9,9 @@ class Actividad extends Model
     //Nombre de la tabla
     protected $table="actividad";
     //Datos visibles para los objetos json
-    protected $fillable=['nombre','por_cred_actividad','id_actividad'];
+    protected $fillable=[
+        'nombre','por_cred_actividad','id_actividad','id_user','alumnos'
+    ];
 
     //Relacion con la tablas de actividad(uno) - evidencia(muchos)
     public function evidencias()
@@ -29,8 +31,12 @@ class Actividad extends Model
     {
         return $query->where('nombre','LIKE',"%$nombre%");
     }
-    //Relacion mucho a muchos una actividad puede terner mucho responsables y un resposables puede tener muchas acctividades
+    //Relacion mucho a muchos una actividad puede terner mucho responsables y un resposables puede tener muchas actividades
     public function users(){
         return $this->belongsToMany('App\User','actividad_evidencia')->withTimestamps();
+    }
+    //Relacion muchos a uno un usuario puede tener muchas actividades creadas pero un actividad solo puede tener un creador
+    public function creador(){
+        return $this->belongsTo('App\User','id_user');
     }
 }

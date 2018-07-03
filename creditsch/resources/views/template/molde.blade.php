@@ -9,7 +9,9 @@
     <title>Inicio|@yield('title','Default')</title>
     <link rel="stylesheet" href="{{asset('menu/fontello.css')}}">
     <link rel="stylesheet" href="{{asset('cssMenu/estilos.css')}}">
-
+    <link rel="stylesheet" type="text/css" href="{{ asset('cssReportes/reportes.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('cssAutocompletar/autocompletar.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('plugins/cssTable/jquery.dataTables.min.css') }}">
     <!-- Custom fonts for this template-->
     <link href="{{asset('plugins/vendorTem/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet">
     <!-- Custom styles for this template-->
@@ -20,7 +22,7 @@
 </head>
 <body>
         <!-- Seccion de menu del sistema, mensajes de alerta y elementos de busqueda -->
-        <div class="content-all" >
+        <div class="content-all" style="position: relative; z-index: 999 !important;">
             <header>
             </header>
             <input type="checkbox" id="check">
@@ -39,8 +41,8 @@
 
             <!-- Incluye el menu al sistema -->
             @include('template.partes.menu')
-        </div>
 
+        </div>
         <!--Contenido principal del sistema  -->
         <main id="cuerpo">
             <!--Div para el contenido de todo el sistema -->
@@ -72,6 +74,7 @@
     <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
     <script src="{{asset('complementos/js/bootstrap.js')}}"></script>
     <script src="{{asset('js2/js2.js')}}"> </script>
+    <script  src="{{ asset('plugins/jsTable/jquery.dataTables.min.js') }}"></script>
     <!-- Script para ocultar los mensajes de Flash -->
     <script>
         $('div.alert').not('.alert-important').delay(3000).fadeOut(300);

@@ -24,7 +24,7 @@ class Alumno extends Model
         return $this->hasMany('App\Avance');
     }
 
-    //Crea el bucador de actividades (Scope)
+    //Crea el buscador de actividades (Scope)
     public function scopeSearch($query,$valor)
     {
         return $query->where('nombre','LIKE',"%$valor%")->orwhere('no_control','LIKE',"%$valor%")->orwhere('carrera','LIKE',"%$valor%");

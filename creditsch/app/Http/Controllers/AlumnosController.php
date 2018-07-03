@@ -88,7 +88,7 @@ class AlumnosController extends Controller
         $alumno->no_control=$request->no_control;
         $alumno->nombre=$request->nombre;
         $alumno->carrera=$request->carrera;
-        $alumno->password=$request->password;
+        $alumno->password=bcrypt($request->password);
         $alumno->status=$request->status;
         $alumno->save();
         Flash::warning('El alumno '. $alumno->nombre .' a sido editado de forma exitosa');//Envia mensaje

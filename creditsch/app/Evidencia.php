@@ -14,7 +14,7 @@ class Evidencia extends Model
     //Relacion con la tablas de evidencia(uno) a participante(muchos)
     public function participantes()
     {
-        return $this->hasMany('App\Participante');
+        //return $this->hasMany('App\Participante');
     }
 
     //Relacion con la tablas de actividad(uno) a evidencia(muchos)

@@ -2,6 +2,7 @@
 var band=0;
 var band2=0;
 var bandSub=0;
+var bandSub2=0;
 var obj;
 
 /*Abre el menu al dar click en cualquier link del menu*/

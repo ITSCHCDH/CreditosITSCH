@@ -18,9 +18,9 @@ class Participante extends Model
     }
 
     //Relacion de la tabla evidencia(uno)-participante(muchos)
-    public function evidencia()
+    public function evidencias()
     {
-        return $this->belongsTo('App\Evidencia');
+        //return $this->belongsToMany('App\Evidencia');
     }
 
     //Crea el bucador de participantes (Scope)

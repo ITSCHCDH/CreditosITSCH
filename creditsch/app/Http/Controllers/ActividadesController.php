@@ -6,6 +6,7 @@ use App\Credito;
 use Illuminate\Http\Request;
 use Laracasts\Flash\Flash;
 use App\Actividad;
+use Illuminate\Support\Facades\Auth;
 
 class ActividadesController extends Controller
 {
@@ -49,6 +50,7 @@ class ActividadesController extends Controller
 
 
         $act=new Actividad($request->all()); //Obtiene todos los datos de la vista para guardarlos en la BD
+        $act->id_user = Auth::User()->id;
         $act->save(); //Guarda el articulo en su tabla
 
         Flash::success('La actividad '.$act->nombre.' se registro de forma correcta');
