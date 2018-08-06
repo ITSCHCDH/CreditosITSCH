@@ -23,6 +23,9 @@ class Participante extends Model
         //return $this->belongsToMany('App\Evidencia');
     }
 
+    public function actividad_evidencia(){
+        $this->belongsTo('App\Actividad_Evidencia','id_evidencia','id');
+    }
     //Crea el bucador de participantes (Scope)
     public function scopeSearch($query,$valor)
     {

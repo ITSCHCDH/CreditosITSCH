@@ -15,7 +15,7 @@
     		/
     		<label class="label label-success">Avance alumno</label>
     	</div>
-    	
+
     @else
     	<label class="label label-success">Avance alumno</label>
     @endif

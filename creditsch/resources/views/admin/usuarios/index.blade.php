@@ -1,19 +1,18 @@
 @extends('template.molde')
-
+@section('title','Usuarios')
 @section('ruta')
 	<label class="label label-success">Usuarios</label>
 @endsection
 @section('contenido')
-	<a href="{{ route('usuarios.create')}}" class="btn btn-info">Nuevo Usuario</a>
+	<a href="{{ route('usuarios.create')}}" class="btn btn-primary">Nuevo Usuario</a>
 	<table class="table table-striped" id="tabla-usuarios">
-	    <!-- instancia al archivo table, dentro de este mismo direcctorio -->
 	   <thead>
 	       <th>ID</th>
 	       <th>Nombre</th>
 	       <th>Area</th>
 	       <th>Correo</th>
 	       <th>Activo</th>
-	       <th>Action</th>
+	       <th>Acción</th>
 	   </thead>
 	   <tbody>
 	   	@foreach ($users as $user)
@@ -27,11 +26,18 @@
 	   			@else
 	   				<td>NO</td>
 	   			@endif
-	   			<td>Hola</td>
+	   			<td>
+	   				<a href="{{ route('usuarios.edit',$user->id) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+	   				<a href="{{ route('admin.usuarios.destroy',$user->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+	   				<a href="{{ route('usuarios.asignar_roles',$user->id) }}" class="btn btn-info" style="width: 40px; height: 34px;">
+	   					<img src="{{ asset('images/permissions_icon.png') }}" style="width: 20px; height: 22px;">
+	   				</a>
+	   			</td>
 	   		</tr>
 	   	@endforeach
 	   </tbody>
 	</table>
+	<div style="margin-bottom: 50px;"></div>
 	@section('js')
 		<script type="text/javascript">
 			$(document).ready(function() {

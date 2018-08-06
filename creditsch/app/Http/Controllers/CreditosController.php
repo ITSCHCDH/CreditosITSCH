@@ -5,9 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Credito; //Es el nombre del modelo con el que va a trabajar el controlador
 use Laracasts\Flash\Flash; //Es el paquete para poder usar los mensajes de alerta tipo bootstrap
+use Spatie\Permission\Models\Permission;
 
 class CreditosController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('permission:VIP_SOLO_LECTURA')->only('index');
+        $this->middleware('permission:VIP')->except('index');
+        
+    }
     /**
      * Display a listing of the resource.
      *

@@ -1,5 +1,12 @@
 @extends('template.molde')
 
+@section('title','Usuarios Crear')
+
+@section('ruta')
+	<a href="{{ route('usuarios.index') }}">Usuarios Dashboard</a>
+	/
+	<label class="label label-success">Creación</label>
+@endsection
 @section('contenido')
 
 	<form class="form-horizontal" method="POST" action="{{ route('usuarios.store') }}">
@@ -103,4 +110,5 @@
 	        </div>
 	    </div>
 	</form>
+	<div style = "margin-bottom: 50px;"></div>
 @endsection

@@ -1,64 +1,152 @@
 @extends('template.molde')
 
-@section('title','Actividades')
-
+@section('title','Responsables')
+@section('links')
+    <link rel="stylesheet" type="text/css" href="{{ asset('plugins/checkboxcss/checkbox.css') }}">
+@endsection
 @section('ruta')
-    <a href="{{route('actividades.index')}}">Actividades</a>
-    /
-    <a href="{{route('responsables',$actividad->id)}}">Responsables</a>
-    /
-    <label class="label label-success">Asignar</label>
+    @if ($actividad!=null)
+        <a href="{{route('actividades.index')}}">Actividades</a>
+        /
+        <a href="{{route('responsables',$actividad->id)}}">Responsables</a>
+        /
+        <label class="label label-success">Asignar Responsables</label>
+    @endif
+    
 @endsection
 
 @section('contenido')
-    <!--BUSCADOR DE ARTICULOS  -->
-    <!-- Boton de busqueda en la pagina -->
-    {!! Form::open(['route'=>['responsables.index',$actividad->id],'method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right']) !!}
-
-        <div class="input-group">
-            {!! Form::text('nombre',null,['class'=>'form-control','placeholder'=>'Buscar.....','aria-describedby'=>'search']) !!}
-            <div class="input-group-btn">
-                <button type="submit" class="btn btn-primary"> Buscar
-                      <span class="badge  label label-primary glyphicon glyphicon-search">
-                      </span>
-                </button>
-            </div>
-        </div>
-    {!! Form::close() !!}
-    <!--Nota: Se tiene que agregar el (scope) que es una funcion que se agrega en el modelo y es la encargada de hacer la consulta  -->
-    <!--Fin del boton de busqueda  -->
-    {!! Form::open(['route'=>'actividad_evidencias.store','method'=>'POST'])!!}
-        <input type="hidden" name="actividad_id" value="{{$actividad->id}}">
-        <table class="table table-striped">
-            <thead>
-                <th>Nombre</th>
-                <th>Area</th>
-                <th>Asignar</th>
-            </thead>
-            <tbody>
+    
+    @if ($actividad!=null)
+        <input type="hidden" name="actividad_id" value="{{ $actividad->id }}" id="actividad_id">
+    @endif
+    
+    <table class="table table-striped" id="tabla-responsables">
+        <thead>
+            <th>Nombre</th>
+            <th>Area</th>
+            <th>Asignar</th>
+        </thead>
+        <tbody>
+        @if ($responsables!=null && $actividad!=null)
+            <input type="hidden" name="actividad_id" value="{{ $actividad->id }}" id="actividad_id">
             @foreach($responsables as $res)
                 <tr>
                     <td>
-                        {{$res->name}}
+                        {{$res->usuario_nombre}}
                     </td>
                     <td>
                         {{$res->area}}
                     </td>
                     <td>
                       <label>
-                        @if($res->asignado==null)
-                            <input type="checkbox" name="user_id[]" value="{{$res->user_id}}">
+                        @if($res->actividad_nombre==null)
+                            
+                            @if ($res->active=="false")
+                                <label class="control control--checkbox">
+                                    <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
+                                    <div class="control__indicator"></div>
+                                </label>
+                            @else
+                                <label class="control control--checkbox">
+                                    <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}">
+                                    <div class="control__indicator"></div>
+                                </label>
+                            @endif
                         @else
-                            <input type="checkbox" name="user_id[]" value="{{$res->user_id}}" checked>
+                            @if($res->participantes!=null || $res->evidencias!=null)
+                                <label class="control control--checkbox">
+                                    <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
+                                    <div class="control__indicator"></div>
+                                </label>
+                            @else
+                                <label class="control control--checkbox">
+                                    <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}">
+                                    <div class="control__indicator"></div>
+                                </label>
+                            @endif
+                           
                         @endif
-                        
                       </label>
                     </td>
                 </tr>
             @endforeach
-            </tbody>
-        </table>
-        {!! Form::submit('Aceptar',['class'=>'btn btn-primary']) !!}
-    {!! Form::close()!!}
 
+        @else
+            <tr>
+                <td colspan="3">No se encontraron resultados</td>
+            </tr>
+        @endif
+        
+        </tbody>
+    </table>
+    @if ($responsables!=null && $actividad!=null)
+        <input type="submit" name="" value="Agregar" id="submit-reponsables" class="btn btn-primary">
+    @endif
+    
+    <div style="margin-bottom: 50px;"></div>
+    @section('js')
+        @if ($responsables!=null && $actividad!=null)
+            <script type="text/javascript">
+                $.ajaxSetup( {
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                } );
+                var responsables_array = [];
+                function inicializarArreglo(){
+                    var lista_ya_agregados = document.getElementsByClassName('responsable-agregado');
+                    for (var i = 0; i < lista_ya_agregados.length; i++) {
+                        if(lista_ya_agregados[i].checked){
+                            responsables_array.push(lista_ya_agregados[i].value);
+                        }  
+                    }
+                }
+                function agregarResponsablesArreglo(){
+                    $(document).on('click','.responsable-agregado',function(){
+                        var checkbox = document.getElementById('c'+$(this).attr('value'));
+                        if(checkbox.checked){
+                            responsables_array.push(checkbox.value);
+                        }else{
+                            for (var i = 0; i < responsables_array.length; i++) {
+                                if(responsables_array[i]==$(this).attr('value')){
+                                    responsables_array.splice(i,1);
+                                }
+                            }
+                        }
+                    });
+                }
+                function asignarResponsables(){
+                    $(document).on('click','#submit-reponsables', function(event){
+                        event.preventDefault();
+                        var actividad_id = $('#actividad_id').attr('value');
+                        $.ajax({
+                            type: "post",
+                            dataType: "json",
+                            url: "{{ route('actividad_evidencias.asignar_responsables') }}",
+                            data:{
+                                responsables_id:responsables_array,
+                                actividad_id:actividad_id
+                            },
+                            success: function(response){
+                                console.log(response);
+                                location.href = "{{ route('responsables',$actividad->id) }}"
+                            }, error:function(){
+                                console.log("Error al agregar responsables");
+                            }
+                        });
+                    });
+                }
+                $(document).ready(function(){
+                    inicializarArreglo();
+                    $('#tabla-responsables').DataTable({
+                        "pagingType":"full_numbers"
+                    });
+                    agregarResponsablesArreglo();
+                    asignarResponsables();
+                });
+            </script>
+        @endif
+        
+    @endsection
 @endsection

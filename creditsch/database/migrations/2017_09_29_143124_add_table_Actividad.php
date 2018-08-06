@@ -32,10 +32,13 @@ class AddTableActividad extends Migration
             $table->increments('id');
             $table->integer('actividad_id')->unsigned();
             $table->integer('user_id')->unsigned();
-
+            //Nuevos campos para falicitar el manejo de quien valida y validacion de las evidencias
+            $table->integer('validador_id')->nullable()->unsigned();
+            $table->enum('validado',['true','false'])->default('false');
             //Llaves foraneas de la relacion
             $table->foreign('actividad_id')->references('id')->on('actividad')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('validador_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->timestamps();
         });

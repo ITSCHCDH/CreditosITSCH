@@ -2,6 +2,9 @@
 
 @section('title','Verificar Evidencias')
 
+@section('links')
+	<link rel="stylesheet" type="text/css" href="{{ asset('plugins/checkboxcss/checkbox.css') }}">
+@endsection
 @section('ruta')
     <label class="label label-success">Verificar Evidencias</label>
 @endsection
@@ -9,7 +12,6 @@
 @section('contenido')
 	{!! Form::open(['route' => 'verifica_evidencia.store','method' => 'POST']) !!}
 		<table class="table table-striped" id="tabla_evidencia">
-		    <!-- instancia al archivo table, dentro de este mismo direcctorio -->
 		   <thead>
 		       <th>Actividad</th>
 		       <th>Responsable</th>
@@ -35,10 +37,16 @@
 		   					<input type="hidden" name="id_creditos[]" value="{{ $evi->id_credito }}">
 		   					<input type="hidden" name="array_de_ids[]" value="{{ $evi->actividad_evidencia_id }}">
 		   					<input type="hidden" name="por_cred_actividades[]" value="{{ $evi->por_cred_actividad }}">
-		   					@if($evi->status==0)
-		   						<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado">
+		   					@if($evi->validado=='false')
+	   							<label class="control control--checkbox">
+	   								<input type="checkbox"type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado">
+	   								<div class="control__indicator"></div>
+	   							</label>
 		   					@else
-		   						<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" checked>
+		   						<label class="control control--checkbox">
+		   							<input type="checkbox"type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" checked>
+		   							<div class="control__indicator"></div>
+		   						</label>
 		   					@endif
 		   				</label>
 		   			</td>
@@ -48,13 +56,14 @@
 		</table>
 		{!! Form::submit('Guardar',['class' => 'btn btn-primary','style' =>'margin-bottom:50px;']) !!}
 	{!! Form::close() !!}
+	
+	<div style="margin-bottom: 50px;"></div>
 	@section('js')
 		<script type="text/javascript">
-			
 			$(document).ready(function() {
-			    $('#tabla_evidencia').DataTable( {
+			    $('#tabla_evidencia').DataTable({
 			        "pagingType": "full_numbers"
-			    } );
+			    });
 			} );
 		</script>
 	@endsection

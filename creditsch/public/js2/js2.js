@@ -115,9 +115,10 @@ $('.dropdown').click(function() {
 
 $(document).click(function(evt){
     //Cerramos el menu, dando clic en todo menos en los links,botones,submits,etc...
-    if(evt.target.id=="idMenu" || evt.target.if=="menu" || $(evt.target).closest('a').length || $(evt.target).closest('button').length || $(evt.target).closest('input').length){
+    if(evt.target.id=="idMenu" || evt.target.if=="menu" || $(evt.target).closest('a').length || $(evt.target).closest('button').length || $(evt.target).closest('input').length || $(evt.target).hasClass('subida') || $(evt.target).hasClass('control') || $(evt.target).hasClass('control--checkbox') || $(evt.target).hasClass('control__indicator')){
         return;
     }
+
     $('#check').prop('checked',false);//Cierra el menu
     $('.spaMenu').css('visibility', 'hidden');//Oculta el texto de los menus
     $('.flesub').css('visibility', 'hidden');//Oculta las flechas de los menus que tienen submenus

@@ -39,11 +39,16 @@
                             </div>
                         </div>
 
-                        <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+                        <div class="form-group{{ $errors->has('area') ? ' has-error' : '' }}">
                             <label for="area" class="col-md-4 control-label">Area</label>
 
                             <div class="col-md-6">
-                                <input id="area" type="text" class="form-control" name="area" value="{{ old('area') }}" required>
+                                <select name="area" id="area" class="form-control" required="">
+                                    <option value="">Selecione un area</option>
+                                    @foreach ($carreras as $carrera)
+                                        <option value="{{ $carrera['valor'] }}">{{ $carrera['carrera'] }}</option>
+                                    @endforeach
+                                </select>
 
                                 @if ($errors->has('area'))
                                     <span class="help-block">

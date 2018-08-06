@@ -108,21 +108,37 @@
             </td>
             <td>
                 <!-- Menu para cerrar la sesion--> 
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-fw fa-sign-out"></i>
-                        {{ Auth::user()->name }}
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <!-- Agregamos la ruta para poder iniciar sesion -->
-                        <a class="dropdown-item" href="{{ route('logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar sesión</a>
-                        <!-- Creamos el formularios en orden para que nos podramos cerrar sesion -->
-                        <form id="logout-form" action="{{ route('logout')}}" method="POST" style="display: none;">
-                            {{ csrf_field() }}
-                        </form>
-                    </div>
-                </li>
+                @if (Auth::guard('alumno')->check())
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-fw fa-sign-out"></i>
+                            {{ Auth::guard('alumno')->user()->nombre }}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <!-- Agregamos la ruta para poder iniciar sesion -->
+                            <a class="dropdown-item" href="{{ route('alumnos.logout')}}" onclick="event.preventDefault(); document.getElementById('alumnos-logout-form').submit();">Cerrar sesión</a>
+                            <!-- Creamos el formularios en orden para que nos podramos cerrar sesion -->
+                            <form id="alumnos-logout-form" action="{{ route('alumnos.logout')}}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                            </form>
+                        </div>
+                    </li>
+                @else
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-fw fa-sign-out"></i>
+                            {{ Auth::user()->name }}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <!-- Agregamos la ruta para poder iniciar sesion -->
+                            <a class="dropdown-item" href="{{ route('logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar sesión</a>
+                            <!-- Creamos el formularios en orden para que nos podramos cerrar sesion -->
+                            <form id="logout-form" action="{{ route('logout')}}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                            </form>
+                        </div>
+                    </li>
+                @endif
 
             </td>
         </tr>

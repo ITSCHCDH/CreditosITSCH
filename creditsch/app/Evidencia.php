@@ -22,4 +22,8 @@ class Evidencia extends Model
     {
         return $this->belongsTo('App\Actividad');
     }
+
+    public function actividad_evidencia(){
+        return $this->belongsTo('App\Actividad_Evidencia','id_asig_actividades');
+    }
 }

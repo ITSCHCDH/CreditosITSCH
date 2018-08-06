@@ -70,7 +70,25 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
             'area' => $data['area'],
-            'active' => $data['active'],
         ]);
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showRegistrationForm()
+    {
+        $carreras = [
+            ['carrera' => 'Ing. en Sistemas Computacionales','valor' => 'Sistemas'],
+            ['carrera' => 'Ing. en Nanotecnología', 'valor' => 'Nanotecnología'],
+            ['carrera' => 'Ing. en Mecatrónica','valor' => 'Mecatrónica'],
+            ['carrera' => 'Ing. en Bioquímica','valor' => 'Bioquímica'],
+            ['carrera' => 'Ing. en Tecnologías de la Información y Comunicaciones','valor' =>"TIC's"],
+            ['carrera' => 'Gestión Empresarial','valor' => 'Gestión Empresarial'],
+            ['carrera' => 'Ing. Industrial', 'valor' => 'Industrial']
+        ];
+        return view('auth.register')->with('carreras',$carreras);
     }
 }

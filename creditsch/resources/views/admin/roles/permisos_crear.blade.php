@@ -3,6 +3,8 @@
 @section('title','Roles|Crear')
 
 @section('ruta')
+	<a href="{{ route('roles.index') }}">Roles</a>
+	/
     <label class="label label-success"> Crear Permiso</label>
 @endsection
 

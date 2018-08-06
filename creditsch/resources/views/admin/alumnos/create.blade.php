@@ -24,7 +24,7 @@
 
         <div class="form-group">
            {!! Form::label('carrera','Carrera') !!}
-            {!! Form::select('carrera',[''=>'Seleccione un elemento','Sistemas'=>'Ingeniería es Sistemas Computacionales','Industrial'=>'Ingeniería Industrial','Mecatrónica'=>'Ingeniería Mecatrónica','TICS'=>'Ingeniería en Tecnologias de Información y Comunicaciones','Bioquimica'=>'Ingeniería Bioquimica','Nanotecnologia'=>'Ingeniería en Nanotecnologia'],null,['class'=>'form-control']) !!}
+            {!! Form::select('carrera',[''=>'Seleccione un elemento','Sistemas'=>'Ingeniería es Sistemas Computacionales','Industrial'=>'Ingeniería Industrial','Mecatrónica'=>'Ingeniería Mecatrónica',"TIC'S"=>'Ingeniería en Tecnologias de Información y Comunicaciones','Bioquímica'=>'Ingeniería Bioquímica','Nanotecnología'=>'Ingeniería en Nanotecnologia'],null,['class'=>'form-control']) !!}
         </div>
 
         <div class="form-group">
@@ -40,7 +40,6 @@
         <div class="form-group">
             {!! Form::submit('Registrar',['class'=>'btn btn-primary']) !!}
         </div>
-
     {!! Form::close() !!}
-
+        <div style="margin-bottom: 50px;"></div>
 @endsection

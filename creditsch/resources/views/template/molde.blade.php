@@ -1,5 +1,5 @@
 <!doctype html> 
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -19,8 +19,16 @@
     <!-- Bootstrap -->
     <link href="{{asset('complementos/css/bootstrap.css')}}" rel="stylesheet">
     <link href="{{asset('complementos/css/bootstrap-theme.css')}}" rel="stylesheet">
+    <!--<link rel="stylesheet" type="text/css" href="{{ asset('plugins/cssTable/dataTables.bootstrap4.min.css') }}"> -->
+
+    @yield('links')
 </head>
 <body>
+        <style type="text/css">
+            .alerta-padding{
+                padding: 12px;
+            }
+        </style>
         <!-- Seccion de menu del sistema, mensajes de alerta y elementos de busqueda -->
         <div class="content-all" style="position: relative; z-index: 999 !important;">
             <header>
@@ -50,7 +58,11 @@
                 <div class="container-fluid">
                     <ol class="breadcrumb" style="box-shadow: 2px 2px 7px #999;">
                         <li class="breadcrumb-item">
-                            <a href="{{ url('/home') }}">Inicio</a>
+                            @if (Auth::guard('alumno')->check())
+                                <a href="{{ url('alumnos/home') }}">Inicio</a>
+                            @else
+                                <a href="{{ url('/home') }}">Inicio</a>
+                            @endif
                         </li>
                         <li class="breadcrumb-item active"> @yield('ruta','Default')
                         </li>
@@ -76,11 +88,40 @@
     <script src="{{asset('js2/js2.js')}}"> </script>
     <script  src="{{ asset('plugins/jsTable/jquery.dataTables.min.js') }}"></script>
     <!-- Script para ocultar los mensajes de Flash -->
+
     <script>
         $('div.alert').not('.alert-important').delay(3000).fadeOut(300);
     </script>
     <!-- Paquete para los mensajes tipo bootstrap, para notificaciones en formularios -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script type="text/javascript">
+        // Funcion para manejar mensajes desde javascript 
+        function mostrarMensaje(mensaje_texto,mensaje_id,mensaje_tipo){
+            var mensaje = document.getElementById(mensaje_id);
+            switch (mensaje_tipo){
+                case "error":
+                    mensaje.innerHTML= "<div class='alert-danger alerta-padding' id='mensaje-unico-mds'>"+
+                    mensaje_texto+"</div>";
+                break;
+                case "exito":
+                    mensaje.innerHTML= "<div class='alert-success alerta-padding' id='mensaje-unico-mds'>"+
+                    mensaje_texto+"</div>";
+                break;  
+                case "neutral":
+                    mensaje.innerHTML= "<div class='alert-info alerta-padding' id='mensaje-unico-mds'>"+
+                    mensaje_texto+"</div>";
+                break;
+                case "advertencia":
+                    mensaje.innerHTML= "<div class='alert-warning alerta-padding' id='mensaje-unico-mds'>"+
+                    mensaje_texto+"</div>";
+                break;
+                default:
+                    mensaje.innerHTML= "<div class='alert-info alerta-padding' id='mensaje-unico-mds'>"+
+                    mensaje_texto+"</div>";
+            }
+            $('#mensaje-unico-mds').delay(4000).fadeOut(2000);
+        }
+    </script>
     @yield('js')
 </body>
 </html>

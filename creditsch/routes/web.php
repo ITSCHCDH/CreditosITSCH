@@ -35,7 +35,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 /****Rutas para el controlador de alumnos, con el group::resource, nos crean todas las rutas, para el controlador especificado*****/
 
-Route::group(['prefix'=>'admin'],function(){
+Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 
     Route::resource('alumnos','AlumnosController');
 
@@ -64,6 +64,8 @@ Route::group(['prefix'=>'admin'],function(){
     ]);
 
     /****Rutas para el controlador de usuarios *****/
+    Route::get('usuarios/{id}/asignar_roles','UsersController@asignarRoles')->name('usuarios.asignar_roles');
+    Route::post('usuarios/guardar_roles','UsersController@guardarRoles')->name('usuarios.guardar_roles');
     Route::resource('usuarios','UsersController');
 
     //La siguiente nos crea las rutas para el controlador de actividades(Bajas)
@@ -76,6 +78,7 @@ Route::group(['prefix'=>'admin'],function(){
     Route::get('participantes/busqueda','ParticipantesController@participantesBusqueda')->name('participantes.busqueda');
     Route::get('participantes/peticion','ParticipantesController@peticionAjax')->name('participantes.peticion');
     Route::post('participantes/guardar','ParticipantesController@ajaxGuardar')->name('participantes.guardar');
+    Route::get('participantes/actividad/responsables','ParticipantesController@peticionAjaxResponsables')->name('participantes.actividad_responsables');
     /****Rutas para el controlador de participantes*****/
     Route::resource('participantes','ParticipantesController');
 
@@ -88,6 +91,7 @@ Route::group(['prefix'=>'admin'],function(){
     //Ruta y metodo para las peticiones al servidor mediante Ajax
     Route::get('evidencias/galeria','EvidenciasController@peticionGaleria')->name('evidencias.galeria');
     Route::get('evidencias/peticion','EvidenciasController@peticionAjax')->name('evidencias.peticion');
+    Route::get('evidencias/eliminar','EvidenciasController@peticionEliminar')->name('evidencias.eliminar');
     /****Rutas para el controlador de evidencias*****/
     Route::resource('evidencias','EvidenciasController');
 
@@ -97,6 +101,7 @@ Route::group(['prefix'=>'admin'],function(){
         'as'=> 'admin.evidencias.destroy'
     ]);
     /****Rutas para el controlador de actividad_evidencia *****/
+    Route::post('actividad_evidencias/asignar_responsables','Actividad_EvidenciasController@asignarResponsables')->name('actividad_evidencias.asignar_responsables');
     Route::resource('actividad_evidencias','Actividad_EvidenciasController');
     Route::get('actividad_evidencias/{id}/destroy',[
         'uses'=>'Actividad_EvidenciasController@destroy',
@@ -112,7 +117,11 @@ Route::group(['prefix'=>'admin'],function(){
 
     Route::get('constancias/visualizar','ConstanciasController@visualizar')->name('constancias.visualizar');
     Route::get('constancias','ConstanciasController@index')->name('constancias.index');
-
+    Route::get('constancias/editar','ConstanciasController@editarConstancia')->name('constancias.editar');
+    Route::post('constancias/guardar_datos_globales','ConstanciasController@guardarDatosGlobales')->name('constancias.guardar_datos_globales');
+    Route::get('constancias/{carrera}/obtener_datos_especificos','ConstanciasController@obtenerDatosEspecificos')->name('constancias.obtener_datos_especificos');
+    Route::post('constancias/{carrera}/guardar','ConstanciasController@guardarDatosEspecificos')->name('constancias.guardar_datos_especificos');
+    Route::get('constancias/constancias_faltantes','ConstanciasController@constanciasFaltantes')->name('constancias.constancias_faltantes');
     //Roles y permisos
 
     Route::get('roles_permisos/index','RolesPermisosController@index')->name('roles.index');
@@ -120,11 +129,29 @@ Route::group(['prefix'=>'admin'],function(){
     Route::post('roles_permisos/roles_guardar','RolesPermisosController@guardarRole')->name('roles.roles_guardar');
     Route::get('roles_permisos/permisos_crear','RolesPermisosController@crearPermiso')->name('roles.permisos_crear');
     Route::post('roles_permisos/permisos_guardar','RolesPermisosController@guardarPermiso')->name('roles.permisos_guardar');
-    Route::get('roles_permisos/roles_index','RolesPermisosController@rolesIndex')->name('roles.roles_index');
-    Route::get('roles_permisos/asignar_permiso_vista/{id}','RolesPermisosController@rolesAsignarPermisosVista')->name('roles.roles_asignar_permisos_vista');
+    Route::get('roles_permisos/{id}/asignar_permiso_vista','RolesPermisosController@rolesAsignarPermisosVista')->name('roles.roles_asignar_permisos_vista');
+    Route::get('roles/{id}/ver_permisos','RolesPermisosController@roleVerPermisos')->name('roles.role_ver_permisos');
     Route::post('roles_permisos/role_asignar_permiso','RolesPermisosController@rolesAsignarPermiso')->name('roles.roles_asignar_permisos');
+    Route::get('roles_permisos/{id}/editar','RolesPermisosController@editarRole')->name('roles.role_editar');
+    Route::put('roles_permisos/{id}/actualizar','RolesPermisosController@actualizarRole')->name('roles.role_actualizar');
+    Route::get('roles_permisos/{id}/eliminar','RolesPermisosController@eliminarRole')->name('roles.role_eliminar');
+    Route::get('roles_permisos/{id}/usuarios','RolesPermisosController@usuarios')->name('roles.usuarios');
+    Route::get('roles_permisos/{id}/usuarios/revocar_role','RolesPermisosController@usuarioRevocarRol')->name('roles.usuarios_revocar');
+
 });
 /******************************/
+Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
+    Route::get('home','AlumnosRutasController@home');
+    Route::get('avance','AlumnosRutasController@avance')->name('alumnos.avance');
+    Route::get('actividades','AlumnosRutasController@actividades')->name('alumnos.actividades');
+    Route::get('actividades/subir_evidencia','AlumnosRutasController@subirEvidencia')->name('alumnos.subir_evidencia');
+    Route::post('actividades/guardar_evidencia','AlumnosRutasController@guardarEvidencia')->name('alumnos.guardar_evidencia');
+    Route::get('actividades/evidencia','AlumnosRutasController@evidencia')->name('alumnos.evidencia');
+    Route::get('actividades/eliminar_evidencia','AlumnosRutasController@eliminarEvidencia')->name('alumnos.eliminar_evidencia');
+});
+//Route::get('alumnos/login','AlumnosLoginController@showLoginForm')->name('alumnos.login');
+Route::post('alumnos/login','AlumnosLoginController@login')->name('alumnos.login');
+Route::post('alumnos/logout','AlumnosLoginController@logout')->name('alumnos.logout');
 
 Auth::routes();
 

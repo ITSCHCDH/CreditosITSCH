@@ -33,6 +33,7 @@
             <th>Actividad</th>
             <th>Porcentaje crédito</th>
             <th>Crédito</th>
+            <th>Alumnos</th>
             <th>Acción</th>
         </thead>
         <tbody>
@@ -42,11 +43,19 @@
                 <td>{{$act->nombre}}</td>
                 <td>{{$act->por_cred_actividad}}</td>
                 <td>{{$act->credito->nombre}}</td>
-
+                <td>
+                    @if ($act->alumnos=="true")
+                        {{ "SI" }}
+                    @else
+                        {{ "NO" }}
+                    @endif
+                </td>
                 <td>
                     <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
                     <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                    <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">Responsables</span></a>
+                    <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span
+                    ></a>
                 </td>
             </tr>
         @endforeach

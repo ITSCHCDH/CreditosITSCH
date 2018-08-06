@@ -15,9 +15,9 @@ class CreateTableEvidencia extends Migration
     {
         Schema::create('evidencia', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('status',35);
+            //$table->string('status',35);
             $table->string('nom_imagen');
-            $table->string('valida',20);
+            //$table->string('valida',20);
             $table->integer('id_asig_actividades')->unsigned();
             $table->string('alumno_no_control',20)->nullable();
             $table->string('slug')->nullable();

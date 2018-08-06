@@ -14,10 +14,10 @@
 		</div>
 		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 pull-left">
 		    {!! Form::label('carrera','Carrera') !!}
-            {!! Form::select('carrera',['Sistemas'=>'Ingeniería es Sistemas Computacionales','Industrial'=>'Ingeniería Industrial','Mecatrónica'=>'Ingeniería Mecatrónica','TICS'=>'Ingeniería en Tecnologias de Información y Comunicaciones','Bioquimica'=>'Ingeniería Bioquimica','Nanotecnologia'=>'Ingeniería en Nanotecnologia'],null,['class'=>'form-control','placeholder' => 'Seleccione una carrera','required']) !!}
+            {!! Form::select('carrera',['Sistemas'=>'Ingeniería en Sistemas Computacionales','Industrial'=>'Ingeniería Industrial','Mecatrónica'=>'Ingeniería Mecatrónica',"TIC'S"=>'Ingeniería en Tecnologias de Información y Comunicaciones','Bioquímica'=>'Ingeniería Bioquimica','Nanotecnología'=>'Ingeniería en Nanotecnologia'],null,['class'=>'form-control','placeholder' => 'Seleccione una carrera','required']) !!}
 		</div>
 		<div>
-			{!! Form::submit('Agregar',['class' => 'btn btn-primary']) !!}
+			{!! Form::submit('Buscar',['class' => 'btn btn-primary pull-left','style' => 'margin-top: 24px; margin-left: 25px;']) !!}
 		</div>
 		
 	{!! Form::close() !!}

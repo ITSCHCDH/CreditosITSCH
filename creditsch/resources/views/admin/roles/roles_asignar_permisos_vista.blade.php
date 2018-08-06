@@ -1,49 +1,119 @@
 @extends('template.molde')
 
-@section('title','Roles|Permisos|Asignar')
-
+@section('title','Asignar Permisos')
+@section('links')
+    <link rel="stylesheet" type="text/css" href="{{ asset('plugins/checkboxcss/checkbox.css') }}">
+@endsection
 @section('ruta')
-	<a href="{{route('roles.index')}}"> Alumnos </a>
+	<a href="{{route('roles.index')}}">Roles </a>
 	/
-    <label class="label label-success"> Roles</label>
+    <label class="label label-success"> Asignar Permisos</label>
 @endsection
 
 @section('contenido')
-	@extends('template.molde')
-
-	@section('title','Alumnos|Edit')
-
-	@section('ruta')
-		<a href="{{route('roles.index')}}"> roles </a>
-		/
-	    <label class="label label-success"> Roles Dashboard</label>
-	@endsection
-
-	@section('contenido')
-		<a href="{{ route('roles.permisos_crear')}}" class="btn btn-info">Crear Permiso</a>
-		<br>
-		<label>Rol: {{ $role->name }}</label>
-		{!! Form::open(['route' => 'roles.roles_asignar_permisos', 'method' => 'POST'])!!}
-			<input type="hidden" name="role_id" value="{{ $role->id }}">
-			<table class="table table-striped" id="tabla_evidencia">
-			    <!-- instancia al archivo table, dentro de este mismo direcctorio -->
-			   <thead>
-			       <th>ID</th>
-			       <th>Nombre</th>
-			       <th>Asignar</th>
-			   </thead>
-			   <tbody>
-			   	@foreach ($permisos as $per)
+		@if ($role!=null)
+			<label style="float: left;">Rol: {{ "$role->name" }}</label>
+			<br>
+			<div class="resetear"></div>
+			<a href="{{ route('roles.permisos_crear')}}" class="btn btn-info">Crear Permiso</a>
+			<input type="hidden" name="role_id" value="{{ $role->id }}" id="role_id">
+		@endif
+		
+		<table class="table table-striped table-bordered" id="tabla_permisos">
+		    <!-- instancia al archivo table, dentro de este mismo direcctorio -->
+		   <thead>
+		       <th>ID</th>
+		       <th>Nombre</th>
+		       <th>Asignar</th>
+		   </thead>
+		   <tbody>
+		   	@if ($permisos!=null && $role!=null)
+		   		@foreach ($permisos as $per)
 			   		<tr>
 			   			<td>{{ $per->id }}</td>
 			   			<td>{{ $per->name }}</td>
-			   			<td><input type="checkbox" name="permisos_id[]" value="{{ $per->id}}"></td>
+			   			<td>
+			   				@if ($per->role_id!=null)
+			   					<label class="control control--checkbox">
+			   						<input type="checkbox" name="permisos_id[]" value="{{ $per->id}}" class="permisos_asignados" id="c{{ $per->id }}" checked>
+			   						<div class="control__indicator"></div>
+			   					</label>
+			   				@else
+			   					<label class="control control--checkbox">
+			   						<input type="checkbox" name="permisos_id[]" value="{{ $per->id}}" class="permisos_asignados" id="c{{ $per->id }}" >
+			   						<div class="control__indicator" style=""></div>
+			   					</label>		
+			   				@endif
+			   			</td>
 			   		</tr>
 			   	@endforeach
-			   </tbody>
-			</table>
-			{!! Form::submit('Aceptar',['class'=>'btn btn-primary']) !!}
-		{!! Form::close() !!}
+		   	@endif
+		   </tbody>
+		</table>
+		<a href="#" id="permisos-submit" class="btn btn-primary">Agregar</a>
 		<div style="margin-bottom: 50px;"></div>
-	@endsection
+		@section('js')
+
+			<script type="text/javascript">
+				$.ajaxSetup( {
+				    headers: {
+				        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				    }
+				} );
+				var permisos_id = [];
+				function inicializarArreglo(){
+					var lista_permisos_ya_asignados = document.getElementsByClassName('permisos_asignados');
+					for (var i = 0; i < lista_permisos_ya_asignados.length; i++) {
+						if(lista_permisos_ya_asignados[i].checked){
+							permisos_id.push(lista_permisos_ya_asignados[i].value);
+						}
+					}
+				}
+				function agregarPermisosArreglo(){
+					$(document).on('click','.permisos_asignados',function(event){
+						var checkbox_id = $(this).attr('id');
+						var checkbox = document.getElementById(checkbox_id);
+						if(checkbox.checked){
+							permisos_id.push($(this).attr('value'));
+						}else{
+							for (var i = 0; i < permisos_id.length; i++) {
+								if(permisos_id[i]==$(this).attr('value')){
+									permisos_id.splice(i,1);
+									break;
+								}
+							}
+						}
+					});
+				}
+				function agregarPermisosAjax(){
+					$('#permisos-submit').click(function(event){
+						event.preventDefault();
+						role_id = $('#role_id').attr('value');
+						$.ajax({
+							type: "post",
+							dataType: "json",
+							url:"{{ url('admin/roles_permisos/role_asignar_permiso') }}",
+							data:{
+								permisos_id:permisos_id,
+								role_id:role_id
+							},
+							success: function(response){
+								location.href = "{{ route('roles.index') }}";
+							},error: function(){
+								console.log('Error a agregar permisos');
+							}
+						});
+					});					
+				}
+				$(document).ready(function(){
+					inicializarArreglo();
+					$('#tabla_permisos').DataTable({
+						"pagingType":"full_numbers"
+					});
+					
+					agregarPermisosArreglo();
+					agregarPermisosAjax();
+				});
+			</script>
+		@endsection
 @endsection
