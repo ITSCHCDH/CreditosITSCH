@@ -9,20 +9,56 @@ use App\Actividad_Evidencia;
 use App\Evidencia;
 use Illuminate\Support\Facades\DB;
 use Laracasts\Flash\Flash;
+use Illuminate\Support\Facades\Auth;
+
 class Actividad_EvidenciasController extends Controller
 {
 	public function destroy($id){
-		//Eliminacion de responsables de una actividad
 		$actividad_evidencia = Actividad_Evidencia::find($id);
-		if(count($actividad_evidencia->evidencias)>0){
-			Flash::error('Error al eliminar, el responsable cuenta con evidencias registradas');
+		if ($actividad_evidencia!=null) {
+			if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])){
+				//Eliminacion de responsables de una actividad
+				$participantes = DB::table('participantes as p')->where('p.id_evidencia','=',$id)->select('no_control')->get();
+				if($actividad_evidencia->validado=="true"){
+					Flash::error('Error al eliminar, este responsable ya tiene la evidencia validada');
+				}
+				if(count($actividad_evidencia->evidencias)>0){
+					Flash::error('Error al eliminar, el responsable cuenta con evidencias registradas');
+				}
+				if($participantes->count()>0){
+					Flash::error('Error al eliminar, el responsable cuenta con participantes registrados');	
+				}
+				if(count($actividad_evidencia->evidencias)==0 && $participantes->count()==0 && $actividad_evidencia->validado=="false"){
+					Actividad_Evidencia::destroy($id);
+					Flash::sucess('El responsable fue retirado de la actividad con exito');
+				}
+				return redirect()->back();
+			}else if(Auth::User()->can('ELIMINAR_RESPONSABLES')){
+				$actividad = Actividad::find($actividad_evidencia->actividad_id);
+				if($actividad->id_user!=Auth::User()->id){
+					Flash::error('Error al eliminar, no puedes eliminar responsables de actividades que no te corresponden');
+					return redirect()->back();
+				}
+				$participantes = DB::table('participantes as p')->where('p.id_evidencia','=',$id)->select('no_control')->get();
+				if($actividad_evidencia->validado=="true"){
+					Flash::error('Error al eliminar, este responsable ya tiene la evidencia validada');
+				}
+				if(count($actividad_evidencia->evidencias)>0){
+					Flash::error('Error al eliminar, el responsable cuenta con evidencias registradas');
+				}
+				if($participantes->count()>0){
+					Flash::error('Error al eliminar, el responsable cuenta con participantes registrados');	
+				}
+				if(count($actividad_evidencia->evidencias)==0 && $participantes->count()==0 && $actividad_evidencia->validado=="false"){
+					Actividad_Evidencia::destroy($id);
+					Flash::success('El responsable fue retirado de la actividad con exito');
+				}
+				//Retornamos la ruta de los responsables con el parametro que resibe que es el id de la actividad
+				return redirect()->back();
+			}
 		}
-		if(count($actividad_evidencia->evidencias)==0){
-			Actividad_Evidencia::destroy($id);
-			Flash::sucess('El responsable fue retirado de la actividad con exito');
-		}
-		//Retornamos la ruta de los responsables con el parametro que resibe que es el id de la actividad
-		return redirect()->route('responsables',['id'=>$actividad_evidencia->actividad_id]);
+		Flash::error('Lo que tratas de eliminar no existe');	
+		return redirect()->back();
 	}
 
 	public function show(){

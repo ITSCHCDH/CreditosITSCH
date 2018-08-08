@@ -8,7 +8,10 @@
 
 @section('contenido')
 
-    <a href="{{route('actividades.create')}}" class="btn btn-info">Registrar nueva actividad</a>
+    @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))
+        <a href="{{route('actividades.create')}}" class="btn btn-primary">Registrar nueva actividad</a>
+    @endif
+    
 
     <!--BUSCADOR DE ARTICULOS  -->
     <!-- Boton de busqueda en la pagina -->
@@ -34,7 +37,9 @@
             <th>Porcentaje crédito</th>
             <th>Crédito</th>
             <th>Alumnos</th>
-            <th>Acción</th>
+            @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
+                <th>Acción</th>
+            @endif
         </thead>
         <tbody>
         @foreach($actividad as $act)
@@ -50,18 +55,43 @@
                         {{ "NO" }}
                     @endif
                 </td>
-                <td>
-                    <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
-                    <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                    <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">
-                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span
-                    ></a>
-                </td>
+                @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
+                    <td>
+                        @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ACTIVIDAD','VIP_ACTIVIDAD']))
+                            @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
+                                <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+                            @elseif($act->id_user==Auth::User()->id)
+                                <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+                            @endif
+                        @endif
+                        @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ACTIVIDAD','VIP_ACTIVIDAD']))
+                            @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
+                                <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                            @elseif($act->id_user==Auth::User()->id)
+                                <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                            @endif
+                            
+                        @endif
+                        @if (Auth::User()->hasAnyPermission(['VIP','VER_RESPONSABLES','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
+                            @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
+                                <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">
+                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span
+                                ></a>
+                            @elseif($act->id_user==Auth::User()->id)
+                                <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">
+                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span
+                                ></a>
+                            @endif
+                            
+                        @endif  
+                    </td>
+                @endif
             </tr>
         @endforeach
         </tbody>
     </table>
 
     {!! $actividad->render() !!}
+    <div style="margin-bottom: 50px;"></div>
 
 @endsection

@@ -3,12 +3,14 @@ eliminar_evidencia
 modificar_evidencia
 ver_evidencia
 verificar_evidencia
+vip_evidencia
 
 crear_actividad
 eliminar_actividad
 ver_actividad
 modificar_actividad
 crear_actividad_alumnos
+vip_actividad
 
 crear_alumnos
 eliminar_alumnos
@@ -22,6 +24,26 @@ ver_usuarios
 
 agregar_participantes
 eliminar_participantes
+ver_participantes
+
+agregar_responsables
+eliminar_responsables
+ver_responsables
+
+crear_creditos
+eliminar_creditos
+ver_creditos
+modificar_creditos
+
+crear_roles
+ver_roles
+eliminar_roles
+modificar_roles
+
+ver_reportes_carrera
+vip_reportes
+
+ver_avance_alumno
 
 vip
 vip_solo_lectura

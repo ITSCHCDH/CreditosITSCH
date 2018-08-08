@@ -11,20 +11,38 @@ use App\Avance;
 use App\Alumno;
 use App\Actividad_Evidencia;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
 class ParticipantesController extends Controller
 {
+
+    public function __construct(){
+        $this->middleware('permission:VIP|VIP_SOLO_LECTURA|AGREGAR_PARTICIPANTES|ELIMINAR_PARTICIPANTES|VER_PARTICIPANTES')->only(['index','create','store','show','edit','update']);
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
-        //Consultamos todas las actividades disponibles
-        $actividades = Actividad::select('id','nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
-        //Retorna la vista de Agregar participantes
-        return view('admin.participantes.index')
-        ->with('actividades',$actividades);
+    public function index()
+    {   
+        if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA'])){
+            //Consultamos todas las actividades disponibles
+            $actividades = Actividad::select('id','nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
+            //Retorna la vista de Agregar participantes
+            return view('admin.participantes.index')
+            ->with('actividades',$actividades);
+        }else{
+            //Consultamos todas las actividades disponibles
+            $actividades = DB::table('users as u')->join('actividad_evidencia as ae', function($join){
+                $join->on('ae.user_id','=','u.id');
+                $join->where('u.id','=',Auth::User()->id);
+            })->join('actividad as a','a.id','=','ae.actividad_id')->select('a.id','a.nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
+            //Retorna la vista de Agregar participantes
+            return view('admin.participantes.index')
+            ->with('actividades',$actividades);
+        }
+        
     }
 
     /** 
@@ -34,7 +52,6 @@ class ParticipantesController extends Controller
      */
     public function create(Request $request)
     {
-        dd($request);
     }
 
     /**
@@ -121,33 +138,46 @@ class ParticipantesController extends Controller
             $join->where('ae.actividad_id','=',$request->get('id_actividad'));
         })->get();
         $dommie = [['id'=> -1]];
-        $id_actividad_evidencia = DB::table('actividad_evidencia as ae')->select('ae.id')->where([
+        $id_actividad_evidencia = DB::table('actividad_evidencia as ae')->select('ae.id','ae.validado','ae.user_id')->where([
             ['ae.user_id','=',$request->id_responsable],
             ['ae.actividad_id','=',$request->id_actividad],
         ])->get();
         if($id_actividad_evidencia->count()==0){
-            return response()->json(array('participantes_data' => $dommie,'no_evidencias' => $evidencias->count()));
+            return response()->json(array('participantes_data' => $dommie,'no_evidencias' => $evidencias->count(),'validado' => 'false'));
         }
         //La variable participante_data guarda los participante vinculado a una evidencia
         $participantes_data = DB::table('participantes as p')->join('alumnos as a','a.no_control','=','p.no_control')->where('p.id_evidencia','=',$id_actividad_evidencia[0]->id)->select('a.nombre','a.carrera','p.id','p.id_evidencia','a.no_control')->get();
         if($participantes_data->count()==0){
             //En caso de que la actividad aun no cuente con participantes retornara -1
-            return response()->json(array('participantes_data' => $dommie,'no_evidencias' => $evidencias->count()));
+            return response()->json(array('participantes_data' => $dommie,'no_evidencias' => $evidencias->count(),'validado' => $id_actividad_evidencia[0]->validado,'user_id' => $id_actividad_evidencia[0]->user_id));
         }
         //Retornamos los datos un json
-        return response()->json(array('participantes_data' => $participantes_data,'no_evidencias' => $evidencias->count()));
+        return response()->json(array('participantes_data' => $participantes_data,'no_evidencias' => $evidencias->count(),'validado' => $id_actividad_evidencia[0]->validado,'user_id' => $id_actividad_evidencia[0]->user_id));
     }
 
     public function peticionAjaxResponsables(Request $request){
-        //Consultamos todos los responsables asignadoas a una actividad
-        $evidencias = DB::table('actividad_evidencia as ae')->join('evidencia as e',function($join) use($request){
-            $join->on('e.id_asig_actividades','=','ae.id');
-            $join->where('ae.actividad_id','=',$request->get('id'));
-        })->get();
-        $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->select('u.id','u.name')->orderBy('u.name')->get();
-        $actividad = Actividad::find($request->get('id'));
-        //Retornamos los responsables en un json
-        return response()->json(array('responsables' => $responsables,'actividad' => $actividad,'no_evidencias' => $evidencias->count()));
+        if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA'])) {
+            //Consultamos todos los responsables asignadoas a una actividad
+            $evidencias = DB::table('actividad_evidencia as ae')->join('evidencia as e',function($join) use($request){
+                $join->on('e.id_asig_actividades','=','ae.id');
+                $join->where('ae.actividad_id','=',$request->get('id'));
+            })->get();
+            $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->select('u.id','u.name')->orderBy('u.name')->get();
+            $actividad = Actividad::find($request->get('id'));
+            //Retornamos los responsables en un json
+            return response()->json(array('responsables' => $responsables,'actividad' => $actividad,'no_evidencias' => $evidencias->count()));   
+        }else{
+            //Consultamos todos los responsables asignadoas a una actividad
+            $evidencias = DB::table('actividad_evidencia as ae')->join('evidencia as e',function($join) use($request){
+                $join->on('e.id_asig_actividades','=','ae.id');
+                $join->where('ae.actividad_id','=',$request->get('id'));
+                $join->where('ae.user_id','=',Auth::User()->id);
+            })->get();
+            $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->where('ae.user_id','=',Auth::User()->id)->select('u.id','u.name')->orderBy('u.name')->get();
+            $actividad = Actividad::find($request->get('id'));
+            //Retornamos los responsables en un json
+            return response()->json(array('responsables' => $responsables,'actividad' => $actividad,'no_evidencias' => $evidencias->count()));
+        }
     }
 
     public function ajaxGuardar(Request $request){
@@ -157,7 +187,7 @@ class ParticipantesController extends Controller
             ['ae.actividad_id','=',$request->get('id_actividad')]
         ])->select('ae.id')->get();
 
-        
+        if($evidencias)
         $existe_no_control = DB::table('alumnos')->select('no_control')->where('no_control','=',$request->get('no_control'))->get();
 
         if($existe_no_control->count()==0){

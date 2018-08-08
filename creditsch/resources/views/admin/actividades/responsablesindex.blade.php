@@ -54,7 +54,7 @@
                                 </label>
                             @endif
                         @else
-                            @if($res->participantes!=null || $res->evidencias!=null)
+                            @if($res->participantes!=null || $res->evidencias!=null || $res->validado=="true")
                                 <label class="control control--checkbox">
                                     <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
                                     <div class="control__indicator"></div>

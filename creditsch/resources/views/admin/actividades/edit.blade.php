@@ -26,10 +26,12 @@
         {!! Form::label('id_actividad','Credito al que pertenece la actividad') !!}
         {!! Form::select('id_actividad',$creditos,null,['class'=>'form-control select-category','placeholder'=>'Selecciona un credito','required']) !!}
     </div>
-    <div class="form-group">
-        {!! Form::label('alumnos','Alumnos Responsables')!!}
-        {!! Form::select('alumnos',['false' => 'NO','true' => 'SI'],null,['class'=>'form-control', 'required','placeholder' => 'Actividad dedicada para alumnos responsables?, Si no estas seguro selecciona "NO"'])!!}
-    </div>
+    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','CREAR_ACTIVIDAD_ALUMNOS']))
+        <div class="form-group">
+            {!! Form::label('alumnos','Alumnos Responsables')!!}
+            {!! Form::select('alumnos',['false' => 'NO','true' => 'SI'],null,['class'=>'form-control', 'required','placeholder' => 'Actividad dedicada para alumnos responsables?, Si no estas seguro selecciona "NO"'])!!}
+        </div>
+    @endif
     <div class="form-group">
         {!! Form::submit('Editar actividad',['class'=>'btn btn-primary']) !!}
     </div>

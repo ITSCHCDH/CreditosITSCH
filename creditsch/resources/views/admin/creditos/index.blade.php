@@ -7,7 +7,7 @@
 @endsection
 
 @section('contenido')
-    @if (Auth::User()->can('VIP'))
+    @if (Auth::User()->can('VIP') || Auth::User()->can('CREAR_CREDITOS'))
         <a href="{{route('creditos.create')}}" class="btn btn-info">Registrar nuevo credito</a>
     @endif
     <table class="table table-striped">
@@ -23,13 +23,15 @@
             <tr>
                 <td>{{$cred->id}}</td>
                 <td>{{$cred->nombre}}</td>
-                @if (Auth::User()->can('VIP'))
-                    <td>
+                <td>
+                    @if (Auth::User()->can('MODIFICAR_CREDITOS') || Auth::User()->can('VIP'))
                         <a href="{{ route('creditos.edit',[$cred->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+                    @endif
+                    
+                    @if (Auth::User()->can('ELIMINAR_CREDITOS') || Auth::User()->can('VIP'))
                         <a href="{{ route('admin.creditos.destroy',$cred->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                    </td>
-                @endif
-                
+                    @endif
+                </td>
             </tr>
         @endforeach
         </tbody>

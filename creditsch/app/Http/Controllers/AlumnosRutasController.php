@@ -60,12 +60,15 @@ class AlumnosRutasController extends Controller
     	->with('actividades',$actividades);
     }
     public function subirEvidencia(Request $request){
-    	$dommie_actividad = new Actividad();
-    	$dommie_actividad->nombre = 'Actividad actualmente no disponible';
-    	$dommie_actividad->id=-1;
-    	$dommie_responsable = new User();
-    	$dommie_responsable->name = 'Actualmente no disponible';
-    	$dommie_responsable->id=-1;
+        $existe_actividad = Actividad_Evidencia::where([
+            ['user_id','=',$request->id_responsable],
+            ['actividad_id','=',$request->id_actividad]
+        ])->get();
+        if($existe_actividad->count()==0){
+            return redirect()->back();
+        }else if($existe_actividad[0]->validado=="true"){
+            return redirect()->route('alumnos.actividades');
+        }
     	$usuarios = User::select('name','id')->orderBy('name','ASC')->get()->pluck('name','id');
     	$usuarios_sin_pluck = User::select('name','id')->orderBy('name','ASC')->get();
     	$validador = Actividad_Evidencia::where([
@@ -158,9 +161,14 @@ class AlumnosRutasController extends Controller
     		['ae.actividad_id','=',$request->actividad_id]
     	])->select('ae.id')->get();
     	if($actividad_evidencia->count()==0)$actividad=null;
+        $validado = Actividad_Evidencia::where([
+            ['user_id','=',$request->user_id],
+            ['actividad_id','=',$request->actividad_id]
+        ])->select('validado')->get();
     	return view('alumnos.evidencia')
     	->with('evidencias',$evidencias)
-    	->with('actividad',$actividad);
+    	->with('actividad',$actividad)
+        ->with('validado',$validado);
     }
 
     public function eliminarEvidencia(Request $request){

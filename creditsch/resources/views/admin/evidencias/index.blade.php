@@ -30,7 +30,7 @@
 		        al que estan asignados los participantes -->
 		    {!! Form::label('responsables_id','Responsable') !!}
 		    <select class="form-control" required method="GET" name="responsables_id" id="responsables_id">
-		    	@if (Auth::User()->can('ADMIN'))
+		    	@if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VIP_EVIDENCIA'))
 		    		<option value="nulo">Todos los responsables</option>
 		    	@else
 		    		<option value="{{ Auth::User()->id }}">{{ Auth::User()->name }}</option>
@@ -63,7 +63,7 @@
 						},
 						success: function(response){
 							$('#responsables_id').empty();
-							var autenticacion = "{{ Auth::User()->can('VIP') }}"=="1"?true:false;
+							var autenticacion = "{{ Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VIP_EVIDENCIA') }}"=="1"?true:false;
 							if (autenticacion) {
 								$('#responsables_id').append("<option value='nulo' selected>Todos los responsables</option>");
 							}
@@ -107,16 +107,29 @@
 			function agregaEvidencias(response){
 				for(var x=0; x<response.length; x++){
 					var archivo = response[x]['nom_imagen'].toString();
-					var extension = archivo.substring(archivo.length-3).toLowerCase();
-					if(extension == 'pdf'){
+					var extension = archivo.substring(archivo.length-4).toLowerCase();
+					var eliminar_evidencia = "";
+					var admin = "{{ Auth::User()->can('VIP')}}"=="1"? true: false;
+					var admin_evidencia = "{{ Auth::User()->can('VIP_EVIDENCIA') }}"=="1"? true: false;
+					var permiso_eliminar = "{{ Auth::User()->can('ELIMINAR_EVIDENCIA') }}"=="1"? true: false;
+					if(admin || admin_evidencia){
+						eliminar_evidencia = "<a href='#' data-actividad='"+response[x]['actividad_nombre']+"' data-archivo='"+response[x]['evidencia_id']+"' data-validado = '"+response[x]['validado']+"'data-archivo_nombre='"+archivo+"' class='eliminar-evidencia'>"
+							+"<img src='{{ asset('images/eliminar_icono.png') }}' class='eliminar' width='40' heigth='40'>"
+							+"</a>";
+					}else if(permiso_eliminar && response[x]['validado']=="false"){
+						if(response[x]['user_id']=="{{ Auth::User()->id }}"){
+							eliminar_evidencia = "<a href='#' data-actividad='"+response[x]['actividad_nombre']+"' data-archivo='"+response[x]['evidencia_id']+"' data-validado = '"+response[x]['validado']+"'data-archivo_nombre='"+archivo+"' class='eliminar-evidencia'>"
+								+"<img src='{{ asset('images/eliminar_icono.png') }}' class='eliminar' width='40' heigth='40'>"
+								+"</a>";
+						}
+					}
+					if(extension == '.pdf'){
 						var alumno_nombre = "NO";
 						if(response[x]['alumno_nombre']!=null)alumno_nombre = response[x]['alumno_nombre'];
 						$('#div-galeria').append("<div class='gallery'>"
 						+"<a target='_blank' href='{{asset('storage/evidencias/')}}/"+response[x]['actividad_nombre']+"/"+archivo+"'>"
 						+"<img src='{{asset('images/pdf_icono2.png')}}' width='300' heigth='200' class='imagenes'>"
-							+"<a href='#' data-actividad='"+response[x]['actividad_nombre']+"' data-archivo='"+response[x]['evidencia_id']+"' data-archivo_nombre='"+archivo+"' class='eliminar-evidencia'>"
-							+"<img src='{{ asset('images/eliminar_icono.png') }}' class='eliminar' width='40' heigth='40'>"
-							+"</a>"
+							+eliminar_evidencia
 						+"</a>"
 						+"<div class='desc'>"
 						+"<p><strong>Actividad: </strong>"+response[x]['actividad_nombre']+"</p>"
@@ -131,9 +144,7 @@
 						$('#div-galeria').append("<div class='gallery'>"
 						+"<a target='_blank' href='{{asset('storage/evidencias/')}}/"+response[x]['actividad_nombre']+"/"+archivo+"'>"
 						+"<img src='{{asset('storage/evidencias/')}}/"+response[x]['actividad_nombre']+"/"+archivo+"' width='300' heigth='200' class='imagenes'>"
-							+"<a href='#' data-actividad='"+response[x]['actividad_nombre']+"' data-archivo='"+response[x]['evidencia_id']+"' data-archivo_nombre='"+archivo+"' class='eliminar-evidencia'>"
-							+"<img src='{{ asset('images/eliminar_icono.png') }}' class='eliminar' width='40' heigth='40'>"
-							+"</a>"
+							+eliminar_evidencia
 						+"</a>"
 						+"<div class='desc'>"
 						+"<p><strong>Actividad: </strong>"+response[x]['actividad_nombre']+"</p>"
@@ -194,22 +205,29 @@
 						var actividad = $(this).attr('data-actividad');
 						var archivo_id = $(this).attr('data-archivo');
 						var archivo_nombre = $(this).attr('data-archivo_nombre');
-						$.ajax({
-							type: "get",
-							dataType: "json",
-							url: "{{ route('evidencias.eliminar') }}",
-							data:{
-								actividad: actividad,
-								archivo: archivo_id,
-								archivo_nombre: archivo_nombre
-							}, 
-							success: function(response){
-								mostrarMensaje(response['mensaje'],'mensaje-parte-superior',response['tipo']);
-								$('#responsables_id').trigger('change');
-							}, error: function(){
-								console.log("Error al eliminar la evidencia");
-							}
-						});
+						var validado_msj = $(this).attr('data-validado');
+						var validado = true;
+						if(validado_msj=="true"){
+							validado = confirm("La evidencia se encuentra actualmente validada,¿Seguro que deseas continuar?");
+						}
+						if(validado){
+							$.ajax({
+								type: "get",
+								dataType: "json",
+								url: "{{ route('evidencias.eliminar') }}",
+								data:{
+									actividad: actividad,
+									archivo: archivo_id,
+									archivo_nombre: archivo_nombre
+								}, 
+								success: function(response){
+									mostrarMensaje(response['mensaje'],'mensaje-parte-superior',response['tipo']);
+									$('#responsables_id').trigger('change');
+								}, error: function(){
+									mostrarMensaje("Error al eliminar la evidencia",'mensaje-parte-superior','error');
+								}
+							});
+						}
 					}
 				});
 			}

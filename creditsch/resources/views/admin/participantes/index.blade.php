@@ -15,16 +15,20 @@
 <div id="mensajes-parte-superior" class="alerta-padding">
     
 </div>
-{!! Form::open(['route' => 'evidencias.create', 'method' => 'GET']) !!}
-    <input type="hidden" name="id_actividad" value='-1' id='input_id_actividad'>
-    <input type="hidden" name="id_responsable" value='-1' id='input_id_responsable'>
-    <input type='submit' name='' class='btn btn-primary' value='Agregar Evidencia'>
-{!! Form::close() !!}
+@if (Auth::User()->hasAnyPermission(['VIP','CREAR_EVIDENCIA']))
+    {!! Form::open(['route' => 'evidencias.create', 'method' => 'GET']) !!}
+        <input type="hidden" name="id_actividad" value='-1' id='input_id_actividad'>
+        <input type="hidden" name="id_responsable" value='-1' id='input_id_responsable'>
+        <input type='submit' name='' class='btn btn-primary' value='Agregar Evidencia'>
+    {!! Form::close() !!}
+@endif
+
 <div class="pull-right">
-    @if (Auth::User()->can('VIP'))
+    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA']))
         <p>Total de evidencias: <strong id = "numero-evidencias">0</strong> <a href="{{ route('evidencias.index',['ruta' => 'participantes']) }}" id="evidencia-total">VER</a></p>
     @endif
     <p>Evidencias del responsable seleccionado: <strong id = "numero-evidencias-responsable">0</strong> <a href="{{ route('evidencias.index',['ruta' => 'participantes']) }}" id="evidencia-parcial">VER</a></p>
+    <p id="parrafo-validado" style="display: none;">Validado: <strong id="validado">NO</strong></p>
 </div>
 <div class="resetear"></div>
 <div>
@@ -32,7 +36,7 @@
         <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
             al que estan asignados los participantes -->
         {!! Form::label('actividades_id','Actividad') !!}
-        {!! Form::select('actividades_id',$actividades,null,['class'=>'form-control','required','placeholder'=>'Seleccione una opcion','method'=>'GET']) !!}
+        {!! Form::select('actividades_id',$actividades,null,['class'=>'form-control','required','placeholder'=>'Seleccione una actividad','method'=>'GET']) !!}
     </div>
 
     <div class="input-group form-inline my-2 my-lg-0 mr-lg-2 mt-lg-10 pull-left" style="width: 250px;">
@@ -41,26 +45,27 @@
         {!! Form::label('responsables_id','Responsable') !!}
         {!! Form::select('responsables_id',[],0,['class'=>'form-control','required','placeholder'=>'Responsable','method'=>'GET']) !!}
     </div>
-
-    <!-- Input text donde se podra buscar a los participantes por nombre -->
-    <div class="autocomplete pull-left" style="width:270px;">
-        {!! Form::label('alumno','Alumno') !!}
-        <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
-    </div>
-    <!-- Abrimos el formulario para guardar los participantes -->
-    <div class="form-inline my-2 my-lg-0 mr-lg-2 pull-left" style="margin-top: 25px;">
-        <form id="frm" method="POST">
-             <div class="input-group">
-                <input type="hidden" value="{{ csrf_token() }}" id="token">    
-                <input type="hidden" name="id_actividad" id="id_actividad_oculto" value="-1">
-                <input type="hidden" name="id_responsable" id="responsable_oculto" value='-1'>
-                <input type="text" name="no_control" id="no_control" placeholder="No Control" class="form-control pull-right" list="list_no_control">
-                <div class="input-group-btn">
-                    <input type="submit" name="" value="Agregar" class="btn btn-primary">
-                </div>
-             </div>
-        </form>
-    </div>
+    @if (Auth::User()->hasAnyPermission(['AGREGAR_PARTICIPANTES','VIP']))
+        <!-- Input text donde se podra buscar a los participantes por nombre -->
+        <div class="autocomplete pull-left" style="width:270px;">
+            {!! Form::label('alumno','Alumno') !!}
+            <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
+        </div>
+        <!-- Abrimos el formulario para guardar los participantes -->
+        <div class="form-inline my-2 my-lg-0 mr-lg-2 pull-left" style="margin-top: 25px;">
+            <form id="frm" method="POST">
+                 <div class="input-group">
+                    <input type="hidden" value="{{ csrf_token() }}" id="token">    
+                    <input type="hidden" name="id_actividad" id="id_actividad_oculto" value="-1">
+                    <input type="hidden" name="id_responsable" id="responsable_oculto" value='-1'>
+                    <input type="text" name="no_control" id="no_control" placeholder="No Control" class="form-control pull-right" list="list_no_control">
+                    <div class="input-group-btn">
+                        <input type="submit" name="" value="Agregar" class="btn btn-primary">
+                    </div>
+                 </div>
+            </form>
+        </div>
+    @endif
     
     <datalist id="list_no_control">
     </datalist>
@@ -76,7 +81,9 @@
        <th>Numero de Control</th>
        <th>Nombre</th>
        <th>Carrera</th>
-       <th>Accion</th>
+       @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_PARTICIPANTES']))
+           <th>Accion</th>
+       @endif
    </thead>
    <tbody>
    </tbody>
@@ -95,60 +102,72 @@
     var lista_no_control = [];
     function comboActividades(){
         $('#actividades_id').change(function(){
+            document.getElementById('mensaje-actividad-alumnos').innerHTML = "";
+            document.getElementById('numero-evidencias-responsable').innerHTML = "0";
+            document.getElementById('validado').innerHTML="NO";
+            $('#parrafo-validado').css('display','none');
             var current_id = $(this).val();
             $('#responsable_oculto').val(-1);
             $('#input_id_actividad').val(current_id);
             $('#input_id_responsable').val(-1);
             $('#id_actividad_oculto').val($(this).val());
-            $.ajax({
-                type:"GET",
-                url:"{{ route('participantes.actividad_responsables') }}",
-                cache:false,
-                data:{id:current_id},
-                dataType: 'json',
-                success:function(response){
-                    //Vaciamos la tabla de los participantes
-                    $('#mitabla tbody').empty();
-                    //Vaciamos el combobox de los responsables
-                    $('#responsables_id').empty();
-                    $('#responsables_id').append("<option value='' disabled selected >Responsable</option>");
-                    //Agregamos los responsables al combobox
-                    for(var x=0; x<response['responsables'].length; x++){
-                        var id = response['responsables'][x]['id'];
-                        var nombre = response['responsables'][x]['name'];
-                        $('#responsables_id').append("<option value='"+id+"'>"+nombre+"</option>");
-                    }
-                    //Mensaje para las actividades con alumnos responsables
-                    var temp_mensaje = document.getElementById('mensaje-actividad-alumnos');
-                    if(response['actividad']['alumnos']=="true"){
-                        temp_mensaje.innerHTML = "<div class='alert-warning alerta-padding'>"+
-                        "En esta actividad los participantes también podran subir sus propias evidencias.</div>"
-                    }else{
-                        temp_mensaje.innerHTML = "";
-                    }
-
-                    //Indicamos  el numero de evidencias que tiene la actividad
-                    var msj_numero_evidencias = document.getElementById('numero-evidencias');
-                    msj_numero_evidencias.innerHTML = response['no_evidencias'];
-
-                    //Obtenemos el valor actual del combobox de las actividades
-                    var temp_actividad_cookie = document.getElementById('actividades_id').value;
-                    //Lo guardamos en una cookie
-                    Cookies.set('participantes_actividad',temp_actividad_cookie,{ expires: 1});
-                    var temp_respon_cookie = Cookies.get('participantes_responsable');
-                    //Valdamos que la cookie no sea nula y que la pagina haya sido refrescada
-                    if(temp_respon_cookie!=null && sesion){
-                        //Validamos que el valor exista en el combobox responsables
-                        if($("#responsables_id option[value='"+temp_respon_cookie+"']").length!=0){
-                            $('#responsables_id').val(temp_respon_cookie);
-                            $('#responsables_id').trigger('change'); //Provocamos un evento de tipo change
+            if(current_id!=""){
+                $.ajax({
+                    type:"GET",
+                    url:"{{ route('participantes.actividad_responsables') }}",
+                    cache:false,
+                    data:{id:current_id},
+                    dataType: 'json',
+                    success:function(response){
+                        //Vaciamos la tabla de los participantes
+                        $('#mitabla tbody').empty();
+                        //Vaciamos el combobox de los responsables
+                        $('#responsables_id').empty();
+                        $('#responsables_id').append("<option value='' disabled selected >Responsable</option>");
+                        //Agregamos los responsables al combobox
+                        for(var x=0; x<response['responsables'].length; x++){
+                            var id = response['responsables'][x]['id'];
+                            var nombre = response['responsables'][x]['name'];
+                            $('#responsables_id').append("<option value='"+id+"'>"+nombre+"</option>");
                         }
-                        sesion = false;
+                        //Mensaje para las actividades con alumnos responsables
+                        var temp_mensaje = document.getElementById('mensaje-actividad-alumnos');
+                        if(response['actividad']['alumnos']=="true"){
+                            temp_mensaje.innerHTML = "<div class='alert-warning alerta-padding'>"+
+                            "En esta actividad los participantes también podran subir sus propias evidencias.</div>"
+                        }else{
+                            temp_mensaje.innerHTML = "";
+                        }
+
+                        //Indicamos  el numero de evidencias que tiene la actividad
+                        var msj_numero_evidencias = document.getElementById('numero-evidencias');
+                        if(msj_numero_evidencias!=null)msj_numero_evidencias.innerHTML = response['no_evidencias'];
+
+                        //Obtenemos el valor actual del combobox de las actividades
+                        var temp_actividad_cookie = document.getElementById('actividades_id').value;
+                        //Lo guardamos en una cookie
+                        Cookies.set('participantes_actividad',temp_actividad_cookie,{ expires: 1});
+                        var temp_respon_cookie = Cookies.get('participantes_responsable');
+                        //Valdamos que la cookie no sea nula y que la pagina haya sido refrescada
+                        if(temp_respon_cookie!=null && sesion){
+                            //Validamos que el valor exista en el combobox responsables
+                            if($("#responsables_id option[value='"+temp_respon_cookie+"']").length!=0){
+                                $('#responsables_id').val(temp_respon_cookie);
+                                $('#responsables_id').trigger('change'); //Provocamos un evento de tipo change
+                            }
+                            sesion = false;
+                        }
+                    },error:function(){
+                        console.log('Error :(');
                     }
-                },error:function(){
-                    console.log('Error :(');
-                }
-            });
+                });
+            }else{
+                //Vaciamos la tabla de los participantes
+                $('#mitabla tbody').empty();
+                //Vaciamos el combobox de los responsables
+                $('#responsables_id').empty();
+                $('#responsables_id').append("<option value='' disabled selected >Responsable</option>");
+            }
         });
     }
     function comboResponsables(){
@@ -158,6 +177,7 @@
                 var id_responsable = $('#responsables_id').val();
                 $('#responsable_oculto').val($('#responsables_id').val());
                 $('#input_id_responsable').val($('#responsables_id').val());
+                $('#parrafo-validado').css('display','block');
                 //Guardamos el valor actual del combo responsables y la guardamos en una cookie
                 var temp_respon_cookie = document.getElementById('responsables_id').value;
                 Cookies.set('participantes_responsable',temp_respon_cookie,{ expires:1});
@@ -171,17 +191,29 @@
                         var len = response['participantes_data'].length;
                         $('#mitabla tbody').empty(); // vaciamos la tabla de los participantes
                         //Llenamos la tabla con los valores retornados mediante json
+                        var tiene_permisos = "{{ Auth::User()->hasAnyPermission(['VIP']) }}"=="1"? true: false;
+
                         if(response['participantes_data'][0]['id']!=-1){
                             for(var x=0; x<len; x++){
                                 var nombre = response['participantes_data'][x]['nombre'];
                                 var carrera = response['participantes_data'][x]['carrera'];
                                 var id = response['participantes_data'][x]['id'];
                                 var no_control = response['participantes_data'][x]['no_control'];
-                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a> </td></tr>");
+                                if (tiene_permisos || (response['validado']=="false" && "{{ Auth::User()->can('ELIMINAR_PARTICIPANTES') }}"=="1" && response['user_id']=="{{ Auth::User()->id}}")) {
+                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a> </td></tr>");
+                                }else if(response['validado']=="true" && "{{ Auth::User()->can('ELIMINAR_PARTICIPANTES') }}"=="1" && response['user_id']=="{{ Auth::User()->id}}"){
+                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td><td>Ya Validado</td></tr>");
+                                }else if(response['user_id']!="{{ Auth::User()->id }}"){
+                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td><td>Ninguna</td></tr>");
+                                }else{
+                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td></tr>");
+                                }
                             }
                         }
                         var msj_numero_evidencias = document.getElementById('numero-evidencias-responsable');
                         msj_numero_evidencias.innerHTML = response['no_evidencias'];
+                        document.getElementById('validado').innerHTML = response['validado']=="true"? "SI": "NO";
+
                     },error:function(){
                         console.log('Error :(');
                     }
@@ -386,7 +418,6 @@
                 if(response.length>0){
                     temp.value = response[0]['nombre'];
                 }
-                console.log(response);
             },error: function(response){
                 console.log("error :(");
             }
@@ -404,8 +435,10 @@
     function getActividadCookie(){
         var temp_actividad_cookie = Cookies.get('participantes_actividad');
         if(temp_actividad_cookie!=null){
-            $('#actividades_id').val(temp_actividad_cookie);
-            $('#actividades_id').trigger('change');
+            if($("#actividades_id option[value='"+temp_actividad_cookie+"']").length!=0){
+                $('#actividades_id').val(temp_actividad_cookie);
+                $('#actividades_id').trigger('change');
+            }
         }
     }
     function evidenciaTotal(){
@@ -429,8 +462,11 @@
         comboResponsables();
         agregaParticipante();
         eliminaParticipante();
-        autocompletar(document.getElementById("participante_nombre"));
-        noControlParticipante(document.getElementById("no_control"));
+        var tiene_permisos = "{{ Auth::User()->hasAnyPermission(['VIP','AGREGAR_PARTICIPANTES']) }}"=="1"?true: false;
+        if(tiene_permisos){
+            autocompletar(document.getElementById("participante_nombre"));
+            noControlParticipante(document.getElementById("no_control"));
+        }
         evidenciaTotal();
         evidenciaParcial();
     });

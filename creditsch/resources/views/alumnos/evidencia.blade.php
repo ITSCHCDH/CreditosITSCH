@@ -59,46 +59,50 @@
 	</div>
 	<div style="margin-bottom: 60px;" class="resetear"></div>
 	@section('js')
-		<script type="text/javascript">
-			function elhover(){
-				$(document).on('mouseover','.gallery' ,function(event){
-					$(this).find('img.eliminar').css('visibility','visible');
-				});
-				$(document).on('mouseout','.gallery' ,function(event){
-					$(this).find('img.eliminar').css('visibility','hidden');
-				});
-			}
-			function eliminarEvidencia(){
-				$(document).on('click','.eliminar-evidencia',function(event){
-					event.preventDefault();
-					var confirmacion = confirm("¿Estas seguro que deseas eliminar esta evidencia?");
-					if(confirmacion){
-						var actividad = $(this).attr('data-actividad');
-						var archivo_id = $(this).attr('data-archivo');
-						var archivo_nombre = $(this).attr('data-archivo_nombre');
-						$(this).parent().css('display','none');
-						$.ajax({
-							type: "get",
-							dataType: "json",
-							url: "{{ route('alumnos.eliminar_evidencia') }}",
-							data:{
-								actividad: actividad,
-								archivo: archivo_id,
-								archivo_nombre: archivo_nombre
-							}, 
-							success: function(response){
-								mostrarMensaje(response['mensaje'],'mensaje-parte-superior',response['tipo']);
-							}, error: function(){
-								console.log("Error al eliminar la evidencia");
+		@if ($validado->count()!=0)
+			@if ($validado[0]->validado=="false")
+				<script type="text/javascript">
+					function elhover(){
+						$(document).on('mouseover','.gallery' ,function(event){
+							$(this).find('img.eliminar').css('visibility','visible');
+						});
+						$(document).on('mouseout','.gallery' ,function(event){
+							$(this).find('img.eliminar').css('visibility','hidden');
+						});
+					}
+					function eliminarEvidencia(){
+						$(document).on('click','.eliminar-evidencia',function(event){
+							event.preventDefault();
+							var confirmacion = confirm("¿Estas seguro que deseas eliminar esta evidencia?");
+							if(confirmacion){
+								var actividad = $(this).attr('data-actividad');
+								var archivo_id = $(this).attr('data-archivo');
+								var archivo_nombre = $(this).attr('data-archivo_nombre');
+								$(this).parent().css('display','none');
+								$.ajax({
+									type: "get",
+									dataType: "json",
+									url: "{{ route('alumnos.eliminar_evidencia') }}",
+									data:{
+										actividad: actividad,
+										archivo: archivo_id,
+										archivo_nombre: archivo_nombre
+									}, 
+									success: function(response){
+										mostrarMensaje(response['mensaje'],'mensaje-parte-superior',response['tipo']);
+									}, error: function(){
+										console.log("Error al eliminar la evidencia");
+									}
+								});
 							}
 						});
 					}
-				});
-			}
-			$(document).ready(function(){
-				elhover();
-				eliminarEvidencia();
-			});
-		</script>
+					$(document).ready(function(){
+						elhover();
+						eliminarEvidencia();
+					});
+				</script>
+			@endif
+		@endif
 	@endsection
 @endsection

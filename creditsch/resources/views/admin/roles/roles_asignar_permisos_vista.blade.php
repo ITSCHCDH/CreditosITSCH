@@ -24,6 +24,7 @@
 		   <thead>
 		       <th>ID</th>
 		       <th>Nombre</th>
+		       <th>Asignado</th>
 		       <th>Asignar</th>
 		   </thead>
 		   <tbody>
@@ -32,6 +33,13 @@
 			   		<tr>
 			   			<td>{{ $per->id }}</td>
 			   			<td>{{ $per->name }}</td>
+			   			<td>
+			   				@if ($per->role_id!=null)
+			   					{{ "SI"}}
+			   				@else
+			   					{{ "NO" }}	
+			   				@endif
+			   			</td>
 			   			<td>
 			   				@if ($per->role_id!=null)
 			   					<label class="control control--checkbox">

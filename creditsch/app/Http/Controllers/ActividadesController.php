@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Storage;
 
 class ActividadesController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:VIP_SOLO_LECTURA|VIP|VER_ACTIVIDAD|VIP_ACTIVIDAD')->only(['index','show']);
+        $this->middleware('permission:VIP|VIP_ACTIVIDAD|CREAR_ACTIVIDAD')->only(['create','store']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +23,12 @@ class ActividadesController extends Controller
      */
     public function index(Request $request)
     {   //Aqui mandamos llamar todos los datos de las actividades creadas
-        $act=Actividad::Search($request->nombre)->orderby('id','asc')->paginate(5); //Consulta todos los usuarios y los ordena, ademas pagina la consulta
+        if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])){
+            $act=Actividad::Search($request->nombre)->orderby('id','asc')->paginate(10); //Consulta todos los usuarios y los ordena, ademas pagina la consulta
+        }else{
+            $act = Actividad::Search($request->nombre)->where('id_user','=',Auth::User()->id)->orderby('id','ASC')->paginate(10);
+        }
+        
         //Creamos un metodo que llame a las relaciones de cada una de las actividades
         $act->each(function ($act){
             $act->credito;
@@ -48,8 +58,6 @@ class ActividadesController extends Controller
      */
     public function store(Request $request)
     {
-
-
         $act=new Actividad($request->all()); //Obtiene todos los datos de la vista para guardarlos en la BD
         $act->id_user = Auth::User()->id;
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act->nombre)->get();
@@ -57,8 +65,11 @@ class ActividadesController extends Controller
             Flash::error('El nombre '.$act->nombre.' ya ha sido tomado, ingrese uno diferente');
             return back()->withInput();
         }
+        if($act->por_cred_actividad>100){
+            Flash::error('El porcentaje de liberación no debe exceder el 100% del credito');
+            return back()->withInput();
+        }
         $act->save(); //Guarda el articulo en su tabla
-
         Flash::success('La actividad '.$act->nombre.' se registro de forma correcta');
         return redirect()->route('actividades.index');
     }
@@ -102,7 +113,13 @@ class ActividadesController extends Controller
         $act_nueva->fill($request->all());
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act_nueva->nombre)->get();
         if($actividad_con_mismo_nombre->count()>0){
-            Flash::error('El nombre '.$act_nueva->nombre.' ya ha sido tomado, ingrese uno diferente');
+            if($actividad_con_mismo_nombre[0]->id!=$id){
+                Flash::error('El nombre '.$act_nueva->nombre.' ya ha sido tomado, ingrese uno diferente');
+                return back()->withInput();
+            }
+        }
+        if($act_nueva->por_cred_actividad>100){
+            Flash::error('El porcentaje de liberación no debe exceder el 100% del credito');
             return back()->withInput();
         }
         $act_nueva->save();

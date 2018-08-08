@@ -14,7 +14,16 @@
 		</div>
 		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 pull-left">
 		    {!! Form::label('carrera','Carrera') !!}
-            {!! Form::select('carrera',['Sistemas'=>'Ingeniería en Sistemas Computacionales','Industrial'=>'Ingeniería Industrial','Mecatrónica'=>'Ingeniería Mecatrónica',"TIC'S"=>'Ingeniería en Tecnologias de Información y Comunicaciones','Bioquímica'=>'Ingeniería Bioquimica','Nanotecnología'=>'Ingeniería en Nanotecnologia'],null,['class'=>'form-control','placeholder' => 'Seleccione una carrera','required']) !!}
+		    <select class="form-control" required name="carrera" id="carrera">
+		    	@if (Auth::User()->hasAnyPermission(['VIP','VIP_REPORTES','VIP_SOLO_LECTURA']))
+		    		<option value="">Seleccione una carrera</option>
+		    	@endif
+		    	@for ($i = 0; $i < count($carreras); $i++)
+		    		<option value="{{ $carreras[$i]['valor'] }}">{{ $carreras[$i]['carrera'] }}</option>
+		    	@endfor
+		    </select>
+            
+
 		</div>
 		<div>
 			{!! Form::submit('Buscar',['class' => 'btn btn-primary pull-left','style' => 'margin-top: 24px; margin-left: 25px;']) !!}
@@ -37,23 +46,25 @@
 					</div>
 				</div>
 				<p class="btn btn-primary boton-desplegar pull-left" id="{{ $suma_creditos[$alumno]->alumno_id }}">Ver más</p>
-
-				{!! Form::open(['route' => 'verifica_evidencia.avance_alumno', 'method' => 'get','style' => 'width: 100px;','class' =>'pull-left']) !!}
-					@php
-						$ruta_carrera = "desconocida";
-						if(isset($_GET['carrera'])){
-							$ruta_carrera=$_GET['carrera'];
-						}
-						$ruta_generacion = "desconocida";
-						if(isset($_GET['generacion'])){
-							$ruta_generacion = $_GET['generacion'];
-						}
-					@endphp
-					{!! Form::hidden('ruta_carrera',$ruta_carrera) !!}
-					{!! Form::hidden('ruta_generacion',$ruta_generacion) !!}
-					{!! Form::hidden('no_control', $suma_creditos[$alumno]->no_control) !!}
-					{!! Form::submit('Ver avance del alumno',['class' => 'btn btn-primary pull-left alumno-avance'])!!}
-				{!! Form::close() !!}
+				@if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
+					{!! Form::open(['route' => 'verifica_evidencia.avance_alumno', 'method' => 'get','style' => 'width: 100px;','class' =>'pull-left']) !!}
+						@php
+							$ruta_carrera = "desconocida";
+							if(isset($_GET['carrera'])){
+								$ruta_carrera=$_GET['carrera'];
+							}
+							$ruta_generacion = "desconocida";
+							if(isset($_GET['generacion'])){
+								$ruta_generacion = $_GET['generacion'];
+							}
+						@endphp
+						{!! Form::hidden('ruta_carrera',$ruta_carrera) !!}
+						{!! Form::hidden('ruta_generacion',$ruta_generacion) !!}
+						{!! Form::hidden('no_control', $suma_creditos[$alumno]->no_control) !!}
+						{!! Form::submit('Ver avance del alumno',['class' => 'btn btn-primary pull-left alumno-avance'])!!}
+					{!! Form::close() !!}
+				@endif
+				
 				
 				<div class="resetear" ></div>
 				<ul class="pull-left lista" id="a{{ $suma_creditos[$alumno]->alumno_id }}" style="display:none;">

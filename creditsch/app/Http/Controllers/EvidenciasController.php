@@ -17,6 +17,13 @@ use Illuminate\Support\Facades\Auth;
 
 class EvidenciasController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('permission:VIP_SOLO_LECTURA|VIP|VER_EVIDENCIA')->only(['index','show']);
+        $this->middleware('permission:VIP|CREAR_EVIDENCIA')->only('create','store');
+        //$this->middleware('permission:VIP|ADMIN_EVIDENCIA')->only('peticionEliminar');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -25,7 +32,7 @@ class EvidenciasController extends Controller
     public function index(Request $request)
     {
         $ruta = $request->has('ruta');
-        if(Auth::User()->can('VIP')){
+        if(Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA')){
             $actividades = Actividad::select('nombre','id')->orderBy('nombre')->pluck('nombre','id');
             return view('admin.evidencias.index')
             ->with('actividades',$actividades)
@@ -141,7 +148,7 @@ class EvidenciasController extends Controller
 
     public function peticionAjax(Request $request){
         //Consultamos todos los responsables asignados a una activdad
-        if(Auth::User()->can('VIP')){
+        if(Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA')){
             $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->select('u.id','u.name')->orderBy('u.name')->get();
             //Retornamos los responsables en un json
             return response()->json($responsables);
@@ -204,14 +211,14 @@ class EvidenciasController extends Controller
                 $evidencias = DB::table('evidencia as e')->join('actividad_evidencia as ae',function($join) use($request){
                     $join->on('ae.id','=','e.id_asig_actividades');
                     $join->where('ae.actividad_id','=',$request->get('actividad_id'));
-                })->join('users as u','u.id','=','ae.user_id')->join('actividad as a','a.id','=','ae.actividad_id')->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')->select('e.nom_imagen','e.created_at','u.name as responsable_nombre','a.nombre as actividad_nombre','e.id as evidencia_id','alu.nombre as alumno_nombre')->get();
+                })->join('users as u','u.id','=','ae.user_id')->join('actividad as a','a.id','=','ae.actividad_id')->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')->select('e.nom_imagen','e.created_at','u.name as responsable_nombre','a.nombre as actividad_nombre','e.id as evidencia_id','alu.nombre as alumno_nombre','ae.validado','u.id as user_id')->get();
                 return response()->json($evidencias);
             }
             $evidencias = DB::table('users')->join('actividad_evidencia as ae',function($join) use($request){
                 $join->where('ae.user_id','=',$request->get('responsable_id'));
                 $join->where('ae.actividad_id','=',$request->get('actividad_id'));
                 $join->where('users.id','=',$request->get('responsable_id'));
-            })->join('actividad as a','a.id','=','ae.actividad_id')->join('evidencia as e','e.id_asig_actividades','=','ae.id')->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')->select('users.name as responsable_nombre','a.nombre as actividad_nombre','e.nom_imagen','e.created_at','e.id as evidencia_id','alu.nombre as alumno_nombre')->get();
+            })->join('actividad as a','a.id','=','ae.actividad_id')->join('evidencia as e','e.id_asig_actividades','=','ae.id')->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')->select('users.name as responsable_nombre','a.nombre as actividad_nombre','e.nom_imagen','e.created_at','e.id as evidencia_id','alu.nombre as alumno_nombre','ae.validado','users.id as user_id')->get();
             return response()->json($evidencias);
         }
         return response()->json(0);
@@ -219,9 +226,28 @@ class EvidenciasController extends Controller
 
     public function peticionEliminar(Request $request){
         if($request->has('actividad') && $request->has('archivo') && $request->has('archivo_nombre')){
-            Evidencia::destroy($request->get('archivo'));
-            Storage::delete('public/evidencias/'.$request->get('actividad').'/'.$request->get('archivo_nombre'));
-            return response()->json(array('mensaje' => 'Evidencia eliminada con exito','tipo' => 'exito'));
+            if(Auth::User()->can('VIP') || Auth::User()->can('VIP_EVIDENCIA')){
+                Evidencia::destroy($request->get('archivo'));
+                Storage::delete('public/evidencias/'.$request->get('actividad').'/'.$request->get('archivo_nombre'));
+                return response()->json(array('mensaje' => 'Evidencia eliminada con exito','tipo' => 'exito'));
+            }
+            $evidencia_validada = DB::table('evidencia as e')->join('actividad_evidencia as ae',function($join) use($request){
+                $join->on('ae.id','=','e.id_asig_actividades');
+                $join->where('e.id','=',$request->get('archivo'));
+            })->select('ae.validado','ae.user_id')->get();
+            if($evidencia_validada->count()==0){
+                return response()->json(array('mensaje' => 'Error al eliminar la evidencia', 'tipo' => 'error'));
+            }else{
+                if($evidencia_validada[0]->validado=="true"){
+                    return response()->json(array('mensaje' => 'La evidencia ya se encuentra validada. No esta permitida esta acción.', 'tipo' => 'error'));
+                }else if(Auth::User()->id==$evidencia_validada[0]->user_id && Auth::User()->can('ELIMINAR_EVIDENCIA')){
+                    Evidencia::destroy($request->get('archivo'));
+                    Storage::delete('public/evidencias/'.$request->get('actividad').'/'.$request->get('archivo_nombre'));
+                    return response()->json(array('mensaje' => 'Evidencia eliminada con exito','tipo' => 'exito'));
+                }else{
+                    return response()->json(array('mensaje' => 'No cuentas con los permisos necesarios para realizar esta acción', 'tipo' => 'error'));
+                }
+            }
         }
         return response()->json(array('mensaje' => 'Error al eliminar la evidencia', 'tipo' => 'error'));
     }

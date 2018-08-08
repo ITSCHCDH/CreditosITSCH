@@ -12,9 +12,10 @@ class CreditosController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:VIP_SOLO_LECTURA')->only('index');
-        $this->middleware('permission:VIP')->except('index');
-        
+        $this->middleware('permission:VIP_SOLO_LECTURA|VIP|VER_CREDITOS')->only(['index','show']);
+        $this->middleware('permission:VIP|CREAR_CREDITOS')->only(['create','store']);
+        $this->middleware('permission:VIP|ELIMINAR_CREDITOS')->only('destroy');
+        $this->middleware('permission:VIP|MODIFICAR_CREDITOS')->only(['edit','update']);
     }
     /**
      * Display a listing of the resource.
