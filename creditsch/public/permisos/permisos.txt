@@ -1,49 +1,57 @@
-crear_evidencia
-eliminar_evidencia
-modificar_evidencia
-ver_evidencia
-verificar_evidencia
-vip_evidencia
+CREAR_EVIDENCIA
+ELIMINAR_EVIDENCIA
+MODIFICAR_EVIDENCIA
+VER_EVIDENCIA
+VERIFICAR_EVIDENCIA
+VIP_EVIDENCIA
 
-crear_actividad
-eliminar_actividad
-ver_actividad
-modificar_actividad
-crear_actividad_alumnos
-vip_actividad
+CREAR_ACTIVIDAD
+ELIMINAR_ACTIVIDAD
+VER_ACTIVIDAD
+MODIFICAR_ACTIVIDAD
+CREAR_ACTIVIDAD_ALUMNOS
+VIP_ACTIVIDAD
 
-crear_alumnos
-eliminar_alumnos
-modificar_alumnos
-ver_alumnos
+CREAR_ALUMNOS
+ELIMINAR_ALUMNOS
+MODIFICAR_ALUMNOS
+VER_ALUMNOS
 
-crear_usuarios
-eliminar_usuarios
-modificar_usuarios
-ver_usuarios
+CREAR_USUARIOS
+ELIMINAR_USUARIOS
+MODIFICAR_USUARIOS
+VER_USUARIOS
 
-agregar_participantes
-eliminar_participantes
-ver_participantes
+AGREGAR_PARTICIPANTES
+ELIMINAR_PARTICIPANTES
+VER_PARTICIPANTES
 
-agregar_responsables
-eliminar_responsables
-ver_responsables
+AGREGAR_RESPONSABLES
+ELIMINAR_RESPONSABLES
+VER_RESPONSABLES
 
-crear_creditos
-eliminar_creditos
-ver_creditos
-modificar_creditos
+CREAR_CREDITOS
+ELIMINAR_CREDITOS
+VER_CREDITOS
+MODIFICAR_CREDITOS
 
-crear_roles
-ver_roles
-eliminar_roles
-modificar_roles
+VER_REPORTES_CARRERA
+VIP_REPORTES
 
-ver_reportes_carrera
-vip_reportes
+VER_AVANCE_ALUMNO
 
-ver_avance_alumno
+ASIGNAR_REMOVER_ROLES_USUARIOS
+CREAR_ROLES
+ELIMINAR_ROLES
+MODIFICAR_ROLES
+VER_ROLES
+VER_ROLES_USUARIOS
+ELIMINAR_ROLES_USUARIOS
+ASIGNAR_REMOVER_PERMISOS_A_ROLES
 
-vip
-vip_solo_lectura
+MODIFICAR_CONSTANCIAS_CARRERA
+VIP_CONSTANCIAS
+IMPRIMIR_CONSTANCIAS
+
+VIP
+VIP_SOLO_LECTURA

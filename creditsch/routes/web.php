@@ -136,12 +136,12 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::put('roles_permisos/{id}/actualizar','RolesPermisosController@actualizarRole')->name('roles.role_actualizar');
     Route::get('roles_permisos/{id}/eliminar','RolesPermisosController@eliminarRole')->name('roles.role_eliminar');
     Route::get('roles_permisos/{id}/usuarios','RolesPermisosController@usuarios')->name('roles.usuarios');
-    Route::get('roles_permisos/{id}/usuarios/revocar_role','RolesPermisosController@usuarioRevocarRol')->name('roles.usuarios_revocar');
+    Route::get('roles_permisos/{id}/usuarios/revocar_role','RolesPermisosController@usuariosRevocarRol')->name('roles.usuarios_revocar');
 
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
-    Route::get('home','AlumnosRutasController@home');
+    Route::get('home','AlumnosRutasController@home')->name('alumnos.home');
     Route::get('avance','AlumnosRutasController@avance')->name('alumnos.avance');
     Route::get('actividades','AlumnosRutasController@actividades')->name('alumnos.actividades');
     Route::get('actividades/subir_evidencia','AlumnosRutasController@subirEvidencia')->name('alumnos.subir_evidencia');

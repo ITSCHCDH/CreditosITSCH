@@ -22,13 +22,32 @@
             <div class="container">
                 <div class="navbar-header">
                        <!-- Imagen ITSCH -->
-                        <a  href="{{ url('/') }}">
-                            <div style="text-align: center;">
-                                <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
-                                <br>
-                                <p style="font-family: sans-serif; color: darkred;">CREDITSCH</p>
-                            </div>
-                        </a>
+                        @if (Auth::guard('web')->check())
+                           <a  href="{{ url('/home') }}">
+                               <div style="text-align: center;">
+                                   <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
+                                   <br>
+                                   <p style="font-family: sans-serif; color: darkred;">CREDITSCH</p>
+                               </div>
+                           </a>
+                        @elseif(Auth::guard('alumno')->check())
+                            <a  href="{{ route('alumnos.home') }}">
+                                <div style="text-align: center;">
+                                    <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
+                                    <br>
+                                    <p style="font-family: sans-serif; color: darkred;">CREDITSCH</p>
+                                </div>
+                            </a>
+                        @else
+                            <a  href="{{ url('/') }}">
+                                <div style="text-align: center;">
+                                    <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
+                                    <br>
+                                    <p style="font-family: sans-serif; color: darkred;">CREDITSCH</p>
+                                </div>
+                            </a>
+                        @endif
+                        
                 </div>
 
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
@@ -41,6 +60,9 @@
                     <ul class="nav navbar-nav navbar-right">
                         <!-- Authentication Links -->
                         @if (Auth::guard('alumno')->check())
+                            <li>
+                                <a href="{{ route('alumnos.home') }}">Home</a>
+                            </li>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true">
                                     {{ Auth::guard('alumno')->user()->nombre }} <span class="caret"></span>
@@ -60,7 +82,10 @@
                                     </li>
                                 </ul>
                             </li>
-                        @elseif (Auth::guard()->check())
+                        @elseif (Auth::guard('web')->check())
+                            <li>
+                                <a href="{{ url('/home') }}">Home</a>
+                            </li>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                     {{ Auth::user()->name }} <span class="caret"></span>
@@ -80,9 +105,6 @@
                                     </li>
                                 </ul>
                             </li>
-                        @else
-                            <li><a href="{{ route('login') }}">Iniciar</a></li>
-                            <li><a href="{{ route('register') }}">Registrarse</a></li>
                         @endif
                     </ul>
                 </div>

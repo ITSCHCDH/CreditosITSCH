@@ -4,7 +4,9 @@
 	<label class="label label-success">Usuarios</label>
 @endsection
 @section('contenido')
-	<a href="{{ route('usuarios.create')}}" class="btn btn-primary">Nuevo Usuario</a>
+	@if (Auth::User()->hasAnyPermission(['VIP','CREAR_USUARIOS']))
+		<a href="{{ route('usuarios.create')}}" class="btn btn-primary">Nuevo Usuario</a>
+	@endif
 	<table class="table table-striped" id="tabla-usuarios">
 	   <thead>
 	       <th>ID</th>
@@ -12,7 +14,9 @@
 	       <th>Area</th>
 	       <th>Correo</th>
 	       <th>Activo</th>
+	       @if (Auth::User()->hasAnyPermission(['VIP','ASIGNAR_REMOVER_ROLES_USUARIOS','MODIFICAR_USUARIOS','ELIMINAR_USUARIOS']))
 	       <th>Acción</th>
+	       @endif
 	   </thead>
 	   <tbody>
 	   	@foreach ($users as $user)
@@ -27,11 +31,17 @@
 	   				<td>NO</td>
 	   			@endif
 	   			<td>
-	   				<a href="{{ route('usuarios.edit',$user->id) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
-	   				<a href="{{ route('admin.usuarios.destroy',$user->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-	   				<a href="{{ route('usuarios.asignar_roles',$user->id) }}" class="btn btn-info" style="width: 40px; height: 34px;">
-	   					<img src="{{ asset('images/permissions_icon.png') }}" style="width: 20px; height: 22px;">
-	   				</a>
+	   				@if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_USUARIOS']))
+	   					<a href="{{ route('usuarios.edit',$user->id) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+	   				@endif
+	   				@if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_USUARIOS']))
+	   					<a href="{{ route('admin.usuarios.destroy',$user->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+	   				@endif
+	   				@if (Auth::User()->hasAnyPermission(['VIP','ASIGNAR_REMOVER_ROLES_USUARIOS']))
+	   					<a href="{{ route('usuarios.asignar_roles',$user->id) }}" class="btn btn-info" style="width: 40px; height: 34px;">
+	   						<img src="{{ asset('images/permissions_icon.png') }}" style="width: 20px; height: 22px;">
+	   					</a>
+	   				@endif
 	   			</td>
 	   		</tr>
 	   	@endforeach

@@ -25,7 +25,7 @@ class UpdateAlumnosTable extends Migration
      */
     public function down()
     {
-        Schemma::table('alumnos', function(Blueprint $table){
+        Schema::table('alumnos', function(Blueprint $table){
             $table->dropRememberToken();
         });
     }

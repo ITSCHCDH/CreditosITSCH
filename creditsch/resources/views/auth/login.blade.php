@@ -11,14 +11,13 @@
                 </div>
 
                 <div class="panel-body">
-                    <form class="form-horizontal" method="POST" action="{{ route('alumnos.login') }}" id="frm-login">
+                    <form class="form-horizontal" method="POST" action="{{ route('login') }}" id="frm-login">
                         {{ csrf_field() }}
 
                         <div class="form-group{{ $errors->has('email') || $errors->has('no_control') ? ' has-error' : '' }}">
-                            <label for="email" id="label-username" class="col-md-4 control-label">No de Control</label>
-
+                            <label for="email" id="label-username" class="col-md-4 control-label">Dirección E-Mail</label>
                             <div class="col-md-6">
-                                <input id="email" type="text" class="form-control" name="no_control" required autofocus>
+                                <input id="email" type="text" class="form-control" name="email" required autofocus>
 
                                 @if ($errors->has('email'))
                                     <span class="help-block">
@@ -52,8 +51,8 @@
 
                             <div class="col-md-6">
                                 <select id="tipo-login" name="tipo-login" class="form-control">
-                                    <option value="0" selected>Alumno</option>
-                                    <option value="1">Administrativo</option>
+                                    <option value="1" selected>Administrativo</option>
+                                    <option value="0">Alumno</option>
                                 </select>
                                 @if ($errors->has('active'))
                                     <span class="help-block" style="color:red;">
@@ -77,7 +76,7 @@
                                 <button type="submit" class="btn btn-primary">
                                     Inicio
                                 </button>
-                                <a class="btn btn-link" href="{{ route('password.request') }}">
+                                <a class="btn btn-link" href="{{ route('password.request') }}" id="olvidaste">
                                     ¿Olvidaste tu contraseña?
                                 </a>
                             </div>
@@ -102,10 +101,12 @@
                     email.name = "no_control";
                     formulario.action = "{{ route('alumnos.login') }}";
                     label.innerHTML = "No de Control";
+                    $('#olvidaste').css('display','none');
                 }else{
                     email.name = "email";
                     formulario.action = "{{ route('login') }}";
                     label.innerHTML = "Dirección E-Mail";
+                    $('#olvidaste').css('display','inline');
                 }
             });
         }

@@ -8,7 +8,10 @@
 
 @section('contenido')
 
-    <a href="{{route('alumnos.create')}}" class="btn btn-info">Registrar nuevo alumno</a>
+    @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ALUMNOS']))
+        <a href="{{route('alumnos.create')}}" class="btn btn-primary">Registrar nuevo alumno</a>
+    @endif
+    
     <!--BUSCADOR DE ARTICULOS  -->
     <!-- Boton de busqueda en la pagina -->
     {!! Form::open(['route'=>'alumnos.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right']) !!}
@@ -32,7 +35,9 @@
         <th>Nombre</th>
         <th>Carrera</th>
         <th>Estatus</th>
-        <th>Acción</th>
+        @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS','MODIFICAR_ALUMNOS']))
+            <th>Acción</th>
+        @endif
         </thead>
         <tbody>
         @foreach($alumno as $alu)
@@ -49,13 +54,17 @@
                     @endif
                 </td>
                 <td>
-                    <a href="{{ route('alumnos.edit',[$alu->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
-                    <a href="{{ route('admin.alumnos.destroy',$alu->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                    @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ALUMNOS']))
+                        <a href="{{ route('alumnos.edit',[$alu->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+                    @endif
+                    @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS']))
+                        <a href="{{ route('admin.alumnos.destroy',$alu->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                    @endif
                 </td>
             </tr>
         @endforeach
         </tbody>
     </table>
-
     {!! $alumno->render() !!}
+    <div style="margin-bottom: 70px;"></div>
 @endsection

@@ -3,7 +3,7 @@
 @section('title','Usuarios Crear')
 
 @section('ruta')
-	<a href="{{ route('usuarios.index') }}">Usuarios Dashboard</a>
+	<a href="{{ route('usuarios.index') }}">Usuarios</a>
 	/
 	<label class="label label-success">Creación</label>
 @endsection

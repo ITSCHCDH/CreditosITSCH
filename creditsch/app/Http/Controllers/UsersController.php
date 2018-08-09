@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\User;
 use Laracasts\Flash\Flash;
 use Illuminate\Support\Facades\Hash;
@@ -13,6 +14,13 @@ use DB;
 
 class UsersController extends Controller
 {
+    public function __construct(){
+        $this->middleware('permission:VIP|VER_USUARIOS|VIP_SOLO_LECTURA')->only(['index','show']);
+        $this->middleware('permission:VIP|CREAR_USUARIOS')->only(['store','create']);
+        $this->middleware('permission:VIP|MODIFICAR_USUARIOS')->only(['update','edit']);
+        $this->middleware('permission:VIP|ELIMINAR_USUARIOS')->only(['destroy']);
+        $this->middleware('permission:VIP|ASIGNAR_REMOVER_ROLES_USUARIOS')->only(['guardarRoles','asignarRoles']);
+    }
     public function index(){
     	$users = User::all();
     	return view('admin.usuarios.index')
@@ -66,7 +74,24 @@ class UsersController extends Controller
     }
 
     public function destroy($id){
-        User::destroy($id);
+        if(Auth::User()->id==$id){
+            Flash::error('No te puedes autoeliminar');
+            return redirect()->route('usuarios.index');
+        }
+        $user = User::find($id);
+        if($user==null){
+            Flash::error('El usuario no existe');
+            return redirect()->route('usuarios.index');
+        }
+        $actividades = DB::table('actividad as a')->where('a.id_user','=',$id)->get()->count()>0? true: false;
+        $responsable = DB::table('actividad_evidencia as ae')->where('ae.user_id','=',$id)->orwhere('ae.user_id','=',$id)->get()->count()>0?true:false;
+        $roles = DB::table('model_has_roles')->where('model_id','=',$id)->get()->count()>0?true:false;
+
+        if($roles || $actividades || $responsable){
+            Flash::error('El usuarios '.$user->name.' no puede ser eliminado debido debido a claves foraneas');
+            return redirect()->route('usuarios.index');
+        }
+        $user->delete();
         return redirect()->back();
     }
 

@@ -16,12 +16,14 @@
             
         </li>
         @if (Auth::guard('web')->check())
-            <li class="botMen">
-                <a class="etMenu" href="{{route('alumnos.index')}}">
-                    <i class="fa fa-graduation-cap"></i>
-                    <span class="spaMenu">Alumnos</span>
-                </a>
-            </li>
+            @if (Auth::User()->hasAnyPermission(['VIP','VER_ALUMNOS','VIP_SOLO_LECTURA']))
+                <li class="botMen">
+                    <a class="etMenu" href="{{route('alumnos.index')}}">
+                        <i class="fa fa-graduation-cap"></i>
+                        <span class="spaMenu">Alumnos</span>
+                    </a>
+                </li>
+            @endif
             @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VER_CREDITOS'))
                 <li class="botMen">
                     <a class="etMenu" href="{{route('creditos.index')}}">
@@ -30,39 +32,43 @@
                     </a>
                 </li>
             @endif
-            <li class="botMen" >
-                <a class="etMenu" href="" data-parent="">
-                    <i class="fa fa-fw fa-list-ul"></i>
-                    <span class="spaMenu">Actividades</span>
-                    <i class="fa fa-chevron-right flesub"></i>
-                </a>
-                <ul class="subMenu" >
-                    @if (Auth::User()->can('VIP')|| Auth::User()->can('VER_ACTIVIDAD') || Auth::User()->can('VIP_ACTIVIDAD') || Auth::User()->can('VIP_SOLO_LECTURA'))
+            @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ACTIVIDAD','VIP_ACTIVIDAD','VER_PARTICIPANTES','VIP_EVIDENCIA','VER_EVIDENCIA']))
+                <li class="botMen">
+
+                    <a class="etMenu" href="" data-parent="">
+                        <i class="fa fa-fw fa-list-ul"></i>
+                        <span class="spaMenu">Actividades</span>
+                        <i class="fa fa-chevron-right flesub"></i>
+                    </a>
+                    <ul class="subMenu" >
+                        @if (Auth::User()->can('VIP')|| Auth::User()->can('VER_ACTIVIDAD') || Auth::User()->can('VIP_ACTIVIDAD') || Auth::User()->can('VIP_SOLO_LECTURA'))
+                            <li class='tamSubMenu'>
+                                <a class="etSubMenu" href="{{route('actividades.index')}}">
+                                    <i class="fa fa-futbol-o"></i>
+                                    <span class="etSubMenu">Crear Actividad</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']))
+                            <li class='tamSubMenu'>
+                                <a class="etSubMenu" href="{{route('participantes.index')}}">
+                                    <i class="fa fa-users"></i>
+                                    <span class="etSubMenu">Agregar participantes</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_EVIDENCIA') || Auth::User()->can('VER_EVIDENCIA') || Auth::User()->can('VIP_SOLO_LECTURA'))
                         <li class='tamSubMenu'>
-                            <a class="etSubMenu" href="{{route('actividades.index')}}">
-                                <i class="fa fa-futbol-o"></i>
-                                <span class="etSubMenu">Crear Actividad</span>
-                            </a>
-                        </li>
-                    @endif
-                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','AGREGAR_PARTICIPANTES','ELIMINAR_PARTICIPANTES','VIP_EVIDENCIA','VER_PARTICIPANTES']))
-                        <li class='tamSubMenu'>
-                            <a class="etSubMenu" href="{{route('participantes.index')}}">
-                                <i class="fa fa-users"></i>
-                                <span class="etSubMenu">Agregar participantes</span>
-                            </a>
-                        </li>
-                    @endif
-                    @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_EVIDENCIA') || Auth::User()->can('VER_EVIDENCIA') || Auth::User()->can('VIP_SOLO_LECTURA'))
-                    <li class='tamSubMenu'>
-                            <a class="etSubMenu" href="{{route('evidencias.index')}}">
-                                <i class="fa fa-camera"></i>
-                                <span class="etSubMenu">Evidencia</span>
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-            </li>
+                                <a class="etSubMenu" href="{{route('evidencias.index')}}">
+                                    <i class="fa fa-camera"></i>
+                                    <span class="etSubMenu">Evidencia</span>
+                                </a>
+                            </li>
+                        @endif
+                    </ul>
+                </li>
+            @endif
+            
             <li class="botMen">
                 <a class="etMenu" href="" data-parent="">
                     <i class="fa fa-pie-chart"></i>
@@ -103,31 +109,36 @@
                     @endif
                 </ul>
             </li>
-            <li class="botMen">
-                <a class="etMenu"  href="#">
-                    <i class="fa fa-lock"></i>
-                    <span class="spaMenu">Administración</span>
-                    <i class="fa fa-chevron-right flesub"></i>
-                </a>
-                <ul class="subMenu" id="">
-                    <li class='tamSubMenu'>
-                        <a class="etSubMenu" href="{{ route('usuarios.index') }}">
-                            <i class="fa fa-users"></i>
-                            <span class="etSubMenu">Usuarios</span>
-                        </a>
-                    </li>
-                    <li class='tamSubMenu'>
-                        <a class="etSubMenu" href="{{ route('roles.index') }}">
-                            <i class="fa fa-address-card"></i>
-                            <span class="etSubMenu">Roles</span>
-                        </a>
-                    </li>
-
-                </ul>
-            </li>
+            @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES','VER_USUARIOS']))
+                <li class="botMen">
+                    <a class="etMenu"  href="#">
+                        <i class="fa fa-lock"></i>
+                        <span class="spaMenu">Administración</span>
+                        <i class="fa fa-chevron-right flesub"></i>
+                    </a>
+                    <ul class="subMenu" id="">
+                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS']))
+                            <li class='tamSubMenu'>
+                                <a class="etSubMenu" href="{{ route('usuarios.index') }}">
+                                    <i class="fa fa-users"></i>
+                                    <span class="etSubMenu">Usuarios</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES']))
+                            <li class='tamSubMenu'>
+                                <a class="etSubMenu" href="{{ route('roles.index') }}">
+                                    <i class="fa fa-address-card"></i>
+                                    <span class="etSubMenu">Roles</span>
+                                </a>
+                            </li>
+                        @endif
+                    </ul>
+                </li>
+            @endif
         @endif
         @if (Auth::guard('alumno')->check())
-            <li class="botMen">
+            <li class="botMen">http://127.0.0.1:8000/login
                 <a class="etMenu" href="{{ route('alumnos.actividades') }}">
                     <i class="fa fa-fw fa-list-ul"></i>
                     <span class="spaMenu">Actividades</span>

@@ -31,7 +31,7 @@
 	   				@endif
 	   			</td>
 	   			<td>
-	   				<a href="#" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+	   				<a href="{{ route('roles.usuarios_revocar',['id' => $role->id,'user_id' => $user->id]) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
 	   			</td>
 	   		</tr>
 	   	@endforeach

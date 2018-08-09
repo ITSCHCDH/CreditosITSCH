@@ -3,12 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-
+use Laracasts\Flash\Flash;
+use App\User;
 
 class RolesPermisosController extends Controller
 {
+    public function __construct(){
+        $this->middleware('permission:VIP|VER_ROLES|VIP_SOLO_LECTURA')->only('index');
+        $this->middleware('permission:VIP|CREAR_ROLES')->only(['crearRole','guardarRole']);
+        $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_ROLES_USUARIOS')->only('usuarios');
+        $this->middleware('permission:VIP|ELIMINAR_ROLES_USUARIOS|ASIGNAR_REMOVER_ROLES_USUARIOS')->only('usuariosRevocarRol');
+        $this->middleware('permission:VIP|MODIFICAR_ROLES')->only(['editarRole','actualizarRole']);
+        $this->middleware('permission:VIP|ELIMINAR_ROLES')->only(['eliminarRole']);
+        $this->middleware('permission:VIP|ASIGNAR_REMOVER_PERMISOS_A_ROLES')->only(['rolesAsignarPermiso','rolesAsignarPermisosVista']);
+    }
     public function index(){
         $roles = Role::all();
     	return view('admin.roles.index')
@@ -76,18 +87,48 @@ class RolesPermisosController extends Controller
     }
 
     public function eliminarRole($id){
+        $role = Role::find($id);
+        if($role==null){
+            Flash::error('El rol no existe');
+            return redirect()->route('roles.index');
+        }
         Role::destroy($id);
+        Flash::success('Role eliminado correctamente');
         return redirect()->back();
     }
 
     public function usuarios($id){
-        $role = Role::findById($id);
+        $role = Role::find($id);
+        if($role==null){
+            Flash::error('El rol no existe');
+            return redirect()->route('roles.index');
+        }
         $users = $role->users;
         return view('admin.roles.roles_usuarios')
-        ->with('users',$users);
+        ->with('users',$users)
+        ->with('role',$role);
     }
 
-    public function usuariosRevocar(Request $request){
-        $user = User::find(1);
+    public function usuariosRevocarRol(Request $request, $id){
+        $role = Role::find($id);
+        if($role==null){
+            Flash::error('El rol no existe');
+            return redirect()->back();
+        }
+        if(!$request->has('user_id')){
+            return redirect()->back();
+        }
+        if($request->get('user_id') == Auth::User()->id){
+            Flash::error('No puedes autoeliminarte');
+            return redirect()->back();
+        }
+        $user = User::find($request->get('user_id'));
+        if($user==null){
+            Flash::error('El usuario no existe');
+            return redirect()->back();
+        }
+        $user->removeRole($role->name);
+        Flash::success('Roles removidos exitosamente');
+        return redirect()->route('roles.usuarios',$role->id);
     }
 }
