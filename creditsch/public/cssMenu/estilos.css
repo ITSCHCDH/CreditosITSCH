@@ -219,11 +219,19 @@ footer div p{
     background: #1d2950; 
 }
 
-/* Manupukar ek hover */
+/* Manupular el hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #151b50; 
 }
-/* Color de la flecha que aparece en la esquina de nuestri scroll*/
+/* Color de la flecha que aparece en la esquina de nuestro scroll*/
 ::-webkit-scrollbar-corner{
     background: #2d3e50;    
+}
+
+/* Oculta los scrollbar horizontales */
+::-webkit-scrollbar-track:horizontal{
+    visibility: hidden;
+}
+::-webkit-scrollbar-thumb:horizontal{
+    visibility: hidden;
 }

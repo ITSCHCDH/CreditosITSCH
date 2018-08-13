@@ -10,7 +10,6 @@
 	@if (Auth::User()->hasAnyPermission(['VIP','CREAR_ROLES']))
 		<a href="{{ route('roles.roles_crear')}}" class="btn btn-primary">Crear Rol</a>
 	@endif
-	<a href="{{ route('roles.permisos_crear')}}" class="btn btn-primary">Crear Permiso</a>
 	<table class="table table-striped" id="tabla_roles">
 	   <thead>
 	       <th>ID</th>

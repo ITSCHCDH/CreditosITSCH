@@ -32,18 +32,6 @@ class RolesPermisosController extends Controller
     	$role = Role::create(['name' => $request->get('name')]);
     	return redirect()->route('roles.index');
     }
-    public function crearPermiso(){
-    	return view('admin.roles.permisos_crear');
-    }
-    public function guardarPermiso(Request $request){
-        $permisos = strtoupper($request->get('name'));
-        $tokenizer = strtok($permisos, " \n\t");
-        while($tokenizer){
-            Permission::findOrCreate($tokenizer);
-            $tokenizer = strtok(" \n\t");
-        } 
-    	return redirect()->route('roles.index');
-    }
     public function rolesAsignarPermisosVista($id){
     	$permisos = Permission::leftjoin('role_has_permissions as r',function($join) use($id){
             $join->on('r.permission_id','=','id');

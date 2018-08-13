@@ -6,6 +6,7 @@ use App\Credito;
 use Illuminate\Http\Request;
 use Laracasts\Flash\Flash;
 use App\Actividad;
+use App\Actividad_Evidencia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,6 +16,7 @@ class ActividadesController extends Controller
     {
         $this->middleware('permission:VIP_SOLO_LECTURA|VIP|VER_ACTIVIDAD|VIP_ACTIVIDAD')->only(['index','show']);
         $this->middleware('permission:VIP|VIP_ACTIVIDAD|CREAR_ACTIVIDAD')->only(['create','store']);
+        $this->middleware('permission:VIP|VIP_ACTIVIDAD|MODIFICAR_ACTIVIDAD')->only(['edit','update']);
     }
     /**
      * Display a listing of the resource.
@@ -93,10 +95,20 @@ class ActividadesController extends Controller
      */
     public function edit($id)
     {
-        //Codigo de modificaciones
         $act=Actividad::find($id);//Busca el registro
-        $creditos=Credito::orderBy('nombre','asc')->pluck('nombre','id');
-        return view('admin.actividades.edit')->with('actividad',$act)->with('creditos',$creditos);
+        if($act==null){
+            Flash::error('La actividad no existe');
+            return redirect()->route('actividades.index');
+        }
+        if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
+            $creditos=Credito::orderBy('nombre','asc')->pluck('nombre','id');
+            return view('admin.actividades.edit')->with('actividad',$act)->with('creditos',$creditos);
+        }else if(Auth::User()->hasAnyPermission(['VIP'])){
+
+        }
+        //Codigo de modificaciones
+        
+        
     }
 
     /**
@@ -108,6 +120,7 @@ class ActividadesController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         $act_anterior=Actividad::find($id);
         $act_nueva=Actividad::find($id);
         $act_nueva->fill($request->all());
@@ -163,8 +176,30 @@ class ActividadesController extends Controller
     public function destroy($id)
     {
         $act=Actividad::find($id);
-        $act->delete();
-        Flash::error('La actividad '.$act->nombre.' ha sido borrada con exito');
+        if($act==null){
+            Flash::error('La actividad no existe');
+            return redirect()->route('actividades.index');
+        }
+        if (Auth::User()->hasAnyPermission(['VIP_ACTIVIDAD','VIP'])) {
+            $asignada = Actividad_Evidencia::where('actividad_id','=',$act->id)->get()->count()>0?true: false;
+            if($asignada){
+                Flash::error('La actividad no puede ser eliminada debido a conflictos con claves foraneas');
+                return redirect()->route('actividades.index');
+            }
+            $act->delete();
+            Flash::error('La actividad '.$act->nombre.' ha sido borrada con exito');
+        }else if(Auth::User()->can('ELIMINAR_ACTIVIDAD') && Auth::User()->id==$act->id_user){
+            $asignada = Actividad_Evidencia::where('actividad_id','=',$act->id)->get()->count()>0?true: false;
+            if($asignada){
+                Flash::error('La actividad no puede ser eliminada debido a conflictos con claves foraneas');
+                return redirect()->route('actividades.index');
+            }
+            $act->delete();
+            Flash::error('La actividad '.$act->nombre.' ha sido borrada con exito');
+        }else{
+            Flash::error('No tienes permisos para eliminar esta actividad');
+        }
+        
         return redirect()->route('actividades.index');
     }
 }

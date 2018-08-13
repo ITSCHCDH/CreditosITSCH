@@ -127,8 +127,6 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('roles_permisos/index','RolesPermisosController@index')->name('roles.index');
     Route::get('roles_permisos/roles_crear','RolesPermisosController@crearRole')->name('roles.roles_crear');
     Route::post('roles_permisos/roles_guardar','RolesPermisosController@guardarRole')->name('roles.roles_guardar');
-    Route::get('roles_permisos/permisos_crear','RolesPermisosController@crearPermiso')->name('roles.permisos_crear');
-    Route::post('roles_permisos/permisos_guardar','RolesPermisosController@guardarPermiso')->name('roles.permisos_guardar');
     Route::get('roles_permisos/{id}/asignar_permiso_vista','RolesPermisosController@rolesAsignarPermisosVista')->name('roles.roles_asignar_permisos_vista');
     Route::get('roles/{id}/ver_permisos','RolesPermisosController@roleVerPermisos')->name('roles.role_ver_permisos');
     Route::post('roles_permisos/role_asignar_permiso','RolesPermisosController@rolesAsignarPermiso')->name('roles.roles_asignar_permisos');
@@ -137,6 +135,13 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('roles_permisos/{id}/eliminar','RolesPermisosController@eliminarRole')->name('roles.role_eliminar');
     Route::get('roles_permisos/{id}/usuarios','RolesPermisosController@usuarios')->name('roles.usuarios');
     Route::get('roles_permisos/{id}/usuarios/revocar_role','RolesPermisosController@usuariosRevocarRol')->name('roles.usuarios_revocar');
+
+    Route::get('mensajes','MensajesController@index')->name('mensajes.index');
+    Route::get('mensajes/crear','MensajesController@crear')->name('mensajes.crear');
+    Route::post('mensajes/enviar','MensajesController@enviar')->name('mensajes.enviar');
+    Route::get('mensajes/enviados','MensajesController@enviados')->name('mensajes.enviados');
+    Route::get('mensajes/ver','MensajesController@ver')->name('mensajes.ver');
+    Route::get('mensajes/destinatarios','MensajesController@destinatarios')->name('mensajes.destinatarios');
 
 });
 /******************************/

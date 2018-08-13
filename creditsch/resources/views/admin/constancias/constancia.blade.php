@@ -1,7 +1,8 @@
 <style type="text/css">
 	.heading{
 		width: 720px;
-		height: 75px;
+		height: 135px;
+		margin-bottom: 5px;
 	}
 	.marco{
 		width: 650px;
@@ -103,31 +104,16 @@
 	#pie-pagina{
 		position:fixed;
 		bottom:0;
-		height: 60px;
+		height: 90px;
 	}
 </style>
 <div class="heading">
 		<div>
-			<div id="sep" class="f-izquierda div-header">
-				<img src="{{ $data['raiz'].public_path()."/images/constancias/sep_logo2.jpg" }}">
-			</div>
-			<div class="f-izquierda div-header" style="margin-top: 30px; margin-left: 3px; font-weight: 600; height: 40px;">
-				<p class="c-vertical">TECNOLÓGICO NACIONAL DE MEXICO</p>
-			</div>
-			<div id="mich" class="f-izquierda div-header">
-				<img src="{{ $data['raiz'].public_path()."/images/constancias/mich_logo.png" }}">
-			</div>
+			<img src="{{ $data['raiz'].public_path()."/storage/constancia_imagenes/encabezado/".$data['datos_globales']->imagen_encabezado }}" width="100%" height="135px;">
 		</div>
-</div>
-<div class="romper"></div>
-<div di>
-	<p id="institucion">INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO</p>
 </div>
 
 <div class="romper"></div>
-<div>
-	<p id="lema">&quot;{{ $data['datos_globales']->enunciado_superior }}&quot;</p>
-</div>
 <div  style="width: 690px; height: 54px; margin-top: 10px;">
 		<div style="height: 15px;" class="f-derecha">
 			<p id="fecha" class="sin-margenes">{{ $data['dia'] }}/{{ $data['mes'] }}/{{ $data['year'] }}</p>
@@ -137,13 +123,20 @@
 		</div>
 		<div class="romper"></div>
 		<div class="f-derecha">
-			<p class="bloque">OFICIO No. {{ strtoupper($data['datos_globales']->oficio) }}</p>
+			<p class="bloque">OFICIO No. DISC/S-{{ $data['datos_globales']->numero_oficio }}/{{ $data['year'] }}</p>
 		</div>
 		
 </div>
 <div class="romper"></div>
-<p class="jefa">L.I SANDRA YUNUEN VILLEGAS VIVAR</p>
-<P class="jefa">JEFA DEL DEPTO. DE SERVICIOS ESCOLARES</P>
+@if (substr($data['jefe_depto']->profesion_jefe_depto, 0, 5) == "otro-")
+	@php
+		$cadena = substr($data['jefe_depto']->profesion_jefe_depto,5);
+	@endphp
+	<p class="jefa">{{ strtoupper($cadena) }}. {{ strtoupper((string)$data['jefe_depto']->name) }}</p>
+@else
+	<p class="jefa">{{ strtoupper($data['jefe_depto']->profesion_jefe_depto) }}. {{ strtoupper((string)$data['jefe_depto']->name) }}</p>
+@endif
+<P class="jefa">{{ strtoupper((string)$data['jefe_depto']->jefe_depto_enunciado) }}</P>
 <P class="jefa">PRESENTE</P>
 <div class="marco">
 	<p class="parrafo">Por medio del presente le envió un cordial saludo, y aprovecho la oportunidad para hacer de su conocimiento que de acuerdo a lo establecido en el lineamiento para la acreditación de actividades complementarias para el plan de estudios {{ strtoupper($data['datos_globales']->plan_de_estudios) }}, el(a) alumno(a) <strong>Jehú Jair Ruiz Villegas</strong> con el numero de control <strong>15030205</strong> de la carrera INGENIERÍA EN SISTEMAS COMPUTACIONALES ha <strong style="text-decoration: underline;">concluido satisfactoriamente</strong> con las actividades necesarias para liberar los créditos complementarios. Dichas actividades se resumen a continuación: </p>
@@ -234,14 +227,6 @@
 		</div>
 	</div>
 	<div id="pie-pagina">
-		<img style="height: 60px; width: 50px; margin-left: 40px;" class="f-izquierda" src="{{ $data['raiz'].public_path()."/images/constancias/itsch.png" }}">
-		<div style="width: 240px; height: 100%; margin-left: 40px;" class="f-izquierda">
-			<p class="parrafo" style="font-size: 9px;">{{ $data['datos_globales']->institucion_info }}
-			</p>
-		</div>
-		<img style="height: 55px; width: 55px; margin-left: 40px;" class="f-izquierda" src="{{ $data['raiz'].public_path()."/images/constancias/caceca.jpg" }}">
-		<img style="height: 50px; width: 120px; margin-left: 10px;" class="f-izquierda" src="{{ $data['raiz'].public_path()."/images/constancias/cacei_logo.jpg" }}">
-		<img style="height: 55px; width: 40px; margin-left: 15px;" class="f-izquierda" src="{{ $data['raiz'].public_path()."/images/constancias/applus.png" }}">
-		<img style="height: 55px; width: 40px; margin-left: 15px;" class="f-izquierda" src="{{ $data['raiz'].public_path()."/images/constancias/applus.png" }}">
+		<img src="{{ $data['raiz'].public_path()."/storage/constancia_imagenes/pie_de_pagina/".$data['datos_globales']->imagen_pie }}" width="100%" height="90px">
 	</div>
 </div>

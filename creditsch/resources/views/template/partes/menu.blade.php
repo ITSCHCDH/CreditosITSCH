@@ -99,7 +99,7 @@
                             <span class="etSubMenu">Constancias</span>
                         </a>
                     </li>
-                    @if (Auth::User()->hasAnyPermission(['VER_REPORTES_CARRERA','VIP_REPORTES','VIP_SOLO_LECTURA']))
+                    @if (Auth::User()->hasAnyPermission(['VER_REPORTES_CARRERA','VIP_REPORTES','VIP_SOLO_LECTURA','VIP']))
                         <li class='tamSubMenu'>
                             <a class="etSubMenu" href="{{ route('verifica_evidencia.reportes') }}">
                                 <i class="fa fa-file-pdf-o"></i>
@@ -136,9 +136,16 @@
                     </ul>
                 </li>
             @endif
+
+            <li class="botMen">
+                <a class="etMenu"  href="{{ route('mensajes.index') }}">
+                    <i class="fa fa-envelope"></i>
+                    <span class="spaMenu">Mensajes</span>
+                </a>
+            </li>
         @endif
         @if (Auth::guard('alumno')->check())
-            <li class="botMen">http://127.0.0.1:8000/login
+            <li class="botMen">
                 <a class="etMenu" href="{{ route('alumnos.actividades') }}">
                     <i class="fa fa-fw fa-list-ul"></i>
                     <span class="spaMenu">Actividades</span>

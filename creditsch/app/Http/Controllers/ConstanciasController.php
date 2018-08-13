@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use App\User;
 use App\ConstanciaComplemento;
 use App\Constancia;
 use PDF;
+use DB;
+use Laracasts\Flash\Flash;
 class ConstanciasController extends Controller
 {
 	
@@ -19,6 +22,7 @@ class ConstanciasController extends Controller
             'enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'
         ];
         $datos_globales = ConstanciaComplemento::all();
+        $jefe_depto = DB::table('constancia_complemento  as cc')->join('users as u','u.id','=','cc.jefe_depto')->select('u.name','cc.jefe_depto_enunciado','cc.profesion_jefe_depto')->get();
         $fecha_actual = Carbon::now()->setTimezone('CDT')->format('d m Y');
         $tokenizer = strtok($fecha_actual," ");
         $dia = $tokenizer;
@@ -37,7 +41,8 @@ class ConstanciasController extends Controller
             'dia' => $dia,
             'mes' => $meses[$mes-1],
             'year' => $year,
-            'raiz' => $raiz
+            'jefe_depto' => $jefe_depto[0],
+            'raiz' => $raiz,
         ];
         $pdf = PDF::loadView('admin.constancias.constancia', compact('data'));
         //return view('admin.constancias.constancia');
@@ -45,7 +50,12 @@ class ConstanciasController extends Controller
     }
 
     public function editarConstancia(){
-        $datos_globales = ConstanciaComplemento::where('id','=',1)->get();
+        //Cosuntamos si existen los datos globales
+        $datos_globales = ConstanciaComplemento::where([
+            ['id','=',1],
+            ['imagen_encabezado','<>',null],
+            ['imagen_encabezado','<>',null]
+        ])->get();
         $carreras = [
             ['carrera' => 'Ingeniería en Sistemas Computacionales','valor' => 'Sistemas'],
             ['carrera' => 'Ingeniería en Nanotecnología', 'valor' => 'Nanotecnología'],
@@ -55,6 +65,7 @@ class ConstanciasController extends Controller
             ['carrera' => 'Ingeniería en Gestión Empresarial','valor' => 'Gestión Empresarial'],
             ['carrera' => 'Ingeniería Industrial', 'valor' => 'Industrial']
         ];
+
         $abreviaturas = $this->obternerAbreviaturas();
         $users = User::select('name','id')->get();
         return view('admin.constancias.editar')
@@ -65,33 +76,95 @@ class ConstanciasController extends Controller
     }
 
     public function guardarDatosGlobales(Request $request){
-        $oficio = "DISC/117/2017";
-        $enunciado_superior = "Año del Centenario de la Promulgación de la Constitución Política de los Estados Unidos Mexicanos";
         $plan_de_estudios = "ISIC-2010-224";
-        $institucion_info = "Av. Ing. Carlos Rojas Gutiérrez 2120 Fracc. Valle de la Herradura Ciudad Hidalgo, Michoacán. C.P. 61100 Tel. 786 1549000";
         $datos_globales = ConstanciaComplemento::where('id','=',1)->get();
+
         if($datos_globales->count()>0){
             $datos_globales = ConstanciaComplemento::find(1);
             $datos_globales->fill($request->all());
-            if($request->oficio==null)$datos_globales->oficio = $oficio;
+
             if($request->plan_de_estudios==null)$datos_globales->plan_de_estudios = $plan_de_estudios;
-            if($request->enunciado_superior==null)$datos_globales->enunciado_superior = $enunciado_superior;
-            if($request->institucion_info==null)$datos_globales->institucion_info = $institucion_info;
+            if($request->hasFile('imagen_encabezado')){
+                $check = $this->extensionEsValida('imagen_encabezado',$request);
+                if(!$check){
+                    Flash::error('La extensión '.$request->file('imagen_encabezado')->getClientOriginalExtension().' no es valida.');
+                    return redirect()->route('constancias.editar');
+                }
+                $datos_globales->imagen_encabezado = $this->guardarImagen('encabezado','imagen_encabezado','encabezado',$request);
+                $datos_globales->save();
+            }
+
+            if($request->hasFile('imagen_pie')){
+                $check = $this->extensionEsValida('imagen_pie',$request);
+                if(!$check){
+                    Flash::error('La extensión '.$request->file('imagen_pie')->getClientOriginalExtension().' no es valida.');
+                    return redirect()->route('constancias.editar');
+                }
+                $datos_globales->imagen_pie = $this->guardarImagen('pie_de_pagina','imagen_pie','pie_de_pagina',$request);
+                $datos_globales->save();
+            }
+
             $datos_globales->save();
-            return response()->json(array('data'=>$datos_globales,'mensaje' => 'Datos globales guardados exitosamente', 'mensaje_tipo' => 'exito'));
+
         }else{
+            if($request->hasFile('imagen_encabezado')){
+                $check = $this->extensionEsValida('imagen_encabezado',$request);
+                if(!$check){
+                    Flash::error('La extensión '.$request->file('imagen_encabezado')->getClientOriginalExtension().' no es valida.');
+                    return redirect()->route('constancias.editar');
+                }
+            }else{
+                Flash::error('No se encontro la imagen para el encabezado');
+                return redirect()->route('constancias.editar');
+            }
+            if($request->hasFile('imagen_pie')){
+                $check = $this->extensionEsValida('imagen_pie',$request);
+                if(!$check){
+                    Flash::error('La extensión '.$request->file('imagen_pie')->getClientOriginalExtension().' no es valida.');
+                    return redirect()->route('constancias.editar');
+                }
+            }else{
+                Flash::error('No se encontro la imagen para el pie de página');
+                return redirect()->route('constancias.editar');
+            }
+
             $datos_globales = new ConstanciaComplemento($request->all());
             $datos_globales->id = 1;
-            if($request->oficio==null)$datos_globales->oficio = $oficio;
             if($request->plan_de_estudios==null)$datos_globales->plan_de_estudios = $plan_de_estudios;
-            if($request->enunciado_superior==null)$datos_globales->enunciado_superior = $enunciado_superior;
-            if($request->institucion_info==null)$datos_globales->institucion_info = $institucion_info;
+            $datos_globales->imagen_encabezado = $this->guardarImagen('encabezado','imagen_encabezado','encabezado',$request);
+            $datos_globales->imagen_pie = $this->guardarImagen('pie_de_pagina','imagen_pie','pie_de_pagina',$request);
+            $datos_globales->numero_oficio = 0;
             $datos_globales->save();
         }
         
-        return response()->json(array('data'=>$datos_globales,'mensaje' => 'Datos globales guardados exitosamente', 'mensaje_tipo' => 'exito'));
+        Flash::success("Datos guardados correctamente");
+        return redirect()->route('constancias.editar');
     }
-
+    public function extensionEsValida($nombre_request, $request){
+        $allowedfileExtension=['jpg','png','jpeg'];
+        $file = $request->file($nombre_request);
+        $extension = strtolower($file->getClientOriginalExtension());
+        $check=in_array($extension,$allowedfileExtension);
+        return $check;
+    }
+    public function guardarImagen($nombre_archivo,$nombre_request,$carpeta,$request){
+        //Generamos la ruta donde se guardaran las imagenes de los articulos
+        Storage::deleteDirectory('public/constancia_imagenes/'.$carpeta);
+        $path=storage_path().'/app/public/constancia_imagenes/'.$carpeta.'/';
+        $path_to_verify = 'public/constancia_imagenes';
+        if(!Storage::has($path_to_verify)){
+            Storage::makeDirectory($path_to_verify);
+        }
+        $path_to_verify = 'public/constancia_imagenes/'.$carpeta;
+        if(!Storage::has($path_to_verify)){
+            Storage::makeDirectory($path_to_verify);
+        }
+        $file = $request->file($nombre_request);
+        $name=$nombre_archivo.'_'.time().'.'.strtolower($file->getClientOriginalExtension());
+        //Guardamos la imagen en la carpeta creada en la ruta que marcamos anteriormente
+        $file->move($path,$name);
+        return (string)$name;
+    }
     public function obtenerDatosEspecificos($carrera){
         $constancia_data = Constancia::where('carrera','=',$carrera)->get();
         return response()->json($constancia_data);

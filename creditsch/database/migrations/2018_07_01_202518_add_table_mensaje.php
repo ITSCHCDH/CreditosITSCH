@@ -15,7 +15,10 @@ class AddTableMensaje extends Migration
     {
         Schema::create('mensajes', function(Blueprint $table){
             $table->increments('id');
+            $table->integer('creador_id')->unsigned();
             $table->string('mensaje');
+            $table->string('notificacion')->default('Tienes un nuevo nuevo mensaje');
+            $table->foreign('creador_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

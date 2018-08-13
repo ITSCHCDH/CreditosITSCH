@@ -14,8 +14,7 @@
 		@if ($role!=null)
 			<label style="float: left;">Rol: {{ "$role->name" }}</label>
 			<br>
-			<div class="resetear"></div>
-			<a href="{{ route('roles.permisos_crear')}}" class="btn btn-info">Crear Permiso</a>
+			<div class="resetear" style="padding: 5px;"></div>
 			<input type="hidden" name="role_id" value="{{ $role->id }}" id="role_id">
 		@endif
 		

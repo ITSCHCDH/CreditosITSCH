@@ -23,20 +23,28 @@ class ResponsablesController extends Controller
     }
     public function index($id){
         //Muestra todos los responsables incluyendo los que no stan asignados
+        $user = User::permission(['VIP','AGREGAR_PARTICIPANTES'])->get();
+
+        //dd(User::as('usuario'));
         $actividad = Actividad::find($id);
         if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
-                $responsables = DB::table('users as u')->leftjoin('actividad_evidencia as ae',function($join) use($id){
-                    $join->on('ae.user_id','=','u.id');
-                    $join->where('ae.actividad_id','=',$id);
-                })->leftjoin('actividad as a','a.id','=','ae.actividad_id')->leftjoin('evidencia as e','e.id_asig_actividades','=','ae.id')->leftjoin('participantes as p','p.id_evidencia','=','ae.id')->groupBy('usuario_id')->select('u.name as usuario_nombre','u.id as usuario_id','a.nombre as actividad_nombre','e.nom_imagen as evidencias','p.no_control as participantes','u.area','u.active','ae.validado')->get();
-                return view ('admin.actividades.responsablesindex')->with('responsables',$responsables)->with('actividad',$actividad);
+            if ($actividad==null) {
+                Flash::error('La actividad no existe');
+                return redirect()->route('actividades.index');
+            }
+            $responsables = User::permission(['VIP','AGREGAR_PARTICIPANTES','VIP_EVIDENCIA'])->leftjoin('actividad_evidencia as ae',function($join) use($id){
+                $join->on('ae.user_id','=','users.id');
+                $join->where('ae.actividad_id','=',$id);
+
+            })->leftjoin('actividad as a','a.id','=','ae.actividad_id')->leftjoin('evidencia as e','e.id_asig_actividades','=','ae.id')->leftjoin('participantes as p','p.id_evidencia','=','ae.id')->where('users.email','<>','admin@itsch.com')->groupBy('usuario_id')->select('users.name as usuario_nombre','users.id as usuario_id','a.nombre as actividad_nombre','e.nom_imagen as evidencias','p.no_control as participantes','users.area','users.active','ae.validado')->get();
+            return view ('admin.actividades.responsablesindex')->with('responsables',$responsables)->with('actividad',$actividad);
         }else if(Auth::User()->hasAllPermissions(['ELIMINAR_RESPONSABLES','AGREGAR_RESPONSABLES'])){
             if($actividad!=null){
                 if($actividad->id_user==Auth::User()->id){
-                    $responsables = DB::table('users as u')->leftjoin('actividad_evidencia as ae',function($join) use($id){
-                        $join->on('ae.user_id','=','u.id');
+                    $responsables = User::permission(['VIP','AGREGAR_PARTICIPANTES','VIP_EVIDENCIA'])->leftjoin('actividad_evidencia as ae',function($join) use($id){
+                        $join->on('ae.user_id','=','users.id');
                         $join->where('ae.actividad_id','=',$id);
-                    })->leftjoin('actividad as a','a.id','=','ae.actividad_id')->leftjoin('evidencia as e','e.id_asig_actividades','=','ae.id')->leftjoin('participantes as p','p.id_evidencia','=','ae.id')->groupBy('usuario_id')->select('u.name as usuario_nombre','u.id as usuario_id','a.nombre as actividad_nombre','e.nom_imagen as evidencias','p.no_control as participantes','u.area','u.active','ae.validado')->get();
+                    })->leftjoin('actividad as a','a.id','=','ae.actividad_id')->leftjoin('evidencia as e','e.id_asig_actividades','=','ae.id')->leftjoin('participantes as p','p.id_evidencia','=','ae.id')->where('users.email','<>','admin@itsch.com')->groupBy('usuario_id')->select('users.name as usuario_nombre','users.id as usuario_id','a.nombre as actividad_nombre','e.nom_imagen as evidencias','p.no_control as participantes','users.area','users.active','ae.validado')->get();
                     return view ('admin.actividades.responsablesindex')->with('responsables',$responsables)->with('actividad',$actividad);
                 }
             }else{

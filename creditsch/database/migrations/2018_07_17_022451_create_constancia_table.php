@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Storage;
 
 class CreateConstanciaTable extends Migration
 {
@@ -31,7 +32,6 @@ class CreateConstanciaTable extends Migration
             $table->string('profesion_jefe_depto',20);//Abreviatura de la profesion Ejem: LIC, ISC
             $table->integer('jefe_depto')->unsigned();//Jefe de departamento
             $table->string('jefe_depto_enunciado');//Ejem: Jefe de depto. de servicios escolares
-            $table->string('enunciado_superior'); //Enunciado que parace en la parte superior centrada despues del nombre de la institucion
 
             $table->string('profesion_certificador',20);
             $table->integer('certificador')->unsigned();//Nombre de quien certifica el documento A.K.A VoBo
@@ -39,12 +39,12 @@ class CreateConstanciaTable extends Migration
             $table->string('imagen_encabezado');
             $table->string('imagen_pie');
             $table->string('plan_de_estudios'); // El plan de estudios ISIC-2010-224
-            $table->string('oficio');//Ejem: OFICIO No. DISC/117/2017
             $table->integer('numero_oficio');
             $table->foreign('jefe_depto')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('certificador')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
+        Storage::makeDirectory('public/constancia_imagenes');
     }
 
     /**
@@ -55,6 +55,7 @@ class CreateConstanciaTable extends Migration
     public function down()
     {
         Schema::dropIfExists('constancia');
-        Schema::dropIfExists('constancia_complemento');        
+        Schema::dropIfExists('constancia_complemento');
+        Storage::deleteDirectory('public/constancia_imagenes');
     }
 }

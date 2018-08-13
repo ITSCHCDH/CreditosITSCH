@@ -7,15 +7,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Inicio|@yield('title','Default')</title>
-    <link rel="stylesheet" href="{{asset('menu/fontello.css')}}">
+    <link rel="stylesheet" href="{{asset('menu/css/fontello.css')}}">
     <link rel="stylesheet" href="{{asset('cssMenu/estilos.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('cssReportes/reportes.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('cssAutocompletar/autocompletar.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('plugins/cssTable/jquery.dataTables.min.css') }}">
     <!-- Custom fonts for this template-->
     <link href="{{asset('plugins/vendorTem/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet">
-    <!-- Custom styles for this template-->
-    <link href="{{asset('plugins/vendorTem/font-awesome/css/sb-admin.css')}}" rel="stylesheet">
     <!-- Bootstrap -->
     <link href="{{asset('complementos/css/bootstrap.css')}}" rel="stylesheet">
     <link href="{{asset('complementos/css/bootstrap-theme.css')}}" rel="stylesheet">
@@ -82,7 +80,6 @@
 
     <!-- Incluye el pie de pagina en el sistema -->
     @include('template.partes.pie')
-
     <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
     <script src="{{asset('complementos/js/bootstrap.js')}}"></script>
     <script src="{{asset('js2/js2.js')}}"> </script>

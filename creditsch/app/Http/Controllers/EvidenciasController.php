@@ -22,7 +22,6 @@ class EvidenciasController extends Controller
     {
         $this->middleware('permission:VIP_SOLO_LECTURA|VIP|VER_EVIDENCIA')->only(['index','show']);
         $this->middleware('permission:VIP|CREAR_EVIDENCIA')->only('create','store');
-        //$this->middleware('permission:VIP|ADMIN_EVIDENCIA')->only('peticionEliminar');
     }
     /**
      * Display a listing of the resource.
@@ -62,8 +61,8 @@ class EvidenciasController extends Controller
         $dommie_responsable = new User();
         $dommie_responsable->name = 'Actualmente no disponible';
         $dommie_responsable->id=-1;
-        $usuarios = User::select('name','id')->orderBy('name','ASC')->get()->pluck('name','id');
-        $usuarios_sin_pluck = User::select('name','id')->orderBy('name','ASC')->get();
+        $usuarios = User::permission(['VIP','VERIFICAR_EVIDENCIA','VIP_EVIDENCIA'])->select('name','id')->where('users.email','<>','admin@itsch.com')->orderBy('name','ASC')->get()->pluck('name','id');
+        $usuarios_sin_pluck = User::permission(['VIP','VERIFICAR_EVIDENCIA','VIP_EVIDENCIA'])->select('name','id')->where('users.email','<>','admin@itsch.com')->orderBy('name','ASC')->get();
         $validador = Actividad_Evidencia::where([
             ['user_id','=',$request->id_responsable],
             ['actividad_id','=',$request->id_actividad]

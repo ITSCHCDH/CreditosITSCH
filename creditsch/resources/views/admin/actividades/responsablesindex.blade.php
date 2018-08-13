@@ -25,6 +25,7 @@
         <thead>
             <th>Nombre</th>
             <th>Area</th>
+            <th>Activo</th>
             <th>Asignar</th>
         </thead>
         <tbody>
@@ -37,6 +38,13 @@
                     </td>
                     <td>
                         {{$res->area}}
+                    </td>
+                    <td>
+                        @if ($res->active=="true")
+                            {{ "SI" }}
+                        @else
+                            {{ "NO" }}
+                        @endif
                     </td>
                     <td>
                       <label>

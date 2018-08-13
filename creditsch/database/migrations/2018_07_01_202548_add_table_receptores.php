@@ -16,12 +16,14 @@ class AddTableReceptores extends Migration
         Schema::create('receptores', function(Blueprint $table){
             $table->increments('id');
             $table->integer('mensaje_id')->unsigned();
-            $table->integer('user_id')->unsigned();
-            $table->enum('visto',['true','false']);
+            $table->integer('user_id')->nullable()->unsigned();
+            $table->string('alumno_no_control',20)->nullable();
+            $table->enum('visto',['true','false'])->default('false');
             $table->dateTime('fecha_visto')->nullable();
-            $table->timestamps();
             $table->foreign('mensaje_id')->references('id')->on('mensajes')->ondelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->ondelete('cascade');
+            $table->foreign('alumno_no_control')->references('no_control')->on('alumnos');
+            $table->timestamps();
         });
     }
 

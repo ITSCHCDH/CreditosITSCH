@@ -24,20 +24,129 @@
 		
 	</div>
 	<h3>Datos globales de la constancia</h3>
-	<form id="form-datos-globales" method="POST">
-		<input type="hidden" value="{{ csrf_token() }}" id="token"> 
+	{!! Form::open(['route' => 'constancias.guardar_datos_globales','method' => 'post','files' => true]) !!}
+		{{ csrf_field() }}
+		<div class="form-group" >
+			<label>Jefe de departamento</label>
+			<div>
+				<select class="form-control pull-left" style="width: 30%;" name="profesion_jefe_depto" id="profesion_jefe_depto">
+
+					<option value="">Abreviatura de profesión</option>
+					@if ($datos_globales->count()>0)
+						@if (substr($datos_globales[0]->profesion_jefe_depto, 0, 5) == "otro-")
+							@php
+								$cadena = substr($datos_globales[0]->profesion_jefe_depto,5);
+							@endphp
+							<option value="{{ $datos_globales[0]->profesion_certificador }}" id="otro-jefe-depto" selected style="background-color: blue; color: white;">{{ "otro->".$cadena }}</option>
+							@for ($x = 0; $x < count($abreviaturas); $x++)
+								<option value="{{ $abreviaturas[$x]['abreviatura'] }}">{{ $abreviaturas[$x]['profesion'] }}->{{ $abreviaturas[$x]['abreviatura'] }}</option>
+							@endfor
+						@else
+							<option value="otro-" id="otro-jefe-depto">Otro (especificar)</option>
+							@for ($x = 0; $x < count($abreviaturas); $x++)
+								@if ($datos_globales[0]->profesion_jefe_depto==$abreviaturas[$x]['abreviatura'])
+									<option value="{{ $abreviaturas[$x]['abreviatura'] }}" selected style="background-color: blue; color: white;" >{{ $abreviaturas[$x]['profesion'] }}->{{ $abreviaturas[$x]['abreviatura'] }}</option>
+								@else
+									<option value="{{ $abreviaturas[$x]['abreviatura'] }}">{{ $abreviaturas[$x]['profesion'] }}->{{ $abreviaturas[$x]['abreviatura'] }}</option>
+								@endif
+							@endfor
+						@endif
+						
+					@else
+						<option value="otro-" id="otro-jefe-depto">Otro (especificar)</option>
+						@for ($x = 0; $x < count($abreviaturas); $x++)
+							<option value="{{ $abreviaturas[$x]['abreviatura'] }}">{{ $abreviaturas[$x]['profesion'] }}->{{ $abreviaturas[$x]['abreviatura'] }}</option>
+						@endfor
+					@endif
+
+				</select>
+				<select name="jefe_depto" id="jefe_depto" class="form-control pull-left" required style="width: 70%;">
+					<option value="">Nombre del jefe de departamento</option>
+					@if ($datos_globales->count()>0)
+						@foreach ($users as $user)
+							@if ($datos_globales[0]->jefe_depto==$user->id)
+								<option value = "{{ $user->id }}" selected style="background-color: blue; color: white;">{{ $user->name }}</option>
+							@else
+								<option value = "{{ $user->id }}">{{ $user->name }}</option>
+							@endif
+						@endforeach
+					@else
+						@foreach ($users as $user)
+							<option value = "{{ $user->id }}">{{ $user->name }}</option>
+						@endforeach
+					@endif
+				</select>
+			</div>
+			<div class="resetear"></div>
+		</div>
 		<div class="form-group">
-			<label for ="enunciado_superior">Enunciado superior</label>
+			<label for="jefe_depto_enunciado">Puesto</label>
 			@if ($datos_globales->count()>0)
-				<textarea class="form-control" name="enunciado_superior" id = "enunciado_superior" placeholder="Enunciado que aparece en la parte superior (escribirlo sin comillas). Si no sabes cual es, se agregará por defecto el siguiente:&#10;&#13;&quot;Año del Centenario de la Promulgación de la Constitución Política de los Estados Unidos Mexicanos&quot;">{{ $datos_globales[0]->enunciado_superior }}</textarea>
+				<input type="text" name="jefe_depto_enunciado" id="jefe_depto_enunciado" required placeholder="Puesto del jefe de depto. Ejem Jefe del depto. de Servicios Escolares" class="form-control" value="{{ $datos_globales[0]->jefe_depto_enunciado }}">
 			@else
-				<textarea class="form-control" name="enunciado_superior" id = "enunciado_superior" placeholder="Enunciado que aparece en la parte superior (escribirlo sin comillas). Si no sabes cual es, se agregará por defecto el siguiente:&#10;&#13;&quot;Año del Centenario de la Promulgación de la Constitución Política de los Estados Unidos Mexicanos&quot;"></textarea>
+				<input type="text" name="jefe_depto_enunciado" id="jefe_depto_enunciado" required placeholder="Puesto del jefe de depto. Ejem Jefe del depto. de Servicios Escolares" class="form-control">
 			@endif
 			
 		</div>
 		<div class="form-group">
-			<label for ="institucion_info">Datos acerca de la institución</label>
-			<textarea class="form-control" name="institucion_info" id = "institucion_info" placeholder="Especificar la información de la institución, tales datos como: dirección, contacto, municipio, Codigo Postal, Teléfono, etc... (max 255 caracteres). En caso de no contar con estos datos en el momento se agregará el predefinodo por este sitio.">@if ($datos_globales->count()>0){{ $datos_globales[0]->institucion_info  }}@endif</textarea>
+			<label>Vo.Bo</label>
+			<div>
+				<select class="form-control pull-left" style="width: 30%;" name = "profesion_certificador" id = "profesion_certificador">
+					<option value="">Abreviatura de profesión</option>
+					@if ($datos_globales->count()>0)
+						@if (substr($datos_globales[0]->profesion_certificador, 0, 5) == "otro-")
+							@php
+								$cadena = substr($datos_globales[0]->profesion_certificador,5);
+							@endphp
+							<option value="{{ $datos_globales[0]->profesion_certificador }}" id="otro-certificador" selected style="background-color: blue; color: white;">{{ "otro->".$cadena }}</option>
+							@for ($x = 0; $x < count($abreviaturas); $x++)
+								<option value="{{ $abreviaturas[$x]['abreviatura'] }}">{{ $abreviaturas[$x]['profesion'] }}->{{ $abreviaturas[$x]['abreviatura'] }}</option>
+							@endfor
+						@else
+							<option value="otro-" id="otro-certificador">Otro (especificar)</option>
+							@for ($x = 0; $x < count($abreviaturas); $x++)
+								@if ($datos_globales[0]->profesion_certificador==$abreviaturas[$x]['abreviatura'])
+									<option value="{{ $abreviaturas[$x]['abreviatura'] }}" selected style="background-color: blue; color: white;" >{{ $abreviaturas[$x]['profesion'] }}->{{ $abreviaturas[$x]['abreviatura'] }}</option>
+								@else
+									<option value="{{ $abreviaturas[$x]['abreviatura'] }}">{{ $abreviaturas[$x]['profesion'] }}->{{ $abreviaturas[$x]['abreviatura'] }}</option>
+								@endif
+							@endfor
+						@endif
+						
+					@else
+						<option value="otro-" id="otro-certificador">Otro (especificar)</option>
+						@for ($x = 0; $x < count($abreviaturas); $x++)
+							<option value="{{ $abreviaturas[$x]['abreviatura'] }}">{{ $abreviaturas[$x]['profesion'] }}->{{ $abreviaturas[$x]['abreviatura'] }}</option>
+						@endfor
+					@endif
+					
+				</select>
+				<select name="certificador" id="certificador" class="form-control pull-left" required style="width: 70%;">
+					<option value="">Nombre de quien cerfica el documento</option>
+					@if ($datos_globales->count()>0)
+						@foreach ($users as $user)
+							@if ($datos_globales[0]->certificador==$user->id)
+								<option value = "{{ $user->id }}" selected style="background-color: blue; color: white;">{{ $user->name }}</option>
+							@else
+								<option value = "{{ $user->id }}">{{ $user->name }}</option>
+							@endif
+						@endforeach
+					@else
+						@foreach ($users as $user)
+							<option value = "{{ $user->id }}">{{ $user->name }}</option>
+						@endforeach
+					@endif
+				</select>
+			</div>
+			<div class="resetear"></div>
+		</div>
+		<div class="form-group">
+			<label >Puesto del Vo.Bo</label>
+			@if ($datos_globales->count()>0)
+				<input type="text" name="certificador_enunciado" id="certificador_enunciado" required placeholder="Puesto/posicion en que tiene quien certifica el documento. Ejem: Director Academico" class="form-control" value = "{{ $datos_globales[0]->certificador_enunciado }}">
+			@else
+				<input type="text" name="certificador_enunciado" id="certificador_enunciado" required placeholder="Puesto/posicion en que tiene quien certifica el documento. Ejem: Director Academico" class="form-control">
+			@endif
 		</div>
 		<div class="form-group">
 			<label for ="plan_de_estudios">Plan de estudios</label>
@@ -49,19 +158,31 @@
 			
 		</div>
 		<div class="form-group">
-			<label for ="oficio">Oficio</label>
-			@if ($datos_globales->count()>0)
-				<input type="text" name="oficio" id="oficio" class="form-control" placeholder="Dejar en blanco este campo agregará el siguiente oficio por defecto: &quot;DISC/117/2017&quot;" value="{{ $datos_globales[0]->oficio }}">
-			@else
-				<input type="text" name="oficio" id="oficio" class="form-control" placeholder="Dejar en blanco este campo agregará el siguiente oficio por defecto: &quot;DISC/117/2017&quot;">
-			@endif
-			
+			<label for="imagen_encabezado">Agregar imagen de encabezado</label>
+			<input type="file" name="imagen_encabezado" id="imagen_encabezado" class="form-control" required>
 		</div>
-		<input type="submit" name="" value="Guardar" class="btn btn-primary">
-	</form>
+		@if ($datos_globales->count()>0)
+			<label for="img-encabezado" >Imagen actual del encabezado</label>
+			<div id="img-encabezado" style="margin-bottom: 10px; margin-top: 10px;">
+				<img src="{{ asset('/storage/constancia_imagenes/encabezado/'.$datos_globales[0]->imagen_encabezado) }}" width="100%" height="150px">
+			</div>
+		@endif
+		<div class="form-group">
+			<label for="imagen_pie">Agregar imagen de pie de pagina</label>
+			<input type="file" name="imagen_pie" id="imagen_pie" class="form-control" required>
+		</div>
+		@if ($datos_globales->count()>0)
+			<label for="img-pie-de-pagina">Imagen actual del pie de pagina</label>
+			<div id="img-pie-de-pagina" style="margin-bottom: 10px; margin-top: 10px;">
+				<img src="{{ asset('/storage/constancia_imagenes/pie_de_pagina/'.$datos_globales[0]->imagen_pie) }}" width="100%" height="150px">
+			</div>
+		@endif
+		<input type="submit" name="" value="Guardar" class="btn btn-primary" style="margin-top: 30px;">
+	{!! Form::close() !!}
 
 	<!-- Segundo formulario -->
 	<!-- Datos especificos de constancia por carrera -->
+
 	<div class="alert-warning alerta-padding ocultar-formulario" id = "constancias-faltantes">
 		Es importante proporcionar los datos requeridos de todas las constancias de las carreras para evitar problemas al realizar consultas de las mismas. Ha continuación se muestran las constancias que faltan se dichos datos.
 		<div style= "width: 35%; margin-left: 45%;">
@@ -88,29 +209,7 @@
 				@endfor
 			</select>
 		</div>
-		<div class="form-group" >
-			<label>Jefe de departamento</label>
-			<div>
-				<select class="form-control pull-left" style="width: 30%;" name="profesion_jefe_depto" id="profesion_jefe_depto">
-					<option value="">Abreviatura de profesión</option>
-					<option value="otro-" id="otro-jefe-depto">Otro (especificar)</option>
-					@for ($x = 0; $x < count($abreviaturas); $x++)
-						<option value="{{ $abreviaturas[$x]['abreviatura'] }}">{{ $abreviaturas[$x]['profesion'] }}->{{ $abreviaturas[$x]['abreviatura'] }}</option>
-					@endfor
-				</select>
-				<select name="jefe_depto" id="jefe_depto" class="form-control pull-left" required style="width: 70%;">
-					<option value="">Nombre del jefe de departamento</option>
-					@foreach ($users as $user)
-						<option value = "{{ $user->id }}">{{ $user->name }}</option>
-					@endforeach
-				</select>
-			</div>
-			<div class="resetear"></div>
-		</div>
-		<div class="form-group">
-			<label for="jefe_depto_enunciado">Puesto</label>
-			<input type="text" name="jefe_depto_enunciado" id="jefe_depto_enunciado" required placeholder="Puesto del jefe de depto. Ejem Jefe del depto. de Servicios Escolares" class="form-control">
-		</div>
+		
 		<div class="form-group">
 			<label>Jefe de división</label>
 			<div>
@@ -131,29 +230,7 @@
 			<div class="resetear"></div>
 				
 		</div>
-		<div class="form-group">
-			<label>Vo.Bo</label>
-			<div>
-				<select class="form-control pull-left" style="width: 30%;" name = "profesion_certificador" id = "profesion_certificador">
-					<option value="">Abreviatura de profesión</option>
-					<option value="otro-" id="otro-certificador">Otro (especificar)</option>
-					@for ($x = 0; $x < count($abreviaturas); $x++)
-						<option value="{{ $abreviaturas[$x]['abreviatura'] }}">{{ $abreviaturas[$x]['profesion'] }}->{{ $abreviaturas[$x]['abreviatura'] }}</option>
-					@endfor
-				</select>
-				<select name="certificador" id="certificador" class="form-control pull-left" required style="width: 70%;">
-					<option value="">Nombre de quien cerfica el documento</option>
-					@foreach ($users as $user)
-						<option value = "{{ $user->id }}">{{ $user->name }}</option>
-					@endforeach
-				</select>
-			</div>
-			<div class="resetear"></div>
-		</div>
-		<div class="form-group">
-			<label >Puesto del Vo.Bo</label>
-			<input type="text" name="certificador_enunciado" id="certificador_enunciado" required placeholder="Puesto/posicion en que tiene quien certifica el documento. Ejem: Director Academico" class="form-control">
-		</div>
+		
 		<input type="submit" name="" value="Guardar" class="btn btn-primary">
 	</form>
 	<div style="margin-bottom: 80px;"></div>
@@ -169,39 +246,17 @@
 				if(existen_datos==1){
 					$('.ocultar-formulario').fadeIn();
 					$('#mensaje-agregar-datos').fadeOut();
+					$('#imagen_encabezado').removeAttr('required');
+					$('#imagen_pie').removeAttr('required');
 				}else{
 					$('.ocultar-formulario').fadeOut();
 					$('#mensaje-agregar-datos').fadeIn();
+					$('#imagen_encabezado').attr("required","required");
+					$('#imagen_pie').attr("required","required");
 				}
 				
 			}
-			function guardarDatosGlobales(){
-				$(document).on('submit','#form-datos-globales',function(event){
-					event.preventDefault();
-					var datos = $('#form-datos-globales').serialize();
-					$.ajax({
-						type: 'POST',
-						url: '{{ route('constancias.guardar_datos_globales') }}',
-						dataType: 'json',
-						data:datos,
-						success: function(response){
-							var variable_ocultar = document.getElementById('variable-ocultar');
-							variable_ocultar.value=1;
-							ocultarDatosEspecificosConstancia();
-							actualizarDatosGlobales(response['data']);
-							mostrarMensaje(response['mensaje'],'mensajes-parte-superior',response['mensaje_tipo']);
-						},error: function(){
-							mostrarMensaje('Error al guardar datos globales','mensajes-parte-superior','error');
-						}
-					});
-				});
-			}
-			function actualizarDatosGlobales(response){
-				$('#institucion_info').val(response['institucion_info']);
-				$('#enunciado_superior').val(response['enunciado_superior']);
-				$('#oficio').val(response['oficio']);
-				$('#plan_de_estudios').val(response['plan_de_estudios']);
-			}
+			
 			function abreviaturasEspeciales(abreviatura,option_id){
 				var token  = abreviatura.substring(0,5);
 				if(token == "otro-"){
@@ -214,25 +269,11 @@
 			function actualizarDatosEspecificos(response,accion = "llenar"){
 				if(accion=="llenar"){
 					abreviaturasEspeciales(response['profesion_jefe_division'],'otro-jefe-division');
-					abreviaturasEspeciales(response['profesion_jefe_depto'],'otro-jefe-depto');
-					abreviaturasEspeciales(response['profesion_certificador'],'otro-certificador');
-					$('#jefe_depto').val(response['jefe_depto']);
-					$('#jefe_depto_enunciado').val(response['jefe_depto_enunciado']);
-					$('#profesion_jefe_depto').val(response['profesion_jefe_depto']);
 					$('#jefe_division').val(response['jefe_division']);
 					$('#profesion_jefe_division').val(response['profesion_jefe_division']);
-					$('#certificador').val(response['certificador']);
-					$('#certificador_enunciado').val(response['certificador_enunciado']);
-					$('#profesion_certificador').val(response['profesion_certificador']);
 				}else{
-					$('#jefe_depto').val('');
-					$('#jefe_depto_enunciado').val('');
-					$('#profesion_jefe_depto').val('');
 					$('#jefe_division').val('');
 					$('#profesion_jefe_division').val('');
-					$('#certificador').val('');
-					$('#certificador_enunciado').val('');
-					$('#profesion_certificador').val('');
 				}
 			}
 			function comboCarrera(){
@@ -269,6 +310,8 @@
 						carrera_nom_completo.value="";
 						$('#form-datos-especificos input').attr("disabled","disabled");
 						$('#form-datos-especificos select').attr("disabled","disabled");
+						$('#jefe_division').val('');
+						$('#profesion_jefe_division').val('');
 						$('#carrera').removeAttr("disabled");
 					}	
 				});
@@ -286,7 +329,6 @@
 						data:constancia_data,
 						url: ruta,
 						success: function(response){
-							console.log(response);
 							mostrarMensaje(response['mensaje'],'mensajes-parte_media',response['mensaje_tipo']);
 							mostrarConstanciasFaltantes();
 						},error: function(){
@@ -372,7 +414,6 @@
 			}
 			$(document).ready(function(){
 				ocultarDatosEspecificosConstancia();
-				guardarDatosGlobales();
 				comboCarrera();
 				guardarDatosEspecificos();
 				mostrarConstanciasFaltantes();
