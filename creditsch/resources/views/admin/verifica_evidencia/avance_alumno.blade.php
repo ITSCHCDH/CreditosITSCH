@@ -300,7 +300,7 @@
 			    if(valor.length < 8 || valor.length > 10) return false;
 			    $.ajax({
 			        type: "GET",
-			        url: "{{ url('admin/participantes/busqueda') }}",
+			        url: "{{ route('verifica_evidencia.alumnos_busqueda') }}",
 			        dataType: "json",
 			        data:{
 			            no_control: valor,

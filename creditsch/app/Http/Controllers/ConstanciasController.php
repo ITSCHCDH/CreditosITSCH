@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\ConstanciaComplemento;
 use App\Constancia;
@@ -13,16 +14,32 @@ use DB;
 use Laracasts\Flash\Flash;
 class ConstanciasController extends Controller
 {
-	
+    public function __construct(){
+
+        $this->middleware('permission:VIP|VIP_CONSTANCIAS')->only('guardarDatosGlobales');
+        $this->middleware('permission:VIP|VIP_CONSTANCIAS|MODIFICAR_CONSTANCIAS_CARRERA')->only('guardarDatosEspecificos','visualizar','editarConstancia');
+    }
+    	
     public function index(){
     	return view('admin.constancias.index');
     }
-    public function visualizar(){
+    public function visualizar(Request $request){
+        if(!$request->has('carrera')){
+            Flash::error('Error datos inconcistentes');
+            return redirect()->route('constancias.editar');
+        }
+        $jefe_division = DB::table('constancia as c')->join('users as u','u.id','=','c.jefe_division')->where('c.carrera','=',$request->get('carrera'))->select('u.name','c.profesion_jefe_division','c.division_enunciado')->get();
+
+        if($jefe_division->count()==0){
+            Flash::error('Error datos inconcistentes');
+            return redirect()->route('constancias.editar');
+        }
         $meses = [
             'enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'
         ];
         $datos_globales = ConstanciaComplemento::all();
         $jefe_depto = DB::table('constancia_complemento  as cc')->join('users as u','u.id','=','cc.jefe_depto')->select('u.name','cc.jefe_depto_enunciado','cc.profesion_jefe_depto')->get();
+        $certificador = DB::table('constancia_complemento as cc')->join('users as u','u.id','=','cc.certificador')->select('u.name','cc.profesion_certificador','cc.certificador_enunciado')->get();
         $fecha_actual = Carbon::now()->setTimezone('CDT')->format('d m Y');
         $tokenizer = strtok($fecha_actual," ");
         $dia = $tokenizer;
@@ -43,6 +60,8 @@ class ConstanciasController extends Controller
             'year' => $year,
             'jefe_depto' => $jefe_depto[0],
             'raiz' => $raiz,
+            'certificador' => $certificador[0],
+            'jefe_division' => $jefe_division[0]
         ];
         $pdf = PDF::loadView('admin.constancias.constancia', compact('data'));
         //return view('admin.constancias.constancia');
@@ -50,29 +69,68 @@ class ConstanciasController extends Controller
     }
 
     public function editarConstancia(){
-        //Cosuntamos si existen los datos globales
-        $datos_globales = ConstanciaComplemento::where([
-            ['id','=',1],
-            ['imagen_encabezado','<>',null],
-            ['imagen_encabezado','<>',null]
-        ])->get();
-        $carreras = [
-            ['carrera' => 'Ingeniería en Sistemas Computacionales','valor' => 'Sistemas'],
-            ['carrera' => 'Ingeniería en Nanotecnología', 'valor' => 'Nanotecnología'],
-            ['carrera' => 'Ingeniería en Mecatrónica','valor' => 'Mecatrónica'],
-            ['carrera' => 'Ingeniería en Bioquímica','valor' => 'Bioquímica'],
-            ['carrera' => 'Ingeniería en Tecnologías de la Información y Comunicaciones','valor' =>"TIC's"],
-            ['carrera' => 'Ingeniería en Gestión Empresarial','valor' => 'Gestión Empresarial'],
-            ['carrera' => 'Ingeniería Industrial', 'valor' => 'Industrial']
-        ];
+        if (Auth::User()->hasAnyPermission(['VIP','VIP_CONSTANCIAS'])) {
+            //Cosuntamos si existen los datos globales
+            $datos_globales = ConstanciaComplemento::where([
+                ['id','=',1],
+                ['imagen_encabezado','<>',null],
+                ['imagen_encabezado','<>',null]
+            ])->get();
+            $carreras = [
+                ['carrera' => 'Ingeniería en Sistemas Computacionales','valor' => 'Sistemas'],
+                ['carrera' => 'Ingeniería en Nanotecnología', 'valor' => 'Nanotecnología'],
+                ['carrera' => 'Ingeniería en Mecatrónica','valor' => 'Mecatrónica'],
+                ['carrera' => 'Ingeniería en Bioquímica','valor' => 'Bioquímica'],
+                ['carrera' => 'Ingeniería en Tecnologías de la Información y Comunicaciones','valor' =>"TIC's"],
+                ['carrera' => 'Ingeniería en Gestión Empresarial','valor' => 'Gestión Empresarial'],
+                ['carrera' => 'Ingeniería Industrial', 'valor' => 'Industrial']
+            ];
 
-        $abreviaturas = $this->obternerAbreviaturas();
-        $users = User::select('name','id')->get();
-        return view('admin.constancias.editar')
-        ->with('carreras',$carreras)
-        ->with('abreviaturas',$abreviaturas)
-        ->with('users',$users)
-        ->with('datos_globales',$datos_globales);
+            $abreviaturas = $this->obternerAbreviaturas();
+            $users = User::select('name','id')->where('email','<>','admin@itsch.com')->orderBy('name','ASC')->get();
+            return view('admin.constancias.editar')
+            ->with('carreras',$carreras)
+            ->with('abreviaturas',$abreviaturas)
+            ->with('users',$users)
+            ->with('datos_globales',$datos_globales);
+        }else{
+            //Cosuntamos si existen los datos globales
+            $datos_globales = ConstanciaComplemento::where([
+                ['id','=',1],
+                ['imagen_encabezado','<>',null],
+                ['imagen_encabezado','<>',null]
+            ])->get();
+
+            $carreras = [
+                ['carrera' => 'Ingeniería en Sistemas Computacionales','valor' => 'Sistemas'],
+                ['carrera' => 'Ingeniería en Nanotecnología', 'valor' => 'Nanotecnología'],
+                ['carrera' => 'Ingeniería en Mecatrónica','valor' => 'Mecatrónica'],
+                ['carrera' => 'Ingeniería en Bioquímica','valor' => 'Bioquímica'],
+                ['carrera' => 'Ingeniería en Tecnologías de la Información y Comunicaciones','valor' =>"TIC's"],
+                ['carrera' => 'Ingeniería en Gestión Empresarial','valor' => 'Gestión Empresarial'],
+                ['carrera' => 'Ingeniería Industrial', 'valor' => 'Industrial']
+            ];
+
+            $carrera = [[]];
+            for ($i = 0; $i < count($carreras); $i++) {
+                if($carreras[$i]['valor'] == Auth::User()->area){
+                    $carrera = [
+                        ['carrera' => $carreras[$i]['carrera'], 'valor' => $carreras[$i]['valor']]
+                    ];
+                }
+            }
+            $abreviaturas = $this->obternerAbreviaturas();
+            $users = User::select('name','id')->where([
+                ['email','<>','admin@itsch.com'],
+                ['area','=',Auth::User()->area]
+            ])->orderBy('name','ASC')->get();
+            return view('admin.constancias.editar')
+            ->with('carreras',$carrera)
+            ->with('abreviaturas',$abreviaturas)
+            ->with('users',$users)
+            ->with('datos_globales',$datos_globales);
+        }
+        
     }
 
     public function guardarDatosGlobales(Request $request){
@@ -322,6 +380,7 @@ class ConstanciasController extends Controller
             ['abreviatura' => 'LED', 'profesion' => 'Licenciado en Derecho'],
             ['abreviatura' => 'LDG', 'profesion' => 'Licenciado en Diseño Gráfico'],
             ['abreviatura' => 'LEC', 'profesion' => 'Licenciado en Economía'],
+            ['abreviatura' => 'L.I', 'profesion' => 'Licenciado en Informática'],
             ['abreviatura' => 'LIA', 'profesion' => 'Licenciado en Informática Aplicada'],
             ['abreviatura' => 'LLI', 'profesion' => 'Licenciado en Lengua Inglesa'],
             ['abreviatura' => 'LLE', 'profesion' => 'Licenciado en Letras Españolas'],
@@ -334,7 +393,6 @@ class ConstanciasController extends Controller
             ['abreviatura' => 'LSC', 'profesion' => 'Licenciado en Sistemas Computacionales'],
             ['abreviatura' => 'LSCA', 'profesion' => 'Licenciado en Sistemas de Computación Administrativa'],
             ['abreviatura' => 'LTI', 'profesion' => 'Licenciado en Tecnología de Información'],
-            ['abreviatura' => 'L.I', 'profesion' => 'Licenciado(a) en Informática'],
             ['abreviatura' => 'MC', 'profesion' => 'Médico Cirujano'],
             ['abreviatura' => 'MA', 'profesion' => 'Maestría en Administración'],
             ['abreviatura' => 'MAD', 'profesion' => 'Maestría en Administración de Instituciones Educativas'],

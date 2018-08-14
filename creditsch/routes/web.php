@@ -142,6 +142,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('mensajes/enviados','MensajesController@enviados')->name('mensajes.enviados');
     Route::get('mensajes/ver','MensajesController@ver')->name('mensajes.ver');
     Route::get('mensajes/destinatarios','MensajesController@destinatarios')->name('mensajes.destinatarios');
+    Route::get('mensajes/nuevos_mensajes','MensajesController@nuevosMensajes')->name('mensajes.nuevos_mensajes');
 
 });
 /******************************/

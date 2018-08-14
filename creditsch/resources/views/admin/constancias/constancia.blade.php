@@ -123,7 +123,7 @@
 		</div>
 		<div class="romper"></div>
 		<div class="f-derecha">
-			<p class="bloque">OFICIO No. DISC/S-{{ $data['datos_globales']->numero_oficio }}/{{ $data['year'] }}</p>
+			<p class="bloque">OFICIO No. DISC/S-000/{{ $data['year'] }}</p>
 		</div>
 		
 </div>
@@ -214,16 +214,32 @@
 			<div style="height: 40px;">
 				
 			</div>
-			<p class="jefa no-margen-izq">ING. OSCAR DELGADO CAMACHO</p>
-			<p class="jefa no-margen-izq">DIV. DE ING. SIST. COMP</p>
+			@if (substr($data['jefe_division']->profesion_jefe_division, 0, 5) == "otro-")
+				@php
+					$cadena = substr($data['jefe_division']->profesion_jefe_division,5);
+				@endphp
+				<p class="jefa no-margen-izq"=>{{ strtoupper($cadena) }}. {{ strtoupper((string)$data['certificador']->name) }}
+				</p>
+			@else
+				<p class="jefa no-margen-izq">{{ strtoupper($data['jefe_division']->profesion_jefe_division) }}. {{ strtoupper((string)$data['jefe_division']->name) }}
+				</p>
+			@endif
+			<p class="jefa no-margen-izq">{{ $data['jefe_division']->division_enunciado }}</p>
 		</div>
 		<div class="firmas f-derecha">
 			<p class="jefa no-margen-izq">Vo.Bo</p>
 			<div style="height: 49px;">
 				
 			</div>
-			<p class="jefa no-margen-izq">ISC. ESMERALDA DELGADO PEREZ</p>
-			<p class="jefa no-margen-izq">SUBDIRECTORA ACADEMICA</p>
+			@if (substr($data['certificador']->profesion_certificador, 0, 5) == "otro-")
+				@php
+					$cadena = substr($data['certificador']->profesion_certificador,5);
+				@endphp
+				<p class="jefa no-margen-izq"=>{{ strtoupper($cadena) }}. {{ strtoupper((string)$data['certificador']->name) }}</p>
+			@else
+				<p class="jefa no-margen-izq">{{ strtoupper($data['certificador']->profesion_certificador) }}. {{ strtoupper((string)$data['certificador']->name) }}</p>
+			@endif
+			<p class="jefa no-margen-izq">{{ strtoupper($data['certificador']->certificador_enunciado) }}</p>
 		</div>
 	</div>
 	<div id="pie-pagina">

@@ -107,24 +107,29 @@ class ParticipantesController extends Controller
      */
     public function destroy($id)
     {
-        $participante_data = DB::table('participantes as p')->join('actividad_evidencia as ae','p.id_evidencia','=','ae.id')->join('evidencia as e','e.id_asig_actividades','=','ae.id')->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->where([
-            ['ae.validado','=','true'],
-            ['p.id','=',$id]
-        ])->select('p.no_control','c.id as credito_id','a.por_cred_actividad')->groupBy('p.id')->get();
-        if($participante_data->count()>0){
-           $temp = Avance::where([
-               ['no_control','=',$participante_data[0]->no_control],
-               ['id_credito','=',$participante_data[0]->credito_id]
-           ])->get();
-           if($temp->count()>0){
-               $avance = Avance::find($temp[0]->id);
-               $avance->por_credito -= (int)$participante_data[0]->por_cred_actividad;
-               if($avance->por_credito<0)$avance->por_credito=0;
-               $avance->save();
-           } 
+        if (Auth::User()->hasAnyPermission(['VIP'])) {
+            $participante_data = DB::table('participantes as p')->join('actividad_evidencia as ae','p.id_evidencia','=','ae.id')->join('evidencia as e','e.id_asig_actividades','=','ae.id')->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->where([
+                ['ae.validado','=','true'],
+                ['p.id','=',$id]
+            ])->select('p.no_control','c.id as credito_id','a.por_cred_actividad')->groupBy('p.id')->get();
+            if($participante_data->count()>0){
+               $temp = Avance::where([
+                   ['no_control','=',$participante_data[0]->no_control],
+                   ['id_credito','=',$participante_data[0]->credito_id]
+               ])->get();
+               if($temp->count()>0){
+                   $avance = Avance::find($temp[0]->id);
+                   $avance->por_credito -= (int)$participante_data[0]->por_cred_actividad;
+                   if($avance->por_credito<0)$avance->por_credito=0;
+                   $avance->save();
+               } 
+            }
+            Participante::destroy($id);
+            return response()->json(array("mensaje" => "El participante ha sido eliminado de la actividad","mensaje_tipo" => "advertencia"));
+        }else{
+            return response()->json(array("mensaje" => "La actividad ya ha sido validada no puedes hacer modificaciones","mensaje_tipo" => "advertencia"));
         }
-        Participante::destroy($id);
-        return response()->json(array("mensaje" => "El participante ha sido eliminado de la actividad","mensaje_tipo" => "advertencia"));
+        
     }
     public function peticionAjax(Request $request){
         /*
@@ -181,13 +186,12 @@ class ParticipantesController extends Controller
     }
 
     public function ajaxGuardar(Request $request){
-        
+        return response()->json($request);
         $evidencias = DB::table('actividad_evidencia as ae')->where([
             ['ae.user_id','=',$request->get('id_responsable')],
             ['ae.actividad_id','=',$request->get('id_actividad')]
         ])->select('ae.id')->get();
 
-        if($evidencias)
         $existe_no_control = DB::table('alumnos')->select('no_control')->where('no_control','=',$request->get('no_control'))->get();
 
         if($existe_no_control->count()==0){
@@ -223,22 +227,6 @@ class ParticipantesController extends Controller
                 $avance = new Avance();
                 $avance->no_control = $request->get('no_control');
                 $avance->por_credito = (int)$evidencia_data->por_cred_actividad;
-                $avance->id_credito=$evidencia_data[0]->credito_id;
-                $avance->save();
-            }else{
-                $avance = Avance::find($temp[0]->id);
-                $avance->por_credito += (int)$evidencia_data[0]->por_cred_actividad;
-                $avance->save();
-            }
-        }else{
-            $temp = Avance::where([
-                ['no_control','=',$request->get('no_control')],
-                ['id_credito','=',$evidencia_data[0]->credito_id]
-            ])->get();
-            if($temp->count()==0){
-                $avance = new Avance();
-                $avance->no_control = $request->get('no_control');
-                $avance->por_credito = 0;
                 $avance->id_credito=$evidencia_data[0]->credito_id;
                 $avance->save();
             }else{

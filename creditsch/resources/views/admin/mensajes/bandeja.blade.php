@@ -21,7 +21,7 @@
 		    	@if ($msj->visto=="true")
 		    		<tr>
 		    			<td>
-		    				<a href="#" class="btn btn-warning"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a>
+		    				<a href="{{ route('mensajes.ver',['mensaje_id' => $msj->mensaje_id,'receptor_id' => $msj->receptor_id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a>
 		    			</td>
 		    			<td>{{ $msj->usuario_nombre }}</td>
 		    			<td>{{ $msj->notificacion }}</td>

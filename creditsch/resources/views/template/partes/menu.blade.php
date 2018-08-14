@@ -68,47 +68,50 @@
                     </ul>
                 </li>
             @endif
+            @if (Auth::User()->hasAnyPermission('VIP','VIP_AVANCE_ALUMNO','VER_AVANCE_ALUMNO','VIP_CONSTANCIAS','MODIFICAR_CONSTANCIAS_CARRERA','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VER_REPORTES_CARRERA','VIP_REPORTES'))
+                <li class="botMen">
+                    <a class="etMenu" href="" data-parent="">
+                        <i class="fa fa-pie-chart"></i>
+                        <span class="spaMenu">Avances</span>
+                        <i class="fa fa-chevron-right flesub"></i>
+                    </a>
+                    <ul class="subMenu" id="">
+                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
+                            <li class='tamSubMenu'>
+                                <a class="etSubMenu" href="{{ route('verifica_evidencia.avance_alumno') }}">
+                                    <i class="fa fa-bar-chart-o"></i>
+                                    <span class="etSubMenu">Avance</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA']))
+                            <li class='tamSubMenu'>
+                                <a class="etSubMenu" href="{{ route('verifica_evidencia.index') }}">
+                                    <i class="fa fa-calendar-check-o"></i>
+                                    <span class="etSubMenu">Verificar evidencia</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if (Auth::User()->hasAnyPermission('VIP','VIP_CONSTANCIAS','MODIFICAR_CONSTANCIAS_CARRERA'))
+                            <li class='tamSubMenu'>
+                                <a class="etSubMenu" href="{{ route('constancias.index') }}">
+                                    <i class="fa fa-print"></i>
+                                    <span class="etSubMenu">Constancias</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if (Auth::User()->hasAnyPermission(['VER_REPORTES_CARRERA','VIP_REPORTES','VIP_SOLO_LECTURA','VIP']))
+                            <li class='tamSubMenu'>
+                                <a class="etSubMenu" href="{{ route('verifica_evidencia.reportes') }}">
+                                    <i class="fa fa-file-pdf-o"></i>
+                                    <span class="etSubMenu">Reportes</span>
+                                </a>
+                            </li>
+                        @endif
+                    </ul>
+                </li>
+            @endif
             
-            <li class="botMen">
-                <a class="etMenu" href="" data-parent="">
-                    <i class="fa fa-pie-chart"></i>
-                    <span class="spaMenu">Avances</span>
-                    <i class="fa fa-chevron-right flesub"></i>
-                </a>
-                <ul class="subMenu" id="">
-                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
-                        <li class='tamSubMenu'>
-                            <a class="etSubMenu" href="{{ route('verifica_evidencia.avance_alumno') }}">
-                                <i class="fa fa-bar-chart-o"></i>
-                                <span class="etSubMenu">Avance</span>
-                            </a>
-                        </li>
-                    @endif
-                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA']))
-                        <li class='tamSubMenu'>
-                            <a class="etSubMenu" href="{{ route('verifica_evidencia.index') }}">
-                                <i class="fa fa-calendar-check-o"></i>
-                                <span class="etSubMenu">Verificar evidencia</span>
-                            </a>
-                        </li>
-                    @endif
-                    
-                    <li class='tamSubMenu'>
-                        <a class="etSubMenu" href="{{ route('constancias.index') }}">
-                            <i class="fa fa-print"></i>
-                            <span class="etSubMenu">Constancias</span>
-                        </a>
-                    </li>
-                    @if (Auth::User()->hasAnyPermission(['VER_REPORTES_CARRERA','VIP_REPORTES','VIP_SOLO_LECTURA','VIP']))
-                        <li class='tamSubMenu'>
-                            <a class="etSubMenu" href="{{ route('verifica_evidencia.reportes') }}">
-                                <i class="fa fa-file-pdf-o"></i>
-                                <span class="etSubMenu">Reportes</span>
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-            </li>
             @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES','VER_USUARIOS']))
                 <li class="botMen">
                     <a class="etMenu"  href="#">

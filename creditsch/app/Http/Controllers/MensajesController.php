@@ -9,6 +9,7 @@ use Laracasts\Flash\Flash;
 use App\User;
 use App\Mensaje;
 use App\Receptor;
+use DB;
 
 class MensajesController extends Controller
 {
@@ -64,5 +65,13 @@ class MensajesController extends Controller
     	$receptores = Receptor::where('mensaje_id','=',$request->mensaje_id)->join('users','users.id','=','receptores.user_id')->select('receptores.visto','receptores.fecha_visto','users.name as usuario_nombre')->get();
     	return view('admin.mensajes.receptores')
     	->with('receptores',$receptores);
+    }
+
+    public function nuevosMensajes(){
+        $mensajes = DB::table('users as u')->join('receptores as r', function($join){
+            $join->on('r.user_id','=','u.id');
+            $join->where('u.id','=',Auth::User()->id);
+        })->join('mensajes as m','m.id','=','r.mensaje_id')->where('r.visto','<>','true')->select('r.mensaje_id','u.id as usuario_id','m.notificacion','m.created_at as fecha','r.id as receptor_id')->get();
+        return response()->json(array('data' => $mensajes,'no_mensajes' => $mensajes->count()));
     }
 }

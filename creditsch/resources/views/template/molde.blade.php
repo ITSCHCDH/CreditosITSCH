@@ -119,6 +119,62 @@
             $('#mensaje-unico-mds').delay(4000).fadeOut(2000);
         }
     </script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $.ajax({
+                type: "get",
+                cache: false,
+                url: "{{ route('mensajes.nuevos_mensajes') }}",
+                success: function(response){
+                    var numero_mensajes_recibidos = document.getElementById('no-mensajes-recibidos');
+                    var div_mensajes_recibidos = document.getElementById('div-mensajes-recibidos');
+                    div_mensajes_recibidos.innerHTML = "";
+                    if(response['no_mensajes']==0){
+                        numero_mensajes_recibidos.innerHTML = "No tienes mensajes";
+                        div_mensajes_recibidos.innerHTML +="<div class='dropdown-divider'></div>";
+                    }else if(response['no_mensajes']==1){
+                        numero_mensajes_recibidos.innerHTML = response['no_mensajes']+" nuevo mensaje";
+                        for (var i = 0; i < response['data'].length; i++) {
+                            if (i!=0){
+                                div_mensajes_recibidos.innerHTML +="<div class='dropdown-divider'></div>";
+                            }
+                            var temp_ruta = "{{ route('mensajes.ver',['mensaje_id' => 'aux','receptor_id' => 'mds']) }}";
+                            temp_ruta = temp_ruta.replace('aux',response['data'][i]['mensaje_id']);
+                            temp_ruta = temp_ruta.replace('mds',response['data'][i]['receptor_id']);
+                            div_mensajes_recibidos.innerHTML += "<a class='dropdown-item' href='"+temp_ruta+"'>"+
+                            "<span class='text-success'>"+
+                            "<strong>"+
+                            "<i class='fa fa-long-arrow-up fa-fw'></i>Mensaje "+(i+1)+": </strong>"+
+                            "</span>"+
+                            "<span class='small float-right text-muted'>"+response['data'][i]['fecha'].substring(11,16)+"</span>"+
+                            "<div class='dropdown-message small'>"+response['data'][i]['notificacion']+"<div>"+
+                            "</a>";
+                        }
+                    }else{
+                        numero_mensajes_recibidos.innerHTML = response['no_mensajes']+" nuevos mensajes";
+                        for (var i = 0; i < response['data'].length; i++) {
+                            if (i!=0){
+                                div_mensajes_recibidos.innerHTML +="<div class='dropdown-divider'></div>";
+                            }
+                            var temp_ruta = "{{ route('mensajes.ver',['mensaje_id' => 'aux','receptor_id' => 'mds']) }}";
+                            temp_ruta = temp_ruta.replace('aux',response['data'][i]['mensaje_id']);
+                            temp_ruta = temp_ruta.replace('mds',response['data'][i]['receptor_id']);
+                            div_mensajes_recibidos.innerHTML += "<a class='dropdown-item' href='"+temp_ruta+"'>"+
+                            "<span class='text-success'>"+
+                            "<strong>"+
+                            "<i class='fa fa-long-arrow-up fa-fw'></i>Mensaje "+(i+1)+": </strong>"+
+                            "</span>"+
+                            "<span class='small float-right text-muted'>"+response['data'][i]['fecha'].substring(11,16)+"</span>"+
+                            "<div class='dropdown-message small'>"+response['data'][i]['notificacion']+"<div>"+
+                            "</a>";
+                        }
+                    }
+                },error: function(){
+                    console.log('Error al recibir los mensajes nuevos');
+                }
+            });
+        });
+    </script>
     @yield('js')
 </body>
 </html>

@@ -7,6 +7,8 @@ use Illuminate\Support\Collection;
 use App\Actividad;
 use App\Actividad_Evidencia;
 use App\Evidencia;
+use App\Mensaje;
+use App\Receptor;
 use Illuminate\Support\Facades\DB;
 use Laracasts\Flash\Flash;
 use Illuminate\Support\Facades\Auth;
@@ -140,6 +142,21 @@ class Actividad_EvidenciasController extends Controller
 			$actividad_evidencia->actividad_id = $request->actividad_id;
 			$actividad_evidencia->save();
 		}
+		if(count($diferencia_agregar)>0){
+			$actividad = Actividad::find($request->actividad_id);
+			$mensaje = new Mensaje();
+			$mensaje->creador_id = Auth::User()->id;
+			$mensaje->mensaje = "Has sido asignado a la actividad ".$actividad->nombre.".";
+			$mensaje->notificacion = "Nueva actividad asignada";
+			$mensaje->save();
+			for ($i = 0; $i < count($diferencia_agregar); $i++) {
+				$destinatario = new Receptor();
+				$destinatario->mensaje_id = $mensaje->id;
+				$destinatario->user_id = $diferencia_agregar[$i];
+				$destinatario->save();
+			}
+		}
+		
 
 		return response()->json("Responsables asignados correctamente");
 

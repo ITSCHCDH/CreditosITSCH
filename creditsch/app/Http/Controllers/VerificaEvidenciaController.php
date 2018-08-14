@@ -21,7 +21,8 @@ class VerificaEvidenciaController extends Controller
         $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VIP_EVIDENCIA|VERIFICAR_EVIDENCIA')->only(['index','show']);
         $this->middleware('permission:VIP|VIP_EVIDENCIA|VERIFICAR_EVIDENCIA')->only(['create','store']);
         $this->middleware('permission:VIP|VIP_EVIDENCIA|VERIFICAR_EVIDENCIA|VIP_SOLO_LECTURA')->only('verEvidencia');
-        $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_AVANCE_ALUMNO')->only('avanceAlumno');
+        $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_AVANCE_ALUMNO|VIP_AVANCE_ALUMNO')->only('avanceAlumno');
+        $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_AVANCE_ALUMNO|VIP_AVANCE_ALUMNO')->only('alumnosBusqueda');
     }
     public function index(){
         if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA'])){
@@ -54,6 +55,7 @@ class VerificaEvidenciaController extends Controller
 
                 //Consulta para traer los numeros de control vinculasdos con la actividad
                 $participantes_lista = DB::table('participantes as p')->join('actividad_evidencia as ae','ae.id','=','p.id_evidencia')->where('ae.id','=',$request->id_evidencias[$x])->select('p.no_control')->get();
+                //dd($actividad);
                 //Se le asigna el porcentaje de credito a los participantes una vez validada
                 for ($i=0; $i < count($participantes_lista); $i++) {
                     $temp = Avance::where([
@@ -109,7 +111,12 @@ class VerificaEvidenciaController extends Controller
     			Flash::error('El numero de control no exite');
     			return redirect()->route('verifica_evidencia.avance_alumno');
 
-    		}
+    		}else{
+                if(!Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO']) && $alumno[0]->carrera!=Auth::User()->area){
+                    Flash::error('No puedes consultar avances de alumnos de otras carreras');
+                    return redirect()->route('verifica_evidencia.avance_alumno');
+                }
+            }
             //Consulta para obterner el avance del alumno
     		$alumno_data = DB::table('alumnos as alu')->join('participantes as p', function($join) use ($request){
     			$join->on('p.no_control','=','alu.no_control');
@@ -205,12 +212,28 @@ class VerificaEvidenciaController extends Controller
     }
 
     public function alumnosBusqueda(Request $request){
-        if($request->peticion == 0){
-            $lista_alumnos = Alumno::select('nombre','no_control')->where('nombre','like',"%$request->nombre%")->orderBy('nombre')->get();
+        if (Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO'])) {
+            if($request->peticion == 0){
+                $lista_alumnos = Alumno::select('nombre','no_control')->where('nombre','like',"%$request->nombre%")->orderBy('nombre')->get();
+            }else{
+                $lista_alumnos = Alumno::select('nombre')->where('no_control','=',$request->no_control)->get();
+            }
+            return response()->json($lista_alumnos);
         }else{
-            $lista_alumnos = Alumno::select('nombre')->where('no_control','=',$request->no_control)->get();
+            if($request->peticion == 0){
+                $lista_alumnos = Alumno::select('nombre','no_control')->where([
+                    ['nombre','like',"%$request->nombre%"],
+                    ['carrera','=',Auth::User()->area]
+                ])->orderBy('nombre')->get();
+            }else{
+                $lista_alumnos = Alumno::select('nombre')->where([
+                    ['no_control','=',$request->no_control],
+                    ['carrera','=',Auth::User()->area]
+                ])->get();
+            }
+            return response()->json($lista_alumnos);
         }
-        return response()->json($lista_alumnos);
+        
     }
 
 }
