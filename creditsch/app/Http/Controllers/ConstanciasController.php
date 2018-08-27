@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\ConstanciaComplemento;
 use App\Constancia;
+use App\Area;
+use App\Alumno;
+use Illuminate\Support\Carbon;
 use PDF;
 use DB;
 use Laracasts\Flash\Flash;
@@ -53,6 +56,7 @@ class ConstanciasController extends Controller
         }else{
             $raiz = $raiz[0];
         }
+        $datos_globales = ConstanciaComplemento::all();
     	$data = [
             'datos_globales' => $datos_globales[0],
             'dia' => $dia,
@@ -68,6 +72,62 @@ class ConstanciasController extends Controller
         return $pdf->stream('constancia.pdf');
     }
 
+    public function imprimir(Request $request){
+        if(!$request->has('no_control')){
+            Flash::error('Estas intentando acceder de forma ilegal');
+            return redirect('/home');
+        }
+        $existe_alumno = Alumno::where('no_control','=',$request->no_control)->get()->count()>0? true: false;
+        if(!$existe_alumno){
+            Flash::error('El numero de control no existe');
+            return redirect()->back();
+        }
+        $meses = [
+            'enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'
+        ];
+        $fecha_actual = Carbon::now()->setTimezone('CDT')->format('d m Y');
+        $tokenizer = strtok($fecha_actual," ");
+        $dia = $tokenizer;
+        $tokenizer = strtok(" ");
+        $mes = (int)$tokenizer;
+        $tokenizer = strtok(" ");
+        $year = $tokenizer;
+        $raiz = (string)public_path();
+        if($raiz[0]!="/"){
+            $raiz="";
+        }else{
+            $raiz = $raiz[0];
+        }
+        $datos_globales = ConstanciaComplemento::all();
+        $jefe_depto = DB::table('constancia_complemento  as cc')->join('users as u','u.id','=','cc.jefe_depto')->select('u.name','cc.jefe_depto_enunciado','cc.profesion_jefe_depto')->get();
+        $certificador = DB::table('constancia_complemento as cc')->join('users as u','u.id','=','cc.certificador')->select('u.name','cc.profesion_certificador','cc.certificador_enunciado')->get();
+        $jefe_division = DB::table('alumnos as alu')->join('constancia as c', function($join) use($request){
+            $join->on('alu.carrera','=','c.carrera');
+            $join->where('alu.no_control','=',$request->no_control);
+        })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division')->get();
+        $alumno = DB::table('alumnos')->join('areas','areas.id','=','alumnos.carrera')->where('alumnos.no_control','=',$request->no_control)->select('alumnos.nombre','alumnos.no_control','areas.nombre as carrera')->get();
+        $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.$request->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
+        if(count($alumno_data)!=5){
+            Flash::error('El alumno aun no liberado todos sus credito complementarios');
+            return redirect('/home');
+        }
+        sort($alumno_data);
+        $data = [
+            'datos_globales' => $datos_globales[0],
+            'dia' => $dia,
+            'mes' => $meses[$mes-1],
+            'year' => $year,
+            'jefe_depto' => $jefe_depto[0],
+            'raiz' => $raiz,
+            'certificador' => $certificador[0],
+            'jefe_division' => $jefe_division[0],
+            'alumno' => $alumno[0],
+            'alumno_data' => $alumno_data
+        ];
+        $pdf = PDF::loadView('admin.constancias.constancia_alumno', compact('data'));
+        //return view('admin.constancias.constancia');
+        return $pdf->stream('constancia.pdf');
+    }
     public function editarConstancia(){
         if (Auth::User()->hasAnyPermission(['VIP','VIP_CONSTANCIAS'])) {
             //Cosuntamos si existen los datos globales
@@ -76,16 +136,7 @@ class ConstanciasController extends Controller
                 ['imagen_encabezado','<>',null],
                 ['imagen_encabezado','<>',null]
             ])->get();
-            $carreras = [
-                ['carrera' => 'Ingeniería en Sistemas Computacionales','valor' => 'Sistemas'],
-                ['carrera' => 'Ingeniería en Nanotecnología', 'valor' => 'Nanotecnología'],
-                ['carrera' => 'Ingeniería en Mecatrónica','valor' => 'Mecatrónica'],
-                ['carrera' => 'Ingeniería en Bioquímica','valor' => 'Bioquímica'],
-                ['carrera' => 'Ingeniería en Tecnologías de la Información y Comunicaciones','valor' =>"TIC's"],
-                ['carrera' => 'Ingeniería en Gestión Empresarial','valor' => 'Gestión Empresarial'],
-                ['carrera' => 'Ingeniería Industrial', 'valor' => 'Industrial']
-            ];
-
+            $carreras = Area::where('tipo','=','carrera')->get();
             $abreviaturas = $this->obternerAbreviaturas();
             $users = User::select('name','id')->where('email','<>','admin@itsch.com')->orderBy('name','ASC')->get();
             return view('admin.constancias.editar')
@@ -101,31 +152,17 @@ class ConstanciasController extends Controller
                 ['imagen_encabezado','<>',null]
             ])->get();
 
-            $carreras = [
-                ['carrera' => 'Ingeniería en Sistemas Computacionales','valor' => 'Sistemas'],
-                ['carrera' => 'Ingeniería en Nanotecnología', 'valor' => 'Nanotecnología'],
-                ['carrera' => 'Ingeniería en Mecatrónica','valor' => 'Mecatrónica'],
-                ['carrera' => 'Ingeniería en Bioquímica','valor' => 'Bioquímica'],
-                ['carrera' => 'Ingeniería en Tecnologías de la Información y Comunicaciones','valor' =>"TIC's"],
-                ['carrera' => 'Ingeniería en Gestión Empresarial','valor' => 'Gestión Empresarial'],
-                ['carrera' => 'Ingeniería Industrial', 'valor' => 'Industrial']
-            ];
-
-            $carrera = [[]];
-            for ($i = 0; $i < count($carreras); $i++) {
-                if($carreras[$i]['valor'] == Auth::User()->area){
-                    $carrera = [
-                        ['carrera' => $carreras[$i]['carrera'], 'valor' => $carreras[$i]['valor']]
-                    ];
-                }
-            }
+            $carreras = Area::where([
+                ['tipo','=','carrera'],
+                ['id','=',Auth::User()->id]
+            ])->get();
             $abreviaturas = $this->obternerAbreviaturas();
             $users = User::select('name','id')->where([
                 ['email','<>','admin@itsch.com'],
                 ['area','=',Auth::User()->area]
             ])->orderBy('name','ASC')->get();
             return view('admin.constancias.editar')
-            ->with('carreras',$carrera)
+            ->with('carreras',$carreras)
             ->with('abreviaturas',$abreviaturas)
             ->with('users',$users)
             ->with('datos_globales',$datos_globales);
@@ -229,61 +266,39 @@ class ConstanciasController extends Controller
     }
 
     public function guardarDatosEspecificos($carrera,Request $request){
+        $area = Area::find($carrera);
+        if($area==null){
+            return response()->json(array('data' => [],'mensaje' => 'La carrera no existe','mensaje_tipo' => 'error'));
+        }
+        if($area->tipo!="carrera"){
+            return response()->json(array('data' => [],'mensaje' => 'No es una carrera','mensaje_tipo' => 'error'));
+        }
         $constancia_existe = Constancia::where('carrera','=',$carrera)->select('id')->get();
-        $division_enunciado_lista=[
-            ['enunciado' => 'DIV. DE ING. SIST. COMP.','valor' => 'Sistemas'],
-            ['enunciado' => 'DIV. DE ING. NANOTECNOLOGÍA.', 'valor' => 'Nanotecnología'],
-            ['enunciado' => 'DIV. DE ING. MECATRÓNICA.','valor' => 'Mecatrónica'],
-            ['enunciado' => 'DIV. DE ING. BIOQUÍMICA.','valor' => 'Bioquímica'],
-            ['enunciado' => "DIV. DE ING. TIC'S.",'valor' =>"TIC's"],
-            ['enunciado' => 'DIV. DE ING. GEST. EMP.','valor' => 'Gestión Empresarial'],
-            ['enunciado' => 'DIV. DE ING. INDUSTRIAL', 'valor' => 'Industrial']
-        ];
-        $division_enunciado = "";
-        for ($i = 0; $i < count($division_enunciado_lista); $i++) {
-            if($division_enunciado_lista[$i]['valor']==$carrera){
-                $division_enunciado = $division_enunciado_lista[$i]['enunciado'];
-                break;
-            }
+        if($constancia_existe->count()>0){
+            $constancia = Constancia::find($constancia_existe[0]->id);
+            $constancia->fill($request->all());
+            $constancia->save();
+        }else{
+            $constancia = new Constancia($request->all());
+            $constancia->save();
         }
-        if(strlen($division_enunciado)>0){
-            if($constancia_existe->count()>0){
-                $constancia = Constancia::find($constancia_existe[0]->id);
-                $constancia->fill($request->all());
-                $constancia->save();
-            }else{
-                $constancia = new Constancia($request->all());
-                $constancia->division_enunciado = $division_enunciado;
-                $constancia->save();
-            }
-            return response()->json(array('data' => $constancia,'mensaje' => 'Datos guardados correctamente','mensaje_tipo' => 'exito'));
-        }
-        return response()->json(array('data' => $constancia,'mensaje' => 'Datos inconcistentes', 'mensaje_tipo' => 'error'));
-        
+        return response()->json(array('data' => $constancia,'mensaje' => 'Datos guardados correctamente','mensaje_tipo' => 'exito'));
     }
 
     public function constanciasFaltantes(){
         $constancias_existentes = Constancia::all();
         $constancias_faltantes = array();
-        $lista=[
-            ['valor' => 'Sistemas'],
-            ['valor' => 'Nanotecnología'],
-            ['valor' => 'Mecatrónica'],
-            ['valor' => 'Bioquímica'],
-            ['valor' =>"TIC's"],
-            ['valor' => 'Gestión Empresarial'],
-            ['valor' => 'Industrial']
-        ];
-        for ($x=0;$x < count($lista) && $constancias_existentes->count()!=7; $x++) {
+        $carreras_lista= Area::where('tipo','=','carrera')->get();
+        foreach ($carreras_lista as $carrera) {
             $existe = false;
             foreach ($constancias_existentes as $constancia) {
-                if($constancia->carrera == $lista[$x]['valor']){
+                if($constancia->carrera==$carrera->id){
                     $existe = true;
                     break;
                 }
             }
             if(!$existe){
-                array_push($constancias_faltantes,$lista[$x]['valor']);
+                array_push($constancias_faltantes, $carrera->nombre);
             }
         }
         return response()->json($constancias_faltantes);

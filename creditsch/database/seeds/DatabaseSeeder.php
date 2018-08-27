@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
+            CrearAreas::class,
         	RolesPermisos::class,
         	CrearCreditos::class,
         ]);

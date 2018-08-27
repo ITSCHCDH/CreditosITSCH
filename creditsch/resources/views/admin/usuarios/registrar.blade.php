@@ -45,10 +45,15 @@
 
 	        <div class="col-md-6">
 	            <select id="area" type="text" class="form-control" name="area" value="{{ old('area') }}" >
-	            	<option value="" disabled selected>Seleccione un Carrera</option>
-	            	@foreach ($carreras as $carrera)
-	            		<option value={{ $carrera['valor'] }}>{{ $carrera['carrera'] }}</option>
-	            	@endforeach
+	            	@if($areas->count()==1)
+	            		<option value="{{ $areas[0]->id }}" selected>{{ $areas[0]->nombre }}</option>
+	            	@else
+	            		<option value="" disabled selected>Seleccione un Area</option>
+	            		@foreach($areas as $area)
+	            			<option value = "{{ $area->id }}">{{ $area->nombre }}</option>
+	            		@endforeach
+	            	@endif
+	            	
 	            </select>
 
 	            @if ($errors->has('area'))

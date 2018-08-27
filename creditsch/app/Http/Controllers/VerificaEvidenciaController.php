@@ -13,6 +13,7 @@ use App\Credito;
 use App\Participante;
 use App\Actividad_Evidencia;
 use App\Actividad;
+use App\Area;
 
 class VerificaEvidenciaController extends Controller
 {
@@ -26,10 +27,10 @@ class VerificaEvidenciaController extends Controller
     }
     public function index(){
         if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA'])){
-            $evidencias_data = DB::table('evidencia as e')->join('actividad_evidencia as ae','e.id_asig_actividades','=','ae.id')->join('users as u','ae.user_id','=','u.id')->join('actividad as a','ae.actividad_id','=','a.id')->join('creditos as c','a.id_actividad','=','c.id')->join('users as validador','validador.id','=','ae.validador_id')->join('participantes as p','p.id_evidencia','=','ae.id')->select('e.nom_imagen','e.id','ae.validado','u.name','a.nombre','a.por_cred_actividad','c.nombre as nombre_credito','c.id as id_credito','ae.id as actividad_evidencia_id','validador.name as validador_nombre','validador.id as validador_id')->groupBy('ae.id')->get();
+            $evidencias_data = DB::table('evidencia as e')->join('actividad_evidencia as ae','e.id_asig_actividades','=','ae.id')->join('users as u','ae.user_id','=','u.id')->join('actividad as a','ae.actividad_id','=','a.id')->join('creditos as c','a.id_actividad','=','c.id')->join('users as validador','validador.id','=','ae.validador_id')->join('participantes as p','p.id_evidencia','=','ae.id')->select('e.nom_imagen','e.id','ae.validado','u.name','a.nombre','a.por_cred_actividad','c.nombre as nombre_credito','c.id as id_credito','ae.id as actividad_evidencia_id','validador.name as validador_nombre','validador.id as validador_id','c.vigente')->groupBy('ae.id')->get();
             return view('admin.verifica_evidencia.index')->with('evidencias_data',$evidencias_data);
         }else{
-            $evidencias_data = DB::table('evidencia as e')->join('actividad_evidencia as ae','e.id_asig_actividades','=','ae.id')->join('users as u','ae.user_id','=','u.id')->join('actividad as a','ae.actividad_id','=','a.id')->join('creditos as c','a.id_actividad','=','c.id')->join('users as validador','validador.id','=','ae.validador_id')->join('participantes as p','p.id_evidencia','=','ae.id')->where('validador.id','=',Auth::User()->id)->select('e.nom_imagen','e.id','ae.validado','u.name','a.nombre','a.por_cred_actividad','c.nombre as nombre_credito','c.id as id_credito','ae.id as actividad_evidencia_id','validador.name as validador_nombre','validador.id as validador_id')->groupBy('ae.id')->get();
+            $evidencias_data = DB::table('evidencia as e')->join('actividad_evidencia as ae','e.id_asig_actividades','=','ae.id')->join('users as u','ae.user_id','=','u.id')->join('actividad as a','ae.actividad_id','=','a.id')->join('creditos as c','a.id_actividad','=','c.id')->join('users as validador','validador.id','=','ae.validador_id')->join('participantes as p','p.id_evidencia','=','ae.id')->where('validador.id','=',Auth::User()->id)->select('e.nom_imagen','e.id','ae.validado','u.name','a.nombre','a.por_cred_actividad','c.nombre as nombre_credito','c.id as id_credito','ae.id as actividad_evidencia_id','validador.name as validador_nombre','validador.id as validador_id','c.vigente')->groupBy('ae.id')->get();
             return view('admin.verifica_evidencia.index')->with('evidencias_data',$evidencias_data);
         }
     	
@@ -37,7 +38,8 @@ class VerificaEvidenciaController extends Controller
     public function store(Request $request){
         //Validamos si el request viene con las evidencias
     	if($request->id_evidencias){
-            //Variabla index no ayudara como apuntador para saber el porcetaje de liberacion de la actividad y el idencificador del credito al que pertenece
+
+            //Variabla index no ayudara como apuntador para saber el porcentaje de liberacion de la actividad y el idencificador del credito al que pertenece
             for($x=0; $x<count($request->id_evidencias); $x++){
                 $validados = DB::table('actividad_evidencia as ae')->where([
                     ['ae.id','=',$request->id_evidencias[$x]],
@@ -45,6 +47,12 @@ class VerificaEvidenciaController extends Controller
                 ])->get();
                 //Si la evidencia ya esta validada continuamos
                 if($validados->count()>0)continue;
+
+                $credito_vigente = DB::table('actividad_evidencia as ae')->join('actividad as a', function($join) use($request,$x){
+                    $join->on('a.id','=','ae.actividad_id');
+                    $join->where('ae.id','=',$request->id_evidencias[$x]);
+                })->join('creditos as c','c.id','=','a.id_actividad')->where('c.vigente','=','true')->get()->count()>0?true: false;
+                if(!$credito_vigente)continue;
 
                 //Validamos la evidencia
                 $validar_evidencia = Actividad_Evidencia::find($request->id_evidencias[$x]);
@@ -97,6 +105,7 @@ class VerificaEvidenciaController extends Controller
     	$alumno_data=null;
         $avance = true;
         $ruta_data = array();
+        $liberado = false;
 
         //Aqui se valida si la peticiom viene de la ruta reportes o de la de avance, para generar las rutas correctamente dependiendo de su origen
         if($request->has('ruta_carrera') && $request->has('ruta_generacion')){
@@ -129,42 +138,41 @@ class VerificaEvidenciaController extends Controller
             })->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->join('avance as av',function($join) use ($request){
     			$join->on('av.id_credito','=','c.id');
     			$join->where('av.no_control','=',$request->get('no_control'));
-    		})->select('alu.no_control','alu.nombre as nombre_alumno','alu.carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
+    		})->join('areas','alu.carrera','=','areas.id')->select('alu.no_control','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
+            $liberado = $this->alumnoLiberado($request->get('no_control'));
             //Validamos que el alumnos tenga algun avance
     		if($alumno_data->count()==0){
                 //SI no tiene avance solo retornamos los datos del alumno los datos del alumno
                 $avance = false;
-                $alumno_data= DB::table('alumnos')->select('nombre as nombre_alumno','carrera','no_control')->where('no_control','=',$request->get('no_control'))->get();
+                $alumno_data= DB::table('alumnos as alu')->join('areas as a','a.id','=','alu.carrera')->select('alu.nombre as nombre_alumno','a.nombre as carrera','alu.no_control')->where('alu.no_control','=',$request->get('no_control'))->get();
             }
     	}
     	return view('admin.verifica_evidencia.avance_alumno')
         ->with('alumno_data',$alumno_data)
         ->with('creditos',$creditos)
         ->with('ruta_data',$ruta_data)
-        ->with('avance',$avance);
+        ->with('avance',$avance)
+        ->with('liberado',$liberado);
     }
-
+    public function alumnoLiberado($no_control){
+        $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.$no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
+        if(count($alumno_data)!=5) return false;
+        return true;
+    }
     public function reportes(Request $request){
     	$creditos_count = Credito::all();
     	$creditos = count($creditos_count);
-        $carreras = [
-            ['carrera' => 'Ing. en Sistemas Computacionales','valor' => 'Sistemas'],
-            ['carrera' => 'Ing. en Nanotecnología', 'valor' => 'Nanotecnología'],
-            ['carrera' => 'Ing. en Mecatrónica','valor' => 'Mecatrónica'],
-            ['carrera' => 'Ing. en Bioquímica','valor' => 'Bioquímica'],
-            ['carrera' => 'Ing. en Tecnologías de la Información y Comunicaciones','valor' =>"TIC's"],
-            ['carrera' => 'Ing. en Gestión Empresarial','valor' => 'Gestión Empresarial'],
-            ['carrera' => 'Ing. Industrial', 'valor' => 'Industrial']
-        ];
+        $carreras = Area::where('tipo','=','carrera')->get();
         if (Auth::User()->hasAnyPermission(['VIP','VIP_REPORTES','VIP_SOLO_LECTURA'])) {
+            $carrera = null;
             if($request->has('generacion')){
                 //Substraemos los dos ultimos digitos del año de generacion
                 $generacion = substr($request->generacion,2,4);
                 $carrera = $request->get('carrera');
                 //Consulta para traer los creditos y su avance indibidual de cada uno
-                $reportes_data = DB::select('select alumnos.nombre, alumnos.no_control, alumnos.carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%") and alumnos.carrera="'.$carrera.'" left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control order by alumnos.nombre asc, creditos.nombre asc');
+                $reportes_data = DB::select('select alumnos.nombre, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%") and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control order by alumnos.nombre asc, creditos.nombre asc');
                 //Cosulta para traer la suma total de todos creditos
-                $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre, alumnos.no_control, alumnos.carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%") and alumnos.carrera="'.$carrera.'" left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control group by alumnos.nombre order by alumnos.nombre asc');
+                $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%") and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control group by alumnos.nombre order by alumnos.nombre asc');
             }else{
                 $reportes_data = null;
                 $suma_creditos = null;
@@ -174,33 +182,29 @@ class VerificaEvidenciaController extends Controller
             ->with('reportes_data',$reportes_data)
             ->with('creditos',$creditos)
             ->with('suma_creditos',$suma_creditos)
-            ->with('carreras',$carreras);
+            ->with('carreras',$carreras)
+            ->with('carrera_seleccionada',$carrera);
         }else{
+            $carrera = null;
             if($request->has('generacion')){
                 //Substraemos los dos ultimos digitos del año de generacion
                 $generacion = substr($request->generacion,2,4);
                 $carrera = $request->get('carrera');
                 //Consulta para traer los creditos y su avance indibidual de cada uno
-                $reportes_data = DB::select('select alumnos.nombre, alumnos.no_control, alumnos.carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%") and alumnos.carrera="'.$carrera.'" left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control order by alumnos.nombre asc, creditos.nombre asc');
+                $reportes_data = DB::select('select alumnos.nombre, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%") and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control order by alumnos.nombre asc, creditos.nombre asc');
                 //Cosulta para traer la suma total de todos creditos
-                $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre, alumnos.no_control, alumnos.carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%") and alumnos.carrera="'.$carrera.'" left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control group by alumnos.nombre order by alumnos.nombre asc');
+                $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%") and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control group by alumnos.nombre order by alumnos.nombre asc');
             }else{
                 $reportes_data = null;
                 $suma_creditos = null;
             }
-            $temp_carrera = [];
-            for ($i = 0; $i < count($carreras); $i++) {
-                if($carreras[$i]['valor']==Auth::User()->area){
-                    $temp_carrera = [
-                        ['carrera' => $carreras[$i]['carrera'],'valor' => $carreras[$i]['valor']]
-                    ];
-                }
-            }
+            $carreras = Area::where('id','=',Auth::User()->id)->get();
             return view('admin.verifica_evidencia.reportes')
             ->with('reportes_data',$reportes_data)
             ->with('creditos',$creditos)
             ->with('suma_creditos',$suma_creditos)
-            ->with('carreras',$temp_carrera);
+            ->with('carreras',$carreras)
+            ->with('carrera_seleccionada',$carrera);
         }
     	
     }

@@ -8,12 +8,14 @@
 
 @section('contenido')
     @if (Auth::User()->can('VIP') || Auth::User()->can('CREAR_CREDITOS'))
-        <a href="{{route('creditos.create')}}" class="btn btn-info">Registrar nuevo credito</a>
+        <a href="{{route('creditos.create')}}" class="btn btn-primary">Registrar nuevo credito</a>
     @endif
     <table class="table table-striped">
         <thead>
         <th>ID</th>
         <th>Nombre</th>
+        <th>Jefe</th>
+        <th>Vigente</th>
         @if (Auth::User()->can('VIP'))
             <th>Acción</th>
         @endif
@@ -23,6 +25,20 @@
             <tr>
                 <td>{{$cred->id}}</td>
                 <td>{{$cred->nombre}}</td>
+                <td>
+                    @if( $cred->jefe_nombre==null)
+                        {{ "Ninguno" }}
+                    @else
+                        {{ $cred->jefe_nombre }}
+                    @endif
+                </td>
+                <td>
+                    @if($cred->vigente=="true")
+                        {{ "SI" }}
+                    @else
+                        {{ "NO" }}
+                    @endif
+                </td>
                 <td>
                     @if (Auth::User()->can('MODIFICAR_CREDITOS') || Auth::User()->can('VIP'))
                         <a href="{{ route('creditos.edit',[$cred->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>

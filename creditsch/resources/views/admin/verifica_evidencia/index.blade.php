@@ -32,42 +32,46 @@
 		   			</td>
 		   			<td>
 		   				<label>
-		   					@if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA']))
-			   					@if($evi->validado=='false')
-		   							<label class="control control--checkbox">
-		   								<input type="checkbox"type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado">
-		   								<div class="control__indicator"></div>
-		   							</label>
-			   					@else
-			   						<label class="control control--checkbox">
-			   							<input type="checkbox"type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" checked disabled>
-			   							<div class="control__indicator"></div>
-			   						</label>
-			   					@endif
-			   				@elseif(Auth::User()->hasAnyPermission(['VIP_SOLO_LECTURA','VERIFICAR_EVIDENCIA']))
-			   					@if (Auth::User()->can('VERIFICAR_EVIDENCIA') && $evi->validador_id==Auth::User()->id)
+		   					@if($evi->vigente=="false")
+		   						Credito no Vigente
+		   					@else
+			   					@if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA']))
 				   					@if($evi->validado=='false')
 			   							<label class="control control--checkbox">
-			   								<input type="checkbox"type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado">
+			   								<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado">
 			   								<div class="control__indicator"></div>
 			   							</label>
 				   					@else
 				   						<label class="control control--checkbox">
-				   							<input type="checkbox"type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" checked disabled>
+				   							<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" checked disabled>
 				   							<div class="control__indicator"></div>
 				   						</label>
 				   					@endif
-				   				@else
-				   					@if($evi->validado=='false')
-			   							<label class="control control--checkbox">
-			   								<input type="checkbox"type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" disabled>
-			   								<div class="control__indicator"></div>
-			   							</label>
-				   					@else
-				   						<label class="control control--checkbox">
-				   							<input type="checkbox"type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" checked disabled>
-				   							<div class="control__indicator"></div>
-				   						</label>
+				   				@elseif(Auth::User()->hasAnyPermission(['VIP_SOLO_LECTURA','VERIFICAR_EVIDENCIA']))
+				   					@if (Auth::User()->can('VERIFICAR_EVIDENCIA') && $evi->validador_id==Auth::User()->id)
+					   					@if($evi->validado=='false')
+				   							<label class="control control--checkbox">
+				   								<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado">
+				   								<div class="control__indicator"></div>
+				   							</label>
+					   					@else
+					   						<label class="control control--checkbox">
+					   							<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" checked disabled>
+					   							<div class="control__indicator"></div>
+					   						</label>
+					   					@endif
+					   				@else
+					   					@if($evi->validado=='false')
+				   							<label class="control control--checkbox">
+				   								<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" disabled>
+				   								<div class="control__indicator"></div>
+				   							</label>
+					   					@else
+					   						<label class="control control--checkbox">
+					   							<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" checked disabled>
+					   							<div class="control__indicator"></div>
+					   						</label>
+					   					@endif
 				   					@endif
 			   					@endif
 		   					@endif

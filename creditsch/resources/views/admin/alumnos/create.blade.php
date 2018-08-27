@@ -24,7 +24,12 @@
 
         <div class="form-group">
            {!! Form::label('carrera','Carrera') !!}
-            {!! Form::select('carrera',[''=>'Seleccione un elemento','Sistemas'=>'Ingeniería es Sistemas Computacionales','Industrial'=>'Ingeniería Industrial','Mecatrónica'=>'Ingeniería Mecatrónica',"TIC'S"=>'Ingeniería en Tecnologias de Información y Comunicaciones','Bioquímica'=>'Ingeniería Bioquímica','Nanotecnología'=>'Ingeniería en Nanotecnologia'],null,['class'=>'form-control']) !!}
+           <select name="carrera" id="carrera" class="form-control">
+               <option value="">Seleccione una carrera</option>
+               @foreach($carreras as $carrera)
+                    <option value="{{ $carrera->id }}">{{ $carrera->nombre }}</option>
+               @endforeach
+           </select>
         </div>
 
         <div class="form-group">

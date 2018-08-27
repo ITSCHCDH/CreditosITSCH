@@ -10,7 +10,7 @@
 	{!! Form::open(['route' => 'verifica_evidencia.reportes','method' => 'GET']) !!}
 		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 mt-lg-10 pull-left">
 		    {!! Form::label('generacion','Generacion') !!}
-		    {!! Form::select('generacion',['2015' => '2015','2016' => '2016','2014' => '2014'],null,['class'=>'form-control','required','placeholder'=>'Año-Generacion','method'=>'GET','required']) !!}
+		    {!! Form::select('generacion',['2015' => '2015','2016' => '2016','2017' => '2017','2018' => '2018'],null,['class'=>'form-control','required','placeholder'=>'Año-Generacion','method'=>'GET','required']) !!}
 		</div>
 		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 pull-left">
 		    {!! Form::label('carrera','Carrera') !!}
@@ -18,15 +18,19 @@
 		    	@if (Auth::User()->hasAnyPermission(['VIP','VIP_REPORTES','VIP_SOLO_LECTURA']))
 		    		<option value="">Seleccione una carrera</option>
 		    	@endif
-		    	@for ($i = 0; $i < count($carreras); $i++)
-		    		<option value="{{ $carreras[$i]['valor'] }}">{{ $carreras[$i]['carrera'] }}</option>
-		    	@endfor
+		    	@foreach($carreras as $carrera)
+		    		@if($carrera_seleccionada == $carrera->id)
+		    			<option value="{{ $carrera->id }}" selected>{{ $carrera->nombre }}</option>
+		    		@else
+		    			<option value="{{ $carrera->id }}">{{ $carrera->nombre }}</option>
+		    		@endif
+		    	@endforeach
 		    </select>
             
 
 		</div>
 		<div>
-			{!! Form::submit('Buscar',['class' => 'btn btn-primary pull-left','style' => 'margin-top: 24px; margin-left: 25px;']) !!}
+			{!! Form::submit('Consultar',['class' => 'btn btn-primary pull-left','style' => 'margin-top: 24px; margin-left: 25px;']) !!}
 		</div>
 		
 	{!! Form::close() !!}

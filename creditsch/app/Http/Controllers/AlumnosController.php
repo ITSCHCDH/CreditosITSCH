@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Alumno; //Es el nombre del modelo con el que va a trabajar el controlador
+use App\Area;
 use Laracasts\Flash\Flash; //Es el paquete para poder usar los mensajes de alerta tipo bootstrap
 use DB;
 
@@ -22,9 +23,8 @@ class AlumnosController extends Controller
      */
     public function index(Request $request)
     {
-        //Aqui mandamos llamar la vista de la pagina de inicio de alumnos
-        $alumno=Alumno::Search($request->valor)->orderby('id','asc')->paginate(10); //Consulta todos los usuarios y los ordena, ademas pagina la consulta
-        return view('admin.alumnos.index')->with('alumno',$alumno); //Llama a la vista y le envia los usuarios
+        $alumnos = DB::table('alumnos as alu')->join('areas as a','a.id','=','alu.carrera')->where('alu.nombre','LIKE',"%".$request->valor."%")->orwhere('no_control','LIKE',"%$request->valor%")->orwhere('carrera','LIKE',"%$request->valor%")->orderBy('alu.id')->select('alu.nombre','alu.no_control','alu.status','alu.id','a.nombre as carrera')->paginate(5);
+        return view('admin.alumnos.index')->with('alumno',$alumnos); //Llama a la vista y le envia los usuarios
     }
 
     /**
@@ -34,8 +34,9 @@ class AlumnosController extends Controller
      */
     public function create()
     {
-        //Ponemos el codigo de la vista que se llamara para las altas de los alumnos
-        return view('admin.alumnos.create');
+        $carreras = Area::where('tipo','=','carrera')->orderBy('nombre','ASC')->get();
+        return view('admin.alumnos.create')
+        ->with('carreras',$carreras);
     }
 
     /**

@@ -11,11 +11,13 @@
 @section('contenido')
     @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
         @if ($actividad!=null)
-            <a href="{{route('responsables.index',$actividad->id)}}" class="btn btn-primary">Asignar Responsables</a>
+            @if($actividad->vigente=="true")
+                <a href="{{route('responsables.index',$actividad->id)}}" class="btn btn-primary">Asignar Responsables</a>
+            @endif
         @endif
     @elseif(Auth::User()->hasAllPermissions(['AGREGAR_RESPONSABLES','ELIMINAR_RESPONSABLES']))
         @if ($actividad!=null)
-            @if ($actividad->id_user==Auth::User()->id)
+            @if ($actividad->id_user==Auth::User()->id && $actividad->vigente=="true")
                 <a href="{{route('responsables.index',$actividad->id)}}" class="btn btn-primary">Asignar Responsables</a>
             @endif
         @endif
@@ -46,13 +48,25 @@
                         </td>
                         @if (Auth::User()->hasAnyPermission(['ELIMINAR_RESPONSABLES','VIP','VIP_ACTIVIDAD']))
                             @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-                                <td>
-                                  <a href="{{ route('actividad_evidencias.destroy',$res->actividad_evidencia_id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                                </td>
+                                @if($actividad->vigente=="true")
+                                    <td>
+                                      <a href="{{ route('actividad_evidencias.destroy',$res->actividad_evidencia_id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                                    </td>
+                                @else
+                                    <td>
+                                        {{ "Ninguna" }}
+                                    </td>
+                                @endif                     
                             @elseif($actividad->id_user==Auth::User()->id)
-                                <td>
-                                  <a href="{{ route('actividad_evidencias.destroy',$res->actividad_evidencia_id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                                </td>
+                                @if($actividad->vigente=="true")
+                                    <td>
+                                      <a href="{{ route('actividad_evidencias.destroy',$res->actividad_evidencia_id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                                    </td>
+                                @else
+                                    <td>
+                                        {{ "Ninguna" }}
+                                    </td>
+                                @endif
                             @endif
                         @endif
                         

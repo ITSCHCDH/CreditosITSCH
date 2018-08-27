@@ -26,9 +26,9 @@ class ActividadesController extends Controller
     public function index(Request $request)
     {   //Aqui mandamos llamar todos los datos de las actividades creadas
         if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])){
-            $act=Actividad::Search($request->nombre)->orderby('id','asc')->paginate(10); //Consulta todos los usuarios y los ordena, ademas pagina la consulta
+            $act=Actividad::Search($request->nombre)->orderby('id','asc')->paginate(5); //Consulta todos los usuarios y los ordena, ademas pagina la consulta
         }else{
-            $act = Actividad::Search($request->nombre)->where('id_user','=',Auth::User()->id)->orderby('id','ASC')->paginate(10);
+            $act = Actividad::Search($request->nombre)->where('id_user','=',Auth::User()->id)->orderby('id','ASC')->paginate(5);
         }
         
         //Creamos un metodo que llame a las relaciones de cada una de las actividades
@@ -48,7 +48,15 @@ class ActividadesController extends Controller
      */
     public function create()
     {
-        $creditos=Credito::orderBy('nombre','asc')->pluck('nombre','id');//Traemos todas las categorias que existen en la bd
+        if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
+            $creditos = Credito::where('vigente','=','true')->orderBy('nombre','asc')->pluck('nombre','id');
+        }else{
+            $creditos = Credito::leftjoin('creditos_areas as ca','ca.credito_id','=','creditos.id')->where([
+                ['ca.credito_area','=',Auth::User()->area],
+                ['creditos.vigente','=','true']
+            ])->groupBy('creditos.id')->orderBy('creditos.nombre','asc')->pluck('creditos.nombre','creditos.id');
+        }
+        
        return view('admin.actividades.create')->with('creditos',$creditos);
     }
 
@@ -101,10 +109,12 @@ class ActividadesController extends Controller
             return redirect()->route('actividades.index');
         }
         if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
+            
             $creditos=Credito::orderBy('nombre','asc')->pluck('nombre','id');
             return view('admin.actividades.edit')->with('actividad',$act)->with('creditos',$creditos);
-        }else if(Auth::User()->hasAnyPermission(['VIP'])){
-
+        }else{
+            $creditos=Credito::orderBy('nombre','asc')->pluck('nombre','id');
+            return view('admin.actividades.edit')->with('actividad',$act)->with('creditos',$creditos);
         }
         //Codigo de modificaciones
         
@@ -134,6 +144,16 @@ class ActividadesController extends Controller
         if($act_nueva->por_cred_actividad>100){
             Flash::error('El porcentaje de liberación no debe exceder el 100% del credito');
             return back()->withInput();
+        }
+        if($act_anterior->id_actividad != $act_nueva->id_actividad){
+            $tiene_foraneas = DB::table('actividad as a')->join('actividad_evidencia as ae', function($join) use($id){
+                $join->on('ae.actividad_id','=','a.id');
+                $join->where('a.id','=',$id);
+            })->get()->count()>0? true: false;
+            if($tiene_foraneas){
+                Flash::error('Para cambiar el credito al que pertenece esta actividad primero necesita estar libre de participantes, responsables y evidencias');
+                return redirect()->back();
+            }
         }
         $act_nueva->save();
         //En caso de la actividad ya cuente con evidencias y a esta se le cambie el nombre

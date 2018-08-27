@@ -16,7 +16,16 @@ class AddTableCreditos extends Migration
         Schema::create('creditos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nombre',70);
+            $table->integer("credito_jefe")->nullable()->unsigned();
+            $table->enum("vigente",["true","false"])->default("true");
+            $table->foreign("credito_jefe")->references("id")->on("users")->onDelete("cascade");
             $table->timestamps();
+        });
+
+        Schema::create('creditos_areas', function(Blueprint $table){
+            $table->increments('id');
+            $table->integer('credito_id')->unsigned();
+            $table->integer('credito_area')->unsigned();
         });
     }
 
@@ -27,6 +36,7 @@ class AddTableCreditos extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('creditos_areas');
         Schema::dropIfExists('creditos');
     }
 }

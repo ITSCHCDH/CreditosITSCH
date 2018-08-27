@@ -49,17 +49,13 @@
 				<tr>
 					<th>Nombre</th>
 					<td>
-						@if ($alumno_data!=null)
-							{{ $alumno_data[0]->nombre_alumno }}
-						@endif
+						{{ Auth::User()->nombre }}
 					</td>
 				</tr>
 				<tr>
 					<th>Numero de control</th>
 					<td>
-						@if ($alumno_data!=null)
-							{{ $alumno_data[0]->no_control }}
-						@endif
+						{{ Auth::User()->no_control }}
 					</td>
 				</tr>
 				<tr>
@@ -74,7 +70,7 @@
 		</table>
 	</div>
 
-	<table class="table table-striped" style="margin: 30px auto 50px auto; width:60%;">
+	<table class="table table-striped" style="margin: 30px auto 0 auto; width:60%;">
 		<thead>
 			<th>Credito</th>
 			<th>Actividades</th>
@@ -200,6 +196,14 @@
 			@endif
 		</tbody>
 	</table>
+	@if($liberado && (Auth::User()->hasAnyPermission(['VIP','IMPRIMIR_CONSTAMCIAS'])))
+		<form action="{{ route('constancias.imprimir') }}" style="padding: 10px;" method="post">
+			{{ csrf_field() }}
+			<input type="hidden" name="no_control" value="{{ $alumno_data[0]->no_control }}">
+			<input type="submit" name="" value="Imprimir constancia" class="btn btn-primary">
+		</form>
+	@endif
+	<div style="padding: 5px 0 50px 0;"></div>
 	@section('js')
 		<script type="text/javascript">
 			function autocompletar(entrada){

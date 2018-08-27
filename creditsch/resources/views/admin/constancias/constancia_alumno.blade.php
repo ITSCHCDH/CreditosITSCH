@@ -139,8 +139,8 @@
 <P class="jefa">{{ strtoupper((string)$data['jefe_depto']->jefe_depto_enunciado) }}</P>
 <P class="jefa">PRESENTE</P>
 <div class="marco">
-	<p class="parrafo">Por medio del presente le envió un coordial saludo, y aprovecho la oportunidad para hacer de su conocimiento que de acuerdo a lo establecido en el lineamiento para la acreditación de actividades complementarias para el plan de estudios {{ strtoupper($data['datos_globales']->plan_de_estudios) }}, el(a) alumno(a) <strong>Jehú Jair Ruiz Villegas</strong> con el numero de control <strong>15030205</strong> de la carrera INGENIERÍA EN SISTEMAS COMPUTACIONALES ha <strong style="text-decoration: underline;">concluido satisfactoriamente</strong> con las actividades necesarias para liberar los créditos complementarios. Dichas actividades se resumen a continuación: </p>
-	<table id="tabla-constancia">
+	<p class="parrafo">Por medio del presente le envió un coordial saludo, y aprovecho la oportunidad para hacer de su conocimiento que de acuerdo a lo establecido en el lineamiento para la acreditación de actividades complementarias para el plan de estudios {{ strtoupper($data['datos_globales']->plan_de_estudios) }}, el(a) alumno(a) <strong>{{ $data['alumno']->nombre }}</strong> con el numero de control <strong>{{ $data['alumno']->no_control }}</strong> de la carrera {{ strtoupper($data['alumno']->carrera) }} ha <strong style="text-decoration: underline;">concluido satisfactoriamente</strong> con las actividades necesarias para liberar los créditos complementarios. Dichas actividades se resumen a continuación: </p>
+	<table id="tabla-constancia" style="margin-top: 5px">
 		<thead>
 			<tr>
 				<th>Actividad</th>
@@ -149,31 +149,17 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<td>Nombre del crédito</td>
-				<td class="centrado">1</td>
-				<td>Nombre del jefe del credito</td>
-			</tr>
-			<tr>
-				<td>Nombre del crédito</td>
-				<td class="centrado">1</td>
-				<td>Nombre del jefe del credito</td>
-			</tr>
-			<tr>
-				<td>Nombre del crédito</td>
-				<td class="centrado">1</td>
-				<td>Nombre del jefe del credito</td>
-			</tr>
-			<tr>
-				<td>Nombre del crédito</td>
-				<td class="centrado">1</td>
-				<td>Nombre del jefe del credito</td>
-			</tr>
-			<tr>
-				<td>Nombre del crédito</td>
-				<td class="centrado">1</td>
-				<td>Nombre del jefe del credito</td>
-			</tr>
+			@for($x = 0; $x < count($data['alumno_data']); $x++)
+				<tr>
+					<td>
+						{{ $data['alumno_data'][$x]->credito_nombre }}
+					</td>
+					<td class="centrado">1</td>
+					<td>
+						{{ $data['alumno_data'][$x]->credito_jefe }}
+					</td>
+				</tr>
+			@endfor
 			<tr>
 				<td style="font-size: 13px;"><strong>TOTAL</strong></td>
 				<td class="centrado" style="font-size: 13px;"><strong>5</strong></td>

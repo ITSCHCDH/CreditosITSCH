@@ -197,21 +197,17 @@
 	<div id="mensajes-parte_media">
 		
 	</div>
-	<a href="#" class="btn btn-primary pull-left ocultar-formulario" id="constancia-vista-previa">Vista previa</a>
+	<a href="#" class="btn btn-primary pull-left ocultar-formulario" id="constancia-vista-previa" style="visibility: hidden;">Vista previa</a>
 	<div class="resetear"></div>
 	<form class="ocultar-formulario" method = "post" id = "form-datos-especificos">
 		<input type="hidden" value="{{ csrf_token() }}" id="token">
-		<input type="hidden" name="carrera_nom_completo" value="" id="carrera_nom_completo"> 
 		<div class="form-group">
 			<label for="carrera">Carrera</label>
 			<select id="carrera" name="carrera" class="form-control" required>
 				<option value="" selected>Seleccione una carrera</option>
-				@for ($x = 0; $x < count($carreras); $x++)
-					@php
-						$subcadena = substr((string)$carreras[$x]['valor'],0,3);
-					@endphp
-					 <option value="{{ $carreras[$x]['valor'] }}" data-nombre="{{ $carreras[$x]['carrera'] }}" id = "option{{ $subcadena }}">{{ $carreras[$x]['carrera']}}</option>
-				@endfor
+				@foreach($carreras as $carrera)
+					<option value="{{ $carrera->id }}">{{ $carrera->nombre }}</option>
+				@endforeach
 			</select>
 		</div>
 		
@@ -233,7 +229,10 @@
 				</select>
 			</div>
 			<div class="resetear"></div>
-				
+		</div>
+		<div class="form-group">
+			<label for="division_enunciado">Enunciado de la división de carrera</label>
+			<input type="text" name="division_enunciado" id="division_enunciado" class="form-control" required placeholder="Enunciado de la división. Ejem DIV. DE ING. SIST. COMP">
 		</div>
 		<input type="submit" name="" value="Guardar" class="btn btn-primary">
 	</form>
@@ -275,24 +274,23 @@
 					abreviaturasEspeciales(response['profesion_jefe_division'],'otro-jefe-division');
 					$('#jefe_division').val(response['jefe_division']);
 					$('#profesion_jefe_division').val(response['profesion_jefe_division']);
+					$('#division_enunciado').val(response['division_enunciado']);
 				}else{
 					$('#jefe_division').val('');
 					$('#profesion_jefe_division').val('');
+					$('#division_enunciado').val('');
 				}
 			}
 			function comboCarrera(){
 				$(document).on('change','#carrera',function(event){
 					event.preventDefault();
 					var carrera_nombre = $('#carrera').val();
-					var carrera_nombre_subcadena = carrera_nombre.substring(0,3);;
-					var carrera_nom_completo = document.getElementById('carrera_nom_completo');
 					$('#carrera').removeAttr("disabled");
 					if(carrera_nombre.length>0){
 						var ruta = "{{ route('constancias.obtener_datos_especificos','aux') }}";
 						var ruta_visualizar = "{{ route('constancias.visualizar',['carrera' => 'aux']) }}";
 						ruta = ruta.replace('aux',carrera_nombre);
 						ruta_visualizar = ruta_visualizar.replace('aux',carrera_nombre);
-						carrera_nom_completo.value = $('#option'+carrera_nombre_subcadena).attr('data-nombre');
 						$.ajax({
 							type: 'get',
 							dataType: 'json',
@@ -303,6 +301,7 @@
 									actualizarDatosEspecificos(response[0]);
 									$('#constancia-vista-previa').attr('href',ruta_visualizar);
 									$('#constancia-vista-previa').fadeIn();
+									$('#constancia-vista-previa').css('visibility','visible');
 								}else{
 									actualizarDatosEspecificos(response, "vaciar");
 									$('#constancia-vista-previa').attr('href','#');
@@ -318,9 +317,9 @@
 							}
 						});
 					}else{
-						carrera_nom_completo.value="";
 						$('#constancia-vista-previa').attr('href','#');
 						$('#constancia-vista-previa').fadeOut();
+						$('#constancia-vista-previa').css('visibility','hidden');
 						$('#form-datos-especificos input').attr("disabled","disabled");
 						$('#form-datos-especificos select').attr("disabled","disabled");
 						$('#jefe_division').val('');

@@ -5,14 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
 use Laracasts\Flash\Flash;
 use App\Credito;
 use App\Actividad;
 use App\User;
 use App\Actividad_Evidencia;
 use App\Evidencia;
+use App\ALumno;
+use App\ConstanciaComplemento;
 use DB;
-
+use PDF;
 class AlumnosRutasController extends Controller
 {
     public function home(){
@@ -22,7 +25,7 @@ class AlumnosRutasController extends Controller
     public function avance(){
 		$alumno_data=null;
 	    $avance = true;
-
+        $liberado = false;
 	    //Traemos todos los creditos existentes
 	    $creditos = Credito::select('nombre')->orderBy('nombre')->get();
 
@@ -38,7 +41,8 @@ class AlumnosRutasController extends Controller
         })->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->join('avance as av',function($join){
 			$join->on('av.id_credito','=','c.id');
 			$join->where('av.no_control','=',Auth::User()->no_control);
-		})->select('alu.no_control','alu.nombre as nombre_alumno','alu.carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
+		})->join('areas','areas.id','=','alu.carrera')->select('alu.no_control','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
+        $liberado = $this->alumnoLiberado();
         //Validamos que el alumnos tenga algun avance
 		if($alumno_data->count()==0){
             //SI no tiene avance solo retornamos los datos del alumno los datos del alumno
@@ -48,9 +52,68 @@ class AlumnosRutasController extends Controller
     	return view('alumnos.avance')
     	->with('alumno_data',$alumno_data)
     	->with('creditos',$creditos)
-    	->with('avance',$avance);
+    	->with('avance',$avance)
+        ->with('liberado',$liberado);
     }
 
+    public function imprimir(){
+        $existe_alumno = Alumno::where('no_control','=',Auth::User()->no_control)->get()->count()>0? true: false;
+        if(!$existe_alumno){
+            Flash::error('El numero de control no existe');
+            return redirect()->back();
+        }
+        $meses = [
+            'enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'
+        ];
+        $fecha_actual = Carbon::now()->setTimezone('CDT')->format('d m Y');
+        $tokenizer = strtok($fecha_actual," ");
+        $dia = $tokenizer;
+        $tokenizer = strtok(" ");
+        $mes = (int)$tokenizer;
+        $tokenizer = strtok(" ");
+        $year = $tokenizer;
+        $raiz = (string)public_path();
+        if($raiz[0]!="/"){
+            $raiz="";
+        }else{
+            $raiz = $raiz[0];
+        }
+        $datos_globales = ConstanciaComplemento::all();
+        $jefe_depto = DB::table('constancia_complemento  as cc')->join('users as u','u.id','=','cc.jefe_depto')->select('u.name','cc.jefe_depto_enunciado','cc.profesion_jefe_depto')->get();
+        $certificador = DB::table('constancia_complemento as cc')->join('users as u','u.id','=','cc.certificador')->select('u.name','cc.profesion_certificador','cc.certificador_enunciado')->get();
+        $jefe_division = DB::table('alumnos as alu')->join('constancia as c', function($join){
+            $join->on('alu.carrera','=','c.carrera');
+            $join->where('alu.no_control','=',Auth::User()->no_control);
+        })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division')->get();
+        $alumno = DB::table('alumnos')->join('areas','areas.id','=','alumnos.carrera')->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.nombre','alumnos.no_control','areas.nombre as carrera')->get();
+        $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
+        if(count($alumno_data)!=5){
+            Flash::error('El alumno aun no liberado todos sus credito complementarios');
+            return redirect('/home');
+        }
+        sort($alumno_data);
+        $data = [
+            'datos_globales' => $datos_globales[0],
+            'dia' => $dia,
+            'mes' => $meses[$mes-1],
+            'year' => $year,
+            'jefe_depto' => $jefe_depto[0],
+            'raiz' => $raiz,
+            'certificador' => $certificador[0],
+            'jefe_division' => $jefe_division[0],
+            'alumno' => $alumno[0],
+            'alumno_data' => $alumno_data
+        ];
+        $pdf = PDF::loadView('admin.constancias.constancia_alumno', compact('data'));
+        //return view('admin.constancias.constancia');
+        return $pdf->stream('constancia.pdf');
+    }
+
+    public function alumnoLiberado(){
+        $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
+        if(count($alumno_data)!=5) return false;
+        return true;
+    }
     public function actividades(){
     	$actividades = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join){
     		$join->on('ae.id','=','p.id_evidencia');

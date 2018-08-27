@@ -169,4 +169,8 @@
 		@endif
 	</tbody>
 	</table>
+	@if($liberado)
+		<a href="{{ route('alumnos.constancias_imprimir') }}" class="btn btn-primary">Imprimir constancia</a>
+	@endif
+	<div style="padding: 5px 0 50px 0;"></div>
 @endsection

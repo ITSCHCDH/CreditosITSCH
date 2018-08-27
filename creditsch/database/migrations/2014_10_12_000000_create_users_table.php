@@ -18,8 +18,9 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email',60)->unique();
             $table->string('password');
-            $table->string('area',60);
+            $table->integer('area')->unsigned();
             $table->enum('active',['true','false'])->default('true');
+            $table->foreign('area')->references('id')->on('areas')->onDelete('cascade');
             $table->rememberToken();
             $table->timestamps();
         });

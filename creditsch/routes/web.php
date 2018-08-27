@@ -122,6 +122,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('constancias/{carrera}/obtener_datos_especificos','ConstanciasController@obtenerDatosEspecificos')->name('constancias.obtener_datos_especificos');
     Route::post('constancias/{carrera}/guardar','ConstanciasController@guardarDatosEspecificos')->name('constancias.guardar_datos_especificos');
     Route::get('constancias/constancias_faltantes','ConstanciasController@constanciasFaltantes')->name('constancias.constancias_faltantes');
+    Route::post('constancias/imprimir','ConstanciasController@imprimir')->name('constancias.imprimir');
     //Roles y permisos
 
     Route::get('roles_permisos/index','RolesPermisosController@index')->name('roles.index');
@@ -144,6 +145,13 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('mensajes/destinatarios','MensajesController@destinatarios')->name('mensajes.destinatarios');
     Route::get('mensajes/nuevos_mensajes','MensajesController@nuevosMensajes')->name('mensajes.nuevos_mensajes');
 
+    Route::get('areas/lista','AreasController@inicio')->name('areas.inicio');
+    Route::get('areas/crear','AreasController@crear')->name('areas.crear');
+    Route::get('areas/{area}/eliminar','AreasController@eliminar')->name('areas.eliminar');
+    Route::post('areas/guardar','AreasController@guardar')->name('areas.guardar');
+    Route::get('areas/{area}/editar','AreasController@editar')->name('areas.editar');
+    Route::post('areas/{area}/actualizar','AreasController@actualizar')->name('areas.actualizar');
+    Route::get('areas/{area}/usuarios','AreasController@usuarios')->name('areas.usuarios');
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
@@ -154,6 +162,7 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::post('actividades/guardar_evidencia','AlumnosRutasController@guardarEvidencia')->name('alumnos.guardar_evidencia');
     Route::get('actividades/evidencia','AlumnosRutasController@evidencia')->name('alumnos.evidencia');
     Route::get('actividades/eliminar_evidencia','AlumnosRutasController@eliminarEvidencia')->name('alumnos.eliminar_evidencia');
+    Route::get('constancias/imprimir','AlumnosRutasController@imprimir')->name('alumnos.constancias_imprimir');
 });
 //Route::get('alumnos/login','AlumnosLoginController@showLoginForm')->name('alumnos.login');
 Route::post('alumnos/login','AlumnosLoginController@login')->name('alumnos.login');

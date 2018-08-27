@@ -33,7 +33,11 @@
         </div>
     @endif
     <div class="form-group">
-        {!! Form::submit('Editar actividad',['class'=>'btn btn-primary']) !!}
+        {!! Form::label('vigente','Vigente') !!}
+        {!! Form::select('vigente',['true' => 'SI','false' => 'NO'],$actividad->vigente,['class' => 'form-control','required']) !!}
+    </div>
+    <div class="form-group">
+        {!! Form::submit('Guardar',['class'=>'btn btn-primary']) !!}
     </div>
 
 

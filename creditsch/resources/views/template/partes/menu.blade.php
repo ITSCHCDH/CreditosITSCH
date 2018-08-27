@@ -28,7 +28,7 @@
                 <li class="botMen">
                     <a class="etMenu" href="{{route('creditos.index')}}">
                         <i class="fa fa-fw fa-table"></i>
-                        <span class="spaMenu">Creditos</span>
+                        <span class="spaMenu">Créditos</span>
                     </a>
                 </li>
             @endif
@@ -112,7 +112,7 @@
                 </li>
             @endif
             
-            @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES','VER_USUARIOS']))
+            @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES','VER_USUARIOS','VER_AREAS']))
                 <li class="botMen">
                     <a class="etMenu"  href="#">
                         <i class="fa fa-lock"></i>
@@ -133,6 +133,14 @@
                                 <a class="etSubMenu" href="{{ route('roles.index') }}">
                                     <i class="fa fa-address-card"></i>
                                     <span class="etSubMenu">Roles</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if(Auth::User()->hasAnyPermission('VIP','VER_AREAS','VIP_SOLO_LECTURA'))
+                            <li class='tamSubMenu'>
+                                <a class="etSubMenu" href="{{ route('areas.inicio') }}">
+                                    <i class="fa fa-map-marker"></i>
+                                    <span class="etSubMenu">Areas</span>
                                 </a>
                             </li>
                         @endif

@@ -41,10 +41,8 @@
 	   					<a href="{{ route('roles.role_editar',[$rol->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>	
 	   				@endif
 	   				@if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ROLES']))
-	   					{{-- expr --}}
+	   					<a href="{{ route('roles.role_eliminar',$rol->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
 	   				@endif
-	   				<a href="{{ route('roles.role_eliminar',$rol->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-
 	   			</td>
 	   		</tr>
 	   	@endforeach

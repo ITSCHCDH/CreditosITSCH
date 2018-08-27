@@ -20,6 +20,15 @@ class Actividad_EvidenciasController extends Controller
 		if ($actividad_evidencia!=null) {
 			if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])){
 				//Eliminacion de responsables de una actividad
+				$credito_vigente = DB::table('creditos as c')->join('actividad as a', function($join) use($actividad_evidencia){
+					$join->on('a.id_actividad','=','c.id');
+					$join->where('a.id','=',$actividad_evidencia->actividad_id);
+					$join->where('c.vigente','=','true');
+				})->get()->count()>0? true: false;
+				if(!$credito_vigente){
+					Flash::error('Error es credito al que pertenece este responsable ya no es vigente por lo que esta operación esta restringida');
+					return redirect()->back();
+				}
 				$participantes = DB::table('participantes as p')->where('p.id_evidencia','=',$id)->select('no_control')->get();
 				if($actividad_evidencia->validado=="true"){
 					Flash::error('Error al eliminar, este responsable ya tiene la evidencia validada');
@@ -32,13 +41,23 @@ class Actividad_EvidenciasController extends Controller
 				}
 				if(count($actividad_evidencia->evidencias)==0 && $participantes->count()==0 && $actividad_evidencia->validado=="false"){
 					Actividad_Evidencia::destroy($id);
-					Flash::sucess('El responsable fue retirado de la actividad con exito');
+					Flash::success('El responsable fue retirado de la actividad con exito');
 				}
 				return redirect()->back();
 			}else if(Auth::User()->can('ELIMINAR_RESPONSABLES')){
 				$actividad = Actividad::find($actividad_evidencia->actividad_id);
 				if($actividad->id_user!=Auth::User()->id){
 					Flash::error('Error al eliminar, no puedes eliminar responsables de actividades que no te corresponden');
+					return redirect()->back();
+				}
+				
+				$credito_vigente = DB::table('creditos as c')->join('actividad as a', function($join) use($actividad_evidencia){
+					$join->on('a.id_actividad','=','c.id');
+					$join->where('a.id','=',$actividad_evidencia->actividad_id);
+					$join->where('c.vigente','=','true');
+				})->get()->count()>0? true: false;
+				if(!$credito_vigente){
+					Flash::error('Error es credito al que pertenece este responsable ya no es vigente por lo que esta operación esta restringida');
 					return redirect()->back();
 				}
 				$participantes = DB::table('participantes as p')->where('p.id_evidencia','=',$id)->select('no_control')->get();
@@ -135,11 +154,12 @@ class Actividad_EvidenciasController extends Controller
 			array_push($responsables_sobrevivientes,(string)$data->user_id);
 		}
 		$diferencia_agregar = $this->obtenerDiferencia($request->responsables_id,$responsables_sobrevivientes);
-
+		$actividad = Actividad::find($request->actividad_id);
 		for ($i = 0; $i < count($diferencia_agregar); $i++) {
 			$actividad_evidencia = new Actividad_Evidencia();
 			$actividad_evidencia->user_id = $diferencia_agregar[$i];
 			$actividad_evidencia->actividad_id = $request->actividad_id;
+			$actividad_evidencia->validador_id = $actividad->id_user;
 			$actividad_evidencia->save();
 		}
 		if(count($diferencia_agregar)>0){

@@ -1,5 +1,5 @@
 <!-- Pie de pagina del sistema-->
-	<footer style="vertical-align:middle; position:fixed; bottom:0; height: 37px;">
+	<footer style="vertical-align:middle; position:fixed; bottom:0; height: 37px; z-index: 9999;">
 	    <div class="container">
 	        <p ><small>Copyright © ITSCH 2017|CEDEITSCH</small></p>
 	    </div>

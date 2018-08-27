@@ -45,15 +45,17 @@
 
 	        <div class="col-md-6">
 	            <select id="area" type="text" class="form-control" name="area">
-	            	
-	            	@foreach ($carreras as $carrera)
-	            		@if ($user->area==$carrera['valor'])
-	            			<option value="{{ $carrera['valor'] }}" selected style="background-color: blue; color: white;">{{ $carrera['carrera'] }}</option>
-	            		@else
-	            			<option value="{{ $carrera['valor'] }}">{{ $carrera['carrera'] }}</option>
-	            		@endif
-	            		
-	            	@endforeach
+	            	@if($areas->count()==1)
+	            		<option value="{{ $areas[0]->id }}" selected>{{ $areas[0]->nombre }}</option>
+	            	@else
+		            	@foreach($areas as $area)
+		            		@if($user->area==$area->id)
+		            			<option value="{{ $area->id }}" selected style="background-color: blue; color: white;">{{ $area->nombre }}</option>
+		            		@else
+		            			<option value="{{ $area->id }}">{{ $area->nombre }}</option>
+		            		@endif
+		            	@endforeach
+		            @endif
 	            </select>
 
 	            @if ($errors->has('area'))

@@ -47,35 +47,40 @@
                         @endif
                     </td>
                     <td>
-                      <label>
-                        @if($res->actividad_nombre==null)
-                            
-                            @if ($res->active=="false")
-                                <label class="control control--checkbox">
-                                    <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
-                                    <div class="control__indicator"></div>
-                                </label>
+                        @if($actividad->vigente=="true")
+                            <label>
+                            @if($res->actividad_nombre==null)
+                                
+                                @if ($res->active=="false")
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                @else
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}">
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                @endif
                             @else
-                                <label class="control control--checkbox">
-                                    <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}">
-                                    <div class="control__indicator"></div>
-                                </label>
+                                @if($res->participantes!=null || $res->evidencias!=null || $res->validado=="true")
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                @else
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}">
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                @endif
+                               
                             @endif
-                        @else
-                            @if($res->participantes!=null || $res->evidencias!=null || $res->validado=="true")
-                                <label class="control control--checkbox">
-                                    <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
-                                    <div class="control__indicator"></div>
-                                </label>
-                            @else
-                                <label class="control control--checkbox">
-                                    <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}">
-                                    <div class="control__indicator"></div>
-                                </label>
-                            @endif
-                           
-                        @endif
-                      </label>
+                            </label>
+                      @else
+                        {{ "Ninguna" }}
+                      @endif
+
                     </td>
                 </tr>
             @endforeach

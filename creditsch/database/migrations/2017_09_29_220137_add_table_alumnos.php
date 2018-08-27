@@ -15,12 +15,12 @@ class AddTableAlumnos extends Migration
     {
         Schema::create('alumnos', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('nombre');
             $table->string('no_control',20)->unique();
             $table->string('password',255);
-            $table->string('nombre',70);
-            $table->string('carrera',70);
+            $table->integer('carrera')->unsigned();
             $table->string('status',35);
-
+            $table->foreign('carrera')->references('id')->on('areas')->onDelete('cascade');
             $table->timestamps();
         });
     }

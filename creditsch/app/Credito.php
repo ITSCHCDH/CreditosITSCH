@@ -9,7 +9,7 @@ class Credito extends Model
     //Nombre de la tabla
     protected $table="creditos";
     //Datos visibles para los objetos json
-    protected $fillable=['nombre'];
+    protected $fillable=['nombre','credito_jefe','vigente'];
 
     //Relacion con la tablas de credito(uno) - Actividades(muchos)
     public function actividades()

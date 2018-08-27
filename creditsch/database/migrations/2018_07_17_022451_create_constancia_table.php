@@ -19,10 +19,9 @@ class CreateConstanciaTable extends Migration
             $table->string('profesion_jefe_division',20);
             $table->integer('jefe_division')->unsigned();
             $table->string('division_enunciado');//enuciado que aparece despues del jefe de division (DIV.DE ING.SIST.COMP)
-            
-            $table->string('carrera')->unique(); //nombre de la carrera, area (sistemas, bioqumica...)
-            $table->string('carrera_nom_completo'); //Ingenieria en Sistemas Computacionales
+            $table->integer('carrera')->nullable()->unsigned();
             $table->foreign('jefe_division')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('carrera')->references('id')->on('areas')->onDelete('cascade');
             $table->timestamps();
 
         });

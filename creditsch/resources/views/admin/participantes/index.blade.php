@@ -81,7 +81,7 @@
        <th>Numero de Control</th>
        <th>Nombre</th>
        <th>Carrera</th>
-       @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_PARTICIPANTES']))
+       @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_PARTICIPANTES','VER_PARTICIPANTES','VIP_EVIDENCIA']))
            <th>Accion</th>
        @endif
    </thead>

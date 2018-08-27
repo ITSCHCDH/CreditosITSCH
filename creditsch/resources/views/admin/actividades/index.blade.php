@@ -37,6 +37,7 @@
             <th>Porcentaje crédito</th>
             <th>Crédito</th>
             <th>Alumnos</th>
+            <th>Vigente</th>
             @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
                 <th>Acción</th>
             @endif
@@ -50,6 +51,13 @@
                 <td>{{$act->credito->nombre}}</td>
                 <td>
                     @if ($act->alumnos=="true")
+                        {{ "SI" }}
+                    @else
+                        {{ "NO" }}
+                    @endif
+                </td>
+                <td>
+                    @if($act->vigente=="true")
                         {{ "SI" }}
                     @else
                         {{ "NO" }}

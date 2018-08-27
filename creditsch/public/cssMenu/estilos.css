@@ -79,7 +79,7 @@ header{
     /*Es el minimo que reduce al dar click*/
     width: 50px;
     /*Para que ocupe toda la pantalla en lo alto*/
-    height: 85%;
+    height: 87.5%;
     background: #2d3e50;
     opacity: 0.9;
     filter: alpha(opacity=60);

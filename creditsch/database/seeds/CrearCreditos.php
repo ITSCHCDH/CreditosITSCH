@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Credito;
+use App\CreditoArea;
 
 class CrearCreditos extends Seeder
 {
@@ -15,7 +16,7 @@ class CrearCreditos extends Seeder
         $credito = new Credito();
         $credito->nombre = "Clubes";
         $credito->save();
-
+        
 		$credito = new Credito();
 		$credito->nombre = "Tutorías";
 		$credito->save();

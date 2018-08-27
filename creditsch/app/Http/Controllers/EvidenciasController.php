@@ -39,8 +39,7 @@ class EvidenciasController extends Controller
         }else{
             $actividades = DB::table('users as u')->join('actividad_evidencia as ae',function($join){
                 $join->on('ae.user_id','=','u.id');
-                $join->where('u.id','=',Auth::guard('web')->User()->id);
-            })->join('actividad as a','a.id','=','ae.actividad_id')->select('a.nombre','a.id')->orderBy('nombre')->pluck('nombre','id');
+            })->join('actividad as a','a.id','=','ae.actividad_id')->where('u.id','=',Auth::guard('web')->User()->id)->orwhere('a.id_user','=',Auth::User()->id)->select('a.nombre','a.id')->orderBy('nombre')->pluck('nombre','id');
             return view('admin.evidencias.index')
             ->with('actividades',$actividades)
             ->with('ruta',$ruta);
@@ -55,18 +54,15 @@ class EvidenciasController extends Controller
     public function create(Request $request)
     {
         //$evidencia->user_id=\Auth::user()->id;//Obtiene el id del usuario que esta logueado
-        $dommie_actividad = new Actividad();
-        $dommie_actividad->nombre = 'Actividad actualmente no disponible';
-        $dommie_actividad->id=-1;
-        $dommie_responsable = new User();
-        $dommie_responsable->name = 'Actualmente no disponible';
-        $dommie_responsable->id=-1;
-        $usuarios = User::permission(['VIP','VERIFICAR_EVIDENCIA','VIP_EVIDENCIA'])->select('name','id')->where('users.email','<>','admin@itsch.com')->orderBy('name','ASC')->get()->pluck('name','id');
-        $usuarios_sin_pluck = User::permission(['VIP','VERIFICAR_EVIDENCIA','VIP_EVIDENCIA'])->select('name','id')->where('users.email','<>','admin@itsch.com')->orderBy('name','ASC')->get();
-        $validador = Actividad_Evidencia::where([
+        
+        $actividad_evidencia = Actividad_Evidencia::where([
             ['user_id','=',$request->id_responsable],
             ['actividad_id','=',$request->id_actividad]
-        ])->select('validador_id')->get();
+        ])->get();
+        if($actividad_evidencia->count()==0){
+            return redirect()->back();
+        }
+        $validador = User::find($actividad_evidencia[0]->validador_id);
         $responsable = User::select('id','name')->where('id','=',$request->id_responsable)->get();
         $actividad = Actividad::select('id','nombre')->where('id','=',$request->id_actividad)->get();
         if($actividad->count()==0 || $responsable->count()==0){
@@ -76,9 +72,7 @@ class EvidenciasController extends Controller
         return view('admin.evidencias.create')
             ->with('responsable',$responsable[0])
             ->with('actividad',$actividad[0])
-            ->with('usuarios',$usuarios)
-            ->with('validador_id',$validador)
-            ->with('usuarios_sin_pluck',$usuarios_sin_pluck);
+            ->with('validador',$validador);
     }
 
     /**
@@ -87,7 +81,7 @@ class EvidenciasController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(EvidenciasRequest $request)
+    public function store(Request $request)
     {
         //dd(Storage::deleteDirectory('public/evidencias'));
         if(!Storage::has('public/evidencias')){
@@ -138,7 +132,6 @@ class EvidenciasController extends Controller
                 
             }
             $actividad_evidencia = Actividad_Evidencia::find($id_actividad_evidencia[0]->id);
-            $actividad_evidencia->validador_id = $request->valida;
             $actividad_evidencia->save();
         }
         Flash::success('La evidencia fue guardada correctamente');
@@ -152,7 +145,13 @@ class EvidenciasController extends Controller
             //Retornamos los responsables en un json
             return response()->json($responsables);
         }else{
-            $responsables = User::where('id','=',Auth::User()->id)->select('id','name')->get();
+            $actividad = Actividad::find($request->get('id'));
+            if($actividad->id_user==Auth::User()->id){
+                $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->select('u.id','u.name')->orderBy('u.name')->get();
+            }else{
+                $responsables = User::where('id','=',Auth::User()->id)->select('id','name')->get();
+            }
+            
             //Retornamos los responsables en un json
             return response()->json($responsables);   
         }

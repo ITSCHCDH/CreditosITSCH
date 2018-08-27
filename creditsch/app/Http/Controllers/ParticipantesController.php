@@ -26,7 +26,7 @@ class ParticipantesController extends Controller
      */
     public function index()
     {   
-        if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA'])){
+        if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA','VIP_ACTIVIDAD'])){
             //Consultamos todas las actividades disponibles
             $actividades = Actividad::select('id','nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
             //Retorna la vista de Agregar participantes
@@ -36,8 +36,7 @@ class ParticipantesController extends Controller
             //Consultamos todas las actividades disponibles
             $actividades = DB::table('users as u')->join('actividad_evidencia as ae', function($join){
                 $join->on('ae.user_id','=','u.id');
-                $join->where('u.id','=',Auth::User()->id);
-            })->join('actividad as a','a.id','=','ae.actividad_id')->select('a.id','a.nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
+            })->join('actividad as a','a.id','=','ae.actividad_id')->where('u.id','=',Auth::User()->id)->orwhere('a.id_user','=',Auth::User()->id)->select('a.id','a.nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
             //Retorna la vista de Agregar participantes
             return view('admin.participantes.index')
             ->with('actividades',$actividades);
@@ -107,7 +106,17 @@ class ParticipantesController extends Controller
      */
     public function destroy($id)
     {
+        if(Participante::find($id)==null){
+            return response()->json(array('mensaje' => 'El participante que estas buscando no existe', 'mensaje_tipo' => 'error'));
+        }
         if (Auth::User()->hasAnyPermission(['VIP'])) {
+            $credito_vigente = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
+                $join->on('ae.id','=','p.id_evidencia');
+                $join->where('p.id','=',$id);
+            })->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->where('c.vigente','=','true')->get()->count()>0?true: false;
+            if(!$credito_vigente){
+                return response()->json(array("mensaje" => "El credito actualmente ya no esta vigente","mensaje_tipo" => "error"));
+            }
             $participante_data = DB::table('participantes as p')->join('actividad_evidencia as ae','p.id_evidencia','=','ae.id')->join('evidencia as e','e.id_asig_actividades','=','ae.id')->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->where([
                 ['ae.validado','=','true'],
                 ['p.id','=',$id]
@@ -126,8 +135,36 @@ class ParticipantesController extends Controller
             }
             Participante::destroy($id);
             return response()->json(array("mensaje" => "El participante ha sido eliminado de la actividad","mensaje_tipo" => "advertencia"));
+        }if(Auth::User()->can('ELIMINAR_PARTICIPANTES')){
+            $credito_vigente = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
+                $join->on('ae.id','=','p.id_evidencia');
+                $join->where('p.id','=',$id);
+            })->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->where('c.vigente','=','true')->get()->count()>0?true: false;
+            if(!$credito_vigente){
+                return response()->json(array("mensaje" => "El credito actualmente ya no esta vigente","mensaje_tipo" => "error"));
+            }
+            $participante_ajeno = DB::table('participantes as p')->join('actividad_evidencias as ae', function($join) use($id){
+                $join->on('ae.id','=','p.id_evidencia');
+                $join->where('p.id','=',$id);
+                $join->where('ae.user_id','<>',Auth::User()->id);
+            })->get()->count()>0? true: false;
+            if($participante_ajeno){
+                return response()->json(array('mensaje' => 'Este participante no pertenece a tu actividad','mensaje_tipo' => 'error'));
+            }
+            $evidencia_validada = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
+                $join->on('ae.id','=','p.id_evidencia');
+                $join->where('p.id','=',$id);
+                $join->where('ae.validado','=','true');
+            })->get()->count()>0?true: false;
+
+            if($evidencia_validada){
+                return response()->json(array('mensaje' => 'La actividad ya ha sido validada, ya no puede recibir modificaciones','mensaje_tipo' => 'error'));
+            }else{
+                Participante::destroy($id);
+                return response()->json(array("mensaje" => "El participante ha sido eliminado de la actividad","mensaje_tipo" => "advertencia"));
+            }
         }else{
-            return response()->json(array("mensaje" => "La actividad ya ha sido validada no puedes hacer modificaciones","mensaje_tipo" => "advertencia"));
+            return response()->json(array("mensaje" => "No puedes eliminar participantes de esta actividad","mensaje_tipo" => "advertencia"));
         }
         
     }
@@ -151,7 +188,7 @@ class ParticipantesController extends Controller
             return response()->json(array('participantes_data' => $dommie,'no_evidencias' => $evidencias->count(),'validado' => 'false'));
         }
         //La variable participante_data guarda los participante vinculado a una evidencia
-        $participantes_data = DB::table('participantes as p')->join('alumnos as a','a.no_control','=','p.no_control')->where('p.id_evidencia','=',$id_actividad_evidencia[0]->id)->select('a.nombre','a.carrera','p.id','p.id_evidencia','a.no_control')->get();
+        $participantes_data = DB::table('participantes as p')->join('alumnos as a','a.no_control','=','p.no_control')->join('areas','areas.id','=','a.carrera')->where('p.id_evidencia','=',$id_actividad_evidencia[0]->id)->select('a.nombre','areas.nombre as carrera','p.id','p.id_evidencia','a.no_control')->get();
         if($participantes_data->count()==0){
             //En caso de que la actividad aun no cuente con participantes retornara -1
             return response()->json(array('participantes_data' => $dommie,'no_evidencias' => $evidencias->count(),'validado' => $id_actividad_evidencia[0]->validado,'user_id' => $id_actividad_evidencia[0]->user_id));
@@ -172,26 +209,48 @@ class ParticipantesController extends Controller
             //Retornamos los responsables en un json
             return response()->json(array('responsables' => $responsables,'actividad' => $actividad,'no_evidencias' => $evidencias->count()));   
         }else{
-            //Consultamos todos los responsables asignadoas a una actividad
-            $evidencias = DB::table('actividad_evidencia as ae')->join('evidencia as e',function($join) use($request){
-                $join->on('e.id_asig_actividades','=','ae.id');
-                $join->where('ae.actividad_id','=',$request->get('id'));
-                $join->where('ae.user_id','=',Auth::User()->id);
-            })->get();
-            $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->where('ae.user_id','=',Auth::User()->id)->select('u.id','u.name')->orderBy('u.name')->get();
             $actividad = Actividad::find($request->get('id'));
-            //Retornamos los responsables en un json
-            return response()->json(array('responsables' => $responsables,'actividad' => $actividad,'no_evidencias' => $evidencias->count()));
+
+            if($actividad->id_user==Auth::User()->id){
+                //Consultamos todos los responsables asignadoas a una actividad
+                $evidencias = DB::table('actividad_evidencia as ae')->join('evidencia as e',function($join) use($request){
+                    $join->on('e.id_asig_actividades','=','ae.id');
+                    $join->where('ae.actividad_id','=',$request->get('id'));
+                })->get();
+                $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->select('u.id','u.name')->orderBy('u.name')->get();
+                //Retornamos los responsables en un json
+                return response()->json(array('responsables' => $responsables,'actividad' => $actividad,'no_evidencias' => $evidencias->count())); 
+            }else{
+                //Consultamos todos los responsables asignadoas a una actividad
+                $evidencias = DB::table('actividad_evidencia as ae')->join('evidencia as e',function($join) use($request){
+                    $join->on('e.id_asig_actividades','=','ae.id');
+                    $join->where('ae.actividad_id','=',$request->get('id'));
+                    $join->where('ae.user_id','=',Auth::User()->id);
+                })->get();
+                $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->where('ae.user_id','=',Auth::User()->id)->select('u.id','u.name')->orderBy('u.name')->get();
+                //Retornamos los responsables en un json
+                return response()->json(array('responsables' => $responsables,'actividad' => $actividad,'no_evidencias' => $evidencias->count()));
+            }  
         }
     }
 
     public function ajaxGuardar(Request $request){
-        return response()->json($request);
+
         $evidencias = DB::table('actividad_evidencia as ae')->where([
             ['ae.user_id','=',$request->get('id_responsable')],
             ['ae.actividad_id','=',$request->get('id_actividad')]
         ])->select('ae.id')->get();
+        if($evidencias->count()==0){
+            return response()->json(array('mensaje' => 'Algun error ocurrió durane el proceso','mensaje_tipo' => 'error'));
+        }
+        $credito_vigente = DB::table('actividad as a')->join('creditos as c','c.id','=','a.id_actividad')->where([
+            ['a.id','=',$request->get('id_actividad')],
+            ['c.vigente','=','true']
+        ])->get()->count()>0? true: false;
 
+        if(!$credito_vigente){
+            return response()->json(array('mensaje' => 'El credito actualmente ya no esta vigente, por lo que no puede ser modificado', 'mensaje_tipo' => 'error'));
+        }
         $existe_no_control = DB::table('alumnos')->select('no_control')->where('no_control','=',$request->get('no_control'))->get();
 
         if($existe_no_control->count()==0){
@@ -217,29 +276,70 @@ class ParticipantesController extends Controller
         }
 
         $validado = Actividad_Evidencia::find($evidencias[0]->id);
-        $evidencia_data = Actividad::find($request->get('id_actividad'))->select('por_cred_actividad','id_actividad as credito_id')->get();
-        if($validado->validado=='true'){
-            $temp = Avance::where([
-                ['no_control','=',$request->get('no_control')],
-                ['id_credito','=',$evidencia_data[0]->credito_id]
-            ])->get();
-            if($temp->count()==0){
-                $avance = new Avance();
-                $avance->no_control = $request->get('no_control');
-                $avance->por_credito = (int)$evidencia_data->por_cred_actividad;
-                $avance->id_credito=$evidencia_data[0]->credito_id;
-                $avance->save();
+        $actividad = Actividad::find($request->get('id_actividad'));
+        if(Auth::User()->hasAnyPermission('VIP')){
+            if($validado->validado=='true'){
+                $temp = Avance::where([
+                    ['no_control','=',$request->get('no_control')],
+                    ['id_credito','=',$actividad->id_actividad]
+                ])->get();
+                if($temp->count()==0){
+                    $avance = new Avance();
+                    $avance->no_control = $request->get('no_control');
+                    $avance->por_credito = (int)$actividad->por_cred_actividad;
+                    $avance->id_credito=$actividad->id_actividad;
+                    $avance->save();
+                }else{
+                    $avance = Avance::find($temp[0]->id);
+                    $avance->por_credito += (int)$actividad->por_cred_actividad;
+                    $avance->save();
+                }
             }else{
-                $avance = Avance::find($temp[0]->id);
-                $avance->por_credito += (int)$evidencia_data[0]->por_cred_actividad;
-                $avance->save();
+                $temp = Avance::where([
+                    ['no_control','=',$request->get('no_control')],
+                    ['id_credito','=',$actividad->credito_id]
+                ])->get();
+                if($temp->count()==0){
+                    $avance = new Avance();
+                    $avance->no_control = $request->get('no_control');
+                    $avance->por_credito = 0;
+                    $avance->id_credito=$actividad->credito_id;
+                    $avance->save();
+                }
             }
+            $participante = new Participante();
+            $participante->no_control = $request->get('no_control');
+            $participante->id_evidencia = $evidencias[0]->id;
+            $participante->save();
+            return response()->json(array('mensaje' => 'Participante agregado correctamente','mensaje_tipo' => 'exito' ));
+        }else{
+            if($validado->validado=='false'){
+                $temp = Avance::where([
+                    ['no_control','=',$request->get('no_control')],
+                    ['id_credito','=',$actividad->id_actividad]
+                ])->get();
+                if($temp->count()==0){
+                    $avance = new Avance();
+                    $avance->no_control = $request->get('no_control');
+                    $avance->por_credito = (int)$actividad->por_cred_actividad;
+                    $avance->id_credito=$actividad->id_actividad;
+                    $avance->save();
+                }else{
+                    $avance = Avance::find($temp[0]->id);
+                    $avance->por_credito += (int)$actividad->por_cred_actividad;
+                    $avance->save();
+                }
+            }else{
+                return response()->json(array('mensaje' => 'Ya no se pueden agregar participantes','mensaje_tipo' => 'error' ));
+            }
+            $participante = new Participante();
+            $participante->no_control = $request->get('no_control');
+            $participante->id_evidencia = $evidencias[0]->id;
+            $participante->save();
+            return response()->json(array('mensaje' => 'Participante agregado correctamente','mensaje_tipo' => 'exito' ));
         }
-        $participante = new Participante();
-        $participante->no_control = $request->get('no_control');
-        $participante->id_evidencia = $evidencias[0]->id;
-        $participante->save();
-        return response()->json(array('mensaje' => 'Participante agregado correctamente','mensaje_tipo' => 'exito' ));
+        
+       
     }
 
     public function participantesBusqueda(Request $request){

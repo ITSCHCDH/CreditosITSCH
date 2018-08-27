@@ -66,5 +66,5 @@
         </tbody>
     </table>
     {!! $alumno->render() !!}
-    <div style="margin-bottom: 70px;"></div>
+    <div style="margin-bottom: 50px;"></div>
 @endsection
