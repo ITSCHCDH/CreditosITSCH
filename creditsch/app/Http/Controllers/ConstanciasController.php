@@ -11,7 +11,6 @@ use App\ConstanciaComplemento;
 use App\Constancia;
 use App\Area;
 use App\Alumno;
-use Illuminate\Support\Carbon;
 use PDF;
 use DB;
 use Laracasts\Flash\Flash;
