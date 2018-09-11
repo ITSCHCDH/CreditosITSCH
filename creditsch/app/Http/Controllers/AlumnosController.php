@@ -83,7 +83,10 @@ class AlumnosController extends Controller
     {
         //Codigo de modificaciones
         $alumno=Alumno::find($id);//Busca el registro
-
+        if($alumno==null){
+            Flash::error('El alumno no existe');
+            return redirect()->back();
+        }
         return view('admin.alumnos.edit')->with('alumno',$alumno);
     }
 
@@ -99,9 +102,13 @@ class AlumnosController extends Controller
         //Ejecuta la modificacion
 
         $alumno= Alumno::find($id);
-        $valida_no_control = DB::table('alumnos as alu')->join('participantes as p','p.no_control','=','alu.no_control')->join('avance as av','av.no_control','=','alu.no_control')->where('alu.no_control','=',$alumno->no_control)->select('alu.no_control')->get();
-        $valida_no_control_evidencia = DB::table('alumnos as alu')->join('evidencia as e','e.alumno_no_control','=','alu.no_control')->where('alu.no_control','=',$alumno->no_control)->select('alu.no_control')->get();
-        if(($valida_no_control->count()>0 || $valida_no_control_evidencia->count()>0) && $alumno->no_control!=$request->no_control){
+        if($alumno==null){
+            Flash::error('El alumno no existe');
+            return redirect()->back();
+        }
+        $avance = DB::table('avance')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
+        $participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
+        if($avance || $participante){
             Flash::error('El numero de control del alumno no puede ser modificado debido a claves foraneas');
             return back()->withInput();
         }

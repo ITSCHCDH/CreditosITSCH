@@ -7,8 +7,9 @@
 @endsection
 
 @section('contenido')
-
-	<div style="width:500px; margin-top:50px;">
+	
+	<a href="{{ route('alumnos.actividades') }}" class="btn btn-primary">Actividades</a>
+	<div style="width:500px; margin-top:10px;">
 		<table class="table table-striped">
 			<thead>
 				<th colspan="2">Información del alumno</th>
@@ -17,23 +18,19 @@
 				<tr>
 					<th>Nombre</th>
 					<td>
-						@if ($alumno_data!=null)
-							{{ $alumno_data[0]->nombre_alumno }}
-						@endif
+						{{ Auth::User()->nombre }}
 					</td>
 				</tr>
 				<tr>
 					<th>Numero de control</th>
 					<td>
-						@if ($alumno_data!=null)
-							{{ $alumno_data[0]->no_control }}
-						@endif
+						{{ Auth::User()->no_control }}
 					</td>
 				</tr>
 				<tr>
 					<th>Carrera</th>
 					<td>
-						@if ($alumno_data)
+						@if ($alumno_data!=null)
 							{{ $alumno_data[0]->carrera }}
 						@endif
 					</td>

@@ -49,19 +49,24 @@
 				<tr>
 					<th>Nombre</th>
 					<td>
-						{{ Auth::User()->nombre }}
+						@if ($alumno_data!=null)
+							{{ $alumno_data[0]->nombre_alumno }}
+						@endif
 					</td>
 				</tr>
 				<tr>
 					<th>Numero de control</th>
 					<td>
-						{{ Auth::User()->no_control }}
+						@if ($alumno_data!=null)
+							{{ $alumno_data[0]->no_control }}
+						@endif
+
 					</td>
 				</tr>
 				<tr>
 					<th>Carrera</th>
 					<td>
-						@if ($alumno_data)
+						@if ($alumno_data!=null)
 							{{ $alumno_data[0]->carrera }}
 						@endif
 					</td>
@@ -196,7 +201,7 @@
 			@endif
 		</tbody>
 	</table>
-	@if($liberado && (Auth::User()->hasAnyPermission(['VIP','IMPRIMIR_CONSTAMCIAS'])))
+	@if($liberado && (Auth::User()->hasAnyPermission(['VIP','IMPRIMIR_CONSTANCIAS'])))
 		<form action="{{ route('constancias.imprimir') }}" style="padding: 10px;" method="post">
 			{{ csrf_field() }}
 			<input type="hidden" name="no_control" value="{{ $alumno_data[0]->no_control }}">

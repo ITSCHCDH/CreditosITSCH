@@ -9,6 +9,7 @@ use App\Actividad;
 use App\Actividad_Evidencia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use DB;
 
 class ActividadesController extends Controller
 {
@@ -71,6 +72,22 @@ class ActividadesController extends Controller
         $act=new Actividad($request->all()); //Obtiene todos los datos de la vista para guardarlos en la BD
         $act->id_user = Auth::User()->id;
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act->nombre)->get();
+        if(!Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])){
+            $areas_del_credito = DB::table('creditos as c')->join('creditos_areas as ca', function($join) use($request){
+                $join->on('c.id','=','ca.credito_id');
+                $join->where('c.id','=',$request->id_actividad);
+            })->get();
+            $tiene_permitido = false;
+            foreach ($areas_del_credito as $area) {
+                if($area->id == Auth::User()->id){
+                    $tiene_permitido = true;
+                }
+            }
+            if(!$tiene_permitido){
+                Flash::error('No puedes crear actividades de este crédito');
+                return redirect()->back();
+            }
+        }
         if($actividad_con_mismo_nombre->count()>0){
             Flash::error('El nombre '.$act->nombre.' ya ha sido tomado, ingrese uno diferente');
             return back()->withInput();
@@ -145,7 +162,7 @@ class ActividadesController extends Controller
             Flash::error('El porcentaje de liberación no debe exceder el 100% del credito');
             return back()->withInput();
         }
-        if($act_anterior->id_actividad != $act_nueva->id_actividad){
+        if($act_anterior->id_actividad != $act_nueva->id_actividad || $act_anterior->por_cred_actividad!=$act_nueva->por_cred_actividad){
             $tiene_foraneas = DB::table('actividad as a')->join('actividad_evidencia as ae', function($join) use($id){
                 $join->on('ae.actividad_id','=','a.id');
                 $join->where('a.id','=',$id);

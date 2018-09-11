@@ -37,7 +37,7 @@
 	<div class="resetear"></div>
 	<div style="margin-top: 30px;">
 	@if ($reportes_data != null)
-		@for ($alumno = 0, $alumno_index=0; $alumno < count($reportes_data)/$creditos; $alumno++)
+		@for ($alumno = 0, $alumno_index=0;  $alumno < count($suma_creditos); $alumno++)
 			<div class="informe_alumno">
 				<p class="alumno_nombre texto" style="text-align: left;"><strong>Alumno:</strong> {{ $suma_creditos[$alumno]->nombre }}</p>
 				<div class="resetear"></div>

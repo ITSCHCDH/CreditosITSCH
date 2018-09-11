@@ -32,7 +32,9 @@
             <header>
             </header>
             <input type="checkbox" id="check">
-            <label for="check" class="fa fa-bars" id="menu">Menu</label>
+            @if(Auth::guard('web')->check())
+                <label for="check" class="fa fa-bars" id="menu">Menu</label>
+            @endif
             <!-- Imagen ITSCH -->
             <div style="position: fixed;left: 97%;top: 8px;">
                 <a  href="{{ url('/home') }}">
@@ -46,7 +48,9 @@
             @include('template.partes.alertas')
 
             <!-- Incluye el menu al sistema -->
-            @include('template.partes.menu')
+            @if(Auth::guard('web')->check())
+                @include('template.partes.menu')
+            @endif
 
         </div>
         <!--Contenido principal del sistema  -->
@@ -57,7 +61,7 @@
                     <ol class="breadcrumb" style="box-shadow: 2px 2px 7px #999;">
                         <li class="breadcrumb-item">
                             @if (Auth::guard('alumno')->check())
-                                <a href="{{ url('alumnos/home') }}">Inicio</a>
+                                <label class="label label-primary">{{ Auth::User()->nombre }}</label>
                             @else
                                 <a href="{{ url('/home') }}">Inicio</a>
                             @endif
@@ -82,7 +86,9 @@
     @include('template.partes.pie')
     <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
     <script src="{{asset('complementos/js/bootstrap.js')}}"></script>
-    <script src="{{asset('js2/js2.js')}}"> </script>
+    @if(Auth::guard('web')->check())
+        <script src="{{asset('js2/js2.js')}}"> </script>
+    @endif
     <script  src="{{ asset('plugins/jsTable/jquery.dataTables.min.js') }}"></script>
     <!-- Script para ocultar los mensajes de Flash -->
 

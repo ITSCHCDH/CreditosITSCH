@@ -104,6 +104,10 @@ class ConstanciasController extends Controller
             $join->on('alu.carrera','=','c.carrera');
             $join->where('alu.no_control','=',$request->no_control);
         })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division')->get();
+        if($jefe_depto->count()==0 || $certificador->count()==0 || $jefe_division->count()==0 || $datos_globales->count()==0){
+            Flash::error('Falta de integridad en los datos de la constancia');
+            return redirect()->back();
+        }
         $alumno = DB::table('alumnos')->join('areas','areas.id','=','alumnos.carrera')->where('alumnos.no_control','=',$request->no_control)->select('alumnos.nombre','alumnos.no_control','areas.nombre as carrera')->get();
         $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.$request->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
         if(count($alumno_data)!=5){

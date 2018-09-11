@@ -18,9 +18,6 @@ use DB;
 use PDF;
 class AlumnosRutasController extends Controller
 {
-    public function home(){
-    	return view('home');
-    }
 
     public function avance(){
 		$alumno_data=null;
@@ -85,6 +82,10 @@ class AlumnosRutasController extends Controller
             $join->on('alu.carrera','=','c.carrera');
             $join->where('alu.no_control','=',Auth::User()->no_control);
         })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division')->get();
+        if($jefe_depto->count()==0 || $certificador->count()==0 || $jefe_division->count()==0 || $datos_globales->count()==0){
+            Flash::error('Falta de integridad en los datos de la constancia');
+            return redirect()->back();
+        }
         $alumno = DB::table('alumnos')->join('areas','areas.id','=','alumnos.carrera')->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.nombre','alumnos.no_control','areas.nombre as carrera')->get();
         $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
         if(count($alumno_data)!=5){
@@ -110,7 +111,7 @@ class AlumnosRutasController extends Controller
     }
 
     public function alumnoLiberado(){
-        $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
+        $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 join order by c.id limit 5');
         if(count($alumno_data)!=5) return false;
         return true;
     }
@@ -118,7 +119,7 @@ class AlumnosRutasController extends Controller
     	$actividades = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join){
     		$join->on('ae.id','=','p.id_evidencia');
     		$join->where('p.no_control','=',Auth::User()->no_control);
-    	})->join('actividad as a','a.id','=','ae.actividad_id')->select('a.nombre as actividad_nombre','a.id as actividad_id','a.por_cred_actividad as actividad_porcentaje','a.alumnos','ae.validado','ae.user_id')->orderBy('actividad_nombre','ASC')->get();
+    	})->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','a.id_actividad','=','c.id')->select('a.nombre as actividad_nombre','a.id as actividad_id','a.por_cred_actividad as actividad_porcentaje','a.alumnos','ae.validado','ae.user_id','c.nombre as credito_nombre')->orderBy('actividad_nombre','ASC')->get();
     	return view('alumnos.actividades')
     	->with('actividades',$actividades);
     }

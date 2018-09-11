@@ -177,7 +177,6 @@ class VerificaEvidenciaController extends Controller
                 $reportes_data = null;
                 $suma_creditos = null;
             }
-
             return view('admin.verifica_evidencia.reportes')
             ->with('reportes_data',$reportes_data)
             ->with('creditos',$creditos)
@@ -198,7 +197,7 @@ class VerificaEvidenciaController extends Controller
                 $reportes_data = null;
                 $suma_creditos = null;
             }
-            $carreras = Area::where('id','=',Auth::User()->id)->get();
+            $carreras = Area::where('id','=',Auth::User()->area)->get();
             return view('admin.verifica_evidencia.reportes')
             ->with('reportes_data',$reportes_data)
             ->with('creditos',$creditos)

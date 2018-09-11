@@ -29,7 +29,7 @@ Route::get('/admin/actividades/{id}/responsables/asignar','ResponsablesControlle
 })->name('responsables.index'); /* Le asignamos un nombre a la ruta para facilitar su uso **/
 
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'MensajesController@index')->name('home');
 
 
 
@@ -155,7 +155,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
-    Route::get('home','AlumnosRutasController@home')->name('alumnos.home');
+    Route::get('home','AlumnosRutasController@avance')->name('alumnos.home_avance');
     Route::get('avance','AlumnosRutasController@avance')->name('alumnos.avance');
     Route::get('actividades','AlumnosRutasController@actividades')->name('alumnos.actividades');
     Route::get('actividades/subir_evidencia','AlumnosRutasController@subirEvidencia')->name('alumnos.subir_evidencia');
@@ -170,5 +170,4 @@ Route::post('alumnos/logout','AlumnosLoginController@logout')->name('alumnos.log
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
 

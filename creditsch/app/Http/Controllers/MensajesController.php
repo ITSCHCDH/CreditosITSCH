@@ -20,7 +20,6 @@ class MensajesController extends Controller
     }
     public function crear(){
     	$users = User::where([
-    		['email','<>','admin@itsch.com'],
     		['active','=','true'],
     		['id','<>',Auth::User()->id]
     	])->select('id','name')->get();

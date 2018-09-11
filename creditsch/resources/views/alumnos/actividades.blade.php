@@ -3,13 +3,16 @@
 @section('title','Actividades')
 
 @section('ruta')
+	<a href="{{ route('alumnos.avance') }}" class="label label-info">Avance</a>
+	/
 	<label class="label label-success">Actividades</label>
 @endsection
 
 @section('contenido')
-	<table class="table table-striped" id="tabla-responsables">
+	<table class="table table-striped">
 	    <thead>
 	        <th>Nombre</th>
+	        <th>Crédito</th>
 	        <th>Porcentaje</th>
 	        <th>Validado</th>
 	        <th>Acción</th>
@@ -19,6 +22,7 @@
 	                <tr>
 	                	<td>{{ $actividad->actividad_nombre }}</td>
 	                	<td>{{ $actividad->actividad_porcentaje }}%</td>
+	                	<td>{{ $actividad->credito_nombre }}</td>
 	                	<td>
 	                		@if ($actividad->validado=="true")
 	                			{{ "SI" }}

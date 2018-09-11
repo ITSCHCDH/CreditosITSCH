@@ -256,7 +256,6 @@ class ParticipantesController extends Controller
         if($existe_no_control->count()==0){
             return response()->json(array('mensaje' => 'El numero de control no exite','mensaje_tipo' => 'error' ));
         }
-        
         $participante_duplicado = DB::table('participantes')->select('no_control')->where([
             ['no_control','=',$request->get('no_control')],
             ['id_evidencia','=',$evidencias[0]->id]
@@ -303,10 +302,11 @@ class ParticipantesController extends Controller
                     $avance = new Avance();
                     $avance->no_control = $request->get('no_control');
                     $avance->por_credito = 0;
-                    $avance->id_credito=$actividad->credito_id;
+                    $avance->id_credito=$actividad->id_actividad;
                     $avance->save();
                 }
             }
+
             $participante = new Participante();
             $participante->no_control = $request->get('no_control');
             $participante->id_evidencia = $evidencias[0]->id;

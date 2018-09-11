@@ -155,38 +155,18 @@
                 </a>
             </li>
         @endif
-        @if (Auth::guard('alumno')->check())
+        @if(Auth::guard('web')->check())
             <li class="botMen">
-                <a class="etMenu" href="{{ route('alumnos.actividades') }}">
-                    <i class="fa fa-fw fa-list-ul"></i>
-                    <span class="spaMenu">Actividades</span>
-                </a>
-            </li>
-            <li class="botMen">
-                <a class="etMenu" href="{{ route('alumnos.avance') }}">
-                    <i class="fa fa-bar-chart-o"></i>
-                    <span class="spaMenu">Avance</span>
-                </a>
-            </li>
-            
-        @endif
-        <li class="botMen">
-            <a class="etMenu" href="{{ route('logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            <p class="etMenu"  onclick="event.preventDefault(); document.getElementById('logout-form2').submit();">
                 <i class="fa fa-fw fa-sign-out"></i>
                 <span class="spaMenu">Cerrar sesión </span>
-            </a>
+            </p>
             <!-- Creamos el formulario en orden para poder cerrar sesion -->
-            @if (Auth::guard('web')->check())
-                <form id="logout-form" action="{{ route('logout')}}" method="POST" style="display: none;">
-                    {{ csrf_field() }}
-                </form>
-            @else
-                <form id="logout-form" action="{{ route('alumnos.logout')}}" method="POST" style="display: none;">
-                    {{ csrf_field() }}
-                </form>
-            @endif
-            
+            <form id="logout-form2" action="{{ route('logout')}}" method="POST" style="display: none;">
+                {{ csrf_field() }}
+            </form>           
         </li>
+        @endif
     </ul>
 </nav>
 
