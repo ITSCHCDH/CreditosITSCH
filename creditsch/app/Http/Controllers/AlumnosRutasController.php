@@ -111,7 +111,7 @@ class AlumnosRutasController extends Controller
     }
 
     public function alumnoLiberado(){
-        $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 join order by c.id limit 5');
+        $alumno_data = DB::select('select c.nombre as credito_nombre from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 order by c.id limit 5');
         if(count($alumno_data)!=5) return false;
         return true;
     }
