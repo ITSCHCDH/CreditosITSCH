@@ -2,18 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2b269e78-3289-4f90-a2e3-18575e6b3553" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/app/Http/Controllers/Auth/RegisterController.php" afterPath="$PROJECT_DIR$/creditsch/app/Http/Controllers/Auth/RegisterController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/app/User.php" afterPath="$PROJECT_DIR$/creditsch/app/User.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/config/app.php" afterPath="$PROJECT_DIR$/creditsch/config/app.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/public/plugins/css/sb-admin.css" afterPath="$PROJECT_DIR$/creditsch/public/plugins/css/sb-admin.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/resources/views/auth/login.blade.php" afterPath="$PROJECT_DIR$/creditsch/resources/views/auth/login.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/resources/views/auth/register.blade.php" afterPath="$PROJECT_DIR$/creditsch/resources/views/auth/register.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/resources/views/home.blade.php" afterPath="$PROJECT_DIR$/creditsch/resources/views/home.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/resources/views/layouts/app.blade.php" afterPath="$PROJECT_DIR$/creditsch/resources/views/layouts/app.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/resources/views/template/molde.blade.php" afterPath="$PROJECT_DIR$/creditsch/resources/views/template/molde.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/resources/views/template/partes/menu.blade.php" afterPath="$PROJECT_DIR$/creditsch/resources/views/template/partes/menu.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/resources/views/welcome.blade.php" afterPath="$PROJECT_DIR$/creditsch/resources/views/welcome.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/routes/web.php" afterPath="$PROJECT_DIR$/creditsch/routes/web.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/creditsch/public/manual/configuracion.txt" afterPath="$PROJECT_DIR$/creditsch/public/manual/configuracion.txt" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -22,8 +11,30 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="configuracion.txt" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/creditsch/public/manual/configuracion.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="238">
+              <caret line="14" column="14" lean-forward="false" selection-start-line="14" selection-start-column="14" selection-end-line="14" selection-end-column="14" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/creditsch/.env" />
+        <option value="$PROJECT_DIR$/creditsch/public/manual/configuracion.txt" />
+      </list>
+    </option>
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
   <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
@@ -53,14 +64,34 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="ProjectPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="CreditosITSCH" type="b2602c69:ProjectViewProjectNode" />
+              <item name="CreditosITSCH" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="CreditosITSCH" type="b2602c69:ProjectViewProjectNode" />
+              <item name="CreditosITSCH" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="creditsch" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/creditsch" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\Trabajo\CEDEIT\CreditosITSCH\creditsch" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -86,16 +117,17 @@
       <updated>1506694680352</updated>
       <workItem from="1506694689263" duration="57000" />
       <workItem from="1507768305475" duration="40000" />
+      <workItem from="1536720697200" duration="1825000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="97000" />
+    <option name="totallyTimeSpent" value="1922000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25340393" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25718608" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -123,5 +155,31 @@
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/creditsch/.env">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" column="19" lean-forward="true" selection-start-line="16" selection-start-column="19" selection-end-line="16" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/creditsch/config/app.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-51">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/creditsch/public/manual/configuracion.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="14" lean-forward="false" selection-start-line="14" selection-start-column="14" selection-end-line="14" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
   </component>
 </project>
