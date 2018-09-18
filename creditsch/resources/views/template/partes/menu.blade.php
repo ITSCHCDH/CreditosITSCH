@@ -58,7 +58,7 @@
                             </li>
                         @endif
                         @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_EVIDENCIA') || Auth::User()->can('VER_EVIDENCIA') || Auth::User()->can('VIP_SOLO_LECTURA'))
-                        <li class='tamSubMenu'>
+                            <li class='tamSubMenu'>
                                 <a class="etSubMenu" href="{{route('evidencias.index')}}">
                                     <i class="fa fa-camera"></i>
                                     <span class="etSubMenu">Evidencia</span>
@@ -118,6 +118,12 @@
                     <i class="fa fa-chevron-right flesub"></i>
                 </a>
                 <ul class="subMenu" id="">
+                    <li class='tamSubMenu'>
+                        <a class="etSubMenu" href="{{ route('perfil.index') }}">
+                            <i class="fa fa-user"></i>
+                            <span class="etSubMenu">Mi perfil</span>
+                        </a>
+                    </li>
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS']))
                         <li class='tamSubMenu'>
                             <a class="etSubMenu" href="{{ route('usuarios.index') }}">
@@ -142,12 +148,6 @@
                             </a>
                         </li>
                     @endif
-                    <li class='tamSubMenu'>
-                        <a class="etSubMenu" href="{{ route('perfil.index') }}">
-                            <i class="fa fa-user"></i>
-                            <span class="etSubMenu">Mi perfil</span>
-                        </a>
-                    </li>
                 </ul>
             </li>
 
