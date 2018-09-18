@@ -8,7 +8,11 @@ ejecutar el siguiente comando -> php artisan db:seed
 6.-Listo ejecutar -> php artisan serve
 
 *usuario: admin@itsch.com
-contraseña: Jaguares
+contraseï¿½a: Jaguares
+
+Usuario de prueba para alumnos
+user: No_control
+Pass: sistemas
 
 IMPORTANTE:
 1.-asignar los jefes de los creditos  e indicar que areas podran crear actividades de este credito
