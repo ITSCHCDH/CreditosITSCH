@@ -133,12 +133,7 @@ class AlumnosRutasController extends Controller
         }else if($existe_actividad[0]->validado=="true"){
             return redirect()->route('alumnos.actividades');
         }
-    	$usuarios = User::select('name','id')->orderBy('name','ASC')->get()->pluck('name','id');
-    	$usuarios_sin_pluck = User::select('name','id')->orderBy('name','ASC')->get();
-    	$validador = Actividad_Evidencia::where([
-    	    ['user_id','=',$request->id_responsable],
-    	    ['actividad_id','=',$request->id_actividad]
-    	])->select('validador_id')->get();
+    	$validador = User::find($existe_actividad[0]->validador_id);
     	$responsable = User::select('id','name')->where('id','=',$request->id_responsable)->get();
     	$actividad = Actividad::select('id','nombre')->where('id','=',$request->id_actividad)->get();
     	if($actividad->count()==0 || $responsable->count()==0){
@@ -148,9 +143,7 @@ class AlumnosRutasController extends Controller
     	return view('alumnos.subir_evidencia')
     	->with('responsable',$responsable[0])
     	->with('actividad',$actividad[0])
-    	->with('usuarios',$usuarios)
-    	->with('validador_id',$validador)
-    	->with('usuarios_sin_pluck',$usuarios_sin_pluck);
+    	->with('validador',$validador);
     }
 
     public function guardarEvidencia(Request $request){
@@ -204,7 +197,6 @@ class AlumnosRutasController extends Controller
     	        
     	    }
     	    $actividad_evidencia = Actividad_Evidencia::find($id_actividad_evidencia[0]->id);
-    	    $actividad_evidencia->validador_id = $request->valida;
     	    $actividad_evidencia->save();
     	}
     	Flash::success('La evidencia fue guardada correctamente');
@@ -237,6 +229,17 @@ class AlumnosRutasController extends Controller
 
     public function eliminarEvidencia(Request $request){
     	if($request->has('actividad') && $request->has('archivo') && $request->has('archivo_nombre')){
+            $validado = DB::table('evidencia as e')->join('actividad_evidencia as ae', function($join) use($request){
+                $join->on('ae.id','=','e.id_asig_actividades');
+                $join->where('e.id','=',$request->get('archivo'));
+            })->select('ae.validado')->get();
+            if($validado->count()==0){
+                return response()->json(array('mensaje' => 'Error al eliminar la evidencia', 'tipo' => 'error'));
+            }else{
+                if($validado[0]->validado=="true"){
+                    return response()->json(array('mensaje' => 'La evidencia ya ha sido validada', 'tipo' => 'error'));
+                }
+            }
     	    Evidencia::destroy($request->get('archivo'));
     	    Storage::delete('public/evidencias/'.$request->get('actividad').'/'.$request->get('archivo_nombre'));
     	    return response()->json(array('mensaje' => 'Evidencia eliminada con exito','tipo' => 'exito'));

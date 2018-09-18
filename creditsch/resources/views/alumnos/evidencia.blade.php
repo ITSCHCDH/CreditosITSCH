@@ -78,7 +78,8 @@
 								var actividad = $(this).attr('data-actividad');
 								var archivo_id = $(this).attr('data-archivo');
 								var archivo_nombre = $(this).attr('data-archivo_nombre');
-								$(this).parent().css('display','none');
+								var mensaje_tipo = "";
+								var referencia = $(this);
 								$.ajax({
 									type: "get",
 									dataType: "json",
@@ -90,10 +91,14 @@
 									}, 
 									success: function(response){
 										mostrarMensaje(response['mensaje'],'mensaje-parte-superior',response['tipo']);
+										if(response['tipo']=="exito"){
+											referencia.parent().css('display','none');
+										}
 									}, error: function(){
 										console.log("Error al eliminar la evidencia");
 									}
 								});
+								
 							}
 						});
 					}

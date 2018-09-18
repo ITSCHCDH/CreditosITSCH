@@ -296,7 +296,7 @@ class ParticipantesController extends Controller
             }else{
                 $temp = Avance::where([
                     ['no_control','=',$request->get('no_control')],
-                    ['id_credito','=',$actividad->credito_id]
+                    ['id_credito','=',$actividad->id_actividad]
                 ])->get();
                 if($temp->count()==0){
                     $avance = new Avance();

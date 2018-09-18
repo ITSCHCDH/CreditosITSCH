@@ -111,42 +111,45 @@
                     </ul>
                 </li>
             @endif
-            
-            @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES','VER_USUARIOS','VER_AREAS']))
-                <li class="botMen">
-                    <a class="etMenu"  href="#">
-                        <i class="fa fa-lock"></i>
-                        <span class="spaMenu">Administración</span>
-                        <i class="fa fa-chevron-right flesub"></i>
-                    </a>
-                    <ul class="subMenu" id="">
-                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS']))
-                            <li class='tamSubMenu'>
-                                <a class="etSubMenu" href="{{ route('usuarios.index') }}">
-                                    <i class="fa fa-users"></i>
-                                    <span class="etSubMenu">Usuarios</span>
-                                </a>
-                            </li>
-                        @endif
-                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES']))
-                            <li class='tamSubMenu'>
-                                <a class="etSubMenu" href="{{ route('roles.index') }}">
-                                    <i class="fa fa-address-card"></i>
-                                    <span class="etSubMenu">Roles</span>
-                                </a>
-                            </li>
-                        @endif
-                        @if(Auth::User()->hasAnyPermission('VIP','VER_AREAS','VIP_SOLO_LECTURA'))
-                            <li class='tamSubMenu'>
-                                <a class="etSubMenu" href="{{ route('areas.inicio') }}">
-                                    <i class="fa fa-map-marker"></i>
-                                    <span class="etSubMenu">Areas</span>
-                                </a>
-                            </li>
-                        @endif
-                    </ul>
-                </li>
-            @endif
+            <li class="botMen">
+                <a class="etMenu"  href="#">
+                    <i class="fa fa-lock"></i>
+                    <span class="spaMenu">Administración</span>
+                    <i class="fa fa-chevron-right flesub"></i>
+                </a>
+                <ul class="subMenu" id="">
+                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS']))
+                        <li class='tamSubMenu'>
+                            <a class="etSubMenu" href="{{ route('usuarios.index') }}">
+                                <i class="fa fa-users"></i>
+                                <span class="etSubMenu">Usuarios</span>
+                            </a>
+                        </li>
+                    @endif
+                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES']))
+                        <li class='tamSubMenu'>
+                            <a class="etSubMenu" href="{{ route('roles.index') }}">
+                                <i class="fa fa-address-card"></i>
+                                <span class="etSubMenu">Roles</span>
+                            </a>
+                        </li>
+                    @endif
+                    @if(Auth::User()->hasAnyPermission('VIP','VER_AREAS','VIP_SOLO_LECTURA'))
+                        <li class='tamSubMenu'>
+                            <a class="etSubMenu" href="{{ route('areas.inicio') }}">
+                                <i class="fa fa-map-marker"></i>
+                                <span class="etSubMenu">Areas</span>
+                            </a>
+                        </li>
+                    @endif
+                    <li class='tamSubMenu'>
+                        <a class="etSubMenu" href="{{ route('perfil.index') }}">
+                            <i class="fa fa-user"></i>
+                            <span class="etSubMenu">Mi perfil</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
             <li class="botMen">
                 <a class="etMenu"  href="{{ route('mensajes.index') }}">
