@@ -17,7 +17,6 @@
     <!-- Bootstrap -->
     <link href="{{asset('complementos/css/bootstrap.css')}}" rel="stylesheet">
     <link href="{{asset('complementos/css/bootstrap-theme.css')}}" rel="stylesheet">
-    <!--<link rel="stylesheet" type="text/css" href="{{ asset('plugins/cssTable/dataTables.bootstrap4.min.css') }}"> -->
 
     @yield('links')
 </head>
