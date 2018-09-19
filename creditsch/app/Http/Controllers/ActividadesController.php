@@ -76,10 +76,10 @@ class ActividadesController extends Controller
             $areas_del_credito = DB::table('creditos as c')->join('creditos_areas as ca', function($join) use($request){
                 $join->on('c.id','=','ca.credito_id');
                 $join->where('c.id','=',$request->id_actividad);
-            })->get();
+            })->select('ca.credito_area as area_id')->get();
             $tiene_permitido = false;
             foreach ($areas_del_credito as $area) {
-                if($area->id == Auth::User()->id){
+                if($area->area_id == Auth::User()->area){
                     $tiene_permitido = true;
                 }
             }

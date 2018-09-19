@@ -33,20 +33,14 @@
 
         <div class="form-group">
             {!! Form::label('valida','Nombre del quien valida la evidencia') !!}
-            @if ($validador_id!=null)
-                <select id='valida' name='valida' class="form-control select-category" required>
-                    <option value="">Selecciona un validador</option>
-                    @foreach ($usuarios_sin_pluck as $usuario)
-                        @if ($validador_id[0]->validador_id==$usuario->id)
-                            <option value="{{ $usuario->id}}" style="background-color: blue; color: white;" selected>{{ $usuario->name }}</option>
-                        @else
-                            <option value="{{ $usuario->id}}">{{ $usuario->name }}</option>
-                        @endif
-                    @endforeach
-                </select>
-            @else
-                {!! Form::select('valida',$usuarios,null,['class'=>'form-control select-category','placeholder'=>'Selecciona un validador','required']) !!}
-            @endif
+            <select id='valida' name='valida' class="form-control select-category" required disabled>
+                @if ($validador!=null)
+                    <option value="{{ $validador->id }}">{{ $validador->name }}</option>
+                @else
+                    <option value="">{{ "No hay validador" }}</option>
+                @endif
+                
+            </select>
             
         </div>
 

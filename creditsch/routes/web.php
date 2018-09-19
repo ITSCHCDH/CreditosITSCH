@@ -152,6 +152,11 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('areas/{area}/editar','AreasController@editar')->name('areas.editar');
     Route::post('areas/{area}/actualizar','AreasController@actualizar')->name('areas.actualizar');
     Route::get('areas/{area}/usuarios','AreasController@usuarios')->name('areas.usuarios');
+
+    //Rutas de mi perfil
+    Route::get('perfil','PerfilController@index')->name('perfil.index');
+    Route::get('perfil/password_reset','PerfilController@passwordResetView')->name('perfil.password_reset_view');
+    Route::post('perfil/password_update','PerfilController@passwordUpdate')->name('perfil.password_update');
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){

@@ -1,5 +1,5 @@
 <!-- Tabla para los mensajes de alerta y busqueda -->
-<div class="table-responsive alertas" id="tabAlertas"> 
+<div class="table-responsive alertas" id="tabAlertas" >
     <table class="table">
         <thead>
         <tr>
@@ -8,7 +8,7 @@
                 <ul class="navbar-nav ml-auto">
                     <!-- Link para los mensajes-->
                     @if(!Auth::guard('alumno')->check())
-                        <li class="nav-item dropdown">
+                        <li class="nav-item dropdown" >
                             <a class="nav-link dropdown-toggle mr-lg-2" id="messagesDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-fw fa-envelope"></i>
                                 <span class="d-lg-none txt">Mensajes
@@ -21,7 +21,7 @@
 
                             <!--Div para los mensajes recibidos -->
                             <div class="dropdown-menu" aria-labelledby="messagesDropdown">
-                                <h6 class="dropdown-header">Nuevos Mensajes:</h6>
+                                <h3 class="dropdown-header">Nuevos Mensajes:</h3>
                                 <div class="dropdown-divider"></div>
                                 <div id="div-mensajes-recibidos">
                                     <a class="dropdown-item" href="#">
@@ -131,12 +131,15 @@
                             {{ Auth::user()->name }}
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <!-- Agregamos la ruta para poder iniciar sesion -->
-                            <a class="dropdown-item" href="{{ route('logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar sesión</a>
-                            <!-- Creamos el formularios en orden para que nos podramos cerrar sesion -->
-                            <form id="logout-form" action="{{ route('logout')}}" method="POST" style="display: none;">
-                                {{ csrf_field() }}
-                            </form>
+                            
+                             <a class="dropdown-item" href="{{ route('perfil.index')}}" >Mi perfil</a>
+                             <br>
+                             <!-- Agregamos la ruta para poder iniciar sesion -->
+                             <a class="dropdown-item" href="{{ route('logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar sesión</a>
+                             <!-- Creamos el formularios en orden para que nos podramos cerrar sesion -->
+                             <form id="logout-form" action="{{ route('logout')}}" method="POST" style="display: none;">
+                                 {{ csrf_field() }}
+                             </form>
                         </div>
                     </li>
                 @endif
