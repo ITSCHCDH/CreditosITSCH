@@ -107,9 +107,10 @@ $('.dropdown').click(function() {
         band2=1;
     }
     else{
+        if(ban2==1){
         $('.alertas').css('height', 'auto');
         $('.alertas').css('z-index', '0');
-        band2=0;
+        band2=0;}
     }
 });
 

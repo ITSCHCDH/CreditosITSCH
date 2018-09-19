@@ -23,14 +23,14 @@
 <body>
         <style type="text/css">
             .alerta-padding{
-                padding: 12px;
+                padding: 10px;
             }
         </style>
         <!-- Seccion de menu del sistema, mensajes de alerta y elementos de busqueda -->
         <div class="content-all" style="position: relative; z-index: 999 !important;">
             <header>
             </header>
-            <input type="checkbox" id="check">
+        <input type="checkbox" id="check">
             @if(Auth::guard('web')->check())
                 <label for="check" class="fa fa-bars" id="menu">Menu</label>
             @endif
