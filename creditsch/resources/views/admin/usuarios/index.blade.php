@@ -23,7 +23,7 @@
 	   		<tr>
 	   			<td>{{ $user->id }}</td>
 	   			<td>{{ $user->name }}</td>
-	   			<td>{{ $user->area }}</td>
+	   			<td style="overflow:hidden;">{{ $user->area }}</td>
 	   			<td>{{ $user->email }}</td>
 	   			@if ($user->active=='true')
 	   				<td>SI</td>
