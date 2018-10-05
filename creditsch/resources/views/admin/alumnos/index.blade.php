@@ -12,23 +12,8 @@
         <a href="{{route('alumnos.create')}}" class="btn btn-primary">Registrar nuevo alumno</a>
     @endif
     
-    <!--BUSCADOR DE ARTICULOS  -->
-    <!-- Boton de busqueda en la pagina -->
-    {!! Form::open(['route'=>'alumnos.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right']) !!}
-
-    <div class="input-group">
-        {!! Form::text('valor',null,['class'=>'form-control','placeholder'=>'Control|Nombre|Carrera','aria-describedby'=>'search']) !!}
-        <div class="input-group-btn">
-            <button type="submit" class="btn btn-primary"> Buscar
-                <span class="badge  label label-primary glyphicon glyphicon-search">
-                      </span>
-            </button>
-        </div>
-    </div>
-    {!! Form::close() !!}
-    <!--Nota: Se tiene que agregar el (scope) que es una funcion que se agrega en el modelo y es la encargada de hacer la consulta  -->
     <!--Fin del boton de busqueda  -->
-    <table class="table table-striped">
+    <table class="table table-striped" id="tabla-alumnos">
         <thead>
         <th>ID</th>
         <th>Numero de Control</th>
@@ -65,6 +50,14 @@
         @endforeach
         </tbody>
     </table>
-    {!! $alumno->render() !!}
     <div style="margin-bottom: 50px;"></div>
+    @section('js')
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('#tabla-alumnos').DataTable( {
+                    "pagingType": "full_numbers"
+                } );
+            });
+        </script>
+    @endsection
 @endsection

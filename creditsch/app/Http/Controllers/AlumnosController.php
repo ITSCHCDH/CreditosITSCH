@@ -23,7 +23,7 @@ class AlumnosController extends Controller
      */
     public function index(Request $request)
     {
-        $alumnos = DB::table('alumnos as alu')->join('areas as a','a.id','=','alu.carrera')->where('alu.nombre','LIKE',"%".$request->valor."%")->orwhere('no_control','LIKE',"%$request->valor%")->orwhere('carrera','LIKE',"%$request->valor%")->orderBy('alu.id')->select('alu.nombre','alu.no_control','alu.status','alu.id','a.nombre as carrera')->paginate(5);
+        $alumnos = DB::table('alumnos as alu')->join('areas as a','a.id','=','alu.carrera')->where('alu.nombre','LIKE',"%".$request->valor."%")->orwhere('no_control','LIKE',"%$request->valor%")->orwhere('carrera','LIKE',"%$request->valor%")->orderBy('alu.id')->select('alu.nombre','alu.no_control','alu.status','alu.id','a.nombre as carrera')->get();
         return view('admin.alumnos.index')->with('alumno',$alumnos); //Llama a la vista y le envia los usuarios
     }
 

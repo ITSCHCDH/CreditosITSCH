@@ -312,23 +312,7 @@ class ParticipantesController extends Controller
             $participante->save();
             return response()->json(array('mensaje' => 'Participante agregado correctamente','mensaje_tipo' => 'exito' ));
         }else{
-            if($validado->validado=='false'){
-                /*$temp = Avance::where([
-                    ['no_control','=',$request->get('no_control')],
-                    ['id_credito','=',$actividad->id_actividad]
-                ])->get();
-                if($temp->count()==0){
-                    $avance = new Avance();
-                    $avance->no_control = $request->get('no_control');
-                    $avance->por_credito = (int)$actividad->por_cred_actividad;
-                    $avance->id_credito=$actividad->id_actividad;
-                    $avance->save();
-                }else{
-                    $avance = Avance::find($temp[0]->id);
-                    $avance->por_credito += (int)$actividad->por_cred_actividad;
-                    $avance->save();
-                }*/
-            }else{
+            if($validado->validado!='false'){
                 return response()->json(array('mensaje' => 'Ya no se pueden agregar participantes','mensaje_tipo' => 'error' ));
             }
             $participante = new Participante();
