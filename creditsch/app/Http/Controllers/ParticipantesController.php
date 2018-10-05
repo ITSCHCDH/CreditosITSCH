@@ -235,7 +235,6 @@ class ParticipantesController extends Controller
     }
 
     public function ajaxGuardar(Request $request){
-
         $evidencias = DB::table('actividad_evidencia as ae')->where([
             ['ae.user_id','=',$request->get('id_responsable')],
             ['ae.actividad_id','=',$request->get('id_actividad')]
@@ -314,7 +313,7 @@ class ParticipantesController extends Controller
             return response()->json(array('mensaje' => 'Participante agregado correctamente','mensaje_tipo' => 'exito' ));
         }else{
             if($validado->validado=='false'){
-                $temp = Avance::where([
+                /*$temp = Avance::where([
                     ['no_control','=',$request->get('no_control')],
                     ['id_credito','=',$actividad->id_actividad]
                 ])->get();
@@ -328,7 +327,7 @@ class ParticipantesController extends Controller
                     $avance = Avance::find($temp[0]->id);
                     $avance->por_credito += (int)$actividad->por_cred_actividad;
                     $avance->save();
-                }
+                }*/
             }else{
                 return response()->json(array('mensaje' => 'Ya no se pueden agregar participantes','mensaje_tipo' => 'error' ));
             }
