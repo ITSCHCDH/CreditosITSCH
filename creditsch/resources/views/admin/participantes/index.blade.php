@@ -257,14 +257,14 @@
                 for(var x = 0; x<tk.length; x++){
                     //Anexamos los numeros de control a una lista y validamos que no se encuentra ya agregada
                     if(!$('#'+tk[x]).length){
-                        $('#list_no_control').append('<option value="'+tk[x]+'" id="'+tk[x]+'"');
+                        $('#list_no_control').append('<option value="'+tk[x]+'" id="'+tk[x]+'">');
                         lista_no_control.push(tk[x]);
                     }
                 }
                 $('#no_control').val('');
             }else if(temp_no_control.length>0){
                 if(!$('#'+tk[0]).length){
-                    $('#list_no_control').append('<option value="'+tk[0]+'" id="'+tk[0]+'"');
+                    $('#list_no_control').append('<option value="'+tk[0]+'" id="'+tk[0]+'">');
                     lista_no_control.push(tk[x]);
                 }
                 var participante_data = $(this).serialize();

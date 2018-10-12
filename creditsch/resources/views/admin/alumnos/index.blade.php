@@ -12,6 +12,19 @@
         <a href="{{route('alumnos.create')}}" class="btn btn-primary">Registrar nuevo alumno</a>
     @endif
     
+    {!! Form::open(['route'=>'alumnos.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right']) !!}
+
+        <div class="input-group">
+            {!! Form::text('valor',null,['class'=>'form-control','placeholder'=>'Buscar.....','aria-describedby'=>'search']) !!}
+            <div class="input-group-btn">
+                <button type="submit" class="btn btn-primary"> Buscar
+                      <span class="badge  label label-primary glyphicon glyphicon-search">
+                      </span>
+                </button>
+            </div>
+        </div>
+    {!! Form::close() !!}
+
     <!--Fin del boton de busqueda  -->
     <table class="table table-striped" id="tabla-alumnos">
         <thead>
@@ -50,14 +63,5 @@
         @endforeach
         </tbody>
     </table>
-    <div style="margin-bottom: 50px;"></div>
-    @section('js')
-        <script type="text/javascript">
-            $(document).ready(function() {
-                $('#tabla-alumnos').DataTable( {
-                    "pagingType": "full_numbers"
-                } );
-            });
-        </script>
-    @endsection
+    {{ $alumno->render() }}
 @endsection
