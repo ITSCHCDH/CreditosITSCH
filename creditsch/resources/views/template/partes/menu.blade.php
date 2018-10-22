@@ -45,7 +45,7 @@
                             <li class='tamSubMenu'>
                                 <a class="etSubMenu" href="{{route('actividades.index')}}">
                                     <i class="fa fa-futbol-o"></i>
-                                    <span class="etSubMenu">Crear Actividad</span>
+                                    <span class="etSubMenu">Administración</span>
                                 </a>
                             </li>
                         @endif

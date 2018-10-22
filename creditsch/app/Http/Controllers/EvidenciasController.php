@@ -53,14 +53,13 @@ class EvidenciasController extends Controller
      */
     public function create(Request $request)
     {
-        //$evidencia->user_id=\Auth::user()->id;//Obtiene el id del usuario que esta logueado
-        
         $actividad_evidencia = Actividad_Evidencia::where([
             ['user_id','=',$request->id_responsable],
             ['actividad_id','=',$request->id_actividad]
         ])->get();
         if($actividad_evidencia->count()==0){
-            return redirect()->back();
+            Flash::error("No actividad o responsable seleccionado");
+            return redirect()->back('participantes.index');
         }
         $validador = User::find($actividad_evidencia[0]->validador_id);
         $responsable = User::select('id','name')->where('id','=',$request->id_responsable)->get();

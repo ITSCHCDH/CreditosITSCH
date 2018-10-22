@@ -63,5 +63,5 @@
         @endforeach
         </tbody>
     </table>
-    {{ $alumno->render() }}
+    {{ $alumno->appends(['valor' => $valor])->render() }}
 @endsection

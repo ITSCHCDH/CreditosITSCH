@@ -25,20 +25,24 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {   //Aqui mandamos llamar todos los datos de las actividades creadas
-        if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])){
-            $act=Actividad::Search($request->nombre)->orderby('id','asc')->paginate(5); //Consulta todos los usuarios y los ordena, ademas pagina la consulta
+    {
+        //Aqui mandamos llamar todos los datos de las actividades creadas
+        if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])){           
+            $act = DB::table('actividad as a')->join('users as u','u.id','=','a.id_user')->join('creditos as c','c.id','=','a.id_actividad')->where('a.nombre','LIKE',"%$request->nombre%")->orwhere('u.name','like',"%$request->nombre%")->orwhere('c.nombre','like',"%$request->nombre%")->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user')->orderby('id','asc')->paginate(5);
         }else{
-            $act = Actividad::Search($request->nombre)->where('id_user','=',Auth::User()->id)->orderby('id','ASC')->paginate(5);
+            $act = DB::table('actividad as a')->join('users as u', function($join){
+                $join->on('u.id','=','a.id_user');
+                $join->where('u.id','=',Auth::User()->id);
+            })->join('creditos as c','c.id','=','a.id_actividad')->where('a.nombre','LIKE',"%$request->nombre%")->orwhere('u.name','like',"%$request->nombre%")->orwhere('c.nombre','like',"%$request->nombre%")->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user')->orderby('id','asc')->paginate(5);
         }
         
         //Creamos un metodo que llame a las relaciones de cada una de las actividades
         $act->each(function ($act){
-            $act->credito;
+            //$act->credito;
         });
 
         //dd($act);
-        return view('admin.actividades.index')->with('actividad',$act); //Llama a la vista y le envia los usuarios
+        return view('admin.actividades.index')->with('actividad',$act)->with('nombre',$request->nombre); //Llama a la vista y le envia los usuarios
 
     }
 

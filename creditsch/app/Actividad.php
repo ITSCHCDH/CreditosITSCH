@@ -29,7 +29,7 @@ class Actividad extends Model
     //Crea el bucador de actividades (Scope)
     public function scopeSearch($query,$nombre)
     {
-        return $query->where('nombre','LIKE',"%$nombre%");
+        return $query->where('actividad.nombre','LIKE',"%$nombre%");
     }
     //Relacion mucho a muchos una actividad puede terner mucho responsables y un resposables puede tener muchas actividades
     public function users(){

@@ -144,17 +144,50 @@ class UsersController extends Controller
 
     public function asignarRoles($id){
         $user = User::find($id);
-        $roles_data = DB::table('roles')->leftjoin('model_has_roles as model',function($join) use($id){
-            $join->on('model.role_id','=','roles.id');
-            $join->where('model.model_type','=','App\user');
-            $join->where('model.model_id','=',$id);
-        })->leftjoin('users',function($join) use($id){
-            $join->on('users.id','=','model.model_id');
-            $join->where('users.id','=',$id);
-        })->select('users.name as user_name','roles.name','roles.id as id')->get();
-        return view('admin.usuarios.asignar_roles')
-        ->with('roles',$roles_data)
-        ->with('user',$user);
+        $area = Area::find($user->area);
+        if(Auth::User()->can('VIP')){
+            $roles_data = DB::table('roles')->leftjoin('model_has_roles as model',function($join) use($id){
+                $join->on('model.role_id','=','roles.id');
+                $join->where('model.model_type','=','App\user');
+                $join->where('model.model_id','=',$id);
+            })->leftjoin('users',function($join) use($id){
+                $join->on('users.id','=','model.model_id');
+                $join->where('users.id','=',$id);
+            })->select('users.name as user_name','roles.name','roles.id as id')->get();
+            return view('admin.usuarios.asignar_roles')
+            ->with('roles',$roles_data)
+            ->with('user',$user)
+            ->with('area',$area);
+        }else{
+            $permisos = $user->getPermissionsViaRoles();
+            $arreglo_roles = array();
+            foreach (Role::all() as $role) {
+                $temp_permisos_role = $role->permissions;
+                $valido = true;
+                for ($x=0; $x < count($temp_permisos_role); $x++) {
+                    $tiene_permiso = false;
+                    for ($y=0; $y < count($permisos); $y++) { 
+                        if($temp_permisos_role[$x]->name == $permisos[$y]->name){
+                            $tiene_permiso = true;
+                            break;
+                        }
+                    }
+                    if(!$tiene_permiso){
+                        $valido = false;
+                        break;
+                    }
+                }
+                if($valido){
+                    array_push($arreglo_roles,$role->name);
+                }
+            }
+            $roles_data = Role::whereIn("name",$arreglo_roles)->get();
+            return view('admin.usuarios.asignar_roles')
+            ->with('roles',$roles_data)
+            ->with('user',$user)
+            ->with('area',$area);
+        }
+        
     }
 
     public function guardarRoles(Request $request){

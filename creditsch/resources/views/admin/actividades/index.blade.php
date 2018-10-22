@@ -37,6 +37,7 @@
             <th>Porcentaje crédito</th>
             <th>Crédito</th>
             <th>Alumnos</th>
+            <th>Administrador</th>
             <th>Vigente</th>
             @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
                 <th>Acción</th>
@@ -46,15 +47,18 @@
         @foreach($actividad as $act)
             <tr>
                 <td>{{$act->id}}</td>
-                <td>{{$act->nombre}}</td>
+                <td>{{$act->actividad_nombre}}</td>
                 <td>{{$act->por_cred_actividad}}</td>
-                <td>{{$act->credito->nombre}}</td>
+                <td>{{$act->credito_nombre}}</td>
                 <td>
                     @if ($act->alumnos=="true")
                         {{ "SI" }}
                     @else
                         {{ "NO" }}
                     @endif
+                </td>
+                <td>
+                    {{ $act->usuario_nombre }}
                 </td>
                 <td>
                     @if($act->vigente=="true")
@@ -98,7 +102,7 @@
         </tbody>
     </table>
 
-    {!! $actividad->render() !!}
+    {!! $actividad->appends(['nombre'=> $nombre])->render() !!}
     <div style="margin-bottom: 50px;"></div>
 
 @endsection

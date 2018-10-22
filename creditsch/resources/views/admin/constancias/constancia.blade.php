@@ -123,7 +123,7 @@
 		</div>
 		<div class="romper"></div>
 		<div class="f-derecha">
-			<p class="bloque">OFICIO No. DISC/S-000/{{ $data['year'] }}</p>
+			<p class="bloque">OFICIO No. {{ $data['datos_globales']->numero_oficio }}/{{ $data['year'] }}</p>
 		</div>
 		
 </div>

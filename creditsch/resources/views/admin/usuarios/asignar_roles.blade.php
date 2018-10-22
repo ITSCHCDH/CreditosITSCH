@@ -11,6 +11,9 @@
 @endsection
 
 @section('contenido')
+	@if (Auth::User()->hasAnyPermission(['VIP','CREAR_ROLES','VER_ROLES']))
+		<a href="{{ route('roles.index') }}" class="btn btn-primary" style="margin: 10px;">Administración de Roles</a>
+	@endif
 	<div style="width: 500px;">
 		<table class="table table-striped table-bordered">
 		   <thead>
@@ -42,8 +45,8 @@
 		   	<tr>
 		   		<td>Area</td>
 		   		<td>
-		   			@if ($user!=null)
-		   				{{ $user->area }}
+		   			@if ($area!=null)
+		   				{{ $area->nombre }}
 		   			@else
 		   				{{ "?????????????????????"}}
 		   			@endif

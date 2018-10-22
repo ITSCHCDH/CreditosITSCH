@@ -27,7 +27,7 @@ class MensajesController extends Controller
     	->with('users',$users);
     }
     public function ver(Request $request){
-    	$mensaje = Mensaje::find($request->mensaje_id);
+    	$mensaje = Mensaje::where('mensajes.id','=',$request->mensaje_id)->join('users','users.id','=','mensajes.creador_id')->get();
     	$ruta = $request->has('ruta');
     	if ($request->has('receptor_id')) {
     		$receptor = Receptor::find($request->receptor_id);
@@ -38,7 +38,7 @@ class MensajesController extends Controller
     		}	
     	}
     	return view('admin.mensajes.ver')
-    	->with('mensaje',$mensaje)
+    	->with('mensaje',$mensaje[0])
     	->with('ruta',$ruta);
     }
 

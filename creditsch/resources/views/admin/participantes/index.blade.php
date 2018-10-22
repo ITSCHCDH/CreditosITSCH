@@ -123,12 +123,20 @@
                         $('#mitabla tbody').empty();
                         //Vaciamos el combobox de los responsables
                         $('#responsables_id').empty();
-                        $('#responsables_id').append("<option value='' disabled selected >Responsable</option>");
+                        if(response['responsables'].length==0){
+                            $('#responsables_id').append("<option value='' disabled>Sin responsables</option>");
+                        }
+                        
                         //Agregamos los responsables al combobox
                         for(var x=0; x<response['responsables'].length; x++){
                             var id = response['responsables'][x]['id'];
                             var nombre = response['responsables'][x]['name'];
-                            $('#responsables_id').append("<option value='"+id+"'>"+nombre+"</option>");
+                            if(x==0){
+                                $('#responsables_id').append("<option value='"+id+"' selected>"+nombre+"</option>");
+                            }else{
+                                $('#responsables_id').append("<option value='"+id+"'>"+nombre+"</option>");
+                            }
+                            
                         }
                         //Mensaje para las actividades con alumnos responsables
                         var temp_mensaje = document.getElementById('mensaje-actividad-alumnos');
@@ -157,6 +165,7 @@
                             }
                             sesion = false;
                         }
+                        $('#responsables_id').trigger('change');
                     },error:function(){
                         console.log('Error :(');
                     }
@@ -256,14 +265,16 @@
             if(tk.length>1){
                 for(var x = 0; x<tk.length; x++){
                     //Anexamos los numeros de control a una lista y validamos que no se encuentra ya agregada
-                    if(!$('#'+tk[x]).length){
+                    var identificador = '#'.concat(tk[x]);
+                    if(!$(identificador).length){
                         $('#list_no_control').append('<option value="'+tk[x]+'" id="'+tk[x]+'">');
                         lista_no_control.push(tk[x]);
                     }
                 }
                 $('#no_control').val('');
             }else if(temp_no_control.length>0){
-                if(!$('#'+tk[0]).length){
+                var identificador = '#'.concat(tk[0]);
+                if(!$(identificador).length){
                     $('#list_no_control').append('<option value="'+tk[0]+'" id="'+tk[0]+'">');
                     lista_no_control.push(tk[x]);
                 }
@@ -275,13 +286,14 @@
                     dataType:'json',
                     success:function(response){
                         mostrarMensaje(response['mensaje'],"mensajes-parte-superior",response['mensaje_tipo']);
+                        $('#responsables_id').trigger('change');
                     },error:function(){
                         console.log('Error al guardar');
                     }
                 });
                 $('#no_control').val('');
                 $('#participante_nombre').val(''); 
-                $('#responsables_id').trigger('change');
+                
             }else{
                 var id_responsable = $('#responsables_id').val()!=null? $('#responsables_id').val(): -1;
                 var id_actividad = $('#actividades_id').val()!=null? $('#actividades_id').val(): -1;
@@ -297,6 +309,7 @@
                         dataType:'json',
                         success:function(response){
                             mostrarMensaje(response['mensaje'],"mensajes-parte-superior",response['mensaje_tipo']);
+                            $('#responsables_id').trigger('change');
                         },error:function(){
                             console.log('Error al guardar');
                         }
@@ -305,7 +318,7 @@
                 
                 $('#no_control').val('');
                 $('#participante_nombre').val(''); 
-                $('#responsables_id').trigger('change');
+                
             }
         });
     }

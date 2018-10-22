@@ -82,7 +82,7 @@ header{
     /*Para que ocupe toda la pantalla en lo alto*/
     height: 87.5%;
     background: #2d3e50;
-    opacity: 0.9;
+    opacity: 0.85;
     filter: alpha(opacity=60);
     /*Para que el cambio no sea tan brusco*/
     transition: all 500ms cubic-bezier(1,0,0,1);
