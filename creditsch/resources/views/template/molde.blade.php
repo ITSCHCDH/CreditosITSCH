@@ -35,7 +35,7 @@
                 <label for="check" class="fa fa-bars" id="menu">Menu</label>
             @endif
             <!-- Imagen ITSCH -->
-            <div style="position: fixed;left: 97%;top: 8px;">
+            <div style="position: fixed;left: 90%;top: 8px;">
                 <a  href="{{ url('/home') }}">
                     <div style="text-align: center;">
                         <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="40" class="img-rounded">
@@ -55,9 +55,9 @@
         <!--Contenido principal del sistema  -->
         <main id="cuerpo">
             <!--Div para el contenido de todo el sistema -->
-            <div class="container" id="divPrincipal">
+            <div class="container-fluid" id="divPrincipal">
                 <div class="container-fluid">
-                    <ol class="breadcrumb" style="box-shadow: 2px 2px 7px #999;">
+                    <ol class="breadcrumb" style="box-shadow: 2px 2px 10px #999;">
                         <li class="breadcrumb-item">
                             @if (Auth::guard('alumno')->check())
                                 <label class="label label-primary">{{ Auth::User()->nombre }}</label>
@@ -68,7 +68,7 @@
                         <li class="breadcrumb-item active"> @yield('ruta','Default')
                         </li>
                     </ol>
-                    <div class="container" id="contenido">
+                    <div class="container-fluid" id="contenido">
                         <div class="col-md-12">
                             <h2>Sistema de creditos complementarios CREDITSCH</h2>
                             <section>

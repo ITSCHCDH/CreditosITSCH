@@ -12,6 +12,8 @@ $('.botMen').click(function() {
         $('#check').prop('checked',true);//Abre el menu
         $('.spaMenu').css('visibility', 'visible');//Muestra el texto de los menus
         $('.flesub').css('visibility', 'visible');//Muestra las flechas de los menus que tienen submenus
+        //Hace transparente el menu
+        $('.menu').css({opacity:0.9});
         band=1;  //Menu abierto
         return false;
     }
@@ -23,6 +25,8 @@ $('.botMen').click(function() {
             //Si damos click en un elemento que tenga subMenus lo abre en forma de acordeon
             $(this).children('ul').fadeToggle();//Abre los submenus en caso de que el elemento los tenga
             $('.etSubMenu').css('visibility', 'visible');//Muetra el texto de los submenus
+             //Hace transparente el menu
+            $('.menu').css({opacity:0.9});
             bandSub=1; //SubMenu abierto
             obj=this;
             return false;
@@ -71,6 +75,8 @@ $('#menu').click(function() {
         $('#check').prop('checked',true);
         $('.spaMenu').css('visibility', 'visible');//Muestra el texto de los menus
         $('.flesub').css('visibility', 'visible');//Muestra las flechas de los menus que tienen submenus
+        //Aplica opacidad al menu, desde el boton menu
+        $('.menu').css({opacity:0.9});
         band=1;
         return false;
     }
@@ -79,6 +85,8 @@ $('#menu').click(function() {
         $('.etSubMenu').css('visibility', 'hidden');//Oculta el texto de los submenus
         $('.spaMenu').css('visibility', 'hidden');//Oculta el texto de los menus
         $('.flesub').css('visibility', 'hidden');//Oculta las flechas de los menus que tienen submenus
+        //Quita la opasidad al menu, desde el boton menu
+        $('.menu').css({opacity:1});
         band=0;
         bandSub=0;
     }
@@ -93,6 +101,8 @@ $('#cuerpo').click(function(){
     $('.flesub').css('visibility', 'hidden');//Oculta las flechas de los menus que tienen submenus
     if (bandSub==1)
         $(obj).children('ul').fadeToggle();//Contrae los submenus en caso de que el elemento los tenga
+    //Quita la opasidad al menu, desde el boton menu
+    $('.menu').css({opacity:1});
     band=0;
     bandSub=0;
 });
@@ -125,6 +135,8 @@ $(document).click(function(evt){
     $('.flesub').css('visibility', 'hidden');//Oculta las flechas de los menus que tienen submenus
     $(this).children('ul').fadeToggle();//Cierra los submenus en caso de que el elemento los tenga
     $('.botMen .subMenu').fadeOut(); //Ocultamos todos los menus y submenus
+    //Quita la opasidad al menu, desde el boton menu
+    $('.menu').css({opacity:1});
     band=0; //Menu cerrado
     bandSub=0;
     window.open($(this).children('a').prop('href'),'_self');
