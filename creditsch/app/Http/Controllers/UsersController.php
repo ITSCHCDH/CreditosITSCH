@@ -48,6 +48,11 @@ class UsersController extends Controller
     }
     public function store(UserRequest $request){
     	$user = new User($request->all());
+        $correo_duplicado = User::where('email','=',$user->email)->get()->count() > 0;
+        if($correo_duplicado){
+            Flash::error("El correo ".$user->email." ya ha sido tomado");
+            return back()->withInput();
+        }
     	$user->password = bcrypt($request->password);
     	$user->save();
     	Flash::success('El usuario '.$user->name.' has sido registrado exitosamente!');
@@ -87,6 +92,11 @@ class UsersController extends Controller
         if($user==null){
             Flash::error('El usuario no existe');
             return redirect()->back();
+        }
+        $correo_duplicado = User::where('email','=',$request->email)->get()->count() > 0;
+        if($correo_duplicado){
+            Flash::error("El correo ".$request->email." ya ha sido tomado");
+            return back()->withInput();
         }
         $user->name = $request->name;
         $user->email = $request->email;
@@ -159,7 +169,7 @@ class UsersController extends Controller
             ->with('user',$user)
             ->with('area',$area);
         }else{
-            $permisos = $user->getPermissionsViaRoles();
+            $permisos = Auth::User()->getPermissionsViaRoles();
             $arreglo_roles = array();
             foreach (Role::all() as $role) {
                 $temp_permisos_role = $role->permissions;
@@ -181,7 +191,14 @@ class UsersController extends Controller
                     array_push($arreglo_roles,$role->name);
                 }
             }
-            $roles_data = Role::whereIn("name",$arreglo_roles)->get();
+            $roles_data = DB::table('roles')->leftjoin('model_has_roles as model',function($join) use($id){
+                $join->on('model.role_id','=','roles.id');
+                $join->where('model.model_type','=','App\user');
+                $join->where('model.model_id','=',$id);
+            })->leftjoin('users',function($join) use($id){
+                $join->on('users.id','=','model.model_id');
+                $join->where('users.id','=',$id);
+            })->whereIn("roles.name",$arreglo_roles)->select('users.name as user_name','roles.name','roles.id as id')->get();
             return view('admin.usuarios.asignar_roles')
             ->with('roles',$roles_data)
             ->with('user',$user)

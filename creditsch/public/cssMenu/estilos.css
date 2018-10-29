@@ -222,7 +222,7 @@ footer div p{
 
 /* Manupular el hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #151b50; 
+    background: #151b50;
 }
 /* Color de la flecha que aparece en la esquina de nuestro scroll*/
 ::-webkit-scrollbar-corner{

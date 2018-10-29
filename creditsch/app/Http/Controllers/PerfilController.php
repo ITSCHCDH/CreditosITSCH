@@ -14,7 +14,7 @@ use App\User;
 class PerfilController extends Controller
 {
     public function index(){
-    	$data_user = User::join('areas as a','a.id','=','users.id')->where('users.id','=',Auth::User()->id)->select('a.nombre as area_nombre','users.name as usuario_nombre','users.email as usuario_correo')->get();
+    	$data_user = User::join('areas as a','a.id','=','users.area')->where('users.id','=',Auth::User()->id)->select('a.nombre as area_nombre','users.name as usuario_nombre','users.email as usuario_correo')->get();
     	$roles = User::find(Auth::User()->id)->getRoleNames();
     	return view('admin.perfil.index')
     	->with('data_usuario',$data_user[0])
