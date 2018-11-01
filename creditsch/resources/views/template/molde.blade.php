@@ -30,7 +30,7 @@
         <div class="content-all" style="position: relative; z-index: 999 !important;">
             <header>
             </header>
-        <input type="checkbox" id="check">
+            <input type="checkbox" id="check">
             @if(Auth::guard('web')->check())
                 <label for="check" class="fa fa-bars" id="menu">Menu</label>
             @endif
@@ -49,15 +49,14 @@
             <!-- Incluye el menu al sistema -->
             @if(Auth::guard('web')->check())
                 @include('template.partes.menu')
-            @endif
-
+            @endif                
         </div>
         <!--Contenido principal del sistema  -->
         <main id="cuerpo">
             <!--Div para el contenido de todo el sistema -->
             <div class="container-fluid" id="divPrincipal">
                 <div class="container-fluid">
-                    <ol class="breadcrumb" style="box-shadow: 2px 2px 10px #999;">
+                    <ol class="breadcrumb" style="box-shadow: 4px 4px 10px #000;">
                         <li class="breadcrumb-item">
                             @if (Auth::guard('alumno')->check())
                                 <label class="label label-primary">{{ Auth::User()->nombre }}</label>
@@ -69,8 +68,8 @@
                         </li>
                     </ol>
                     <div class="container-fluid" id="contenido">
-                        <div class="col-md-12">
-                            <h2>Sistema de creditos complementarios CREDITSCH</h2>
+                        <div class="col-xs-12 col-sm-12 col-md-12">
+                            <h2></h2>
                             <section>
                                 @include('flash::message') <!-- Esto es para mostrar los mensajes en los formularios -->
                             </section>
