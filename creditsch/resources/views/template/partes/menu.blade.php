@@ -1,6 +1,6 @@
 <!-- Menu del sistema -->
 <nav class="menu" id="idMenu">
-    <ul>
+    <ul style="margin-bottom: 100px;">
         <li class="botMen">
             @if (Auth::guard('alumno')->check())
                 <a class="etMenu" href="/alumnos/home">

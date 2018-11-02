@@ -152,7 +152,7 @@ header{
 }
 
 .etSubMenu{
-    visibility: hidden;
+    visibility: visible;
 }
 
 .menu li{
