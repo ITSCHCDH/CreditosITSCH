@@ -68,17 +68,17 @@
                         </li>
                     </ol>
                     <div class="container-fluid" id="contenido">
-                        <div class="col-xs-12 col-sm-12 col-md-12">
+                        <div class="col-xs-12 col-sm-12 col-md-12">                           
                             <h2></h2>
                             <section>
                                 @include('flash::message') <!-- Esto es para mostrar los mensajes en los formularios -->
                             </section>
-                            @yield('contenido','Default')<!-- Contenido general del sistema -->
+                            @yield('contenido','Default')<!-- Contenido general del sistema -->      
                         </div>
                     </div>
                 </div>
             </div>
-    </main>
+        </main>
 
     <!-- Incluye el pie de pagina en el sistema -->
     @include('template.partes.pie')

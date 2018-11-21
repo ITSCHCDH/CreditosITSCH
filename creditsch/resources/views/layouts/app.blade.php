@@ -12,14 +12,15 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{asset('cssMenu/estilos.css')}}">
 </head>
 
 
-<body>
+<body background="{{ asset('images/Fondo/fondo.gif') }}"  id="inicio">
 
     <div id="app">
-        <nav class="navbar navbar-default navbar-static-top">
-            <div class="container">
+        <nav class="navbar navbar-default navbar-static-top" style="background-color:#2d3e50;">
+            <div class="container" >
                 <div class="navbar-header">
                        <!-- Imagen ITSCH -->
                         @if (Auth::guard('web')->check())
@@ -27,7 +28,7 @@
                                <div style="text-align: center;">
                                    <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
                                    <br>
-                                   <p style="font-family: sans-serif; color: darkred;">CREDITSCH</p>
+                                   <p style="font-family: sans-serif; color:#fff;">CREDITSCH</p>
                                </div>
                            </a>
                         @elseif(Auth::guard('alumno')->check())
@@ -35,7 +36,7 @@
                                 <div style="text-align: center;">
                                     <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
                                     <br>
-                                    <p style="font-family: sans-serif; color: darkred;">CREDITSCH</p>
+                                    <p style="font-family: sans-serif; color:#fff;">CREDITSCH</p>
                                 </div>
                             </a>
                         @else
@@ -43,7 +44,7 @@
                                 <div style="text-align: center;">
                                     <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
                                     <br>
-                                    <p style="font-family: sans-serif; color: darkred;">CREDITSCH</p>
+                                    <p style="font-family: sans-serif; color:#fff;">CREDITSCH</p>
                                 </div>
                             </a>
                         @endif
@@ -119,4 +120,5 @@
     <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
     @yield('js')
 </body>
+ @include('template.partes.pie')
 </html>
