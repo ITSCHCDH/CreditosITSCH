@@ -12,111 +12,127 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{asset('cssMenu/estilos.css')}}">
+
+    <!-- Fondo de particulas -->
+     <link rel="stylesheet" href="{{asset('cssParticles/style.css')}}">  
 </head>
 
 
 <body>
 
-    <div id="app">
-        <nav class="navbar navbar-default navbar-static-top">
-            <div class="container">
-                <div class="navbar-header">
-                       <!-- Imagen ITSCH -->
-                        @if (Auth::guard('web')->check())
-                           <a  href="{{ url('/home') }}">
-                               <div style="text-align: center;">
-                                   <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
-                                   <br>
-                                   <p style="font-family: sans-serif; color: darkred;">CREDITSCH</p>
-                               </div>
-                           </a>
-                        @elseif(Auth::guard('alumno')->check())
-                            <a  href="{{ route('alumnos.home') }}">
-                                <div style="text-align: center;">
-                                    <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
-                                    <br>
-                                    <p style="font-family: sans-serif; color: darkred;">CREDITSCH</p>
-                                </div>
-                            </a>
-                        @else
-                            <a  href="{{ url('/') }}">
-                                <div style="text-align: center;">
-                                    <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
-                                    <br>
-                                    <p style="font-family: sans-serif; color: darkred;">CREDITSCH</p>
-                                </div>
-                            </a>
-                        @endif
-                        
-                </div>
+    <!-- particles.js container --> 
+  <div id="particles-js"></div> 
+  <!-- stats - count particles --> 
+  <div class="count-particles"> <span class="js-count-particles">--</span> particles </div> 
+            <div id="app">
+                <nav class="navbar navbar-default navbar-static-top" style="background-color:#2d3e50;">
+                    <div class="container" >
+                        <div class="navbar-header">
+                               <!-- Imagen ITSCH -->
+                                @if (Auth::guard('web')->check())
+                                   <a  href="{{ url('/home') }}">
+                                       <div style="text-align: center;">
+                                           <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
+                                           <br>
+                                           <p style="font-family: sans-serif; color:#fff;">CREDITSCH</p>
+                                       </div>
+                                   </a>
+                                @elseif(Auth::guard('alumno')->check())
+                                    <a  href="{{ route('alumnos.home') }}">
+                                        <div style="text-align: center;">
+                                            <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
+                                            <br>
+                                            <p style="font-family: sans-serif; color:#fff;">CREDITSCH</p>
+                                        </div>
+                                    </a>
+                                @else
+                                    <a  href="{{ url('/') }}">
+                                        <div style="text-align: center;">
+                                            <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
+                                            <br>
+                                            <p style="font-family: sans-serif; color:#fff;">CREDITSCH</p>
+                                        </div>
+                                    </a>
+                                @endif
+                                
+                        </div>
 
-                <div class="collapse navbar-collapse" id="app-navbar-collapse">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="nav navbar-nav">
-                        &nbsp;
-                    </ul>
+                        <div class="collapse navbar-collapse" id="app-navbar-collapse">
+                            <!-- Left Side Of Navbar -->
+                            <ul class="nav navbar-nav">
+                                &nbsp;
+                            </ul>
 
-                    <!-- Right Side Of Navbar -->
-                    <ul class="nav navbar-nav navbar-right">
-                        <!-- Authentication Links -->
-                        @if (Auth::guard('alumno')->check())
-                            <li>
-                                <a href="{{ route('alumnos.home') }}">Home</a>
-                            </li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true">
-                                    {{ Auth::guard('alumno')->user()->nombre }} <span class="caret"></span>
-                                </a>
-
-                                <ul class="dropdown-menu" role="menu">
+                            <!-- Right Side Of Navbar -->
+                            <ul class="nav navbar-nav navbar-right">
+                                <!-- Authentication Links -->
+                                @if (Auth::guard('alumno')->check())
                                     <li>
-                                        <a href="{{ route('alumnos.logout') }}"
-                                            onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                            Cerrar sesión
+                                        <a href="{{ route('alumnos.home') }}">Home</a>
+                                    </li>
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true">
+                                            {{ Auth::guard('alumno')->user()->nombre }} <span class="caret"></span>
                                         </a>
 
-                                        <form id="logout-form" action="{{ route('alumnos.logout') }}" method="POST" style="display: none;">
-                                            {{ csrf_field() }}
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        @elseif (Auth::guard('web')->check())
-                            <li>
-                                <a href="{{ url('/home') }}">Home</a>
-                            </li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    {{ Auth::user()->name }} <span class="caret"></span>
-                                </a>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li>
+                                                <a href="{{ route('alumnos.logout') }}"
+                                                    onclick="event.preventDefault();
+                                                             document.getElementById('logout-form').submit();">
+                                                    Cerrar sesión
+                                                </a>
 
-                                <ul class="dropdown-menu" role="menu">
+                                                <form id="logout-form" action="{{ route('alumnos.logout') }}" method="POST" style="display: none;">
+                                                    {{ csrf_field() }}
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                @elseif (Auth::guard('web')->check())
                                     <li>
-                                        <a href="{{ route('logout') }}"
-                                            onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                            Cerrar sesión
+                                        <a href="{{ url('/home') }}">Home</a>
+                                    </li>
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                            {{ Auth::user()->name }} <span class="caret"></span>
                                         </a>
 
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                            {{ csrf_field() }}
-                                        </form>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li>
+                                                <a href="{{ route('logout') }}"
+                                                    onclick="event.preventDefault();
+                                                             document.getElementById('logout-form').submit();">
+                                                    Cerrar sesión
+                                                </a>
+
+                                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                                    {{ csrf_field() }}
+                                                </form>
+                                            </li>
+                                        </ul>
                                     </li>
-                                </ul>
-                            </li>
-                        @endif
-                    </ul>
-                </div>
+                                @endif
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+
+                @yield('content')
             </div>
-        </nav>
 
-        @yield('content')
-    </div>
-
-    <!-- Scripts -->
+    <!-- Scripts -->    
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
+
+    <!-- particles.js lib - https://github.com/VincentGarreau/particles.js --> 
+    <script src="http://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script> 
+    <!-- stats.js lib --> 
+    <script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
+    <script  src="jsParticles/index.js"></script>
+
     @yield('js')
 </body>
+ @include('template.partes.pie')
 </html>

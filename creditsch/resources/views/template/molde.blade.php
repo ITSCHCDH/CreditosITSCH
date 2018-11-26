@@ -27,7 +27,7 @@
             }
         </style>
         <!-- Seccion de menu del sistema, mensajes de alerta y elementos de busqueda -->
-        <div class="content-all" style="position: relative; z-index: 999 !important;">
+        <div class="content-all" style="position: relative; z-index: 999 !important; background-color: red;" >
             <header>
             </header>
             <input type="checkbox" id="check">
@@ -52,10 +52,10 @@
             @endif                
         </div>
         <!--Contenido principal del sistema  -->
-        <main id="cuerpo">
+        <main id="cuerpo" >
             <!--Div para el contenido de todo el sistema -->
             <div class="container-fluid" id="divPrincipal">
-                <div class="container-fluid">
+                <div class="container-fluid" >
                     <ol class="breadcrumb" style="box-shadow: 4px 4px 10px #000;">
                         <li class="breadcrumb-item">
                             @if (Auth::guard('alumno')->check())
@@ -68,17 +68,17 @@
                         </li>
                     </ol>
                     <div class="container-fluid" id="contenido">
-                        <div class="col-xs-12 col-sm-12 col-md-12">
+                        <div class="col-xs-12 col-sm-12 col-md-12">                           
                             <h2></h2>
                             <section>
                                 @include('flash::message') <!-- Esto es para mostrar los mensajes en los formularios -->
                             </section>
-                            @yield('contenido','Default')<!-- Contenido general del sistema -->
+                            @yield('contenido','Default')<!-- Contenido general del sistema -->      
                         </div>
                     </div>
                 </div>
             </div>
-    </main>
+        </main>
 
     <!-- Incluye el pie de pagina en el sistema -->
     @include('template.partes.pie')

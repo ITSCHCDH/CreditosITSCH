@@ -1,14 +1,21 @@
+
 /* Scroll contenedor de tablas grandes */
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 800px){
     #main {
         overflow-x:scroll;
         width:100%;
+       
     }
     #horizontal-scroll {
         /*display : inline-flex;*/
         padding:1px;
+
     }
 }
+#inicio{
+    background-color: rgba(0,0,255,0.5);
+}
+
 /*Estilo de los tooltips del sistema*/
 .toltip {
     position: relative;
@@ -243,18 +250,30 @@ footer div p{
     display: none;
 }
 
+ 
 /*Ocultar tabla de alertas en caso de resolucuines menores a 800px y mostrar solo boton de cerrar sesion*/
 @media screen and (max-width: 800px) {
     #tabAlertas{
-        display:none;
+        display:none;        
     }
     #divSalir{
         display: block;
     }
+
+    /* Scroll contenedor de tablas grandes */
+     .scrol-horiz01{
+        overflow-x:scroll;
+        width:100%;
+    }
+
+    .horizontal-scroll02{
+        display : inline-flex;
+        padding:1px;
+    }
 }
 /* El ancho de nuestro scroll */
 ::-webkit-scrollbar {
-    width: 9px;
+    width: 7px;
 }
 
 /* El fondo de la barra donde aparece nuestro scroll */
@@ -276,7 +295,7 @@ footer div p{
     background: #fff;    
 }
 
-/* Oculta los scrollbar horizontales 
+ /*Oculta los scrollbar horizontales 
 ::-webkit-scrollbar-track:horizontal{
     visibility: hidden;
 }

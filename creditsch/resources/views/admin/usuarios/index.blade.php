@@ -16,9 +16,10 @@
         	<!--<a href="{{ route('usuarios.create')}}" class="btn btn-primary">Nuevo Usuario</a>-->        	
 		</div>			
 	@endif
-	<p></p>
+
 	<section id="main">
-		<aside id="horizontal-scroll">
+        <aside id="horizontal-scroll">
+
 			<table class="table table-striped" id="tabla-usuarios">
 			   <thead>
 			       <th>ID</th>
@@ -67,9 +68,9 @@
 			   		</tr>
 			   	@endforeach
 			   </tbody>
-			</table>
-		</aside>
-	</section>
+			</table>	
+	  	</aside>
+    </section>	
 	<div style="margin-bottom: 50px;"></div>
 	@section('js')
 		<script type="text/javascript">
