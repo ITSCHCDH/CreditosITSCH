@@ -10,6 +10,15 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+/*Ruta para exportar hacia excel */
+Route::get('/export-users', 'ExcelController@exportUsers');
+
+/*Ruta para importar desde excel*/
+//Route::post('/import-excel', 'ExcelController@importUsers')->name('responsables.index');
+Route::post('import', 'ExcelController@importClaves')->name('excel.import');
+Route::get('/admin/ExpoExcel/index','ExcelController@index')->name('ExpoExcel.index');
+Route::resource('import-excel','ExcelController');
+
 
 Route::get('/', function () {
     //return view('welcome');

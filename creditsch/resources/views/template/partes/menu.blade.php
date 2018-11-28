@@ -148,6 +148,14 @@
                             </a>
                         </li>
                     @endif
+                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
+                        <li class='tamSubMenu'>
+                            <a class="etSubMenu" href="{{ route('ExpoExcel.index') }}">
+                                <i class="glyphicon glyphicon-import"></i>
+                                <span class="etSubMenu">Importar password alumnos</span>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
 
