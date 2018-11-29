@@ -234,7 +234,7 @@
 			<label for="division_enunciado">Enunciado de la división de carrera</label>
 			<input type="text" name="division_enunciado" id="division_enunciado" class="form-control" required placeholder="Enunciado de la división. Ejem DIV. DE ING. SIST. COMP">
 		</div>
-		<input type="submit" name="" value="Guardar" class="btn btn-primary">
+		<input type="submit" name="" value="Guardar" class="btn btn-primary btn-lg">
 	</form>
 	<div style="margin-bottom: 80px;"></div>
 	@section('js')

@@ -39,7 +39,7 @@
 	@if ($reportes_data != null)
 		@for ($alumno = 0, $alumno_index=0;  $alumno < count($suma_creditos); $alumno++)
 			<div class="informe_alumno">
-				<p class="alumno_nombre texto" style="text-align: left;"><strong>Alumno:</strong> {{ $suma_creditos[$alumno]->nombre }}</p>
+				<p class="alumno_nombre texto" style="text-align: left; background-color:#38A441; color: white;"><strong>Alumno:</strong> {{ $suma_creditos[$alumno]->nombre }}</p>
 				<div class="resetear"></div>
 				<p class="alumno_nombre texto" style="text-align: left;"><strong>Numero de control:</strong> {{ $suma_creditos[$alumno]->no_control }}</p>
 				<div class="resetear"></div>
