@@ -21,7 +21,7 @@
 
 @section('contenido')
 	<!-- Input text donde se podra buscar a los participantes por nombre -->
-	<div>
+	<div class="">
 		{!! Form::open(['route' => 'verifica_evidencia.avance_alumno', 'method' => 'GET','class' => 'form-inline pull-right']) !!}
 			<div class="input-group">
 				{{ Form::label('no_control','No Control') }}
@@ -39,31 +39,37 @@
 		    <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
 		</div>	
 	</div>
+
 	<div class="resetear"></div>
-	<div style="width:500px; margin-top:30px;">
-		<table class="table table-striped">
+	<br><br>
+
+	<div class="container-fluid ">
+		
+  	<h1>Información del alumno</h1>
+    <div class="row">
+	    <div class="col-sm-4" style="background-color:lavender;">Nombre</div>
+	    <div class="col-sm-4" style="background-color:lavenderblush;">.col-sm-4</div>
+	    <div class="col-sm-4" style="background-color:lavender;">.col-sm-4</div> 
+    </div>
+    
+		<table class="table table-hover">
 			<thead>
-				<th colspan="2">Información del alumno</th>
+				<th colspan="6"><h2>Información del alumno</h2></th>
 			</thead>
 			<tbody>
-				<tr>
+				<tr class="success">
 					<th>Nombre</th>
 					<td>
 						@if ($alumno_data!=null)
 							{{ $alumno_data[0]->nombre_alumno }}
 						@endif
 					</td>
-				</tr>
-				<tr>
 					<th>Numero de control</th>
 					<td>
 						@if ($alumno_data!=null)
 							{{ $alumno_data[0]->no_control }}
 						@endif
-
 					</td>
-				</tr>
-				<tr>
 					<th>Carrera</th>
 					<td>
 						@if ($alumno_data!=null)
@@ -71,11 +77,12 @@
 						@endif
 					</td>
 				</tr>
+				
 			</tbody>
 		</table>
 	</div>
 
-	<table class="table table-striped" style="margin: 30px auto 0 auto; width:60%;">
+	<table class="table table-striped" style="margin: 30px auto 0 auto; width:65%;">
 		<thead>
 			<th>Credito</th>
 			<th>Actividades</th>
@@ -201,6 +208,8 @@
 			@endif
 		</tbody>
 	</table>
+
+
 	@if($liberado && (Auth::User()->hasAnyPermission(['VIP','IMPRIMIR_CONSTANCIAS'])))
 		<form action="{{ route('constancias.imprimir') }}" style="padding: 10px;" method="post">
 			{{ csrf_field() }}
@@ -208,7 +217,9 @@
 			<input type="submit" name="" value="Imprimir constancia" class="btn btn-primary">
 		</form>
 	@endif
+
 	<div style="padding: 5px 0 50px 0;"></div>
+
 	@section('js')
 		<script type="text/javascript">
 			function autocompletar(entrada){
