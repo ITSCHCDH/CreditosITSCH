@@ -53,7 +53,7 @@ class EvidenciasController extends Controller
      */
     public function create(Request $request)
     {
-        if(!$request->has('user_id') || !$request->has('actividad_id')){
+        if(!$request->has("id_actividad")){
             Flash::error("Debes seleccionar una actividad");
             return redirect()->back();
         }
