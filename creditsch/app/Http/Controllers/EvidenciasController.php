@@ -53,20 +53,24 @@ class EvidenciasController extends Controller
      */
     public function create(Request $request)
     {
+        if(!$request->has('user_id') || !$request->has('actividad_id')){
+            Flash::error("Debes seleccionar una actividad");
+            return redirect()->back();
+        }
         $actividad_evidencia = Actividad_Evidencia::where([
             ['user_id','=',$request->id_responsable],
             ['actividad_id','=',$request->id_actividad]
         ])->get();
         if($actividad_evidencia->count()==0){
             Flash::error("No actividad o responsable seleccionado");
-            return redirect()->back('participantes.index');
+            return redirect()->back();
         }
         $validador = User::find($actividad_evidencia[0]->validador_id);
         $responsable = User::select('id','name')->where('id','=',$request->id_responsable)->get();
         $actividad = Actividad::select('id','nombre')->where('id','=',$request->id_actividad)->get();
         if($actividad->count()==0 || $responsable->count()==0){
             Flash::error('No actividad o responsable seleccinado');
-            return redirect()->route('participantes.index');
+            return redirect()->back();
         }
         return view('admin.evidencias.create')
             ->with('responsable',$responsable[0])

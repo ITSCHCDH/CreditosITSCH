@@ -247,11 +247,12 @@
                     },
                     success:function(response){
                         mostrarMensaje(response['mensaje'],'mensajes-parte-superior',response['mensaje_tipo']);
+                        $('#responsables_id').trigger('change');
                     },error:function(){
                         console.log('Error al eliminar');
                     }
                 });
-                $('#responsables_id').trigger('change');
+                
             }  
         });
     }
@@ -262,7 +263,7 @@
             var temp_no_control = $('#no_control').val();
             var tk = temp_no_control.split(" "); //Este metodo parte en pedazos una cadena cada vez que encuentra un espacio y lo guarda en un arreglo
             //Si es mas de un numero de control los agregamos a la lista de numeros de control
-            if(tk.length>1){
+            /*if(tk.length>1){
                 for(var x = 0; x<tk.length; x++){
                     //Anexamos los numeros de control a una lista y validamos que no se encuentra ya agregada
                     var identificador = '#'.concat(tk[x]);
@@ -294,32 +295,29 @@
                 $('#no_control').val('');
                 $('#participante_nombre').val(''); 
                 
-            }else{
-                var id_responsable = $('#responsables_id').val()!=null? $('#responsables_id').val(): -1;
-                var id_actividad = $('#actividades_id').val()!=null? $('#actividades_id').val(): -1;
-                for (var i = 0; i < lista_no_control.length; i++) {
-                    $.ajax({
-                        type:'post',
-                        url:'{{ url('admin/participantes/guardar')}}',
-                        data:{
-                            no_control: lista_no_control[i],
-                            id_responsable: id_responsable,
-                            id_actividad: id_actividad
-                        },
-                        dataType:'json',
-                        success:function(response){
-                            mostrarMensaje(response['mensaje'],"mensajes-parte-superior",response['mensaje_tipo']);
-                            $('#responsables_id').trigger('change');
-                        },error:function(){
-                            console.log('Error al guardar');
-                        }
-                    });
-                }
-                
-                $('#no_control').val('');
-                $('#participante_nombre').val(''); 
-                
+            }*/
+            var id_responsable = $('#responsables_id').val()!=null? $('#responsables_id').val(): -1;
+            var id_actividad = $('#actividades_id').val()!=null? $('#actividades_id').val(): -1;
+            for (var i = 0; i < tk.length; i++) {
+                $.ajax({
+                    type:'post',
+                    url:'{{ url('admin/participantes/guardar')}}',
+                    data:{
+                        no_control: tk[i],
+                        id_responsable: id_responsable,
+                        id_actividad: id_actividad
+                    },
+                    dataType:'json',
+                    success:function(response){
+                        mostrarMensaje(response['mensaje'],"mensajes-parte-superior",response['mensaje_tipo']);
+                        $('#responsables_id').trigger('change');
+                    },error:function(){
+                        console.log('Error al guardar');
+                    }
+                });
             }
+            $('#no_control').val('');
+            $('#participante_nombre').val(''); 
         });
     }
 

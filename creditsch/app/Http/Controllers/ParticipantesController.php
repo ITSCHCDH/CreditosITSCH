@@ -152,7 +152,7 @@ class ParticipantesController extends Controller
             if(!$credito_vigente){
                 return response()->json(array("mensaje" => "El credito actualmente ya no esta vigente","mensaje_tipo" => "error"));
             }
-            $participante_ajeno = DB::table('participantes as p')->join('actividad_evidencias as ae', function($join) use($id){
+            $participante_ajeno = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
                 $join->on('ae.id','=','p.id_evidencia');
                 $join->where('p.id','=',$id);
                 $join->where('ae.user_id','<>',Auth::User()->id);
@@ -249,7 +249,7 @@ class ParticipantesController extends Controller
             ['ae.actividad_id','=',$request->get('id_actividad')]
         ])->select('ae.id')->get();
         if($evidencias->count()==0){
-            return response()->json(array('mensaje' => 'Algun error ocurrió durane el proceso','mensaje_tipo' => 'error'));
+            return response()->json(array('mensaje' => 'Algun error ocurrió durante el proceso','mensaje_tipo' => 'error'));
         }
         $credito_vigente = DB::table('actividad as a')->join('creditos as c','c.id','=','a.id_actividad')->where([
             ['a.id','=',$request->get('id_actividad')],

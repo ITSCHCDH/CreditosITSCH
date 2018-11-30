@@ -8,7 +8,7 @@
 
 @section('contenido')
     @if (Auth::User()->can('VIP') || Auth::User()->can('CREAR_CREDITOS'))
-        <a href="{{route('creditos.create')}}" class="btn btn-primary">Registrar nuevo credito</a>
+        <a href="{{route('creditos.create')}}" class="btn btn-primary">Registrar nuevo crédito</a>
     @endif
     <section id="main">
         <aside id="horizontal-scroll">
