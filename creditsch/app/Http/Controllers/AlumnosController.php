@@ -89,7 +89,11 @@ class AlumnosController extends Controller
             Flash::error('El alumno no existe');
             return redirect()->back();
         }
-        return view('admin.alumnos.edit')->with('alumno',$alumno);
+     
+
+        $areas = Area::all()->pluck('nombre', 'id');    
+        
+        return view('admin.alumnos.edit',compact('alumno','areas'));
     }
 
     /**
@@ -109,16 +113,21 @@ class AlumnosController extends Controller
             return redirect()->back();
         }
         $avance = DB::table('avance')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
-        $participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
-        if($avance || $participante){
-            Flash::error('El numero de control del alumno no puede ser modificado debido a claves foraneas');
-            return back()->withInput();
-        }
-        $alumno->no_control=$request->no_control;
+        $participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;       
         $alumno->nombre=$request->nombre;
         $alumno->carrera=$request->carrera;
-        $alumno->password=bcrypt($request->password);
-        $alumno->status=$request->status;
+        if($alumno->password!=$request->password)
+        {
+            if($request->password==$request->passwordV) 
+            {
+                $alumno->password= bcrypt($request->password);
+            }
+            else
+            {
+                Flash::error('Error de credenciales, las contraseñas deben ser iguales para el alumno: '.$alumno->nombre);
+                return redirect()->route('alumnos.index');
+            }
+        }
         $alumno->save();
         Flash::warning('El alumno '. $alumno->nombre .' a sido editado de forma exitosa');//Envia mensaje
         return redirect('admin/alumnos');//llama a la pagina de consultas

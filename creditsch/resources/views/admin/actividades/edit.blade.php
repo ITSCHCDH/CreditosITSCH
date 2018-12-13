@@ -29,7 +29,7 @@
     @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','CREAR_ACTIVIDAD_ALUMNOS']))
         <div class="form-group">
             {!! Form::label('alumnos','Alumnos Responsables')!!}
-            {!! Form::select('alumnos',['false' => 'NO','true' => 'SI'],null,['class'=>'form-control', 'required','placeholder' => 'Actividad dedicada para alumnos responsables?, Si no estas seguro selecciona "NO"'])!!}
+            {!! Form::select('alumnos',['false' => 'NO','true' => 'SI'],null,['class'=>'form-control', 'required','placeholder' => '¿Quieres permitir que el alumno suba evidencias de esta actividad?])!!}
         </div>
     @endif
     <div class="form-group">

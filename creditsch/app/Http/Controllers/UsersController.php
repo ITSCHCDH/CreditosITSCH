@@ -92,18 +92,29 @@ class UsersController extends Controller
         if($user==null){
             Flash::error('El usuario no existe');
             return redirect()->back();
-        }
-        $correo_duplicado = User::where('email','=',$request->email)->get()->count() > 0;
-        if($correo_duplicado){
-            Flash::error("El correo ".$request->email." ya ha sido tomado");
-            return back()->withInput();
-        }
+        }        
         $user->name = $request->name;
         $user->email = $request->email;
         $user->area = $request->area;
         $user->active = $request->active;
-        if($user->password!=$request->password) $user->password= bcrypt($request->password);
+        $correo_duplicado = User::where('email','=',$request->email)->get()->count() > 1;
+        if($correo_duplicado){
+            Flash::error("El correo ".$request->email." ya se encuentra en uso por otro usuario");
+            return back()->withInput();
+        }
+        if($user->password!=$request->password) {
+            if($request->password==$request->password_confirmation) 
+            {
+                $user->password=bcrypt($request->password);
+            }
+            else
+            {
+                Flash::error('Error de credenciales, las contraseñas deben ser iguales para el usuario: '.$user->nombre);
+                return redirect()->route('alumnos.index');
+            }
+        }
         $user->save();
+        Flash::warning("El usuario '".$request->name."' se modifico correctamente");
         return redirect()->route('usuarios.index');
     }
 

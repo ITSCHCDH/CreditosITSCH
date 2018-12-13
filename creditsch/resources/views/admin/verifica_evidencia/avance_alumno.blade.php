@@ -47,7 +47,7 @@
 		
 	  	<h1>Información del alumno</h1>
 	    <div class="row">
-		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white;" ><p style="font-weight: bold;" class="center">Nombre</p></div>
+		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px" ><p style="font-weight: bold;" class="center">Nombre</p></div>
 		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px;" >
 		    	<p class="center">
 			    	@if ($alumno_data!=null)
@@ -55,7 +55,7 @@
 					@endif
 				</p>
 			</div>
-		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white;" ><p style="font-weight: bold;" class="center">Numero de control</p></div> 
+		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px" ><p style="font-weight: bold;" class="center">Numero de control</p></div> 
 		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px;" >
 		    	<p class="center">
 			    	@if ($alumno_data!=null)
@@ -63,7 +63,7 @@
 					@endif
 				</p>
 			</div>
-		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white;" ><p style="font-weight: bold;" class="center">Carrera</p></div>
+		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px" ><p style="font-weight: bold;" class="center">Carrera</p></div>
 		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px;" >
 		    	<p class="center">
 			    	@if ($alumno_data!=null)
