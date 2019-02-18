@@ -32,7 +32,7 @@
         		</label>
 		    </div>
 	        <br><br>
-	        <input type="submit" value="Importar" class="btn btn-primary">
+	        <input type="submit" value="Importar" class="btn btn-success">
 	        <br><br>
 	    </form>
 	</div>

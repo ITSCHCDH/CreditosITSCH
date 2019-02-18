@@ -17,10 +17,12 @@ class AlumnosImport implements ToModel
     */
     public function model(array $row)
     {
+
         return new Alumno([
            'no_control'     => $row[2],
            'password' => bcrypt($row[3]),
         ]);
+      
      
     }
 
@@ -29,6 +31,14 @@ class AlumnosImport implements ToModel
         return 1000;//Cantidad de registros que se cargan a la memoria de forma simultanea.
     }
 }
+
+
+
+
+
+
+
+
 
 
 

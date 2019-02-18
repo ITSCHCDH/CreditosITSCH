@@ -11,13 +11,12 @@
 |
 */
 /*Ruta para exportar hacia excel */
-Route::get('/export-users', 'ExcelController@exportUsers');
+//Route::get('/export-users', 'ExcelController@exportUsers');
 
 /*Ruta para importar desde excel*/
-//Route::post('/import-excel', 'ExcelController@importUsers')->name('responsables.index');
-Route::post('import', 'ExcelController@importClaves')->name('excel.import');
-Route::get('/admin/ExpoExcel/index','ExcelController@index')->name('ExpoExcel.index');
-Route::resource('import-excel','ExcelController');
+Route::post('Import', 'ExcelController@importClaves')->name('excel.import');
+Route::get('Import','ExcelController@index')->name('ImportExcel.index');
+
 
 
 Route::get('/', function () {
