@@ -18,6 +18,12 @@
     <link href="{{asset('complementos/css/bootstrap.css')}}" rel="stylesheet">
     <link href="{{asset('complementos/css/bootstrap-theme.css')}}" rel="stylesheet">
 
+    <!--  Estilo de la barra de progreso   -->
+    <style>
+        .progress { position:relative; width:30%; border: 1px solid #7F98B2; padding: 1px; border-radius: 5px;}
+        .bar { background-color: #B4F5B4; width:0%; height:25px; border-radius: 3px; }
+        .percent { position:absolute; display:inline-block; top:0px; left:48%; color: #7F98B2;}
+    </style>
     @yield('links')
 </head>
 <body>

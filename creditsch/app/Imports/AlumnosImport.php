@@ -27,6 +27,16 @@ class AlumnosImport implements ToModel
      
     }
 
+     public function batchSize(): int
+    {
+        return 1000;
+    }
+    
+    public function chunkSize(): int
+    {
+        return 1000;
+    }
+
   
 }
 

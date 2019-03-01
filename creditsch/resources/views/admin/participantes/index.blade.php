@@ -89,6 +89,7 @@
    </tbody>
 </table>
 <div style="margin-bottom: 50px;"></div>
+
 @section('js')
 <script>
     //Header necesarios para las peticiones Ajax

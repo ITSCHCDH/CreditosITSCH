@@ -10,6 +10,11 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+//Rutas para funcionamiento del progressbar
+Route::get('/getmsg','ExcelController@camMsg');
+
+
 /*Ruta para exportar hacia excel */
 //Route::get('/export-users', 'ExcelController@exportUsers');
 

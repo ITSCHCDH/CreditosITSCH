@@ -16,11 +16,11 @@
 @endsection
 
 @section('contenido')
-	<div class="links">
-	    <form method="post" action="{{ route('excel.import')}}" enctype="multipart/form-data">
-	        {{ csrf_field() }}
+	<div class="links">		    
+	    <form method="POST" action="{{ route('excel.import')}}" enctype="multipart/form-data">
+	        {{ csrf_field() }} 
 	        <div class="form-group">
-		        <!--<input type="file" name="excel" class="inputfile inputfile-4 subida">-->
+		    
 		        <input type="file" name="excel" id="archivos" class="inputfile inputfile-4 subida" data-multiple-caption="{count} archivos seleccionados" multiple required />
 		        <label for="archivos" class="subida">
 		            <figure class="subida">
@@ -29,11 +29,53 @@
 		                </svg>
 		            </figure> 
 		            <span class="subida">Seleccionar archivos&hellip;</span>
-        		</label>
-		    </div>
-	        <br><br>
-	        <input type="submit" value="Importar" class="btn btn-success">
-	        <br><br>
+        		</label>    
+
+        		<br><br>
+		        <input type="submit" value="Importar" class="btn btn-success">
+		        <br><br>
+
+	        	<br><br>
+		        <div class="align-self-center">
+			        <div class="progress">
+	                    <div class="bar"></div >
+	                    <div class="percent">0%</div >
+	                </div>
+	            </div>     
+	            <div id = 'datos'>Este mensaje se remplasa usando Ajax. 
+	         		  da click al boton.</div>
+	      			<?php
+	         		echo Form::button('Cambiar mensaje',['onClick'=>'getMessage()']);
+	      			?>
+		    	</div>	       
+            
 	    </form>
 	</div>
+	 @section('js')
+	 <script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+	      </script>
+	     
+	      <script>
+ //Header necesarios para las peticiones Ajax
+			    $.ajaxSetup( {
+			        headers: {
+			            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			        }
+			    } );
+
+	         function getMessage() {
+	            $.ajax({
+	               type:'GET',
+	               url:'/getmsg',
+	               data:'_token = <?php echo csrf_token() ?>',
+	               success:function(data) 
+	               {               
+	                  $("#datos").html(data.msg);
+	               }
+	            });
+	         }
+	      </script>
+		<!--  Codigo para funcionamiento del progress bar   -->
+		 
+	@endsection
 @endsection
