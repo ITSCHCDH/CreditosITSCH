@@ -32,48 +32,52 @@
         		</label>    
 
         		<br><br>
-		        <input type="submit" value="Importar" class="btn btn-success">
+		        	<input type="submit" value="Importar" class="btn btn-success" onclick="getMessage()">
 		        <br><br>
 
 	        	<br><br>
 		        <div class="align-self-center">
 			        <div class="progress">
-	                    <div class="bar"></div >
-	                    <div class="percent">0%</div >
+	                    <div class="bar" id="barra-de-progreso"></div >
+	                    <div class="percent" id="porcentaje" >0%</div >
 	                </div>
 	            </div>     
 	            <div id = 'datos'>Este mensaje se remplasa usando Ajax. 
-	         		  da click al boton.</div>
-	      			<?php
-	         		echo Form::button('Cambiar mensaje',['onClick'=>'getMessage()']);
-	      			?>
+					   da click al boton.</div>
+					   <input type="button" onclick="getMessage()" value="Boton de prueba" id = "mdsbutton">
 		    	</div>	       
             
 	    </form>
 	</div>
-	 @section('js')
-	 <script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
-	      </script>
-	     
+	 @section('js')    
 	      <script>
- //Header necesarios para las peticiones Ajax
+ 				//Header necesarios para las peticiones Ajax
 			    $.ajaxSetup( {
 			        headers: {
 			            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 			        }
 			    } );
 
-	         function getMessage() {
-	            $.ajax({
-	               type:'GET',
-	               url:'/getmsg',
-	               data:'_token = <?php echo csrf_token() ?>',
-	               success:function(data) 
-	               {               
-	                  $("#datos").html(data.msg);
-	               }
-	            });
-	         }
+				function getMessage() {
+					$.ajax({
+						type:'GET',
+						url:"{{ route('session_variable') }}",
+						data:'_token = <?php echo csrf_token() ?>',
+						success:function(data){ 
+							if(data['progreso'] != null){
+								$('#barra-de-progreso').css('width',data['progreso']+"%");
+								$('#porcentaje').html(data['progreso']+"%");
+							}else{
+								$('#porcentaje').html("0%");	
+							}
+						}
+					});
+				}
+				$(document).ready(function() {
+					setTimeout(function() {
+						$("#mdsbutton").trigger('click');
+					}, 5000);
+				});
 	      </script>
 		<!--  Codigo para funcionamiento del progress bar   -->
 		 
