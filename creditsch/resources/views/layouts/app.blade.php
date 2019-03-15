@@ -16,6 +16,11 @@
 
     <!-- Fondo de particulas -->
      <link rel="stylesheet" href="{{asset('cssParticles/style.css')}}">  
+     <style>
+         .mdshover:hover{
+           color: #fff !important;
+         }
+     </style>
 </head>
 
 
@@ -27,7 +32,7 @@
   <div class="count-particles"> <span class="js-count-particles">--</span> particles </div> 
             <div id="app">
                 <nav class="navbar navbar-default navbar-static-top" style="background-color:#2d3e50;">
-                    <div class="container" >
+                    <div class="container pull-left" style="margin-left: 70px; width: 93%;">
                         <div class="navbar-header">
                                <!-- Imagen ITSCH -->
                                 @if (Auth::guard('web')->check())
@@ -39,7 +44,7 @@
                                        </div>
                                    </a>
                                 @elseif(Auth::guard('alumno')->check())
-                                    <a  href="{{ route('alumnos.home') }}">
+                                    <a  href="{{ route('alumnos.home_avance') }}">
                                         <div style="text-align: center;">
                                             <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="45" class="img-rounded">
                                             <br>
@@ -69,10 +74,10 @@
                                 <!-- Authentication Links -->
                                 @if (Auth::guard('alumno')->check())
                                     <li>
-                                        <a href="{{ route('alumnos.home') }}">Home</a>
+                                        <a href="{{ route('alumnos.home_avance') }}" class="dropdown-toggle mdshover" style="font-size: 1vw;" class="mdshover">Home</a>
                                     </li>
                                     <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true">
+                                        <a href="#" class="dropdown-toggle mdshover" data-toggle="dropdown" role="button" aria-expanded="true" style="font-size: 1vw; background: #2d3e50;" >
                                             {{ Auth::guard('alumno')->user()->nombre }} <span class="caret"></span>
                                         </a>
 
@@ -80,7 +85,7 @@
                                             <li>
                                                 <a href="{{ route('alumnos.logout') }}"
                                                     onclick="event.preventDefault();
-                                                             document.getElementById('logout-form').submit();">
+                                                             document.getElementById('logout-form').submit();" style="font-size: 1vw;">
                                                     Cerrar sesión
                                                 </a>
 
@@ -92,10 +97,10 @@
                                     </li>
                                 @elseif (Auth::guard('web')->check())
                                     <li>
-                                        <a href="{{ url('/home') }}">Home</a>
+                                        <a href="{{ url('/home') }}" style="font-size: 1vw;" class="mdshover">Home</a>
                                     </li>
                                     <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                        <a href="#" class="dropdown-toggle mdshover" style="font-size: 1vw; background: #2d3e50;" data-toggle="dropdown" role="button" aria-expanded="false">
                                             {{ Auth::user()->name }} <span class="caret"></span>
                                         </a>
 
@@ -103,7 +108,7 @@
                                             <li>
                                                 <a href="{{ route('logout') }}"
                                                     onclick="event.preventDefault();
-                                                             document.getElementById('logout-form').submit();">
+                                                             document.getElementById('logout-form').submit();" style="font-size: 1vw;">
                                                     Cerrar sesión
                                                 </a>
 

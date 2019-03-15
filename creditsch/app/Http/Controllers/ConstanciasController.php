@@ -39,10 +39,10 @@ class ConstanciasController extends Controller
         $meses = [
             'enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'
         ];
-        $datos_a_guardar = ConstanciaComplemento::find(1);
-        $datos_a_guardar->$datos_a_guardar->numero_oficio+1;
-        $datos_a_guardar->save();
-        $datos_globales = ConstanciaComplemento::all();
+        //$datos_a_guardar = ConstanciaComplemento::find(1);
+        //$datos_a_guardar->$datos_a_guardar->numero_oficio+1;
+        //$datos_a_guardar->save();
+        //$datos_globales = ConstanciaComplemento::all();
         $jefe_depto = DB::table('constancia_complemento  as cc')->join('users as u','u.id','=','cc.jefe_depto')->select('u.name','cc.jefe_depto_enunciado','cc.profesion_jefe_depto')->get();
         $certificador = DB::table('constancia_complemento as cc')->join('users as u','u.id','=','cc.certificador')->select('u.name','cc.profesion_certificador','cc.certificador_enunciado')->get();
         $fecha_actual = Carbon::now()->setTimezone('CDT')->format('d m Y');
