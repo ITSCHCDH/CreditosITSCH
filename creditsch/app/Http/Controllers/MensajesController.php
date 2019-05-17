@@ -14,9 +14,9 @@ use DB;
 class MensajesController extends Controller
 {
     public function index(){
-    	$mensajes = Receptor::where('user_id','=',Auth::User()->id)->join('mensajes','mensajes.id','=','receptores.mensaje_id')->join('users','users.id','=','mensajes.creador_id')->select('users.name as usuario_nombre','mensajes.notificacion','mensajes.id as mensaje_id','mensajes.created_at as fecha','receptores.visto','receptores.id as receptor_id')->get();
-    	return view('admin.mensajes.bandeja')
-    	->with('mensajes',$mensajes);
+		$mensajes = Receptor::where('user_id','=',Auth::User()->id)->join('mensajes','mensajes.id','=','receptores.mensaje_id')->join('users','users.id','=','mensajes.creador_id')->select('users.name as usuario_nombre','mensajes.notificacion','mensajes.id as mensaje_id','mensajes.created_at as fecha','receptores.visto','receptores.id as receptor_id')->get();
+		return view('admin.mensajes.bandeja')
+		->with('mensajes',$mensajes);	
     }
     public function crear(){
     	$users = User::where([

@@ -12,8 +12,9 @@
 */
 
 //Rutas para funcionamiento del progressbar
-Route::get('/getmsg','ExcelController@camMsg');
+Route::post('/getmsg','ExcelController@camMsg')->name('getmsg');
 
+Route::get('/fileUploadPost','ExcelController@fileUploadPost')->name('session_variable');
 
 /*Ruta para exportar hacia excel */
 //Route::get('/export-users', 'ExcelController@exportUsers');

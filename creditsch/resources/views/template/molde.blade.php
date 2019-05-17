@@ -42,11 +42,20 @@
             @endif
             <!-- Imagen ITSCH -->
             <div style="position: fixed;left: 90%;top: 8px;">
-                <a  href="{{ url('/home') }}">
-                    <div style="text-align: center;">
-                        <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="40" class="img-rounded">
-                    </div>
-                </a>
+                @if(Auth::guard('web')->check())
+                    <a  href="{{ url('/home') }}">
+                        <div style="text-align: center;">
+                            <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="40" class="img-rounded">
+                        </div>
+                    </a>
+                @else
+                    <a  href="{{ route('alumnos.home_avance')}}">
+                        <div style="text-align: center;">
+                            <img src="{{ asset('images/itsch.jpg') }}" border="0" width="35" height="40" class="img-rounded">
+                        </div>
+                    </a>
+                @endif
+                
             </div>
 
             <!-- Incluye sistema de alertas-->
