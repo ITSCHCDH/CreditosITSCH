@@ -19,59 +19,30 @@ class ExcelController extends Controller
   }
 
 
-  //Codigo para el funcionamiento del progress bar***********
-     public function fileUploadPost(Request $request)
-      {
-        $value = $request->session()->get('progreso');    
-
-        return response()->json(array('progreso'=>$value));
-        
-      }
-
-
-      //********************************************
-
-  public function camMsg()
-  {
-     $msg = "Mensaje de respuesta del controlador.";
-      return response()->json($msg);
-  }
-
 	public function importClaves(Request $request)
 	{
        
-		//$request->excel->move(storage_path().'/app/public/',$request->excel->getClientOriginalName());
-       //dd(storage_path().'/app/public/'.$request->excel->getClientOriginalName());
-	    //$array=Excel::import(new AlumnosImport,$request->excel->path());
-      // $request->validate(['excel' => 'required',]);
-
-	     //ini_set('max_execution_time', 500);
+	
+	     ini_set('max_execution_time',0);  //Quita el limite de tiempo a la ejecucion de archivos
 
 
-       $array = Excel::toArray(new AlumnosImport,$request->excel->path());    
+       $array = Excel::toArray(new AlumnosImport,$request->excel->path());    //Importa el archivo de excel a la base de datos
 
 
        if ($array) 
        {
        		
-          $alumnos = Alumno::all();
+          $alumnos = Alumno::all();  //Hace la consulta de los alumnos existentes en la base de datos
          
-          $total = count($array[0]);
-          $x=0;
-          $request->session()->put('progreso', $x);
-
+      
             
-        	//foreach ($array[0] as $row)
-          for($i = 0; $i < $total; $i++)
-          {        		
-
-      				$row = $array[0][$i];
-        		  Alumno::where('no_control', $row[2])->update(['password' => bcrypt($row[3])]);
-        	    $x = $i / $total * 100;
-              $request->session()->put('progreso', $x);             
-        	}
-            
-            $request->session()->put('progreso', '100'); 
+        	foreach ($array[0] as $row)
+       
+          {        	      			
+        		  Alumno::where('no_control', $row[2])->update(['password' => bcrypt($row[3])]);  //Modifica a los alumnos que coinsiden en el archivo de excel con la bd y les cambia el password
+        	         
+        	}            
+           
         		Flash::success('Los alumnos se importaron de forma exitosa');
             return redirect()->route('ImportExcel.index');
     

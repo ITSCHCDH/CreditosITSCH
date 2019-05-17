@@ -32,50 +32,85 @@
         		</label>    
 
         		<br><br>
-		        <input type="submit" value="Importar" class="btn btn-success">
+		        <input type="submit" value="Importar" class="btn btn-success" onclick="move()">
 		        <br><br>
 
 	        	<br><br>
-		        <div class="align-self-center">
-			        <div class="progress">
-	                    <div class="bar"></div >
-	                    <div class="percent">0%</div >
-	                </div>
-	            </div>     
-	            <div id = 'datos'>Este mensaje se remplasa usando Ajax. 
-	         		  da click al boton.</div>
-	      			<?php
-	         		echo Form::button('Cambiar mensaje',['onClick'=>'getMessage()']);
-	      			?>
-		    	</div>	       
+		        <div id="myProgress">
+  					<div id="myBar"></div>
+  					<div id="percent">0 %</div >
+				</div>  
+	              
             
 	    </form>
 	</div>
-	 @section('js')
-	 <script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
-	      </script>
-	     
+	@section('js')	
 	      <script>
- //Header necesarios para las peticiones Ajax
-			    $.ajaxSetup( {
-			        headers: {
-			            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-			        }
-			    } );
+	      	var ban=0;
+				function move() 
+				{
+				    var elem = document.getElementById("myBar"); 
+				    var percent = $('#percent');
+				    var file=$('#archivos');
+				    var width = 1;			    
+					
 
-	         function getMessage() {
-	            $.ajax({
-	               type:'GET',
-	               url:'/getmsg',
-	               data:'_token = <?php echo csrf_token() ?>',
-	               success:function(data) 
-	               {               
-	                  $("#datos").html(data.msg);
-	               }
-	            });
-	         }
-	      </script>
-		<!--  Codigo para funcionamiento del progress bar   -->
+					if( document.getElementById("archivos").files.length == 0 )
+					{
+						alert("Debes seleccionar un archivo");
+					}
+					else
+					{
+						if(ban==0)
+						{
+
+							ban=1;
+							var id = setInterval(frame, 6000);
+						    function frame() 
+						    {
+							    if (width >= 100) 
+							    {
+							      clearInterval(id);
+							      ban=0;
+							    } 
+							    else 
+							    {
+							      width++; 
+							      elem.style.width = width + '%'; 
+							      percent.text(width+' %');
+							    }
+						 	}
+						}
+					}
+				}
+					
+						
+		  </script>  
+		
+
+		<style>
+			#myProgress {
+			  width: 100%;			
+			  background-color: #ddd;
+			  position:relative;			 
+			  padding: 1px; 
+			  border-radius: 3px;
+			}
+
+			#myBar {
+			  width: 1%;
+			  height: 30px;
+			  background-color: #4CAF50;
+			}
+
+			#percent { 
+				position:absolute; 
+				display:inline-block; 
+				top:3px; 
+				left:48%; 
+				color: #000000;
+			}
+		</style>
 		 
 	@endsection
 @endsection

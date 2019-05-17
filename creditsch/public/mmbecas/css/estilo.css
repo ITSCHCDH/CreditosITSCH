@@ -1,0 +1,287 @@
+body {
+    font-family: "Open Sans";	
+    font-size: 15px;
+    margin: 0px;
+   
+}
+.login{
+    margin-left: 50px;
+    width: 400px;
+    padding: 20px;
+}
+
+input{
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    }
+
+input[type=text], input[type=password],input[type=number]{
+    font-size: 18px;
+    width: 100%; 
+    padding: 5px;
+    outline: none;
+
+}
+#contenedor{
+margin-left: 15px;
+width: 270px;
+float: left;
+}
+
+select{
+outline: none;
+width:283px;
+font-size: 14px;
+padding: 5px;
+display: block;
+display: inline-block;
+position: relative;
+height: 2.2em;
+vertical-align: middle;
+text-decoration: none;
+overflow: hidden;
+zoom: 1;
+background: #AA0000 url(images/ui-bg_highlight-hard_15_459e00_1x100.png) 50% 50% repeat-x;
+font-weight: bold;
+color: #fff;
+}
+
+#datos{
+    padding: 8px;
+    font-size: 18px;
+    outline: none;
+    width: 90%; 
+}
+
+
+input[type=submit]{
+    background-color: #8C3928;
+    color: white;
+    padding: 8px;
+    border: none;
+    width: 150px;
+    margin-top: 100px;
+    margin-left: 90px;
+    margin-bottom: 20px;
+
+}
+#guardar{
+       background-color: #8C3928;
+    color: white;
+    padding: 8px;
+    border: none;
+    width: 150px;
+    margin-top: 20px;
+    margin-left: 90px;
+    margin-bottom: 580px;
+    
+}
+#guardar2{
+       background-color: #8C3928;
+    color: white;
+    border: none;
+    width: 150px;
+    margin-left: 40px;
+    
+}
+
+#guardar3{
+       background-color: #8C3928;
+    color: white;
+    padding: 8px;
+    border: none;
+    width: 150px;
+    margin-top: 30px;
+    margin-left: 100px;
+    margin-bottom: 300px;
+    
+}
+
+.center{
+    text-align: center;
+}
+
+.opcion{
+    padding: 5px 0;
+}
+
+.barra{
+    background-color:rgb(152, 196, 236);
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.seleccionado{
+    background-color: rgb(33, 90, 143);
+    border-radius: 4px;
+    color: white;
+    padding: 10px;
+}
+
+#menu{
+    background-color:#8C3928 ;
+    padding: 10px;
+}
+#menu ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: inline-block;
+    width: 100%;
+}
+#menu ul li{
+    display: inline;
+}
+#menu ul li a{
+    color: #ffffff;
+    text-decoration: none;
+}
+#menu ul li a:hover{
+    color: rgb(227, 109, 30);
+    text-decoration: none;
+}
+.cerrar-sesion{
+    float: right;
+}
+#datos0{
+position: relative;
+float: left;
+width: 40%;
+
+}
+#datos1{
+    position: relative;
+    float: left;
+    width: 40%;
+    margin-left: 60px;
+    
+}  
+
+#datos2{
+    float: left;
+    padding: 50px;
+    width: 200px;
+    margin: 10px;
+    margin-top: 10px;
+}
+#datos3{
+    float: left;
+    width: 200px;
+    margin-top: 60px;
+    
+}
+#datos4{
+    float: left;
+    width: 200px;
+    margin-top: 60px;
+    margin-left: 50px;
+    
+}
+#datos5{
+      float: left;
+    width: 200px;
+    margin-left: 60px;
+}
+#datos6{
+      float: left;
+    width :90%;
+    
+}  
+#datos7{
+      float: left;
+    width: 200px;
+    margin-left: 100px;
+}
+#datos8{
+    float: left;
+    width: 90%;
+    
+}
+#boton2{
+    
+}
+
+
+.contenedor{
+    padding-left: 50px;
+}
+
+
+
+#contenedor .titulo{
+    font-size: 3.5ex;
+    font-weight: bold;
+    margin-left: 30px;
+    margin-bottom: 30px;
+}
+
+#pestanas {
+    float: top;
+    font-size: 3ex;
+    font-weight: bold;
+}
+
+#pestanas ul{
+    margin-left: -40px;    
+}
+
+#pestanas li{
+    list-style-type: none;
+    float: left;
+    text-align: center;
+    margin: 0px 2px -2px -0px;
+    background: #8C3928;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding: 0px 20px 0px 20px;
+}
+
+#pestanas a:link{
+    text-decoration: none;
+    color: bisque;
+}
+
+#contenidopestanas{
+    clear: both;  
+    /*background: dimgray;*/
+    border-radius: 5px;
+    border-top-left-radius: 0px;
+    border: 2px solid #8C3928;
+    width: 92%;
+    padding-left: 50px;
+    margin-bottom: 200px;
+
+
+}
+#cpestana1{
+width: auto;
+margin-inline-start: 50px;
+
+}
+#cpestana2{
+width: auto;
+
+}  
+#Footer{
+    width: 100%;
+    height: 100%;
+    background-color: #8C3928;
+    padding-top: 10px;
+ } 
+
+#Footer p{
+   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    text-align: center;
+    font-size: 9px;
+    color: #FFF;
+    background-color: #8C3928;
+
+}
+
+
+
+
+

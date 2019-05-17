@@ -1,0 +1,170 @@
+$bg-color: #424242;
+$hl-color: #2196F3;
+$muted-color: mix(white, $bg-color, 70%);
+$trans-time: 300ms;
+$width: 320px;
+body{
+    font-family:sans-serif;
+    margin: 0px;
+}
+.login{
+    margin-left: 50px;
+    width: auto;
+    padding: 50px;
+    position: absolute;
+    margin-right: 1000px;
+}
+
+#Header {
+    background-color:#8C3928 ;
+    padding: 10px;
+}
+h2{
+margin-left: 20px;
+font-size: 30px;
+color: #FFF;
+padding: 10px;
+}
+
+input{
+    border: solid 2;
+    border-radius: 1px;
+}
+
+input[type=text], input[type=password]{
+    padding: 5px;
+    font-size: 18px;
+    outline: none;
+    width: 130px; 
+}
+input[name=username], input[name=password]{
+    padding: 5px;
+    font-size: 18px;
+    outline: none;
+    width: 250px; 
+}
+
+input[type=submit]{
+    background-color: #8C3928;
+    color: white;
+    padding: 8px;
+    border: none;
+    width: 200px;
+    margin-top: 30px;
+    margin-right: 130px;
+}
+.center{
+    text-align: center;
+}
+
+.opcion{
+    padding: 5px 0;
+}
+
+.barra{
+    background-color:rgb(152, 196, 236);
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.seleccionado{
+    background-color: rgb(33, 90, 143);
+    border-radius: 4px;
+    color: white;
+    padding: 10px;
+}
+
+#menu{
+    background-color: #eee;
+    padding: 10px;
+}
+#menu ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: inline-block;
+    width: 100%;
+}
+#menu ul li{
+    display: inline;
+}
+#menu ul li a{
+    color: #1E69E3;
+    text-decoration: none;
+}
+#menu ul li a:hover{
+    color: rgb(227, 109, 30);
+    text-decoration: none;
+}
+.cerrar-sesion{
+    float: right;
+}
+#contenedor{
+
+    padding: 10px;
+}
+#datos1{
+     float: left;
+    padding: 20px;
+    width: 150px;
+    margin: 10px;
+
+}
+#datos2{
+     float: left;
+    padding: 30px;
+    width: 150px;
+    margin: 10px;
+}
+#datos3{
+     float: left;
+    padding: 10px;
+    width: 150px;
+    margin: 10px;
+    
+}
+#datos4{
+     float: left;
+    padding: 10px;
+    width: 150px;
+    margin: 10px;
+    
+}
+
+
+ #Footer div{
+    position: relative;
+    left: 40%;
+    width: 100%;
+    margin-left: -450px;
+}
+#Footer{
+	margin: 0;
+    padding: 0;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 50px;
+    background-color: #8C3928;
+}
+#Footer div {
+    position: absolute;
+    left: 50%;
+    width: 960px;
+    margin-left: -480px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#Footer p{
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    text-align: center;
+    font-size: 9px;
+    color: #FFF;
+    background-color: #8C3928;
+}
+

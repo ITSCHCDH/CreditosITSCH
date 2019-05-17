@@ -124,14 +124,14 @@ class ActividadesController extends Controller
      */
     public function edit($id)
     {
-        $act=Actividad::find($id);//Busca el registro
+        $act=Actividad::find($id);//Busca el registro        
         if($act==null){
             Flash::error('La actividad no existe');
             return redirect()->route('actividades.index');
         }
         if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
             
-            $creditos=Credito::orderBy('nombre','asc')->pluck('nombre','id');
+            $creditos=Credito::orderBy('nombre','asc')->pluck('nombre','id');          
             return view('admin.actividades.edit')->with('actividad',$act)->with('creditos',$creditos);
         }else{
             $creditos=Credito::orderBy('nombre','asc')->pluck('nombre','id');
