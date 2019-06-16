@@ -123,7 +123,7 @@
 		</div>
 		<div class="romper"></div>
 		<div class="f-derecha">
-			<p class="bloque">OFICIO No. DISC/S-000/{{ $data['year'] }}</p>
+			<p class="bloque">OFICIO No. {{ $data['datos_globales']->numero_oficio }}/{{ $data['year'] }}</p>
 		</div>
 		
 </div>
@@ -167,7 +167,7 @@
 			</tr>
 		</tbody>
 	</table>
-	<p class="parrafo" style="margin-bottom: 15px; margin-top: 15px;">Sin más por el medio me despido de usted y quedo a sus órdenes para cualquer aclaración</p>
+	<p class="parrafo" style="margin-bottom: 15px; margin-top: 15px;">Sin más por el medio me despido de usted y quedo a sus órdenes para cualquer aclaración.</p>
 	<div>
 		<div class="firmas f-izquierda">
 			<p class="jefa no-margen-izq">ATENTAMENTE</p>

@@ -58,7 +58,6 @@ class VerificaEvidenciaController extends Controller
                 $validar_evidencia = Actividad_Evidencia::find($request->id_evidencias[$x]);
                 $validar_evidencia->validado = 'true';
                 
-
                 $actividad = Actividad::find($validar_evidencia->actividad_id);
 
                 //Consulta para traer los numeros de control vinculasdos con la actividad
@@ -82,13 +81,28 @@ class VerificaEvidenciaController extends Controller
                         $avance->por_credito = (int)$actividad->por_cred_actividad;
                         $avance->save();
                     }
+                    $this->liberar($participantes_lista[$i]->no_control);
                 }
                 $validar_evidencia->save();
+
             }
         }
     	return redirect()->route('verifica_evidencia.index');
     }
-
+    
+    public function liberar($no_control){
+        $avance = Avance::where('no_control','=',$no_control)->get();
+        $creditos = 0;
+        for($i = 0; $i<count($avance); ++$i){
+            if($avance[$i]->por_credito >= 100) ++$creditos;
+        }
+        if($creditos >= 5){
+            $alumno = Alumno::where('no_control','=',$no_control)->get()[0];
+            $alumno->status = "Liberado";
+            $alumno->save();
+        }
+    }
+    
     public function destroy($id){
 
     }

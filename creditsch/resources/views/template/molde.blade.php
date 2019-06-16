@@ -135,7 +135,7 @@
                     mensaje.innerHTML= "<div class='alert-info alerta-padding' id='mensaje-unico-mds'>"+
                     mensaje_texto+"</div>";
             }
-            $('#mensaje-unico-mds').delay(4000).fadeOut(2000);
+            $('#mensaje-unico-mds').delay(5000).fadeOut(2000);
         }
     </script>
     <script type="text/javascript">

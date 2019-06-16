@@ -56,7 +56,7 @@ class AlumnosRutasController extends Controller
     public function imprimir(){
         $existe_alumno = Alumno::where('no_control','=',Auth::User()->no_control)->get()->count()>0? true: false;
         if(!$existe_alumno){
-            Flash::error('El numero de control no existe');
+            Flash::error('El número de control no existe.');
             return redirect()->back();
         }
         $meses = [
@@ -89,10 +89,12 @@ class AlumnosRutasController extends Controller
         $alumno = DB::table('alumnos')->join('areas','areas.id','=','alumnos.carrera')->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.nombre','alumnos.no_control','areas.nombre as carrera')->get();
         $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
         if(count($alumno_data)!=5){
-            Flash::error('Si ya tienes tus 5 créditos');
+            Flash::error('Si ya tienes tus 5 créditos liberados y no se muestra tu constancia.<br>Probablemente no sea han asignados jefes de crédito.');
             return back();
         }
         sort($alumno_data);
+        $datos_globales[0]->numero_oficio = $datos_globales[0]->numero_oficio+1;
+        $datos_globales[0]->save();
         $data = [
             'datos_globales' => $datos_globales[0],
             'dia' => $dia,
@@ -153,13 +155,13 @@ class AlumnosRutasController extends Controller
     	}
     	$actividad = Actividad::where('id','=',$request->actividad_id)->get();
     	if($request->has('archivos')){
-    	    // Creamos un arrelglo con las extemsiones validas
+    	    // Creamos un arreglo con las extensiones validas
     	    $allowedfileExtension=['pdf','jpg','png','jpeg'];
     	    for ($i = 0; $i < count($request->archivos); $i++) {
     	       $file = $request->archivos[$i];
-    	       // Obtenemos la exetension original del archivo
+    	       // Obtenemos la exetensión original del archivo
     	       $extension = strtolower($file->getClientOriginalExtension());
-    	       // Funcion para saber si la extension se encuentra dentro de las extensiones permitidas
+    	       // Función para saber si la extensión se encuentra dentro de las extensiones permitidas
     	       $check=in_array($extension,$allowedfileExtension);
     	       if(!$check){
     	           Flash::error('La extensión '.$extension.' no es valida.');

@@ -53,10 +53,10 @@
                         <td>{{$alu->nombre}}</td>
                         <td>{{$alu->carrera}}</td>
                         <td>
-                            @if($alu->status=="Pendiente")
-                                <span class="label label-danger">{{$alu->status}}</span>
+                            @if($alu->status == "Pendiente" || $alu->status == "pendiente")
+                                <span class="label label-danger">Pendiente</span>
                             @else
-                                <span class="label label-primary">{{$alu->status}}</span>
+                                <span class="label label-primary">Liberado</span>
                             @endif
                         </td>
                         <td>

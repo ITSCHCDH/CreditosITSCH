@@ -123,7 +123,7 @@
 		</div>
 		<div class="romper"></div>
 		<div class="f-derecha">
-			<p class="bloque">OFICIO No. {{ $data['datos_globales']->numero_oficio }}/{{ $data['year'] }}</p>
+			<p class="bloque">OFICIO No. 2532/{{ $data['year'] }}</p>
 		</div>
 		
 </div>
@@ -193,7 +193,7 @@
 				@php
 					$cadena = substr($data['jefe_division']->profesion_jefe_division,5);
 				@endphp
-				<p class="jefa no-margen-izq"=>{{ strtoupper($cadena) }}. {{ strtoupper((string)$data['jefe_division']->name) }}
+				<p class="jefa no-margen-izq">{{ strtoupper($cadena) }}. {{ strtoupper((string)$data['jefe_division']->name) }}
 				</p>
 			@else
 				<p class="jefa no-margen-izq">{{ strtoupper($data['jefe_division']->profesion_jefe_division) }}. {{ strtoupper((string)$data['jefe_division']->name) }}

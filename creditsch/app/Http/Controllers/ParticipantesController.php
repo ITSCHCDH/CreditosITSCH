@@ -143,6 +143,7 @@ class ParticipantesController extends Controller
                } 
             }
             Participante::destroy($id);
+            $this->liberar($participante_data[0]->no_control);
             return response()->json(array("mensaje" => "El participante ha sido eliminado de la actividad","mensaje_tipo" => "advertencia"));
         }if(Auth::User()->can('ELIMINAR_PARTICIPANTES')){
             $credito_vigente = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
@@ -319,6 +320,7 @@ class ParticipantesController extends Controller
             $participante->no_control = $request->get('no_control');
             $participante->id_evidencia = $evidencias[0]->id;
             $participante->save();
+            $this->liberar($request->get('no_control'));
             return response()->json(array('mensaje' => 'Participante agregado correctamente','mensaje_tipo' => 'exito' ));
         }else{
             if($validado->validado!='false'){
@@ -333,7 +335,24 @@ class ParticipantesController extends Controller
         
        
     }
-
+        
+    public function liberar($no_control){
+        $avance = Avance::where('no_control','=',$no_control)->get();
+        $creditos = 0;
+        for($i = 0; $i<count($avance); ++$i){
+            if($avance[$i]->por_credito >= 100) ++$creditos;
+        }
+        if($creditos >= 5){
+            $alumno = Alumno::where('no_control','=',$no_control)->get()[0];
+            $alumno->status = "Liberado";
+            $alumno->save();
+        }else{
+            $alumno = Alumno::where('no_control','=',$no_control)->get()[0];
+            $alumno->status = "Pendiente";
+            $alumno->save();
+        }
+    }
+    
     public function participantesBusqueda(Request $request){
         if($request->peticion == 0){
             $lista_alumnos = Alumno::select('nombre','no_control')->where('nombre','like',"%$request->nombre%")->orderBy('nombre')->get();

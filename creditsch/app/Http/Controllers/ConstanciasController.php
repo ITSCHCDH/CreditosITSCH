@@ -81,7 +81,7 @@ class ConstanciasController extends Controller
         }
         $existe_alumno = Alumno::where('no_control','=',$request->no_control)->get()->count()>0? true: false;
         if(!$existe_alumno){
-            Flash::error('El numero de control no existe');
+            Flash::error('El número de control no existe');
             return redirect()->back();
         }
         $meses = [
@@ -117,6 +117,8 @@ class ConstanciasController extends Controller
             Flash::error('El alumno aun no liberado todos sus credito complementarios');
             return redirect('/home');
         }
+        $datos_globales[0]->numero_oficio = $datos_globales[0]->numero_oficio+1;
+        $datos_globales[0]->save();
         sort($alumno_data);
         $data = [
             'datos_globales' => $datos_globales[0],

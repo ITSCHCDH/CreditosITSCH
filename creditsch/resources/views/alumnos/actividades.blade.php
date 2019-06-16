@@ -21,8 +21,8 @@
 	            @foreach($actividades as $actividad)
 	                <tr>
 	                	<td>{{ $actividad->actividad_nombre }}</td>
-	                	<td>{{ $actividad->actividad_porcentaje }}%</td>
 	                	<td>{{ $actividad->credito_nombre }}</td>
+	                	<td>{{ $actividad->actividad_porcentaje }}%</td>
 	                	<td>
 	                		@if ($actividad->validado=="true")
 	                			{{ "SI" }}
