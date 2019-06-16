@@ -239,7 +239,6 @@
 				                entrada.parentNode.appendChild(divPadre);
 				                for(var x=0; x<participantes_arr.length; x++){
 				                    divHijo = document.createElement("div");
-
 				                    divHijo.innerHTML = "<p style='text-align: left;'><strong>"+participantes_arr[x]['nombre']+"</strong>-"+participantes_arr[x]['no_control']+"</p>";
 				                    divHijo.innerHTML += "<input type = 'hidden' value='"+participantes_arr[x]['nombre']+"'>";
 				                    divHijo.innerHTML += "<input type = 'hidden' value='"+participantes_arr[x]['no_control']+"'>";

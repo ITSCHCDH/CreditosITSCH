@@ -5,9 +5,10 @@
     <div class="row" >
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
-                <div class="panel-heading">
-                    Inicio
+                <div class="panel-heading" >
+                    <p style="font-size: 0.9vw" class="pull-left">Inicio</p>
                     <img src="{{ asset('images/Customer_Male_Light.png') }}" border="0" width="30" height="30" class="img-rounded">
+                    <div style="clear: both;"></div>
                 </div>
 
                 <div class="panel-body">
@@ -21,12 +22,12 @@
 
                                 @if ($errors->has('email'))
                                     <span class="help-block">
-                                        <strong>{{ $errors->first('email') }}</strong>
+                                        <strong style="font-size: 0.9vw" >{{ $errors->first('email') }}</strong>
                                     </span>
                                 @endif
                                 @if ($errors->has('no_control'))
                                     <span class="help-block">
-                                        <strong>{{ $errors->first('no_control') }}</strong>
+                                        <strong style="font-size: 0.9vw" >{{ $errors->first('no_control') }}</strong>
                                     </span>
                                 @endif
                             </div>

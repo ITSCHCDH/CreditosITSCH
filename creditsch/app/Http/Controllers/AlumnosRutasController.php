@@ -52,7 +52,7 @@ class AlumnosRutasController extends Controller
     	->with('avance',$avance)
         ->with('liberado',$liberado);
     }
-
+    
     public function imprimir(){
         $existe_alumno = Alumno::where('no_control','=',Auth::User()->no_control)->get()->count()>0? true: false;
         if(!$existe_alumno){
@@ -89,8 +89,8 @@ class AlumnosRutasController extends Controller
         $alumno = DB::table('alumnos')->join('areas','areas.id','=','alumnos.carrera')->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.nombre','alumnos.no_control','areas.nombre as carrera')->get();
         $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
         if(count($alumno_data)!=5){
-            Flash::error('El alumno aun no liberado todos sus credito complementarios');
-            return redirect('/home');
+            Flash::error('Si ya tienes tus 5 créditos');
+            return back();
         }
         sort($alumno_data);
         $data = [

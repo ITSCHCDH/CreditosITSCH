@@ -4,19 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Receptor;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     /**
      * Show the application dashboard.
      *
@@ -24,7 +15,13 @@ class HomeController extends Controller
      */
     public function index()
     {
-        //dd(Auth::guard('alumno')->user());
-        return view('home');
+        if(Auth::guard('alumno')->check()){
+            return redirect()->route('alumnos.home_avance');
+        }else if(Auth::guard('web')->check()){
+            $mensajes = Receptor::where('user_id','=',Auth::User()->id)->join('mensajes','mensajes.id','=','receptores.mensaje_id')->join('users','users.id','=','mensajes.creador_id')->select('users.name as usuario_nombre','mensajes.notificacion','mensajes.id as mensaje_id','mensajes.created_at as fecha','receptores.visto','receptores.id as receptor_id')->get();
+            return view('admin.mensajes.bandeja')
+            ->with('mensajes',$mensajes);
+        }
+        return redirect()->route('login');
     }
 }

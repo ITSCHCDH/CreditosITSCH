@@ -166,13 +166,17 @@ class ActividadesController extends Controller
             Flash::error('El porcentaje de liberación no debe exceder el 100% del credito');
             return back()->withInput();
         }
-        if($act_anterior->id_actividad != $act_nueva->id_actividad || $act_anterior->por_cred_actividad!=$act_nueva->por_cred_actividad){
+        if($act_anterior->id_actividad != $act_nueva->id_actividad || $act_anterior->por_cred_actividad != $act_nueva->por_cred_actividad){
             $tiene_foraneas = DB::table('actividad as a')->join('actividad_evidencia as ae', function($join) use($id){
                 $join->on('ae.actividad_id','=','a.id');
-                $join->where('a.id','=',$id);
+                //$join->where('a.id','=',$id);
+                $join->where([
+                    ['a.id','=',$id],
+                    ['ae.validado','=','true']
+                ]);
             })->get()->count()>0? true: false;
             if($tiene_foraneas){
-                Flash::error('Para cambiar el credito al que pertenece esta actividad primero necesita estar libre de participantes, responsables y evidencias');
+                Flash::error('La actividad ya tiene evidencias validadas');
                 return redirect()->back();
             }
         }
@@ -224,7 +228,7 @@ class ActividadesController extends Controller
         if (Auth::User()->hasAnyPermission(['VIP_ACTIVIDAD','VIP'])) {
             $asignada = Actividad_Evidencia::where('actividad_id','=',$act->id)->get()->count()>0?true: false;
             if($asignada){
-                Flash::error('La actividad no puede ser eliminada debido a conflictos con claves foraneas');
+                Flash::error('La actividad no puede ser eliminada debido a que cuenta con responsables asignados.');
                 return redirect()->route('actividades.index');
             }
             $act->delete();
@@ -232,7 +236,7 @@ class ActividadesController extends Controller
         }else if(Auth::User()->can('ELIMINAR_ACTIVIDAD') && Auth::User()->id==$act->id_user){
             $asignada = Actividad_Evidencia::where('actividad_id','=',$act->id)->get()->count()>0?true: false;
             if($asignada){
-                Flash::error('La actividad no puede ser eliminada debido a conflictos con claves foraneas');
+                Flash::error('La actividad no puede ser eliminada debido a que cuenta con responsables asignados.');
                 return redirect()->route('actividades.index');
             }
             $act->delete();

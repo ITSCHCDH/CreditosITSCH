@@ -43,7 +43,7 @@ Route::get('/admin/actividades/{id}/responsables/asignar','ResponsablesControlle
 })->name('responsables.index'); /* Le asignamos un nombre a la ruta para facilitar su uso **/
 
 
-Route::get('/home', 'MensajesController@index')->name('home');
+Route::get('/home', 'HomeController@index')->name('home');
 
 
 

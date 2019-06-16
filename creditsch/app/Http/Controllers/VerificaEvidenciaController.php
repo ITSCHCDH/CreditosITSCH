@@ -146,7 +146,7 @@ class VerificaEvidenciaController extends Controller
                 $avance = false;
                 $alumno_data= DB::table('alumnos as alu')->join('areas as a','a.id','=','alu.carrera')->select('alu.nombre as nombre_alumno','a.nombre as carrera','alu.no_control')->where('alu.no_control','=',$request->get('no_control'))->get();
             }
-    	}
+        }
     	return view('admin.verifica_evidencia.avance_alumno')
         ->with('alumno_data',$alumno_data)
         ->with('creditos',$creditos)
