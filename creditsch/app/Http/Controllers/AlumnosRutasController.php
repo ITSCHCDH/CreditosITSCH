@@ -14,6 +14,7 @@ use App\Actividad_Evidencia;
 use App\Evidencia;
 use App\ALumno;
 use App\ConstanciaComplemento;
+use App\Folio;
 use DB;
 use PDF;
 class AlumnosRutasController extends Controller
@@ -93,8 +94,19 @@ class AlumnosRutasController extends Controller
             return back();
         }
         sort($alumno_data);
-        $datos_globales[0]->numero_oficio = $datos_globales[0]->numero_oficio+1;
-        $datos_globales[0]->save();
+        $obtener_folio = Folio::where('no_control','=',Auth::User()->no_control)->get();
+        $folio = -1;
+        if($obtener_folio->count() == 0){
+            $datos_globales[0]->numero_oficio = $datos_globales[0]->numero_oficio+1;
+            $datos_globales[0]->save();
+            $folio_object = new Folio();
+            $folio_object->no_control = $request->no_control;
+            $folio_object->no_folio = $datos_globales[0]->numero_oficio;
+            $folio_object->save();
+            $folio = $folio_object->no_folio;
+        }else{
+            $folio = $obtener_folio[0]->no_folio;
+        }
         $data = [
             'datos_globales' => $datos_globales[0],
             'dia' => $dia,
@@ -105,7 +117,8 @@ class AlumnosRutasController extends Controller
             'certificador' => $certificador[0],
             'jefe_division' => $jefe_division[0],
             'alumno' => $alumno[0],
-            'alumno_data' => $alumno_data
+            'alumno_data' => $alumno_data,
+            'no_oficio' => $folio
         ];
         $pdf = PDF::loadView('admin.constancias.constancia_alumno', compact('data'));
         //return view('admin.constancias.constancia');

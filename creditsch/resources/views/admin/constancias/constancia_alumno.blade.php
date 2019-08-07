@@ -123,7 +123,7 @@
 		</div>
 		<div class="romper"></div>
 		<div class="f-derecha">
-			<p class="bloque">OFICIO No. {{ $data['datos_globales']->numero_oficio }}/{{ $data['year'] }}</p>
+			<p class="bloque">OFICIO No. {{ $data['no_oficio'] }}/{{ $data['year'] }}</p>
 		</div>
 		
 </div>
@@ -173,7 +173,6 @@
 			<p class="jefa no-margen-izq">ATENTAMENTE</p>
 			<p class="parrafo sin-margenes" style="font-size: 9px;">EDUCACIÓN HERENCIA PARA EL ÉXITO</p>
 			<div style="height: 40px;">
-				
 			</div>
 			@if (substr($data['jefe_division']->profesion_jefe_division, 0, 5) == "otro-")
 				@php

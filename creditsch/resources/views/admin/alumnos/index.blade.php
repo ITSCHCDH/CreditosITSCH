@@ -77,8 +77,8 @@
                 @endforeach
                 </tbody>
             </table>
+            
         </aside>
-    </section>  
-        
+    </section>
     {{ $alumno->appends(['valor' => $valor])->render() }}
 @endsection

@@ -31,7 +31,6 @@ class CreateConstanciaTable extends Migration
             $table->string('profesion_jefe_depto',20);//Abreviatura de la profesion Ejem: LIC, ISC
             $table->integer('jefe_depto')->unsigned();//Jefe de departamento
             $table->string('jefe_depto_enunciado');//Ejem: Jefe de depto. de servicios escolares
-
             $table->string('profesion_certificador',20);
             $table->integer('certificador')->unsigned();//Nombre de quien certifica el documento A.K.A VoBo
             $table->string('certificador_enunciado');//Puesto/posicion de quien certifica
@@ -43,6 +42,7 @@ class CreateConstanciaTable extends Migration
             $table->foreign('certificador')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
+
         Storage::makeDirectory('public/constancia_imagenes');
     }
 
