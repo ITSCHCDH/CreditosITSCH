@@ -12,9 +12,9 @@
 */
 
 //Rutas para funcionamiento del progressbar
-Route::post('/getmsg','ExcelController@camMsg')->name('getmsg');
+Route::post('/getmsg','ExcelController@camMsg')->name('getmsg')->middleware('auth');
 
-Route::get('/fileUploadPost','ExcelController@fileUploadPost')->name('session_variable');
+Route::get('/fileUploadPost','ExcelController@fileUploadPost')->name('session_variable')->middleware('auth');
 
 /*Ruta para exportar hacia excel */
 //Route::get('/export-users', 'ExcelController@exportUsers');
@@ -158,6 +158,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('mensajes/ver','MensajesController@ver')->name('mensajes.ver');
     Route::get('mensajes/destinatarios','MensajesController@destinatarios')->name('mensajes.destinatarios');
     Route::get('mensajes/nuevos_mensajes','MensajesController@nuevosMensajes')->name('mensajes.nuevos_mensajes');
+    Route::get('mensajes/mensajes_vistos','MensajesController@mensajesVistos')->name('mensajes.vistos');
 
     Route::get('areas/lista','AreasController@inicio')->name('areas.inicio');
     Route::get('areas/crear','AreasController@crear')->name('areas.crear');

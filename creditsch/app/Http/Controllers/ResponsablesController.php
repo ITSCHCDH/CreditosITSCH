@@ -25,7 +25,6 @@ class ResponsablesController extends Controller
         //Muestra todos los responsables incluyendo los que no stan asignados
         $user = User::permission(['VIP','AGREGAR_PARTICIPANTES'])->get();
 
-        //dd(User::as('usuario'));
         $actividad = Actividad::find($id);
         if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
             if ($actividad==null) {

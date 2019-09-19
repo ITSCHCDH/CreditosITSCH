@@ -14,7 +14,7 @@ use DB;
 class MensajesController extends Controller
 {
     public function index(){
-		$mensajes = Receptor::where('user_id','=',Auth::User()->id)->join('mensajes','mensajes.id','=','receptores.mensaje_id')->join('users','users.id','=','mensajes.creador_id')->select('users.name as usuario_nombre','mensajes.notificacion','mensajes.id as mensaje_id','mensajes.created_at as fecha','receptores.visto','receptores.id as receptor_id')->get();
+		$mensajes = Receptor::where('user_id','=',Auth::User()->id)->whereNull('fecha_visto')->join('mensajes','mensajes.id','=','receptores.mensaje_id')->join('users','users.id','=','mensajes.creador_id')->select('users.name as usuario_nombre','mensajes.notificacion','mensajes.id as mensaje_id','mensajes.created_at as fecha','receptores.visto','receptores.id as receptor_id')->paginate(5);
 		return view('admin.mensajes.bandeja')
 		->with('mensajes',$mensajes);	
     }
@@ -55,9 +55,9 @@ class MensajesController extends Controller
     	return redirect()->route('mensajes.index');
     }
     public function enviados(){
-    	$mensajes = Mensaje::where('creador_id','=',Auth::User()->id)->get();
+    	$mensajes = Mensaje::where('creador_id','=',Auth::User()->id)->paginate(5);
     	return view('admin.mensajes.enviados')
-    	->with('mesajes',$mensajes);
+    	->with('mensajes',$mensajes);
     }
 
     public function destinatarios(Request $request){
@@ -72,5 +72,11 @@ class MensajesController extends Controller
             $join->where('u.id','=',Auth::User()->id);
         })->join('mensajes as m','m.id','=','r.mensaje_id')->where('r.visto','<>','true')->select('r.mensaje_id','u.id as usuario_id','m.notificacion','m.created_at as fecha','r.id as receptor_id')->get();
         return response()->json(array('data' => $mensajes,'no_mensajes' => $mensajes->count()));
-    }
+	}
+	
+	public function mensajesVistos(){
+		$mensajes = Receptor::where('user_id','=',Auth::User()->id)->whereNotNull('fecha_visto')->join('mensajes','mensajes.id','=','receptores.mensaje_id')->join('users','users.id','=','mensajes.creador_id')->select('users.name as usuario_nombre','mensajes.notificacion','mensajes.id as mensaje_id','mensajes.created_at as fecha','receptores.visto','receptores.id as receptor_id')->paginate(5);
+		return view('admin.mensajes.vistos')
+		->with('mensajes',$mensajes);	
+	}
 }

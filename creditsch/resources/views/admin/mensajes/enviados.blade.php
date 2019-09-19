@@ -7,7 +7,15 @@
 	<label class="label label-success">Mensajes Enviados</label>
 @endsection
 @section('contenido')
-	<a href="{{ route('mensajes.crear') }}" class="btn btn-primary">Nuevo mensaje</a>
+	<div class="pull-right">
+		<div class="toltip">
+			<a href="{{ route('mensajes.crear') }}" class="btn btn-primary" style="padding: 2px;">
+				<img src="{{ asset('images/new_message.png') }}" alt="Nuevo mensaje" class="white-icon" style="width: 40px; heigth: 40px;">
+			</a>
+			<span class="toltiptext">Nuevo mensaje</span>
+		</div>
+	</div>
+	<div style="clear: both;"></div>
 	<br>
 	<h3>Bandeja de entrada</h3>
 	<table class="table table-striped table-bordered">
@@ -17,7 +25,7 @@
 	    <th>Acción</th>
 	    </thead>
 	    <tbody>
-	    	@foreach ($mesajes as $msj)
+	    	@foreach ($mensajes as $msj)
 	    		<tr>
 	    			<td>{{ $msj->notificacion }}</td>
 	    			<td>{{ $msj->created_at }}</td>
@@ -29,4 +37,5 @@
 	    	@endforeach
 	    </tbody>
 	</table>
+	{{ $mensajes->links() }}
 @endsection

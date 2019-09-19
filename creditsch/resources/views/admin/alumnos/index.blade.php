@@ -17,9 +17,9 @@
             @endif
             <span class="toltiptext">Agregar nuevo alumno</span>     
         </div>                      
-    </div>      
+    </div>
+    
     {!! Form::open(['route'=>'alumnos.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right']) !!}
-
         <div class="input-group">
             {!! Form::text('valor',null,['class'=>'form-control','placeholder'=>'Buscar.....','aria-describedby'=>'search']) !!}
             <div class="input-group-btn">
@@ -77,7 +77,6 @@
                 @endforeach
                 </tbody>
             </table>
-            
         </aside>
     </section>
     {{ $alumno->appends(['valor' => $valor])->render() }}

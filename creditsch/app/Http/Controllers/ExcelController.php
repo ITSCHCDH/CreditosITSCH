@@ -12,9 +12,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class ExcelController extends Controller
 {
    
-
   public function index(Request $request){  
-
+    dd("Que tal chicos");
     return view('admin.ImportExcel.index');
   }
 
@@ -47,19 +46,8 @@ class ExcelController extends Controller
             return redirect()->route('ImportExcel.index');
     
             
-        }         
-
-        
-     
-
-
-     
-   
+        }
   }
-
-       
-       
-        
 }
 
 

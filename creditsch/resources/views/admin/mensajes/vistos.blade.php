@@ -2,7 +2,9 @@
 
 @section('title','Mensajes')
 @section('ruta')
-	<label class="label label-success">Mensajes</label>
+    <a href="{{ route('mensajes.index') }}">Mensajes</a>
+    /
+	<label class="label label-success">Mensajes vistos</label>
 @endsection
 @section('contenido')
 	<div class="pull-right">
@@ -18,16 +20,10 @@
 			</a>
 			<span class="toltiptext">Mensajes enviados</span>
 		</div>
-		<div class="toltip">
-			<a href="{{ route('mensajes.vistos') }}" class="btn btn-success" style="padding: 2px;">
-				<img src="{{ asset('images/opened-message.png') }}" alt="Nuevo mensaje" class="white-icon" style="width: 40px; heigth: 40px;">
-			</a>
-			<span class="toltiptext">Mensajes vistos</span>
-		</div>
 	</div>
 	<div style="clear: both;"></div>
 	<br>
-	<h3>Bandeja de entrada</h3>
+	<h3>Mensajes vistos</h3>
 	<table class="table table-striped table-bordered">
 	    <thead>
 	    <th>Ver mensaje</th>
