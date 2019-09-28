@@ -209,7 +209,7 @@
                                 var carrera = response['participantes_data'][x]['carrera'];
                                 var id = response['participantes_data'][x]['id'];
                                 var no_control = response['participantes_data'][x]['no_control'];
-                                if (tiene_permisos || (response['validado']=="false" && "{{ Auth::User()->can('ELIMINAR_PARTICIPANTES') }}"=="1" && response['user_id']=="{{ Auth::User()->id}}")) {
+                                if (tiene_permisos || (response['validado']=="false" && "{{ Auth::User()->can('ELIMINAR_PARTICIPANTES') }}"=="1" && response['user_id']=="{{ Auth::User()->id}}") || (response['validador_id'] == "{{ Auth::User()->id }}" && response['validado'] == "false")) {
                                     $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a> </td></tr>");
                                 }else if(response['validado']=="true" && "{{ Auth::User()->can('ELIMINAR_PARTICIPANTES') }}"=="1" && response['user_id']=="{{ Auth::User()->id}}"){
                                     $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td><td>Ya Validado</td></tr>");

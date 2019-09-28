@@ -39,6 +39,7 @@
                     <th>Porcentaje crédito</th>
                     <th>Crédito</th>
                     <th>Alumnos</th>
+                    <th>No Alumnos</th>
                     <th>Administrador</th>
                     <th>Vigente</th>
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
@@ -59,6 +60,7 @@
                                 {{ "NO" }}
                             @endif
                         </td>
+                        <td>{{ $act->no_alumnos }}</td>
                         <td>
                             {{ $act->usuario_nombre }}
                         </td>

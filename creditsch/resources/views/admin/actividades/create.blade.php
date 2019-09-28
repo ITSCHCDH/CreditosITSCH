@@ -19,12 +19,12 @@
 
     <div class="form-group">
         {!! Form::label('avance','Porcentaje de liberación') !!}
-        {!! Form::text('por_cred_actividad',null,['class'=>'form-control','placeholder'=>'Porcentage del credito que se liberara con esta actividad, ej 20','required']) !!}
+        {!! Form::text('por_cred_actividad',null,['class'=>'form-control','placeholder'=>'Porcentage del crédito que se liberara con esta actividad, ej 20','required']) !!}
     </div>
 
     <div class="form-group">
         {!! Form::label('id_actividad','Credito al que pertenece la actividad') !!}
-        {!! Form::select('id_actividad',$creditos,null,['class'=>'form-control select-category','placeholder'=>'Selecciona un credito','required']) !!}
+        {!! Form::select('id_actividad',$creditos,null,['class'=>'form-control select-category','placeholder'=>'Selecciona un crédito','required']) !!}
     </div>
     @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD_ALUMNOS','VIP_ACTIVIDAD']))
         <div class="form-group">

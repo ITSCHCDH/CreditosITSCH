@@ -188,9 +188,9 @@ class ParticipantesController extends Controller
             $join->on('e.id_asig_actividades','=','ae.id');
             $join->where('ae.user_id','=',$request->get('id_responsable'));
             $join->where('ae.actividad_id','=',$request->get('id_actividad'));
-        })->get();
+        })->select('ae.validador_id as validador_id')->get();
         $dommie = [['id'=> -1]];
-        $id_actividad_evidencia = DB::table('actividad_evidencia as ae')->select('ae.id','ae.validado','ae.user_id')->where([
+        $id_actividad_evidencia = DB::table('actividad_evidencia as ae')->select('ae.id','ae.validado','ae.user_id','ae.validador_id')->where([
             ['ae.user_id','=',$request->id_responsable],
             ['ae.actividad_id','=',$request->id_actividad],
         ])->get();
@@ -204,7 +204,7 @@ class ParticipantesController extends Controller
             return response()->json(array('participantes_data' => $dommie,'no_evidencias' => $evidencias->count(),'validado' => $id_actividad_evidencia[0]->validado,'user_id' => $id_actividad_evidencia[0]->user_id));
         }
         //Retornamos los datos un json
-        return response()->json(array('participantes_data' => $participantes_data,'no_evidencias' => $evidencias->count(),'validado' => $id_actividad_evidencia[0]->validado,'user_id' => $id_actividad_evidencia[0]->user_id));
+        return response()->json(array('participantes_data' => $participantes_data,'no_evidencias' => $evidencias->count(),'validador_id' => $id_actividad_evidencia[0]->validador_id,'validado' => $id_actividad_evidencia[0]->validado,'user_id' => $id_actividad_evidencia[0]->user_id));
     }
 
     public function peticionAjaxResponsables(Request $request){
