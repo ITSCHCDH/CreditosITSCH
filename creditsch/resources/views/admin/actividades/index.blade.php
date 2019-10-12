@@ -97,7 +97,6 @@
                                             <span class="glyphicon glyphicon-user" aria-hidden="true"></span
                                         ></a>
                                     @endif
-                                    
                                 @endif  
                             </td>
                         @endif

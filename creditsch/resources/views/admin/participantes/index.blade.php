@@ -58,7 +58,7 @@
                     <input type="hidden" value="{{ csrf_token() }}" id="token">    
                     <input type="hidden" name="id_actividad" id="id_actividad_oculto" value="-1">
                     <input type="hidden" name="id_responsable" id="responsable_oculto" value='-1'>
-                    <input type="text" name="no_control" id="no_control" placeholder="No Control" class="form-control pull-right" list="list_no_control">
+                    <input type="text" name="no_control" id="no_control" placeholder="No Control" class="form-control pull-right" list="list_no_control">     
                     <div class="input-group-btn">
                         <input type="submit" name="" value="Agregar" class="btn btn-primary">
                     </div>
@@ -66,7 +66,7 @@
             </form>
         </div>
     @endif
-    
+
     <datalist id="list_no_control">
     </datalist>
 </div>
@@ -143,7 +143,7 @@
                         var temp_mensaje = document.getElementById('mensaje-actividad-alumnos');
                         if(response['actividad']['alumnos']=="true"){
                             temp_mensaje.innerHTML = "<div class='alert-warning alerta-padding'>"+
-                            "En esta actividad los participantes también podran subir sus propias evidencias.</div>"
+                            "En esta actividad los participantes son responsables de subir sus evidencias de manera individual.</div>"
                         }else{
                             temp_mensaje.innerHTML = "";
                         }

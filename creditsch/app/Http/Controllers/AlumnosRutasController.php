@@ -45,7 +45,6 @@ class AlumnosRutasController extends Controller
 		if($alumno_data->count()==0){
             //SI no tiene avance solo retornamos los datos del alumno los datos del alumno
             $avance = false;
-            //$alumno_data= DB::table('alumnos')->select('nombre as nombre_alumno','carrera','no_control')->where('no_control','=',Auth::User()->no_control)->get();
             $alumno_data = DB::table('alumnos')->join('areas', function($join){
                 $join->on('areas.id','=','alumnos.carrera');
             })->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.nombre as nombre_alumno','areas.nombre as carrera','alumnos.no_control')->get();
