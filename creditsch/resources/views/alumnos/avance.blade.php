@@ -9,7 +9,7 @@
 @section('contenido')
 	
 	<a href="{{ route('alumnos.actividades') }}" class="btn btn-primary">Actividades</a>
-	<div style="width:500px; margin-top:10px;">
+	<div style="width: 100%; margin-top:10px;" class="table-responsive">
 		<table class="table table-striped">
 			<thead>
 				<th colspan="2">Información del alumno</th>

@@ -22,12 +22,12 @@
 
                                 @if ($errors->has('email'))
                                     <span class="help-block">
-                                        <strong style="font-size: 0.9vw" >{{ $errors->first('email') }}</strong>
+                                        <strong style="font-size: small" >{{ $errors->first('email') }}</strong>
                                     </span>
                                 @endif
                                 @if ($errors->has('no_control'))
                                     <span class="help-block">
-                                        <strong style="font-size: 0.9vw" >{{ $errors->first('no_control') }}</strong>
+                                        <strong style="font-size: small" >{{ $errors->first('no_control') }}</strong>
                                     </span>
                                 @endif
                             </div>
@@ -42,7 +42,7 @@
 
                                 @if ($errors->has('password'))
                                     <span class="help-block">
-                                        <strong>{{ $errors->first('password') }}</strong>
+                                        <strong style="font-size: small" >{{ $errors->first('password') }}</strong>
                                     </span>
                                 @endif
                             </div>
@@ -57,7 +57,7 @@
                                 </select>
                                 @if ($errors->has('active'))
                                     <span class="help-block" style="color:red;">
-                                        <strong>{{ $errors->first('active') }}</strong>
+                                        <strong style="font-size: small" >{{ $errors->first('active') }}</strong>
                                     </span>
                                 @endif
                             </div>
