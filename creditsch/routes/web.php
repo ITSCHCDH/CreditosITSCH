@@ -26,7 +26,11 @@ Route::get('Import','ExcelController@index')->name('ImportExcel.index');
 
 
 Route::get('/', function () {
-    //return view('welcome');
+    if(Auth::guard('web')->check()){
+        return redirect("home");
+    }else if(Auth::guard('alumno')->check()){
+        return redirect("alumnos/home");
+    }
     return view('auth.login');
 })->name('login');
 /* Agregamos la ruta al html para listar los resposables de una actividad

@@ -91,4 +91,18 @@ class AlumnosLoginController extends Controller
         return Auth::guard('alumno');
     }
 
+    /**
+     * Show the application's login form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showLoginForm()
+    {
+        if(Auth::guard('alumno')->check()){
+            dd("hola");
+        }
+        dd("hola");
+        return view('auth.login');
+    }
+
 }
