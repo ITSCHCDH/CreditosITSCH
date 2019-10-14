@@ -90,12 +90,10 @@
                                 @if (Auth::User()->hasAnyPermission(['VIP','VER_RESPONSABLES','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
                                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
                                         <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">
-                                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span
-                                        ></a>
+                                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
                                     @elseif($act->id_user==Auth::User()->id)
                                         <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">
-                                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span
-                                        ></a>
+                                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
                                     @endif
                                 @endif  
                             </td>

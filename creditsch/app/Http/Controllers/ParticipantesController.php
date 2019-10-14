@@ -12,6 +12,7 @@ use App\Alumno;
 use App\Actividad_Evidencia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ParticipantesController extends Controller
 {
@@ -107,6 +108,20 @@ class ParticipantesController extends Controller
         //
     }
 
+    public function eliminarEvidenciasAlumno($no_control, $actividad_evidencia_id, $actividad_nombre){
+        $evidencias = DB::table('evidencia')->where([
+            ['id_asig_actividades','=',$actividad_evidencia_id],
+            ['alumno_no_control','=',$no_control]
+        ])->select('nom_imagen')->get();
+        foreach($evidencias as $evidencia){
+            Storage::delete('public/evidencias/'.$actividad_nombre.'/'.$evidencia->nom_imagen);
+            Evidencia::where([
+                ['id_asig_actividades','=',$actividad_evidencia_id],
+                ['alumno_no_control','=',$no_control]
+            ])->delete();
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -115,52 +130,64 @@ class ParticipantesController extends Controller
      */
     public function destroy($id)
     {
-        if(Participante::find($id)==null){
+        // Validamos que el participante exista
+        if(Participante::find($id) == null){
             return response()->json(array('mensaje' => 'El participante que estas buscando no existe', 'mensaje_tipo' => 'error'));
         }
+        // Validamos que el credito siga vigente para realizar modificaciones
+        $credito_vigente = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
+            $join->on('ae.id','=','p.id_evidencia');
+            $join->where('p.id','=',$id);
+        })->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->where('c.vigente','=','true')->get()->count()>0?true: false;
+        if(!$credito_vigente){
+            return response()->json(array("mensaje" => "El crédito actualmente ya no esta vigente","mensaje_tipo" => "error"));
+        }
+        $actividad_data = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
+            $join->on('p.id','=',DB::raw($id));
+            $join->on('ae.id','=','p.id_evidencia');
+        })->join('actividad as act','act.id','=','ae.actividad_id')->select('act.id as actividad_id','act.alumnos as evidencia_individual','ae.id as ae_id','p.no_control as no_control','act.nombre as actividad_nombre')->get()[0];
         if (Auth::User()->hasAnyPermission(['VIP'])) {
-            $credito_vigente = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
-                $join->on('ae.id','=','p.id_evidencia');
-                $join->where('p.id','=',$id);
-            })->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->where('c.vigente','=','true')->get()->count()>0?true: false;
-            if(!$credito_vigente){
-                return response()->json(array("mensaje" => "El credito actualmente ya no esta vigente","mensaje_tipo" => "error"));
-            }
+            // Consulta para saber si la actividad ya ha sido validada
             $participante_data = DB::table('participantes as p')->join('actividad_evidencia as ae','p.id_evidencia','=','ae.id')->join('evidencia as e','e.id_asig_actividades','=','ae.id')->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->where([
                 ['ae.validado','=','true'],
                 ['p.id','=',$id]
             ])->select('p.no_control','c.id as credito_id','a.por_cred_actividad')->groupBy('p.id')->get();
+            // Si la actividad ya ha sido validada descontamos el porcentaje de avance del crédito correspondiente al participante en cuestión
             if($participante_data->count()>0){
-               $temp = Avance::where([
-                   ['no_control','=',$participante_data[0]->no_control],
-                   ['id_credito','=',$participante_data[0]->credito_id]
-               ])->get();
-               if($temp->count()>0){
-                   $avance = Avance::find($temp[0]->id);
-                   $avance->por_credito -= (int)$participante_data[0]->por_cred_actividad;
-                   if($avance->por_credito<0)$avance->por_credito=0;
-                   $avance->save();
-               } 
+                $temp = Avance::where([
+                    ['no_control','=',$participante_data[0]->no_control],
+                    ['id_credito','=',$participante_data[0]->credito_id]
+                ])->get();
+                if($temp->count() > 0){
+                    $avance = Avance::find($temp[0]->id);
+                    $avance->por_credito -= (int)$participante_data[0]->por_cred_actividad;
+                    if($avance->por_credito<0)$avance->por_credito=0;
+                    $avance->save();
+                }
+                // La function liberar cambia es estado del alumno (parámetro: no_control) segun su avance
+                // Si el participante ya cuenta con sus 5 créditos liberados pasa a estado "Liberado"
+                // en caso contratio a "Pendiente"
+                $this->liberar($participante_data[0]->no_control);
             }
+            // Eliminamos al participante
             Participante::destroy($id);
-            $this->liberar($participante_data[0]->no_control);
+            if($actividad_data->evidencia_individual == 'true'){
+                // Eliminamos todas las evidencias que haya subido el participante
+                $this->eliminarEvidenciasAlumno($actividad_data->no_control, $actividad_data->ae_id, $actividad_data->actividad_nombre);
+            }
             return response()->json(array("mensaje" => "El participante ha sido eliminado de la actividad","mensaje_tipo" => "advertencia"));
         }if(Auth::User()->can('ELIMINAR_PARTICIPANTES')){
-            $credito_vigente = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
-                $join->on('ae.id','=','p.id_evidencia');
-                $join->where('p.id','=',$id);
-            })->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->where('c.vigente','=','true')->get()->count()>0?true: false;
-            if(!$credito_vigente){
-                return response()->json(array("mensaje" => "El credito actualmente ya no esta vigente","mensaje_tipo" => "error"));
-            }
+            // Consulta para saber si el participante a eliminar, pertenece a la actividad del responsable
             $participante_ajeno = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
                 $join->on('ae.id','=','p.id_evidencia');
                 $join->where('p.id','=',$id);
                 $join->where('ae.user_id','<>',Auth::User()->id);
             })->get()->count()>0? true: false;
+            // Validamos que el respondable no intente eliminar participantes de otras actividades ajenas
             if($participante_ajeno){
                 return response()->json(array('mensaje' => 'Este participante no pertenece a tu actividad','mensaje_tipo' => 'error'));
             }
+            // Consulta para saber si la evidencia ya ha sido validada
             $evidencia_validada = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
                 $join->on('ae.id','=','p.id_evidencia');
                 $join->where('p.id','=',$id);
@@ -170,7 +197,12 @@ class ParticipantesController extends Controller
             if($evidencia_validada){
                 return response()->json(array('mensaje' => 'La actividad ya ha sido validada, ya no puede recibir modificaciones','mensaje_tipo' => 'error'));
             }else{
+                // Eliminamos al participante
                 Participante::destroy($id);
+                if($actividad_data->evidencia_individual == 'true'){
+                    // Eliminamos todas la evidencias que haya subido el participante
+                    $this->eliminarEvidenciasAlumno($actividad_data->no_control, $actividad_data->ae_id, $actividad_data->actividad_nombre);
+                }
                 return response()->json(array("mensaje" => "El participante ha sido eliminado de la actividad","mensaje_tipo" => "advertencia"));
             }
         }else{
@@ -258,7 +290,7 @@ class ParticipantesController extends Controller
         ])->get()->count()>0? true: false;
 
         if(!$credito_vigente){
-            return response()->json(array('mensaje' => 'El credito actualmente ya no esta vigente, por lo que no puede ser modificado', 'mensaje_tipo' => 'error'));
+            return response()->json(array('mensaje' => 'El crédito actualmente ya no esta vigente, por lo que no puede ser modificado', 'mensaje_tipo' => 'error'));
         }
         $existe_no_control = DB::table('alumnos')->select('no_control')->where('no_control','=',$request->get('no_control'))->get();
 
@@ -282,9 +314,15 @@ class ParticipantesController extends Controller
         if($participante_otra_actividad->count()>0){
             return response()->json(array('mensaje' => 'El participante ya esta registrado en esta actividad solo que con otro responsable','mensaje_tipo' => 'error' ));
         }
-
+        
         $validado = Actividad_Evidencia::find($evidencias[0]->id);
         $actividad = Actividad::find($request->get('id_actividad'));
+        if($actividad->vigente == 'false'){
+            return response()->json(array('mensaje' => 'La actividad '.$actividad->nombre.' ya no se encuentra vigente','mensaje_tipo' => 'error' ));
+        }
+        if($validado->validado == 'true' && $actividad->alumnos == 'true'){
+            return response()->json(array('mensaje' => 'La actividad '.$actividad->nombre.' ya no puede ser modificada al estar validada y ser exclusiva para alumnos','mensaje_tipo' => 'error' ));
+        }
         if(Auth::User()->hasAnyPermission('VIP')){
             if($validado->validado=='true'){
                 $temp = Avance::where([

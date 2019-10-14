@@ -25,6 +25,7 @@ class VerificaEvidenciaController extends Controller
         $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_AVANCE_ALUMNO|VIP_AVANCE_ALUMNO')->only('avanceAlumno');
         $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_AVANCE_ALUMNO|VIP_AVANCE_ALUMNO')->only('alumnosBusqueda');
     }
+    
     public function index(){
         if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA'])){
             $evidencias_data = DB::table('evidencia as e')->join('actividad_evidencia as ae','e.id_asig_actividades','=','ae.id')->join('users as u','ae.user_id','=','u.id')->join('actividad as a','ae.actividad_id','=','a.id')->join('creditos as c','a.id_actividad','=','c.id')->join('users as validador','validador.id','=','ae.validador_id')->join('participantes as p','p.id_evidencia','=','ae.id')->select('e.nom_imagen','e.id','ae.validado','u.name','a.nombre','a.por_cred_actividad','c.nombre as nombre_credito','c.id as id_credito','ae.id as actividad_evidencia_id','validador.name as validador_nombre','validador.id as validador_id','c.vigente')->groupBy('ae.id')->get();
@@ -35,35 +36,62 @@ class VerificaEvidenciaController extends Controller
         }
     	
     }
-    public function store(Request $request){
-        //Validamos si el request viene con las evidencias
-    	if($request->id_evidencias){
 
-            //Variabla index no ayudara como apuntador para saber el porcentaje de liberacion de la actividad y el idencificador del credito al que pertenece
+    public function eliminarAlumnosSinEvidencia($todos_los_alumnos, $alumnos_con_evidencia){
+        foreach($todos_los_alumnos as $alumno){
+            $tiene_evidencia = false;
+            foreach($alumnos_con_evidencia as $alumno_con_evidencia){
+                if($alumno->no_control == $alumno_con_evidencia->no_control){
+                    $tiene_evidencia = true;
+                    break;
+                }
+            }
+            if(!$tiene_evidencia){
+                Participante::destroy($alumno->id);
+            }
+        }
+    }
+    public function store(Request $request){
+        // Validamos si el request viene con las evidencias
+    	if($request->id_evidencias){
+            // Variable index no ayudará como apuntador para saber el porcentaje de liberación de la actividad y el identificador del crédito al que pertenece
             for($x=0; $x<count($request->id_evidencias); $x++){
                 $validados = DB::table('actividad_evidencia as ae')->where([
                     ['ae.id','=',$request->id_evidencias[$x]],
                     ['ae.validado','=','true']
                 ])->get();
-                //Si la evidencia ya esta validada continuamos
+                // Si la evidencia ya esta validada continuamos
                 if($validados->count()>0)continue;
-
+                // Validamos que el crédito se encuentre vigente
                 $credito_vigente = DB::table('actividad_evidencia as ae')->join('actividad as a', function($join) use($request,$x){
                     $join->on('a.id','=','ae.actividad_id');
                     $join->where('ae.id','=',$request->id_evidencias[$x]);
                 })->join('creditos as c','c.id','=','a.id_actividad')->where('c.vigente','=','true')->get()->count()>0?true: false;
                 if(!$credito_vigente)continue;
 
-                //Validamos la evidencia
+                // Validamos la evidencia
                 $validar_evidencia = Actividad_Evidencia::find($request->id_evidencias[$x]);
                 $validar_evidencia->validado = 'true';
-                
+                // Traemos la actidad en cuestión
                 $actividad = Actividad::find($validar_evidencia->actividad_id);
+                // Validamos que la actividad este vigente en caso contrario omitimos esta actividad
+                if($actividad->vigente == 'false') continue;
 
-                //Consulta para traer los numeros de control vinculasdos con la actividad
+                // Consulta para traer los números de control vinculados con la actividad
+                // Validamos si la actividad es de alumnos responsables (Cada alumno es responsable de su
+                // evidencia y lo que no cuenten con ella son eliminados de la actividad)
+                if($actividad->alumnos == 'true'){
+                    $participantes_lista = DB::table('participantes as p')->join('actividad_evidencia as ae','ae.id','=','p.id_evidencia')->where('ae.id','=',$request->id_evidencias[$x])->select('p.no_control','p.id')->get();
+                    $participantes_con_evidencia = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($request,$x){
+                        $join->on('ae.id','=',DB::raw($request->id_evidencias[$x]));
+                    })->join('evidencia as e',function($join){
+                        $join->on('e.id_asig_actividades','=','ae.id');
+                        $join->on('e.alumno_no_control','=','p.no_control');
+                    })->select('p.no_control')->groupBy('p.no_control')->get();
+                    $this->eliminarAlumnosSinEvidencia($participantes_lista, $participantes_con_evidencia);
+                }
                 $participantes_lista = DB::table('participantes as p')->join('actividad_evidencia as ae','ae.id','=','p.id_evidencia')->where('ae.id','=',$request->id_evidencias[$x])->select('p.no_control')->get();
-                //dd($actividad);
-                //Se le asigna el porcentaje de credito a los participantes una vez validada
+                // Se le asigna el porcentaje de crédito a los participantes una vez validada
                 for ($i=0; $i < count($participantes_lista); $i++) {
                     $temp = Avance::where([
                         ['no_control','=',$participantes_lista[$i]->no_control],
@@ -81,10 +109,10 @@ class VerificaEvidenciaController extends Controller
                         $avance->por_credito = (int)$actividad->por_cred_actividad;
                         $avance->save();
                     }
+                    // Liberamos al alumo en caso de que ya tengo los 5 créditos complementarios
                     $this->liberar($participantes_lista[$i]->no_control);
                 }
                 $validar_evidencia->save();
-
             }
         }
     	return redirect()->route('verifica_evidencia.index');

@@ -143,7 +143,7 @@
                         var temp_mensaje = document.getElementById('mensaje-actividad-alumnos');
                         if(response['actividad']['alumnos']=="true"){
                             temp_mensaje.innerHTML = "<div class='alert-warning alerta-padding'>"+
-                            "En esta actividad los participantes son responsables de subir sus evidencias de manera individual.</div>"
+                            "En esta actividad los participantes son responsables de subir sus evidencias de manera individual<br>Alumno que no suba evidencia antes de validar la actividad, no se asignará el porcentaje de liberación correspondiente.</div>"
                         }else{
                             temp_mensaje.innerHTML = "";
                         }
@@ -232,7 +232,7 @@
     }
     function eliminaParticipante(){
         $(document).on('click','.claseEliminaParticipante',function(event){
-            var confirmacion= confirm('¡Estas seguro de eliminar al participante?');
+            var confirmacion = confirm('¡Estas seguro de eliminar al participante?');
             event.preventDefault();
             if(confirmacion){
                 var token = $(this).data('token');
@@ -247,6 +247,7 @@
                         '_token':token
                     },
                     success:function(response){
+                        console.log("Que paso chicos");
                         mostrarMensaje(response['mensaje'],'mensajes-parte-superior',response['mensaje_tipo']);
                         $('#responsables_id').trigger('change');
                     },error:function(){
@@ -263,40 +264,6 @@
             //Guardamos los numeros de control en ua variable
             var temp_no_control = $('#no_control').val();
             var tk = temp_no_control.split(" "); //Este metodo parte en pedazos una cadena cada vez que encuentra un espacio y lo guarda en un arreglo
-            //Si es mas de un numero de control los agregamos a la lista de numeros de control
-            /*if(tk.length>1){
-                for(var x = 0; x<tk.length; x++){
-                    //Anexamos los numeros de control a una lista y validamos que no se encuentra ya agregada
-                    var identificador = '#'.concat(tk[x]);
-                    if(!$(identificador).length){
-                        $('#list_no_control').append('<option value="'+tk[x]+'" id="'+tk[x]+'">');
-                        lista_no_control.push(tk[x]);
-                    }
-                }
-                $('#no_control').val('');
-            }else if(temp_no_control.length>0){
-                var identificador = '#'.concat(tk[0]);
-                if(!$(identificador).length){
-                    $('#list_no_control').append('<option value="'+tk[0]+'" id="'+tk[0]+'">');
-                    lista_no_control.push(tk[x]);
-                }
-                var participante_data = $(this).serialize();
-                $.ajax({
-                    type:'post',
-                    url:'{{ url('admin/participantes/guardar')}}',
-                    data:participante_data,
-                    dataType:'json',
-                    success:function(response){
-                        mostrarMensaje(response['mensaje'],"mensajes-parte-superior",response['mensaje_tipo']);
-                        $('#responsables_id').trigger('change');
-                    },error:function(){
-                        console.log('Error al guardar');
-                    }
-                });
-                $('#no_control').val('');
-                $('#participante_nombre').val(''); 
-                
-            }*/
             var id_responsable = $('#responsables_id').val()!=null? $('#responsables_id').val(): -1;
             var id_actividad = $('#actividades_id').val()!=null? $('#actividades_id').val(): -1;
             for (var i = 0; i < tk.length; i++) {
