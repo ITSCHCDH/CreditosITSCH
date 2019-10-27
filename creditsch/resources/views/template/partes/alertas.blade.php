@@ -103,13 +103,22 @@
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fa fa-fw fa-sign-out"></i>
-            {{ auth::user()->name }}
+            @php
+                if (Auth::guard('alumno')->check()){
+                    $nombre = explode(" ",Auth::guard('alumno')->user()->nombre);
+                }else{
+                    $nombre = explode(" ",Auth::guard('web')->user()->nombre);
+                }
+                echo $nombre[0];
+            @endphp
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="{{ route('perfil.index')}}" >Mi perfil</a>
-         <br>
+            @if (Auth::guard('web')->check())
+                <a class="dropdown-item" href="{{ route('perfil.index')}}" >Mi perfil</a>
+                <br>
+            @endif
          <!-- Agregamos la ruta para poder iniciar sesion -->
-         <a class="dropdown-item" href="{{ route('logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar sesión</a>
+        <a class="dropdown-item" href="{{ route('logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"> Cerrar Sesión</a>
          <!-- Creamos el formularios en orden para que nos podramos cerrar sesion -->
          <form id="logout-form" action="{{ route('logout')}}" method="POST" style="display: none;">
              {{ csrf_field() }}
