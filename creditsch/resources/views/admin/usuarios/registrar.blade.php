@@ -1,7 +1,9 @@
 @extends('template.molde')
 
 @section('title','Usuarios Crear')
-
+@section('links')
+    <link rel="stylesheet" type="text/css" href="{{ asset('plugins/chosen/chosen.css') }}">
+@endsection
 @section('ruta')
 	<a href="{{ route('usuarios.index') }}">Usuarios</a>
 	/
@@ -79,8 +81,20 @@
 	        	    </span>
 	        	@endif
 	        </div>
-	    </div>
-
+		</div>
+		@if (Auth::User()->hasAnyPermission(['VIP','ASIGNAR_REMOVER_ROLES_USUARIOS']))
+			<div class="form-group{{ $errors->has('area') ? ' has-error' : '' }}">
+				<label for="area" class="col-md-4 control-label">Roles</label>
+				<div class="col-md-6">
+					<select id="roles_id" type="text" class="form-control chosen-select" multiple data-placeholder="Seleccionar roles (opcional)" name="roles_id[]" value="{{ old('roles_id[]') }}" >
+						@foreach ($roles as $rol)
+							<option value="{{ $rol->id }}">{{ $rol->name }}</option>	
+						@endforeach
+					</select>
+				</div>
+			</div>
+		@endif
+		
 	    <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
 	        <label for="password" class="col-md-4 control-label">Password</label>
 
@@ -106,7 +120,8 @@
 	                </span>
 	            @endif
 	        </div>
-	    </div>
+		</div>
+		
 	    <div class="form-group">
 	        <div class="col-md-6 col-md-offset-4">
 	            <button type="submit" class="btn btn-primary">
@@ -116,4 +131,12 @@
 	    </div>
 	</form>
 	<div style = "margin-bottom: 50px;"></div>
+	@section('js')
+        <script src="{{ asset('plugins/chosen/chosen.jquery.js') }}"></script>
+        <script type="text/javascript">
+            $(".chosen-select").chosen({
+                no_results_text: "No se encontrarón resultados"
+            }); 
+        </script>
+    @endsection
 @endsection
