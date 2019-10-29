@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithChunkReading; //Para cargar la hoja de excel por partes a la memoria
 
-class AlumnosImport implements ToModel
+class AlumnosAgregar implements ToModel
 {
     
     public function model(array $row)
@@ -21,7 +21,9 @@ class AlumnosImport implements ToModel
         
        return new alumno([
            'no_control' => $row[2],
-           'password' => bcrypt($row[3]),
+           'nombre'=>$rows[3],
+           'password' => bcrypt($row[4]),
+           'carrera'=>$rows[6]
         ]);       
      
     }
@@ -38,13 +40,3 @@ class AlumnosImport implements ToModel
 
   
 }
-
-
-
-
-
-
-
-
-
-

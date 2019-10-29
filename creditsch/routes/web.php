@@ -23,7 +23,9 @@ Route::get('/fileUploadPost','ExcelController@fileUploadPost')->name('session_va
 Route::post('Import', 'ExcelController@importClaves')->name('excel.import');
 Route::get('Import','ExcelController@index')->name('ImportExcel.index');
 
-
+/*Ruta para dar de alta alumnos en masa*/
+Route::post('Import/alta', 'altaAlumnosController@altaAlumnos')->name('excel.aluImport');
+Route::get('Import/altas','altaAlumnosController@index')->name('ImportExcel.altaAlumnos');
 
 Route::get('/', function () {
     if(Auth::guard('web')->check()){
@@ -97,6 +99,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('participantes/peticion','ParticipantesController@peticionAjax')->name('participantes.peticion');
     Route::post('participantes/guardar','ParticipantesController@ajaxGuardar')->name('participantes.guardar');
     Route::get('participantes/actividad/responsables','ParticipantesController@peticionAjaxResponsables')->name('participantes.actividad_responsables');
+
     /****Rutas para el controlador de participantes*****/
     Route::resource('participantes','ParticipantesController');
 

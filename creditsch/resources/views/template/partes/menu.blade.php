@@ -152,7 +152,15 @@
                         <li class='tamSubMenu'>
                             <a class="etSubMenu" href="{{ route('ImportExcel.index') }}">
                                 <i class="glyphicon glyphicon-import"></i>
-                                <span class="etSubMenu">Importar password alumnos</span>
+                                <span class="etSubMenu">Modificar password alumnos</span>
+                            </a>
+                        </li>
+                    @endif
+                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
+                        <li class='tamSubMenu'>
+                            <a class="etSubMenu" href="{{ route('ImportExcel.altaAlumnos') }}">
+                                <i class="glyphicon glyphicon-circle-arrow-up"></i>
+                                <span class="etSubMenu">Insertar alumnos desde excel</span>
                             </a>
                         </li>
                     @endif
