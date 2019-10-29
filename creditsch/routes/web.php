@@ -37,6 +37,7 @@ Route::get('/', function () {
 })->name('login');
 /* Agregamos la ruta al html para listar los resposables de una actividad
 +*/
+
 Route::get('/admin/actividades/{id}/responsables','ResponsablesController@show', function(){
     /* Ruta del html responsables (responsableshow) **/
     return view('admin.actividades.responsableshow');

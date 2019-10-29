@@ -8,9 +8,16 @@
 
 @section('contenido')
 	{!! Form::open(['route' => 'verifica_evidencia.reportes','method' => 'GET']) !!}
-		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 mt-lg-10 pull-left">
-		    {!! Form::label('generacion','Generacion') !!}
-		    {!! Form::select('generacion',['2015' => '2015','2016' => '2016','2017' => '2017','2018' => '2018'],null,['class'=>'form-control','required','placeholder'=>'Año-Generacion','method'=>'GET','required']) !!}
+		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 mt-lg-1 pull-left">
+			{!! Form::label('generacion','Generacion') !!}
+			<select name='generacion' class='form-control' required placeholder='Año-Generación' method='GET'>
+				@php
+					$anio_actual = (int)explode("-",Carbon\Carbon::now())[0];
+					for($anio = 2015; $anio <= $anio_actual; ++$anio){
+						echo "<option value = $anio>$anio</option>";
+					}
+				@endphp
+			</select>
 		</div>
 		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 pull-left">
 		    {!! Form::label('carrera','Carrera') !!}
@@ -26,13 +33,12 @@
 		    		@endif
 		    	@endforeach
 		    </select>
-            
-
 		</div>
-		<div>
-			{!! Form::submit('Consultar',['class' => 'btn btn-primary pull-left','style' => 'margin-top: 24px; margin-left: 25px;']) !!}
+		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 pull-left">
+			{!! Form::label('busqueda','Busqueda') !!}
+			<input type="text" name="busqueda" class="form-control" placeholder="Nombre - No Control">
 		</div>
-		
+		{!! Form::submit('Consultar',['class' => 'btn btn-primary pull-left','style' => 'margin-top: 24px; margin-left: 25px;']) !!}
 	{!! Form::close() !!}
 	<div class="resetear"></div>
 	<div style="margin-top: 30px;">

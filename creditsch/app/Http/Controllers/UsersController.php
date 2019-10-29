@@ -40,10 +40,46 @@ class UsersController extends Controller
     public function create(){
         if (Auth::User()->can('VIP')) {
             $areas = Area::orderBy('nombre','ASC')->get();
-            return view('admin.usuarios.registrar')->with('areas',$areas);
+            $roles = Role::all();
+            return view('admin.usuarios.registrar')
+            ->with('areas',$areas)
+            ->with('roles',$roles);
         }else{
+            $permisos = Auth::User()->getPermissionsViaRoles();
+            $arreglo_roles = array();
+            $id = Auth::User()->id;
+            foreach (Role::all() as $role) {
+                $temp_permisos_role = $role->permissions;
+                $valido = true;
+                for ($x=0; $x < count($temp_permisos_role); $x++) {
+                    $tiene_permiso = false;
+                    for ($y=0; $y < count($permisos); $y++) { 
+                        if($temp_permisos_role[$x]->name == $permisos[$y]->name){
+                            $tiene_permiso = true;
+                            break;
+                        }
+                    }
+                    if(!$tiene_permiso){
+                        $valido = false;
+                        break;
+                    }
+                }
+                if($valido){
+                    array_push($arreglo_roles,$role->name);
+                }
+            }
+            $roles = DB::table('roles')->leftjoin('model_has_roles as model',function($join) use($id){
+                $join->on('model.role_id','=','roles.id');
+                $join->where('model.model_type','=','App\user');
+                $join->where('model.model_id','=',$id);
+            })->leftjoin('users',function($join) use($id){
+                $join->on('users.id','=','model.model_id');
+                $join->where('users.id','=',$id);
+            })->whereIn("roles.name",$arreglo_roles)->select('users.name as user_name','roles.name','roles.id as id')->get();
             $areas = Area::where('id','=',Auth::User()->area)->orderBy('nombre','ASC')->get();
-            return view('admin.usuarios.registrar')->with('areas',$areas);
+            return view('admin.usuarios.registrar')
+            ->with('areas',$areas)
+            ->with('roles',$roles);
         }
     }
     public function store(UserRequest $request){
@@ -54,7 +90,10 @@ class UsersController extends Controller
             return back()->withInput();
         }
     	$user->password = bcrypt($request->password);
-    	$user->save();
+        $user->save();
+        if($request->has('roles_id')){
+            $user->syncRoles($request->roles_id);
+        }
     	Flash::success('El usuario '.$user->name.' has sido registrado exitosamente!');
     	return redirect()->route('usuarios.index');
     }

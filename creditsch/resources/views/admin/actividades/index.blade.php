@@ -2,6 +2,10 @@
 
 @section('title','Actividades')
 
+@section('links')
+    <link rel="stylesheet" href="{{ asset('css/checkbox.css')}}">
+@endsection
+
 @section('ruta')
     <label class="label label-success"> Actividades</label>
 @endsection
@@ -9,14 +13,22 @@
 @section('contenido')
 
     @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))
-        <a href="{{route('actividades.create')}}" class="btn btn-primary">Registrar nueva actividad</a>
+        <div class="toltip pull-left">
+            <a href="{{route('actividades.create')}}" class="btn btn-primary white-icon">
+                <img src="{{ asset('images/organize.png') }}" alt="" }}">
+            </a>
+            <span class="toltiptext">Nueva actividad</span>
+        </div>
     @endif
     
-
-    <!--BUSCADOR DE ARTICULOS  -->
     <!-- Boton de busqueda en la pagina -->
     {!! Form::open(['route'=>'actividades.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right']) !!}
-
+        @if ($vigente == "true")
+            <input type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="vigentes"/>
+        @else
+            <input type="checkbox" id="checkbox5" class="css-checkbox" name="vigentes"/>
+        @endif
+        <label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Solo vigentes</label>
         <div class="input-group">
             {!! Form::text('nombre',null,['class'=>'form-control','placeholder'=>'Buscar.....','aria-describedby'=>'search']) !!}
             <div class="input-group-btn">
@@ -74,27 +86,36 @@
                         @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
                             <td>
                                 @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ACTIVIDAD','VIP_ACTIVIDAD']))
-                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-                                        <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
-                                    @elseif($act->id_user==Auth::User()->id)
-                                        <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
-                                    @endif
+                                    <div class="toltip">
+                                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
+                                            <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+                                        @elseif($act->id_user==Auth::User()->id)
+                                            <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+                                        @endif
+                                        <span class="toltiptext">Editar actividad</span>
+                                    </div>
                                 @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ACTIVIDAD','VIP_ACTIVIDAD']))
-                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
+                                    <div class="toltip">
+                                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
                                         <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                                    @elseif($act->id_user==Auth::User()->id)
+                                        @elseif($act->id_user==Auth::User()->id)
                                         <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                                    @endif
+                                        @endif
+                                        <span class="toltiptext">Eliminar actividad</span>
+                                    </div>
                                 @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','VER_RESPONSABLES','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
-                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
-                                        <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">
-                                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
-                                    @elseif($act->id_user==Auth::User()->id)
-                                        <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">
-                                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
-                                    @endif
+                                    <div class="toltip">
+                                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
+                                            <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">
+                                                <span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+                                        @elseif($act->id_user==Auth::User()->id)
+                                            <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary">
+                                                <span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+                                        @endif
+                                        <span class="toltiptext">Asignar responsables</span>
+                                    </div>
                                 @endif  
                             </td>
                         @endif

@@ -26,16 +26,42 @@ class ActividadesController extends Controller
      */
     public function index(Request $request)
     {
+        $vigente = null;
+        if($request->has('vigentes')){
+            $vigente = "true";
+        }
         //Aqui mandamos llamar todos los datos de las actividades creadas
-        if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])){           
-            $act = DB::table('actividad as a')->leftjoin('actividad_evidencia as act_evi','act_evi.actividad_id','=','a.id')->leftjoin('participantes as par','par.id_evidencia','=','act_evi.id')->leftjoin('users as u','u.id','=','a.id_user')->leftjoin('creditos as c','c.id','=','a.id_actividad')->where('a.nombre','LIKE',"%$request->nombre%")->orwhere('u.name','like',"%$request->nombre%")->orwhere('c.nombre','like',"%$request->nombre%")->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->paginate(5);
+        if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])){
+            $act = DB::table('actividad as a')->leftjoin('actividad_evidencia as act_evi',function($join){
+                $join->on('act_evi.actividad_id','=','a.id');
+            })->leftjoin('participantes as par','par.id_evidencia','=','act_evi.id')->leftjoin('users as u','u.id','=','a.id_user')->leftjoin('creditos as c','c.id','=','a.id_actividad')->where(function($query) use($request){
+                $query->where('a.nombre','LIKE',"%$request->nombre%")->orwhere('u.name','like',"%$request->nombre%")->orwhere('c.nombre','like',"%$request->nombre%");
+            })->where(function($query) use($vigente){
+                if($vigente == null){
+                    $query->where('a.vigente','=','false')->orwhere('a.vigente','=','true');
+                }else{
+                    $query->where('a.vigente','=,',DB::raw('true'));
+                }
+            })->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->paginate(5);
+
         }else{
             $act = DB::table('actividad as a')->join('users as u', function($join){
                 $join->on('u.id','=','a.id_user');
                 $join->where('u.id','=',Auth::User()->id);
-            })->leftjoin('creditos as c','c.id','=','a.id_actividad')->leftjoin('actividad_evidencia as act_evi','act_evi.actividad_id','=','a.id')->leftjoin('participantes as par','par.id_evidencia','=','act_evi.id')->where('a.nombre','LIKE',"%$request->nombre%")->orwhere('u.name','like',"%$request->nombre%")->orwhere('c.nombre','like',"%$request->nombre%")->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->paginate(5);
+            })->leftjoin('creditos as c','c.id','=','a.id_actividad')->leftjoin('actividad_evidencia as act_evi','act_evi.actividad_id','=','a.id')->leftjoin('participantes as par','par.id_evidencia','=','act_evi.id')->where(function($query) use($request){
+                $query->where('a.nombre','LIKE',"%$request->nombre%")->orwhere('u.name','like',"%$request->nombre%")->orwhere('c.nombre','like',"%$request->nombre%");
+            })->where(function($query) use($vigente){
+                if($vigente == null){
+                    $query->where('a.vigente','=','false')->orwhere('a.vigente','=','true');
+                }else{
+                    $query->where('a.vigente','=,',DB::raw('true'));
+                }
+            })->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->paginate(5);
         }
-        return view('admin.actividades.index')->with('actividad',$act)->with('nombre',$request->nombre); //Llama a la vista y le envia los usuarios
+        return view('admin.actividades.index')
+        ->with('actividad',$act)
+        ->with('nombre',$request->nombre)
+        ->with('vigente',$vigente);
 
     }
 
