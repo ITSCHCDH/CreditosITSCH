@@ -26,10 +26,12 @@ class ActividadesController extends Controller
      */
     public function index(Request $request)
     {
-        $vigente = null;
-        if($request->has('vigentes')){
-            $vigente = "true";
+        $vigente = 'true';
+        if(!$request->has('vigentes')){
+            if($request->has('nombre'))
+                $vigente = 'false';
         }
+        
         //Aqui mandamos llamar todos los datos de las actividades creadas
         if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])){
             $act = DB::table('actividad as a')->leftjoin('actividad_evidencia as act_evi',function($join){
@@ -37,13 +39,12 @@ class ActividadesController extends Controller
             })->leftjoin('participantes as par','par.id_evidencia','=','act_evi.id')->leftjoin('users as u','u.id','=','a.id_user')->leftjoin('creditos as c','c.id','=','a.id_actividad')->where(function($query) use($request){
                 $query->where('a.nombre','LIKE',"%$request->nombre%")->orwhere('u.name','like',"%$request->nombre%")->orwhere('c.nombre','like',"%$request->nombre%");
             })->where(function($query) use($vigente){
-                if($vigente == null){
-                    $query->where('a.vigente','=','false')->orwhere('a.vigente','=','true');
+                if($vigente == 'false'){
+                    $query->where('a.vigente','=','false');
                 }else{
-                    $query->where('a.vigente','=,',DB::raw('true'));
+                    $query->where('a.vigente','=','true');
                 }
             })->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->paginate(5);
-
         }else{
             $act = DB::table('actividad as a')->join('users as u', function($join){
                 $join->on('u.id','=','a.id_user');
@@ -51,10 +52,10 @@ class ActividadesController extends Controller
             })->leftjoin('creditos as c','c.id','=','a.id_actividad')->leftjoin('actividad_evidencia as act_evi','act_evi.actividad_id','=','a.id')->leftjoin('participantes as par','par.id_evidencia','=','act_evi.id')->where(function($query) use($request){
                 $query->where('a.nombre','LIKE',"%$request->nombre%")->orwhere('u.name','like',"%$request->nombre%")->orwhere('c.nombre','like',"%$request->nombre%");
             })->where(function($query) use($vigente){
-                if($vigente == null){
-                    $query->where('a.vigente','=','false')->orwhere('a.vigente','=','true');
+                if($vigente == 'false'){
+                    $query->where('a.vigente','=','false');
                 }else{
-                    $query->where('a.vigente','=,',DB::raw('true'));
+                    $query->where('a.vigente','=','true');
                 }
             })->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->paginate(5);
         }

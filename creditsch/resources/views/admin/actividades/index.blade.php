@@ -22,13 +22,13 @@
     @endif
     
     <!-- Boton de busqueda en la pagina -->
-    {!! Form::open(['route'=>'actividades.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right']) !!}
+    {!! Form::open(['route'=>'actividades.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right','id' => 'actividades-submit']) !!}
         @if ($vigente == "true")
             <input type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="vigentes"/>
         @else
             <input type="checkbox" id="checkbox5" class="css-checkbox" name="vigentes"/>
         @endif
-        <label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Solo vigentes</label>
+        <label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Mostrar solo actividades vigentes</label>
         <div class="input-group">
             {!! Form::text('nombre',null,['class'=>'form-control','placeholder'=>'Buscar.....','aria-describedby'=>'search']) !!}
             <div class="input-group-btn">
@@ -128,5 +128,12 @@
 
     {!! $actividad->appends(['nombre'=> $nombre])->render() !!}
     <div style="margin-bottom: 50px;"></div>
-
+    @section('js')
+        <script>
+            $('#checkbox5').click(function(event){
+                var value = $(this).is(':checked');
+                $('#actividades-submit').submit();
+            });
+        </script>
+    @endsection
 @endsection
