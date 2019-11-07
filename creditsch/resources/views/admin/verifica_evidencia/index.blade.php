@@ -4,19 +4,39 @@
 
 @section('links')
 	<link rel="stylesheet" type="text/css" href="{{ asset('plugins/checkboxcss/checkbox.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/checkbox.css')}}">
 @endsection
 @section('ruta')
     <label class="label label-success">Verificar Evidencias</label>
 @endsection
 
 @section('contenido')
+	<!-- Boton de busqueda en la pagina -->
+	{!! Form::open(['route'=>'verifica_evidencia.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right','id' => 'actividades-submit']) !!}
+		@if ($validadas == "false")
+			<input type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="validadas"/>
+		@else
+			<input type="checkbox" id="checkbox5" class="css-checkbox" name="validadas"/>
+		@endif
+		<label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Mostrar actividades sin validar</label>
+		<div class="input-group">
+			{!! Form::text('busqueda',null,['class'=>'form-control','placeholder'=>'Buscar.....','aria-describedby'=>'search']) !!}
+			<div class="input-group-btn">
+				<button type="submit" class="btn btn-primary"> Buscar
+					<span class="badge  label label-primary glyphicon glyphicon-search">
+					</span>
+				</button>
+			</div>
+		</div>
+	{!! Form::close() !!}
+	
 	{!! Form::open(['route' => 'verifica_evidencia.store','method' => 'POST']) !!}
 		<table class="table table-striped" id="tabla_evidencia">
 		   <thead>
 		       <th>Actividad</th>
 		       <th>Validador</th>
 		       <th>Responsable</th>
-		       <th>Credito</th>
+		       <th>Crédito</th>
 		       <th>Evidencias</th>
 		       <th>Validar</th>
 		   </thead>
@@ -88,16 +108,12 @@
 		
 	{!! Form::close() !!}
 	<div style="margin-bottom: 50px;"></div>
-	{{ $evidencias_data->links() }}
+	{{ $evidencias_data->appends(['busqueda' => $busqueda,'validadas' => $validadas])->links() }}
 	@section('js')
-		<!--
-		<script type="text/javascript">
-			$(document).ready(function() {
-			    $('#tabla_evidencia').DataTable({
-			        "pagingType": "full_numbers"
-			    });
-			} );
+		<script>
+			$('#checkbox5').click(function(){
+				$('#actividades-submit').submit();
+			});
 		</script>
-	-->
 	@endsection
 @endsection

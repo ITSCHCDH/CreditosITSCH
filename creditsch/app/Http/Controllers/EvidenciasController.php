@@ -86,18 +86,15 @@ class EvidenciasController extends Controller
      */
     public function store(Request $request)
     {
-        //dd(Storage::deleteDirectory('public/evidencias'));
         if(!Storage::has('public/evidencias')){
             Storage::makeDirectory('public/evidencias');
         }
         $actividad = Actividad::find($request->actividad_id);
-        $archivos_peso_total = 0;
         if($request->has('archivos')){
             // Creamos un arrelglo con las extemsiones validas
             $allowedfileExtension=['pdf','jpg','png','jpeg'];
             for ($i = 0; $i < count($request->archivos); $i++) {
                $file = $request->archivos[$i];
-               $archivos_peso_total += $file->getSize();
                // Obtenemos la extension original del archivo
                $extension = strtolower($file->getClientOriginalExtension());
                // Funcion para saber si la extension se encuentra dentro de las extensiones permitidas
