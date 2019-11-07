@@ -28,7 +28,15 @@ class VerificaEvidenciaController extends Controller
     
     public function index(){
         if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA'])){
-            $evidencias_data = DB::table('evidencia as e')->join('actividad_evidencia as ae','e.id_asig_actividades','=','ae.id')->join('users as u','ae.user_id','=','u.id')->join('actividad as a','ae.actividad_id','=','a.id')->join('creditos as c','a.id_actividad','=','c.id')->join('users as validador','validador.id','=','ae.validador_id')->join('participantes as p','p.id_evidencia','=','ae.id')->select('e.nom_imagen','e.id','ae.validado','u.name','a.nombre','a.por_cred_actividad','c.nombre as nombre_credito','c.id as id_credito','ae.id as actividad_evidencia_id','validador.name as validador_nombre','validador.id as validador_id','c.vigente')->groupBy('ae.id')->get();
+            $evidencias_data = DB::table('evidencia as e')
+            ->join('actividad_evidencia as ae','e.id_asig_actividades','=','ae.id')
+            ->join('users as u','ae.user_id','=','u.id')
+            ->join('actividad as a','ae.actividad_id','=','a.id')
+            ->join('creditos as c','a.id_actividad','=','c.id')
+            ->join('users as validador','validador.id','=','ae.validador_id')
+            ->join('participantes as p','p.id_evidencia','=','ae.id')
+            ->select('e.nom_imagen','e.id','ae.validado','u.name','a.nombre','a.por_cred_actividad','c.nombre as nombre_credito','c.id as id_credito','ae.id as actividad_evidencia_id','validador.name as validador_nombre','validador.id as validador_id','c.vigente')
+            ->groupBy('ae.id')->paginate(5);
             return view('admin.verifica_evidencia.index')->with('evidencias_data',$evidencias_data);
         }else{
             $evidencias_data = DB::table('evidencia as e')->join('actividad_evidencia as ae','e.id_asig_actividades','=','ae.id')->join('users as u','ae.user_id','=','u.id')->join('actividad as a','ae.actividad_id','=','a.id')->join('creditos as c','a.id_actividad','=','c.id')->join('users as validador','validador.id','=','ae.validador_id')->join('participantes as p','p.id_evidencia','=','ae.id')->where('validador.id','=',Auth::User()->id)->select('e.nom_imagen','e.id','ae.validado','u.name','a.nombre','a.por_cred_actividad','c.nombre as nombre_credito','c.id as id_credito','ae.id as actividad_evidencia_id','validador.name as validador_nombre','validador.id as validador_id','c.vigente')->groupBy('ae.id')->get();

@@ -90,13 +90,15 @@ class EvidenciasController extends Controller
         if(!Storage::has('public/evidencias')){
             Storage::makeDirectory('public/evidencias');
         }
-        $actividad = Actividad::where('id','=',$request->actividad_id)->get();
+        $actividad = Actividad::find($request->actividad_id);
+        $archivos_peso_total = 0;
         if($request->has('archivos')){
             // Creamos un arrelglo con las extemsiones validas
             $allowedfileExtension=['pdf','jpg','png','jpeg'];
             for ($i = 0; $i < count($request->archivos); $i++) {
                $file = $request->archivos[$i];
-               // Obtenemos la exetension original del archivo
+               $archivos_peso_total += $file->getSize();
+               // Obtenemos la extension original del archivo
                $extension = strtolower($file->getClientOriginalExtension());
                // Funcion para saber si la extension se encuentra dentro de las extensiones permitidas
                $check=in_array($extension,$allowedfileExtension);
@@ -106,7 +108,6 @@ class EvidenciasController extends Controller
                }
             }
         }
-        
         $id_actividad_evidencia = DB::table('actividad_evidencia')->where([
             ['actividad_id','=',$request->actividad_id],
             ['user_id','=',$request->responsables],
@@ -115,8 +116,8 @@ class EvidenciasController extends Controller
         if($request->has('archivos'))//Validamos si existe una imagen
         {
             //Generamos la ruta donde se guardaran las imagenes de los articulos
-            $path=storage_path().'/app/public/evidencias/'.$actividad[0]->nombre.'/';
-            $path_to_verify = 'public/evidencias/'.$actividad[0]->nombre;
+            $path=storage_path().'/app/public/evidencias/'.$actividad->nombre.'/';
+            $path_to_verify = 'public/evidencias/'.$actividad->nombre;
             if(!Storage::has($path_to_verify)){
                 Storage::makeDirectory($path_to_verify);
             }

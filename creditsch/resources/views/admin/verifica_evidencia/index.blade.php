@@ -88,7 +88,9 @@
 		
 	{!! Form::close() !!}
 	<div style="margin-bottom: 50px;"></div>
+	{{ $evidencias_data->links() }}
 	@section('js')
+		<!--
 		<script type="text/javascript">
 			$(document).ready(function() {
 			    $('#tabla_evidencia').DataTable({
@@ -96,5 +98,6 @@
 			    });
 			} );
 		</script>
+	-->
 	@endsection
 @endsection

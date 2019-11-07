@@ -54,7 +54,16 @@ class Handler extends ExceptionHandler
         if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
                 return response()->view('exceptiones.error_403',[],403);
         }
-
+        if($exception instanceof \Symfony\Component\HttpFoundation\File\Exception\FileException){
+            $upload_max_filesize = (int)ini_get('upload_max_filesize');
+            Flash::error('Favor de no subir archivos con un peso mayor a '.$upload_max_filesize.' Mb');
+            return redirect()->back();
+        }
+        if($exception instanceof PostTooLargeException){
+            $post_max_size = (int)ini_get('post_max_size');
+            Flash::error('Verificar que la suma del peso de los archivos no exceda los '.$post_max_size.' Mb');
+            return redirect()->back();
+        }
         return parent::render($request, $exception);
     }
 
