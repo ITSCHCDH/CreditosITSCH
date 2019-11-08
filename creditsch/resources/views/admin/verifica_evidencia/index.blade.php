@@ -7,7 +7,11 @@
 	<link rel="stylesheet" href="{{ asset('css/checkbox.css')}}">
 @endsection
 @section('ruta')
-    <label class="label label-success">Verificar Evidencias</label>
+	@if ($actividades_link == 'true')
+		<a href="{{ route('actividades.index')}} ">Actividades</a>
+		/
+	@endif
+	<label class="label label-success">Verificar Evidencias</label>
 @endsection
 
 @section('contenido')
@@ -19,6 +23,7 @@
 			<input type="checkbox" id="checkbox5" class="css-checkbox" name="validadas"/>
 		@endif
 		<label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Mostrar actividades sin validar</label>
+		<input type="hidden" name="actividades_link" value="{{ $actividades_link }}">
 		<div class="input-group">
 			{!! Form::text('busqueda',null,['class'=>'form-control','placeholder'=>'Buscar.....','aria-describedby'=>'search']) !!}
 			<div class="input-group-btn">
@@ -31,6 +36,7 @@
 	{!! Form::close() !!}
 	
 	{!! Form::open(['route' => 'verifica_evidencia.store','method' => 'POST']) !!}
+		<input type="hidden" name="actividades_link" value="{{ $actividades_link }}">
 		<table class="table table-striped" id="tabla_evidencia">
 		   <thead>
 		       <th>Actividad</th>
@@ -99,7 +105,6 @@
 		   			</td>
 		   		</tr>
 		   	@endforeach
-		   	
 		   </tbody>
 		</table>
 		@if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA']))

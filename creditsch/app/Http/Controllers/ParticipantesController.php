@@ -25,33 +25,31 @@ class ParticipantesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {   
+        $actividades_link = 'false';
+        if($request->has('actividades_link') && $request->actividades_link == 'true'){
+            $actividades_link = 'true';
+        }
         if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA','VIP_ACTIVIDAD'])){
             //Consultamos todas las actividades disponibles
             $actividades = Actividad::select('id','nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
-            //Retorna la vista de Agregar participantes
-            return view('admin.participantes.index')
-            ->with('actividades',$actividades);
         }else if(Auth::User()->hasAnyPermission(['CREAR_ACTIVIDAD','VER_ACTIVIDAD'])){
             //Consultamos todas las actividades disponibles
             $actividades = DB::table('users as u')->join('actividad_evidencia as ae', function($join){
                 $join->on('ae.user_id','=','u.id');
             })->join('actividad as a','a.id','=','ae.actividad_id')->where('u.id','=',Auth::User()->id)->orwhere('a.id_user','=',Auth::User()->id)->select('a.id','a.nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
-            //Retorna la vista de Agregar participantes
-            return view('admin.participantes.index')
-            ->with('actividades',$actividades);
         }else{
             //Consultamos todas las actividades disponibles
             $actividades = DB::table('users as u')->join('actividad_evidencia as ae', function($join){
                 $join->on('ae.user_id','=','u.id');
                 $join->where('u.id','=',Auth::User()->id);
             })->join('actividad as a','a.id','=','ae.actividad_id')->select('a.id','a.nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
-            //Retorna la vista de Agregar participantes
-            return view('admin.participantes.index')
-            ->with('actividades',$actividades);
         }
-        
+        //Retorna la vista de Agregar participantes
+        return view('admin.participantes.index')
+        ->with('actividades',$actividades)
+        ->with('actividades_link',$actividades_link);
     }
 
     /** 

@@ -5,7 +5,11 @@
     <script type="text/javascript" src="{{ asset('plugins/jsCookie/js.cookie.js') }}"></script>
 @endsection
 @section('ruta')
-<label class="label label-success">Participantes</label>
+    @if ($actividades_link == 'true')
+        <a href="{{ route('actividades.index') }}">Actividades</a>
+        /
+    @endif
+    <label class="label label-success">Participantes</label>
 @endsection
 <!-- HTML index de los participantes -->
 @section('contenido')

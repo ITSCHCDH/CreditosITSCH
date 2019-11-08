@@ -27,10 +27,14 @@ class VerificaEvidenciaController extends Controller
     }
     
     public function index(Request $request){
-        $validadas = 'false'; // Variable para filtrar las activides no validadas de las validadas
+        $validadas = 'true'; // Variable para filtrar las activides no validadas de las validadas
         $busqueda = $request->busqueda;
-        if(!$request->has('validadas')){
-            $validadas = 'true';
+        $actividades_link = 'false';
+        if($request->has('actividades_link') && $request->actividades_link == 'true'){
+            $actividades_link = 'true';
+        }
+        if($request->has('validadas') || (!$request->has('validadas') && !$request->has('busqueda'))){
+            $validadas = 'false';
         }
         if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA'])){
             $evidencias_data = DB::table('evidencia as e')
@@ -72,7 +76,8 @@ class VerificaEvidenciaController extends Controller
         }
         return view('admin.verifica_evidencia.index')
         ->with('evidencias_data',$evidencias_data)
-        ->with("validadas",$validadas)
+        ->with('validadas',$validadas)
+        ->with('actividades_link',$actividades_link)
         ->with('busqueda',$busqueda);
     }
 

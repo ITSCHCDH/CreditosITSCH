@@ -4,6 +4,7 @@
 
 @section('links')
     <link rel="stylesheet" href="{{ asset('css/checkbox.css')}}">
+    <script type="text/javascript" src="{{ asset('plugins/jsCookie/js.cookie.js') }}"></script>
 @endsection
 
 @section('ruta')
@@ -54,7 +55,7 @@
                     <th>No Alumnos</th>
                     <th>Administrador</th>
                     <th>Vigente</th>
-                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
+                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
                         <th>Acción</th>
                     @endif
                 </thead>
@@ -66,7 +67,7 @@
                         <td>{{$act->por_cred_actividad}}</td>
                         <td>{{$act->credito_nombre}}</td>
                         <td>
-                            @if ($act->alumnos=="true")
+                            @if ($act->alumnos == "true")
                                 {{ "SI" }}
                             @else
                                 {{ "NO" }}
@@ -77,14 +78,28 @@
                             {{ $act->usuario_nombre }}
                         </td>
                         <td>
-                            @if($act->vigente=="true")
+                            @if($act->vigente == "true")
                                 {{ "SI" }}
                             @else
                                 {{ "NO" }}
                             @endif
                         </td>
-                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
+                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
                             <td>
+                                @if ($act->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))
+                                    <div class="toltip">
+                                        <a href="#" class="btn btn-info" onclick="redireccionar({{ $act->id }});">
+                                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                        </a>
+                                        <span class="toltiptext">Agregar participantes (Alumnos) a la actividad</span>
+                                    </div>
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD']))
+                                    <div class="toltip">
+                                        <a href="{{ route('verifica_evidencia.index',['validadas=on','busqueda='.$act->actividad_nombre,"actividades_link=true"]) }}" class="btn btn-success"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></a>
+                                        <span class="toltiptext">Verificar evidencias de esta actividad</span>
+                                    </div>
+                                @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ACTIVIDAD','VIP_ACTIVIDAD']))
                                     <div class="toltip">
                                         @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
@@ -130,6 +145,10 @@
     <div style="margin-bottom: 50px;"></div>
     @section('js')
         <script>
+            function redireccionar(actividad_id){
+                Cookies.set('participantes_actividad',actividad_id,{ expires: 1});
+                window.location.href = "{{ route('participantes.index',['actividades_link=true']) }}";
+            }
             $('#checkbox5').click(function(event){
                 var value = $(this).is(':checked');
                 $('#actividades-submit').submit();
