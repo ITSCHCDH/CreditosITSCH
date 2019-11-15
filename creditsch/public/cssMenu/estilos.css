@@ -1,26 +1,4 @@
-/* Clase para centrar texto dentro de div */
-.center {
-    margin: auto;
-    width: 100%;    
-    padding: 10px;
-}
 
-/* Scroll contenedor de tablas grandes */
-@media screen and (max-width: 800px){
-    #main {
-        overflow-x:scroll;
-        width:100%;
-       
-    }
-    #horizontal-scroll {
-        /*display : inline-flex;*/
-        padding:1px;
-
-    }
-}
-#inicio{
-    background-color: rgba(0,0,255,0.5);
-}
 
 /*Estilo de los tooltips del sistema*/
 .toltip {
@@ -69,75 +47,12 @@
     box-sizing: border-box;
 }
 
-main{
-    width: 100%;
-    height: auto;
-    background: #ffffff;
-    position: absolute;
-}
-
-header{
-    width: 100%;
-    max-width: 100%;
-    height: 60px;
-    position: fixed;
-    margin: auto;
-    top: 0;
-    background:  #2d3e50;
-
-}
-
-.content-all{
-    background: #2d3e50;
-    margin: auto;
-    margin-top: 80px;
-}
-
-.content-all label{
-    position: fixed;
-    margin-left: 1%;
-    top: 14px;
-    font-size: 17px;
-    color: white;
-    cursor: pointer;
-    z-index: 10;
-}
-
-/*CSS  busqueda de la pagina*/
-.alertas{
-    position: fixed;
-    top:5px;
-    max-width: 80%;
-    left: 40%;
-
-    /*height: auto;*/
-    /*z-index: 1000;*/
-}
-
-/*CSS  para linck de salir en caso de resoluciones pequeñas*/
-.salir{
-    position: fixed;
-    top:5px;
-    max-width: 80%;
-    left: 60%;
-    height: 100%;
-    z-index: 100;
-}
-
-#navbarDropdownMenuLink{
-    font-size: 13px;
-    text-align: center;
-    color: #e4e4e4;
-}
 
 #check{
     display: none;
 }
 
-#check:checked ~ .menu{
-    /*Es el maximo del ancho del menu al car click*/
-    width: 300px;
-}
+
 
 .menu{
     position: fixed;
@@ -154,11 +69,11 @@ header{
     /*para que no se vean las letras fuera del menu*/
     overflow: hidden;
     /* Agregamos un scroll a nuestro menu */
-    overflow: scroll;
+    /*overflow: scroll;*/
     /*Ocultamos el scroll horizontal */
-    overflow-x: hidden;
+    /*overflow-x: hidden;*/
     /*Para mantener siempre por encima*/
-    z-index: 10;
+    /*z-index: 100;*/
 }
 .spaMenu{
     visibility: hidden;
@@ -211,16 +126,11 @@ header{
 
 /*Css de el area del contenido del sistema*/
 #contenido{
-    background: #f4f4f4;
-    max-width: 100%;
+    background: #f4f4f4;   
     box-shadow: 4px 4px 10px #000;
     text-align: center;
 }
 
-table th ,table td{
-    text-align: center;
-    
-}
 
 /*Pie de pagina*/
 footer{
@@ -233,78 +143,9 @@ footer{
     text-align: center;
 }
 
-/*Imagenes de iconos del sistema*/
-i{
-    color: #e2e2e2;
-}
-
-#indAlert,#indMensajes{
-    color: orangered;
-}
-
-.txt{
-    color: yellow;
-}
 
 /*Css del pie de pagina*/
 footer div p{
    align-content: center;
 }
-
-/*Mantener oculto boton de cerrar sesion en caso de resoluciones mayores a 800px*/
-#divSalir{
-    display: none;
-}
-
  
-/*Ocultar tabla de alertas en caso de resolucuines menores a 800px y mostrar solo boton de cerrar sesion*/
-@media screen and (max-width: 800px) {
-    #tabAlertas{
-        display:none;        
-    }
-    #divSalir{
-        display: block;
-    }
-
-    /* Scroll contenedor de tablas grandes */
-     .scrol-horiz01{
-        overflow-x:scroll;
-        width:100%;
-    }
-
-    .horizontal-scroll02{
-        display : inline-flex;
-        padding:1px;
-    }
-}
-/* El ancho de nuestro scroll */
-::-webkit-scrollbar {
-    width: 7px;
-}
-
-/* El fondo de la barra donde aparece nuestro scroll */
-::-webkit-scrollbar-track {
-    background: #2d3e50; 
-}
- 
-/* El color del scroll*/
-::-webkit-scrollbar-thumb {
-    background: #C87A28; 
-}
-
-/* Manipular el hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #90663A;
-}
-/* Color de la flecha que aparece en la esquina de nuestro scroll*/
-::-webkit-scrollbar-corner{
-    background: #fff;    
-}
-
- /*Oculta los scrollbar horizontales 
-::-webkit-scrollbar-track:horizontal{
-    visibility: hidden;
-}
-::-webkit-scrollbar-thumb:horizontal{
-    visibility: hidden;
-}*/
