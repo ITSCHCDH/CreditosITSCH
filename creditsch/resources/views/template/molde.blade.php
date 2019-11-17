@@ -29,56 +29,94 @@
         }
     </style>
     @yield('links')
+
+<!--Estilos de la pagina principal -->
+<style>
+    /* Remove the navbar's default margin-bottom and rounded borders */ 
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
+    
+       
+    /* Set waith background color and 100% height */
+    .sidenav {
+      padding-top: 10px;
+      background-color: #000;
+      height: 100%;
+    }
+    
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #000;
+      color: white;
+      padding: 15px;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 5px;
+      }
+      .row.content {height:auto;} 
+    }
+  </style>
 </head>
 <body>  
-        <!-- Seccion de menu del sistema, mensajes de alerta y elementos de busqueda -->
-        <div class="row bg-dark text-white">
-            <div class="col-sm-3">
-                <input type="checkbox" id="check">
+    <div>
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+            <div class="container">             
+                <div class="navbar-header ">                          
+                    <!-- Imagen ITSCH -->               
+                    @if(Auth::guard('web')->check())
+                        <a  class="navbar-brand" href="{{ url('/home') }}">
+                            <div style="text-align: center;">
+                                <img src="{{ asset('images/itsch.jpg') }}"  width="35" height="40" >
+                            </div>
+                        </a>
+                    @else
+                        <a  class="navbar-brand" href="{{ route('alumnos.home_avance')}}">
+                            <div style="text-align: center;">
+                                <img src="{{ asset('images/itsch.jpg') }}"  width="35" height="40" >
+                            </div>
+                        </a>
+                    @endif                 
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                  <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>               
+                    <li><a href="#">Mensajes</a></li>
+                    <li> 
+                        @if(!Auth::guard('alumno')->check())             
+                                <a href="{{ route('mensajes.index') }}">
+                                    <i class="material-icons">contact_mail</i>
+                                </a>                         
+                        @endif 
+                    </li>
+                  </ul>
+                  <ul class="nav navbar-nav navbar-right">
+                    <li class="nav-item dropdown"><a href="#" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown"><span class="glyphicon glyphicon-log-in">
+                         <!-- Incluye menu de usuario -->
+                        @include('template.partes.menUser')
+                    </span>                    
+                    </a></li>
+                  </ul>
+                </div>
+              </div>
+        </nav>
+    </div>        
+    <div>    
+        <div class="row">
+            <div class="col-sm-1">
+                <!-- Incluye el menu al sistema -->
                 @if(Auth::guard('web')->check())
-                    <label for="check" class="fa fa-bars" id="menu">Menu</label>
-                @endif
+                    @include('template.partes.menu')
+                @endif                     
             </div>
-            <div class="col-sm-3">
-                @if(!Auth::guard('alumno')->check())                                                             
-                    <button class="btn btn-warning btn-sm"   >
-                        <a href="{{ route('mensajes.index') }}">
-                        <i class="material-icons">contact_mail</i> 
-                    </button>           
-                @endif    
-            </div>
-            <div class="col-sm-3">
-                <!-- Incluye menu de usuario -->
-                @include('template.partes.menUser')
-            </div>
-            <div class="col-sm-3">
-                <!-- Imagen ITSCH -->               
-                @if(Auth::guard('web')->check())
-                    <a  href="{{ url('/home') }}">
-                        <div style="text-align: center;">
-                            <img src="{{ asset('images/itsch.jpg') }}"  width="35" height="40" >
-                        </div>
-                    </a>
-                @else
-                    <a  href="{{ route('alumnos.home_avance')}}">
-                        <div style="text-align: center;">
-                            <img src="{{ asset('images/itsch.jpg') }}"  width="35" height="40" >
-                        </div>
-                    </a>
-                @endif               
-            </div>                         
-        </div>
-         <!-- Incluye el menu al sistema -->
-            @if(Auth::guard('web')->check())
-                @include('template.partes.menu')
-            @endif 
-        
-       
-            <!--Div para el contenido de la ruta -->
-            <div class="row">
-                <div class="col-sm-1"></div>
-                <div class="col-sm-10">
-                    <ul class="breadcrumb" style="box-shadow: 4px 4px 10px #000;">
+            <div class="col-sm-10" id="divPrincipal">
+                <div style="box-shadow: 4px 4px 10px #000;">                  
+                    <ul class="breadcrumb" >
                         <li class="breadcrumb-item">
                             @if (Auth::guard('alumno')->check())
                                 <label class="label label-primary">{{ Auth::User()->nombre }}</label>
@@ -89,24 +127,27 @@
                         <li class="breadcrumb-item active"> @yield('ruta','Default')
                         </li>
                     </ul>
-                </div>
-                <div class="col-sm-1"></div>              
+                </div>                              
+                <div class="text-right" id="contenido">
+                    <section>
+                    @include('flash::message') <!-- Esto es para mostrar los mensajes en los formularios -->
+                    </section>
+                    @yield('contenido','Default')<!-- Contenido general del sistema -->
+                </div>                                 
             </div>
+            <div class="col-sm-1">
+              
+            </div>
+      </div>
+    </div>
 
-            <div class="row">  
-                <div class="col-sm-1"></div>
-                <div class="col-sm-10" id="contenido">                                               
-                        <section>
-                            @include('flash::message') <!-- Esto es para mostrar los mensajes en los formularios -->
-                        </section>
-                        @yield('contenido','Default')<!-- Contenido general del sistema -->                     
-                </div>
-                <div class="col-sm-1"></div>                  
-                
-            </div>
-        
-    <!-- Incluye el pie de pagina en el sistema -->
-    @include('template.partes.pie')
+    <footer class="container-fluid text-center">
+      <p>Copyright © ITSCH 2017|CEDEITSCH</p>
+    </footer>
+
+     
+    <!-- Scripts del sistema -->
+  
     <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
     <script src="{{asset('complementos/js/bootstrap.js')}}"></script>
     @if(Auth::guard('web')->check())

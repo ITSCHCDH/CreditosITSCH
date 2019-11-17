@@ -40,19 +40,10 @@
     opacity: 1;
 }
 /*-----------------------*/
-
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-
+/* Oculta el check necesario para el funcionamiento del menu*/
 #check{
     display: none;
 }
-
-
 
 .menu{
     position: fixed;
@@ -61,7 +52,8 @@
     width: 50px;
     /*Para que ocupe toda la pantalla en lo alto*/
     height: 100%;
-    background: #2d3e50;
+    /*color del fondo del menu*/
+    background: #000;
     /*Para que el cambio no sea tan brusco*/
     transition: all 500ms cubic-bezier(1,0,0,1);
     /*Para cambiar la animacion cambiamos el ultimo numero*/
@@ -73,7 +65,7 @@
     /*Ocultamos el scroll horizontal */
     /*overflow-x: hidden;*/
     /*Para mantener siempre por encima*/
-    /*z-index: 100;*/
+    z-index: 100;
 }
 .spaMenu{
     visibility: hidden;
@@ -83,30 +75,7 @@
     visibility: visible;
 }
 
-.menu li{
-    list-style: none;
-    padding: 16px;
-    color: white;
-    cursor: pointer;
-    /*transition: all 300ms;*/
-    /*Para quitar el que cuando no quepan las palabras, se cambie de renglon*/
-    display: block;
-    width: 290px;
-    /*****/
-}
 
-.menu li a{
-    color: #ededed;
-    font-size: 15px;
-    font-family: sans-serif;
-    /*Quitar subrayado*/
-    text-decoration: none;
-}
-
-/* Cambio de color cuando pasa el raton por encima del menu*/
-.menu li:hover{
-    background: rgba(0,0,0,0.6);
-}
 
 /*Oculta el texto de los submenus*/
 .subMenu{
@@ -128,7 +97,7 @@
 #contenido{
     background: #f4f4f4;   
     box-shadow: 4px 4px 10px #000;
-    text-align: center;
+    
 }
 
 

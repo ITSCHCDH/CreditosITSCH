@@ -137,6 +137,4 @@
     <script  src="jsParticles/index.js"></script>
 
     @yield('js')
-</body>
- @include('template.partes.pie')
-</html>
+

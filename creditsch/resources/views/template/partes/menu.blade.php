@@ -1,6 +1,12 @@
 <!-- Menu del sistema -->
-<nav class="menu" id="idMenu">
-    <ul style="margin-bottom: 100px;">
+<div class="menu">
+    <ul class="nav flex-column">
+        <li class="botMen">
+            <input type="checkbox" id="check">
+            @if(Auth::guard('web')->check())
+                <label for="check" class="fa fa-bars " id="menu">Menu</label>
+            @endif
+        </li>
         <li class="botMen">
             @if (Auth::guard('alumno')->check())
                 <a class="etMenu" href="/alumnos/home">
@@ -175,7 +181,7 @@
             </li>
         @endif
         @if(Auth::guard('web')->check())
-            <li class="botMen">
+        <li class="botMen">
             <p class="etMenu"  onclick="event.preventDefault(); document.getElementById('logout-form2').submit();">
                 <i class="fa fa-fw fa-sign-out"></i>
                 <span class="spaMenu">Cerrar sesión </span>
@@ -187,5 +193,6 @@
         </li>
         @endif
     </ul>
-</nav>
+</div>
+    
 

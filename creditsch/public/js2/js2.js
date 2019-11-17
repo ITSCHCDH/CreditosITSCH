@@ -67,6 +67,7 @@ function mostrarMenu(){
     $('.spaMenu').css('visibility','visible');
     $('.flesub').css('visibility','visible');
     $('.menu').css({opacity:0.9});
+    $('.menu').style.width = "300px";
 }
 
 function cerrarMenu(){

@@ -28,14 +28,16 @@
                       </span>
                 </button>
             </div>
+            <br>
         </div>
+
     {!! Form::close() !!}
 
     <!--Fin del boton de busqueda  -->
     <section id="main">
         <aside id="horizontal-scroll">
-            <table class="table table-striped" id="tabla-alumnos">
-                <thead>
+            <table class="table" id="tabla-alumnos">
+                <thead class="thead-dark">
                 <th>ID</th>
                 <th>Numero de Control</th>
                 <th>Nombre</th>
