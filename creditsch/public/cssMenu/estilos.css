@@ -44,12 +44,26 @@
 #check{
     display: none;
 }
-
+/*Color de las etiquetas del menu*/
+.colMen{
+    color:#337ab7 !important;   
+}
+/*Color de los botones del menu*/
+.card{
+   background-color: #030303 !important;
+   border: 0.5px solid #0D0D0D !important;
+}
+/*Color y forma del menu superior*/
+#menVar{
+        background-color: #000 !important;
+        border-radius: 0px;
+    }
+/*Estilo del menu vertical*/
 .menu{
     position: fixed;
-    top: 60px;
+    top: 63px;
     /*Es el minimo que reduce al dar click*/
-    width: 50px;
+    width: 60px;
     /*Para que ocupe toda la pantalla en lo alto*/
     height: 100%;
     /*color del fondo del menu*/
@@ -65,7 +79,7 @@
     /*Ocultamos el scroll horizontal */
     /*overflow-x: hidden;*/
     /*Para mantener siempre por encima*/
-    z-index: 100;
+    z-index: 10;
 }
 .spaMenu{
     visibility: hidden;
@@ -90,12 +104,12 @@
 
 /*Alineacion del div del contenido principal del sistema, para que no lo deje llegar hasta la izquierdda*/
 #divPrincipal{
-    margin-left: 3%;
+    margin-left: 5%;
 }
 
 /*Css de el area del contenido del sistema*/
 #contenido{
-    background: #f4f4f4;   
+    background: #fff;   
     box-shadow: 4px 4px 10px #000;
     
 }
@@ -103,13 +117,14 @@
 
 /*Pie de pagina*/
 footer{
-    background-color:#2d3e50;
+    background-color: #000;
     position: fixed;
     bottom: 0;
     width: 100%;
     height: 40px;
     color: white;
     text-align: center;
+    padding: 15px;    
 }
 
 

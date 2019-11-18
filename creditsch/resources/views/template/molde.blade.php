@@ -29,48 +29,15 @@
         }
     </style>
     @yield('links')
-
-<!--Estilos de la pagina principal -->
-<style>
-    /* Remove the navbar's default margin-bottom and rounded borders */ 
-    .navbar {
-      margin-bottom: 0;
-      border-radius: 0;
-    }
-    
-       
-    /* Set waith background color and 100% height */
-    .sidenav {
-      padding-top: 10px;
-      background-color: #000;
-      height: 100%;
-    }
-    
-    /* Set black background color, white text and some padding */
-    footer {
-      background-color: #000;
-      color: white;
-      padding: 15px;
-    }
-    
-    /* On small screens, set height to 'auto' for sidenav and grid */
-    @media screen and (max-width: 767px) {
-      .sidenav {
-        height: auto;
-        padding: 5px;
-      }
-      .row.content {height:auto;} 
-    }
-  </style>
 </head>
 <body>  
     <div>
-        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <nav class="navbar navbar-expand-sm" id="menVar">
             <div class="container">             
                 <div class="navbar-header ">                          
                     <!-- Imagen ITSCH -->               
                     @if(Auth::guard('web')->check())
-                        <a  class="navbar-brand" href="{{ url('/home') }}">
+                        <a  class="navbar-brand " href="{{ url('/home') }}">
                             <div style="text-align: center;">
                                 <img src="{{ asset('images/itsch.jpg') }}"  width="35" height="40" >
                             </div>
@@ -85,22 +52,25 @@
                 </div>
                 <div class="collapse navbar-collapse" id="myNavbar">
                   <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Home</a></li>               
-                    <li><a href="#">Mensajes</a></li>
+                    <li class="active"><a class="colMen" href="#">Home</a></li>               
+                    <li><a class="colMen" href="#">Mensajes</a></li>
                     <li> 
                         @if(!Auth::guard('alumno')->check())             
-                                <a href="{{ route('mensajes.index') }}">
-                                    <i class="material-icons">contact_mail</i>
+                                <a class="colMen" href="{{ route('mensajes.index') }}">
+                                    <i class="material-icons ">contact_mail</i>
                                 </a>                         
                         @endif 
                     </li>
                   </ul>
                   <ul class="nav navbar-nav navbar-right">
-                    <li class="nav-item dropdown"><a href="#" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown"><span class="glyphicon glyphicon-log-in">
-                         <!-- Incluye menu de usuario -->
-                        @include('template.partes.menUser')
-                    </span>                    
-                    </a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle colMen" href="#" id="navbardrop" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-log-in">
+                                <!-- Incluye menu de usuario -->
+                                @include('template.partes.menUser')
+                            </span>                    
+                        </a>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -109,11 +79,13 @@
     <div>    
         <div class="row">
             <div class="col-sm-1">
-                <!-- Incluye el menu al sistema -->
-                @if(Auth::guard('web')->check())
-                    @include('template.partes.menu')
-                @endif                     
-            </div>
+                 <div class="menu">
+                    <!-- Incluye el menu al sistema -->
+                    @if(Auth::guard('web')->check())
+                        @include('template.partes.menu')
+                    @endif                     
+                </div>
+            </div>           
             <div class="col-sm-10" id="divPrincipal">
                 <div style="box-shadow: 4px 4px 10px #000;">                  
                     <ul class="breadcrumb" >
@@ -142,7 +114,9 @@
     </div>
 
     <footer class="container-fluid text-center">
-      <p>Copyright © ITSCH 2017|CEDEITSCH</p>
+        <div>
+            <p>Copyright © ITSCH 2017|CEDEITSCH</p>
+        </div>      
     </footer>
 
      

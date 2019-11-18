@@ -7,6 +7,7 @@
 @endsection
 
 @section('contenido')
+<div class="container">
     @if ($faltan_jefes)
         <div class="alert-warning" role="alert" style="padding:1rem;">
             <p style="font-size:large; font-weight: bold;">
@@ -22,17 +23,17 @@
             <span class="toltiptext">Crear un nuevo crédito</span>
         </div>
     @endif
-    <section id="main">
-        <aside id="horizontal-scroll">
-            <table class="table table-striped">
-                <thead>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Jefe</th>
-                <th>Vigente</th>
-                @if (Auth::User()->can('VIP'))
-                    <th>Acción</th>
-                @endif
+   
+        <div class="table-responsive">
+            <table class="table">
+                <thead class="thead-dark">
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Jefe</th>
+                    <th>Vigente</th>
+                    @if (Auth::User()->can('VIP'))
+                        <th>Acción</th>
+                    @endif
                 </thead>
                 <tbody>
                 @foreach($credito as $cred)
@@ -72,8 +73,8 @@
                 @endforeach
                 </tbody>
             </table>
-            </aside>
-    </section>  
-
+        </div> 
+  
     {!! $credito->render() !!}
+</div>    
 @endsection
