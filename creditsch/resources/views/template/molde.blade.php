@@ -18,6 +18,8 @@
     <link href="{{asset('complementos/css/bootstrap-theme.css')}}" rel="stylesheet">
     <!--Link para usar iconos google -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Link para uso de algunos iconos -->
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
 
     <!--  Estilo de la barra de progreso   -->
     <style>
@@ -77,7 +79,7 @@
         </nav>
     </div>        
     <div>    
-        <div class="row">
+        <div class="row">            
             <div class="col-sm-1">
                  <div class="menu">
                     <!-- Incluye el menu al sistema -->
@@ -138,5 +140,29 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     
     @yield('js')
+    <!-- The Modal -->
+    <div class="modal" id="myModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+          
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Modal Heading</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+              Modal body..
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+            
+          </div>
+        </div>
+    </div>
 </body>
 </html>

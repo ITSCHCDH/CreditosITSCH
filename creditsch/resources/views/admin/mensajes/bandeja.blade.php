@@ -7,20 +7,20 @@
 @section('contenido')
 	<div class="pull-right">
 		<div class="toltip">
-			<a href="{{ route('mensajes.crear') }}" class="btn btn-primary" style="padding: 2px;">
-				<img src="{{ asset('images/new_message.png') }}" alt="Nuevo mensaje" class="white-icon" style="width: 40px; heigth: 40px;">
+			<a href="{{ route('mensajes.crear') }}" class="btn btn-primary btn-sm" style="padding: 2px;">
+				<i class='fas fa-envelope' style="font-size:24px"></i>
 			</a>
 			<span class="toltiptext">Nuevo mensaje</span>
 		</div>
 		<div class="toltip">
 			<a href="{{ route('mensajes.enviados') }}" class="btn btn-warning" style="padding: 2px;">
-				<img src="{{ asset('images/paper-plane.png') }}" alt="Nuevo mensaje" class="white-icon" style="width: 40px; heigth: 40px;">
+				<i class="fa fa-send" style="font-size:24px"></i>
 			</a>
 			<span class="toltiptext">Mensajes enviados</span>
 		</div>
 		<div class="toltip">
 			<a href="{{ route('mensajes.vistos') }}" class="btn btn-success" style="padding: 2px;">
-				<img src="{{ asset('images/opened-message.png') }}" alt="Nuevo mensaje" class="white-icon" style="width: 40px; heigth: 40px;">
+				<i class='fas fa-envelope-open-text' style="font-size:24px"></i>
 			</a>
 			<span class="toltiptext">Mensajes vistos</span>
 		</div>
@@ -28,8 +28,8 @@
 	<div style="clear: both;"></div>
 	<br>
 	<h3>Bandeja de entrada</h3>
-	<table class="table table-striped table-bordered">
-	    <thead>
+	<table class="table">
+	    <thead class="thead-dark">
 	    <th>Ver mensaje</th>
 	    <th>Usuario</th>
 	    <th>Asunto o Alerta</th>

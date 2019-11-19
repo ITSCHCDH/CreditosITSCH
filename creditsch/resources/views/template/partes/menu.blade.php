@@ -1,9 +1,9 @@
 <!-- Menu del sistema -->
 <div class="container">
     <p>
-        <input type="checkbox" id="check">
+        
         @if(Auth::guard('web')->check())
-            <label for="check" class="fa fa-bars colMen " id="labMen">Menu</label>
+            <label for="check" class="fa fa-bars colMen " data-toggle="modal" data-target="#myModal">Menu</label>
         @endif
     </p>
     
@@ -13,7 +13,7 @@
                 <div class="card-header">
                     <a class="card-link colMen" href="/alumnos/home">
                         <i class="fa fa-home"></i>
-                        <span class="spaMenu">Inicio</span>
+                        <span >Inicio</span>
                     </a>
                 </div>     
             </div>  

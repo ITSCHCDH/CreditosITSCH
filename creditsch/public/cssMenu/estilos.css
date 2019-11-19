@@ -63,7 +63,7 @@
     position: fixed;
     top: 63px;
     /*Es el minimo que reduce al dar click*/
-    width: 60px;
+    width: 240px;
     /*Para que ocupe toda la pantalla en lo alto*/
     height: 100%;
     /*color del fondo del menu*/
@@ -81,20 +81,11 @@
     /*Para mantener siempre por encima*/
     z-index: 10;
 }
-.spaMenu{
-    visibility: hidden;
-}
-
-.etSubMenu{
-    visibility: visible;
-}
 
 
 
-/*Oculta el texto de los submenus*/
-.subMenu{
-    display: none;
-}
+
+
 
 /*Imagen de flecha para el menu con submenus*/
 #fleSub{
@@ -107,12 +98,12 @@
     margin-left: 5%;
 }
 
-/*Css de el area del contenido del sistema*/
+/*Css de el area del contenido del sistema
 #contenido{
     background: #fff;   
     box-shadow: 4px 4px 10px #000;
     
-}
+}*/
 
 
 /*Pie de pagina*/
