@@ -15,8 +15,8 @@
 
     @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))
         <div class="toltip pull-left">
-            <a href="{{route('actividades.create')}}" class="btn btn-primary white-icon">
-                <img src="{{ asset('images/organize.png') }}" alt="" }}">
+            <a href="{{route('actividades.create')}}" class="btn btn-warning btn-sm">
+            <i class='far fa-edit'></i>
             </a>
             <span class="toltiptext">Nueva actividad</span>
         </div>

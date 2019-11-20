@@ -39,14 +39,14 @@
     visibility: visible;
     opacity: 1;
 }
-/*-----------------------*/
-/* Oculta el check necesario para el funcionamiento del menu*/
-#check{
-    display: none;
-}
+
 /*Color de las etiquetas del menu*/
 .colMen{
-    color:#337ab7 !important;   
+    color:#A9A9F5 !important;   
+}
+/*Color del icono del menu principal*/
+.colMen2{
+    color:rgb(98, 98, 201) !important;
 }
 /*Color de los botones del menu*/
 .card{
@@ -80,22 +80,6 @@
     /*overflow-x: hidden;*/
     /*Para mantener siempre por encima*/
     z-index: 10;
-}
-
-
-
-
-
-
-/*Imagen de flecha para el menu con submenus*/
-#fleSub{
-    position: relative;
-   justify-content: flex-end;
-}
-
-/*Alineacion del div del contenido principal del sistema, para que no lo deje llegar hasta la izquierdda*/
-#divPrincipal{
-    margin-left: 5%;
 }
 
 /*Css de el area del contenido del sistema

@@ -39,14 +39,14 @@
                 <div class="navbar-header ">                          
                     <!-- Imagen ITSCH -->               
                     @if(Auth::guard('web')->check())
-                        <a  class="navbar-brand " href="{{ url('/home') }}">
+                        <a href="{{ url('/home') }}">
                             <div style="text-align: center;">
                                 <img src="{{ asset('images/itsch.jpg') }}"  width="35" height="40" >
                             </div>
                         </a>
                     @else
-                        <a  class="navbar-brand" href="{{ route('alumnos.home_avance')}}">
-                            <div style="text-align: center;">
+                        <a href="{{ route('alumnos.home_avance')}}">
+                            <div >
                                 <img src="{{ asset('images/itsch.jpg') }}"  width="35" height="40" >
                             </div>
                         </a>
@@ -54,13 +54,25 @@
                 </div>
                 <div class="collapse navbar-collapse" id="myNavbar">
                   <ul class="nav navbar-nav">
-                    <li class="active"><a class="colMen" href="#">Home</a></li>               
-                    <li><a class="colMen" href="#">Mensajes</a></li>
+                    <li class="active">
+                        @if (Auth::User()->can('VIP')|| Auth::User()->can('VER_ACTIVIDAD') || Auth::User()->can('VIP_ACTIVIDAD') || Auth::User()->can('VIP_SOLO_LECTURA'))                           
+                            <a class="colMen" href="{{route('actividades.index')}}">
+                                <i class="fa fa-futbol-o" style="font-size:20px"></i>                           
+                            </a>                          
+                        @endif 
+                    </li> 
+                    <li>
+                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']))             
+                            <a class="colMen" href="{{route('participantes.index')}}">
+                                <i class="fa fa-users" style="font-size:20px"></i>                           
+                            </a>                        
+                        @endif
+                    </li>
                     <li> 
                         @if(!Auth::guard('alumno')->check())             
-                                <a class="colMen" href="{{ route('mensajes.index') }}">
-                                    <i class="material-icons ">contact_mail</i>
-                                </a>                         
+                            <a class="colMen" href="{{ route('mensajes.index') }}">
+                                <i class="material-icons ">contact_mail</i>
+                            </a>                         
                         @endif 
                     </li>
                   </ul>
@@ -81,16 +93,16 @@
     <div>    
         <div class="row">            
             <div class="col-sm-1">
-                 <div class="menu">
-                    <!-- Incluye el menu al sistema -->
-                    @if(Auth::guard('web')->check())
-                        @include('template.partes.menu')
-                    @endif                     
-                </div>
+                
             </div>           
-            <div class="col-sm-10" id="divPrincipal">
+            <div class="col-sm-10">
                 <div style="box-shadow: 4px 4px 10px #000;">                  
                     <ul class="breadcrumb" >
+                        <li>
+                             @if(Auth::guard('web')->check())
+                                <label for="check" class="fa fa-bars colMen2 " data-toggle="modal" data-target="#myModal"></label>
+                            @endif
+                        </li>
                         <li class="breadcrumb-item">
                             @if (Auth::guard('alumno')->check())
                                 <label class="label label-primary">{{ Auth::User()->nombre }}</label>
@@ -142,27 +154,13 @@
     @yield('js')
     <!-- The Modal -->
     <div class="modal" id="myModal">
-        <div class="modal-dialog">
-          <div class="modal-content">
-          
-            <!-- Modal Header -->
-            <div class="modal-header">
-              <h4 class="modal-title">Modal Heading</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            
-            <!-- Modal body -->
-            <div class="modal-body">
-              Modal body..
-            </div>
-            
-            <!-- Modal footer -->
-            <div class="modal-footer">
-              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            </div>
-            
-          </div>
+        <div class="menu">
+            <!-- Incluye el menu al sistema -->
+            @if(Auth::guard('web')->check())
+                @include('template.partes.menu')
+            @endif                   
         </div>
+       
     </div>
 </body>
 </html>
