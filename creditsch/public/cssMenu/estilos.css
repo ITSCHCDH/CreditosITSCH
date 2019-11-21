@@ -42,20 +42,35 @@
 
 /*Color de las etiquetas del menu*/
 .colMen{
-    color:#A9A9F5 !important;   
+    color:#fff !important;   
 }
 /*Color del icono del menu principal*/
 .colMen2{
-    color:rgb(98, 98, 201) !important;
+    color:#000 !important;
+}
+/*Color del texto de los submenu*/
+.colTxtSub{
+    color: #000 !important;
 }
 /*Color de los botones del menu*/
 .card{
-   background-color: #030303 !important;
+   background-color: rgb(4, 19, 34) !important;
    border: 0.5px solid #0D0D0D !important;
 }
+/*Color al pasar sobre el menu*/
+.card:hover{
+    background-color: #000 !important;
+    opacity:0.9 !important;
+}
+/*Color al pasar sobre el submenu*/
+.card-body:hover{
+    background-color: #fff !important;
+    opacity:0.9 !important;
+}
+/*Color de fondo de los submenus*/
 .card-body{
     background-color: #fff !important;
-    border-style: ridge !important;
+    border-style: ridge !important;    
 }
 /*Color y forma del menu superior*/
 #menVar{
@@ -65,7 +80,7 @@
 /*Estilo del menu vertical*/
 .menu{
     position: fixed;
-    top: 63px;
+    top: 60px;
     /*Es el minimo que reduce al dar click*/
     width: 240px;
     /*Para que ocupe toda la pantalla en lo alto*/

@@ -57,21 +57,21 @@
                     <li class="active">
                         @if (Auth::User()->can('VIP')|| Auth::User()->can('VER_ACTIVIDAD') || Auth::User()->can('VIP_ACTIVIDAD') || Auth::User()->can('VIP_SOLO_LECTURA'))                           
                             <a class="colMen" href="{{route('actividades.index')}}">
-                                <i class="fa fa-futbol-o" style="font-size:20px"></i>                           
+                                <i class="fa fa-futbol-o" style="font-size:15px"></i>                           
                             </a>                          
                         @endif 
                     </li> 
                     <li>
                         @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']))             
                             <a class="colMen" href="{{route('participantes.index')}}">
-                                <i class="fa fa-users" style="font-size:20px"></i>                           
+                                <i class="fa fa-users" style="font-size:15px"></i>                           
                             </a>                        
                         @endif
                     </li>
                     <li> 
                         @if(!Auth::guard('alumno')->check())             
                             <a class="colMen" href="{{ route('mensajes.index') }}">
-                                <i class="material-icons ">contact_mail</i>
+                                <i class="material-icons " style="font-size:15px">contact_mail</i>
                             </a>                         
                         @endif 
                     </li>
@@ -99,7 +99,7 @@
                 <div style="box-shadow: 4px 4px 10px #000;">                  
                     <ul class="breadcrumb" >
                         <li>
-                             @if(Auth::guard('web')->check())
+                            @if(Auth::guard('web')->check())
                                 <label for="check" class="fa fa-bars colMen2 " data-toggle="modal" data-target="#myModal"></label>
                             @endif
                         </li>
@@ -114,7 +114,7 @@
                         </li>
                     </ul>
                 </div>                              
-                <div class="text-right" id="contenido">
+                <div id="contenido">
                     <section>
                     @include('flash::message') <!-- Esto es para mostrar los mensajes en los formularios -->
                     </section>

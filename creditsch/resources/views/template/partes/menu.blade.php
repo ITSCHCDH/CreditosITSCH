@@ -60,7 +60,7 @@
                         <div id="collapseOne" class="collapse" data-parent="#accordion">
                             @if (Auth::User()->can('VIP')|| Auth::User()->can('VER_ACTIVIDAD') || Auth::User()->can('VIP_ACTIVIDAD') || Auth::User()->can('VIP_SOLO_LECTURA'))
                                 <div class="card-body">
-                                    <a class="colMen" href="{{route('actividades.index')}}">
+                                    <a class="colTxtSub" href="{{route('actividades.index')}}">
                                         <i class="fa fa-futbol-o" style="font-size:10px"></i>
                                         <span >&nbsp;&nbsp;Administrar actividades</span>
                                     </a>
@@ -68,7 +68,7 @@
                             @endif
                             @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']))
                                 <div class="card-body">
-                                    <a class="colMen" href="{{route('participantes.index')}}">
+                                    <a class="colTxtSub" href="{{route('participantes.index')}}">
                                         <i class="fa fa-users" style="font-size:10px"></i>
                                         <span >&nbsp;&nbsp;Agregar participantes</span>
                                     </a>
@@ -76,7 +76,7 @@
                             @endif
                             @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_EVIDENCIA') || Auth::User()->can('VER_EVIDENCIA') || Auth::User()->can('VIP_SOLO_LECTURA'))
                                 <div class="card-body">
-                                    <a class="colMen" href="{{route('evidencias.index')}}">
+                                    <a class="colTxtSub" href="{{route('evidencias.index')}}">
                                         <i class="fa fa-camera" style="font-size:10px"></i>
                                         <span >&nbsp;&nbsp;Evidencia</span>
                                     </a>
@@ -96,8 +96,8 @@
                     </div>
                     <div id="collapseTwo" class="collapse" data-parent="#accordion">
                         @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
-                            <div class="card-body">
-                                <a class="colMen" href="{{ route('verifica_evidencia.avance_alumno') }}">
+                            <div class="card-body ">
+                                <a class="colTxtSub" href="{{ route('verifica_evidencia.avance_alumno') }}">
                                     <i class="fa fa-bar-chart-o" style="font-size:10px"></i>
                                     <span >&nbsp;&nbsp;Avance</span>
                                 </a>
@@ -105,7 +105,7 @@
                         @endif
                         @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA']))
                             <div class="card-body">
-                                <a class="colMen" href="{{ route('verifica_evidencia.index') }}">
+                                <a class="colTxtSub" href="{{ route('verifica_evidencia.index') }}">
                                     <i class="fa fa-calendar-check-o" style="font-size:10px"></i>
                                     <span >&nbsp;&nbsp;Verificar evidencia</span>
                                 </a>
@@ -113,7 +113,7 @@
                         @endif
                         @if (Auth::User()->hasAnyPermission('VIP','VIP_CONSTANCIAS','MODIFICAR_CONSTANCIAS_CARRERA'))
                             <div class="card-body">
-                                <a class="colMen" href="{{ route('constancias.index') }}">
+                                <a class="colTxtSub" href="{{ route('constancias.index') }}">
                                     <i class="fa fa-print" style="font-size:10px"></i>
                                     <span >&nbsp;&nbsp;Constancias</span>
                                 </a>
@@ -121,7 +121,7 @@
                         @endif
                         @if (Auth::User()->hasAnyPermission(['VER_REPORTES_CARRERA','VIP_REPORTES','VIP_SOLO_LECTURA','VIP']))
                             <div class="card-body">
-                                <a class="colMen" href="{{ route('verifica_evidencia.reportes') }}">
+                                <a class="colTxtSub" href="{{ route('verifica_evidencia.reportes') }}">
                                     <i class="fa fa-file-pdf-o" style="font-size:10px"></i>
                                     <span >&nbsp;&nbsp;Reportes</span>
                                 </a>
@@ -140,14 +140,14 @@
                 </div>
                 <div id="collapseThree" class="collapse" data-parent="#accordion">
                     <div class="card-body">
-                        <a class="colMen" href="{{ route('perfil.index') }}">
+                        <a class="colTxtSub" href="{{ route('perfil.index') }}">
                             <i class="fa fa-user" style="font-size:10px"></i>
                             <span >&nbsp;&nbsp;Mi perfil</span>
                         </a>
                     </div>
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS']))
                         <div class="card-body">
-                            <a class="colMen" href="{{ route('usuarios.index') }}">
+                            <a class="colTxtSub" href="{{ route('usuarios.index') }}">
                                 <i class="fa fa-users" style="font-size:10px"></i>
                                 <span >&nbsp;&nbsp;Usuarios</span>
                             </a>
@@ -155,7 +155,7 @@
                     @endif
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES']))
                         <div class="card-body">
-                            <a class="colMen" href="{{ route('roles.index') }}">
+                            <a class="colTxtSub" href="{{ route('roles.index') }}">
                                 <i class="fa fa-address-card" style="font-size:10px"></i>
                                 <span >&nbsp;&nbsp;Roles</span>
                             </a>
@@ -163,7 +163,7 @@
                     @endif
                     @if(Auth::User()->hasAnyPermission('VIP','VER_AREAS','VIP_SOLO_LECTURA'))
                         <div class="card-body">
-                            <a class="colMen" href="{{ route('areas.inicio') }}">
+                            <a class="colTxtSub" href="{{ route('areas.inicio') }}">
                                 <i class="fa fa-map-marker" style="font-size:10px"></i>
                                 <span >&nbsp;&nbsp;Areas</span>
                             </a>
@@ -171,7 +171,7 @@
                     @endif
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
                         <div class="card-body">
-                            <a class="colMen" href="{{ route('ImportExcel.index') }}">
+                            <a class="colTxtSub" href="{{ route('ImportExcel.index') }}">
                                 <i class="glyphicon glyphicon-import" style="font-size:10px"></i>
                                 <span >&nbsp;&nbsp;Modificar password alumnos</span>
                             </a>
@@ -179,7 +179,7 @@
                     @endif   
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
                         <div class="card-body">
-                            <a class="colMen" href="{{ route('ImportExcel.altaAlumnos') }}">
+                            <a class="colTxtSub" href="{{ route('ImportExcel.altaAlumnos') }}">
                                 <i class="glyphicon glyphicon-circle-arrow-up" style="font-size:10px"></i>
                                 <span >&nbsp;&nbsp;Insertar alumnos desde excel</span>
                             </a>
