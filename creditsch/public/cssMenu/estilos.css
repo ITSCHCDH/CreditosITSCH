@@ -53,6 +53,10 @@
    background-color: #030303 !important;
    border: 0.5px solid #0D0D0D !important;
 }
+.card-body{
+    background-color: #fff !important;
+    border-style: ridge !important;
+}
 /*Color y forma del menu superior*/
 #menVar{
         background-color: #000 !important;
