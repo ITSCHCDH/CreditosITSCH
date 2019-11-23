@@ -25,7 +25,7 @@
 
 <body>
 
-    <!-- particles.js container --> 
+  <!-- particles.js container --> 
   <div id="particles-js"></div> 
   <!-- stats - count particles --> 
   <div class="count-particles"> <span class="js-count-particles">--</span> particles </div> 

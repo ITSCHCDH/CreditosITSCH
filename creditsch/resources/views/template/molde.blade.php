@@ -16,6 +16,7 @@
     <!-- Bootstrap -->
     <link href="{{asset('complementos/css/bootstrap.css')}}" rel="stylesheet">
     <link href="{{asset('complementos/css/bootstrap-theme.css')}}" rel="stylesheet">
+    
     <!--Link para usar iconos google -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Link para uso de algunos iconos -->
@@ -132,12 +133,7 @@
             <p>Copyright © ITSCH 2017|CEDEITSCH</p>
         </div>      
     </footer>
-
-     
-    <!-- Scripts del sistema -->
-  
-    <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
-    <script src="{{asset('complementos/js/bootstrap.js')}}"></script>
+         
     @if(Auth::guard('web')->check())
         <script src="{{asset('js2/js2.js')}}"> </script>
     @endif
@@ -147,7 +143,10 @@
     <script>
         $('div.alert').not('.alert-important').delay(3000).fadeOut(300);
     </script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    
     <!-- Paquete para los mensajes tipo bootstrap, para notificaciones en formularios -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     

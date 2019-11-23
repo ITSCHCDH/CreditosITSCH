@@ -76,7 +76,7 @@
                             @endif
                             @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS']))
                                 <div class="toltip">
-                                    <a href="{{ route('admin.alumnos.destroy',$alu->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm">
+                                    <a  class="btn btn-danger btn-sm" onclick="undo_alumno({{$alu->id}})" data-toggle="modal" data-target="#myModalMsg">
                                         <span class="glyphicon glyphicon-remove-circle" aria-hidden="true">                                            
                                         </span>
                                     </a>
@@ -90,6 +90,45 @@
             </table>
         </aside>
     </section>
+
+    <!--Modal para mensajes del sistema-->    
+    <div class="modal" id="myModalMsg">
+        <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+        
+            <!-- Modal Header -->
+            <div class="modal-header">
+            <h4 class="modal-title">Mensaje</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body" id="uno">
+                ¿Estas seguro que deseas eliminar el alumno? 
+                <input type="text" id="e_id" name="id"  readonly onFocus="this.blur()" style="border: none">
+
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <a  class="btn btn-danger" id="prueba">Aceptar</a>
+                <button type="button" class="btn btn-success" data-dismiss="modal">Cancelar</button>
+            </div>
+            
+        </div>
+        </div>
+    </div>
+
+    <!--Script para pasasr el id del alumno a eliminar para que se use en el modal-->
+    <script>
+        function undo_alumno(n)
+		{	            
+			document.getElementById("e_id").value = n;	           					
+            document.getElementById("prueba").href = "alumnos/"+n+"/destroy";
+		}
+    </script>
+    
+
     <div style="text-align:center;">
         {{ $alumno->appends(['valor' => $valor])->render() }}
     </div>   

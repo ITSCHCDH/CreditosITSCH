@@ -15,15 +15,16 @@
             </p>
         </div>
     @endif
+    <br>
     @if (Auth::User()->can('VIP') || Auth::User()->can('CREAR_CREDITOS'))
         <div class="toltip pull-left">
-            <a href="{{route('creditos.create')}}" class="btn btn-success btn-circle btn-sm">
+            <a href="{{route('creditos.create')}}" class="btn btn-success btn-circle">
             <i class='fas fa-plus-circle' style='font-size:24px'></i>
             </a>
             <span class="toltiptext">Crear un nuevo crédito</span>
         </div>
     @endif
-   
+    <br>
         <div class="table-responsive">
             <table class="table">
                 <thead class="thead-dark">
@@ -73,8 +74,9 @@
                 @endforeach
                 </tbody>
             </table>
-        </div> 
-  
-    {!! $credito->render() !!}
+        </div>  
+    <div style="text-align:center;"> 
+        {!! $credito->render() !!}
+    </div>  
 </div>    
 @endsection

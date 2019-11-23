@@ -20,79 +20,81 @@
     @if ($actividad!=null)
         <input type="hidden" name="actividad_id" value="{{ $actividad->id }}" id="actividad_id">
     @endif
-    
-    <table class="table table-striped" id="tabla-responsables">
-        <thead>
-            <th>Nombre</th>
-            <th>Area</th>
-            <th>Activo</th>
-            <th>Asignar</th>
-        </thead>
-        <tbody>
-        @if ($responsables!=null && $actividad!=null)
-            <input type="hidden" name="actividad_id" value="{{ $actividad->id }}" id="actividad_id">
-            @foreach($responsables as $res)
-                <tr>
-                    <td>
-                        {{$res->usuario_nombre}}
-                    </td>
-                    <td>
-                        {{$res->area}}
-                    </td>
-                    <td>
-                        @if ($res->active=="true")
-                            {{ "SI" }}
-                        @else
-                            {{ "NO" }}
-                        @endif
-                    </td>
-                    <td>
-                        @if($actividad->vigente=="true")
-                            <label>
-                            @if($res->actividad_nombre==null)
-                                
-                                @if ($res->active=="false")
-                                    <label class="control control--checkbox">
-                                        <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
-                                        <div class="control__indicator"></div>
-                                    </label>
-                                @else
-                                    <label class="control control--checkbox">
-                                        <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}">
-                                        <div class="control__indicator"></div>
-                                    </label>
-                                @endif
+    <div class="table-responsive">
+        <table class="table" id="tabla-responsables">
+            <thead class="thead-dark">
+                <th>Nombre</th>
+                <th>Area</th>
+                <th>Activo</th>
+                <th>Asignar</th>
+            </thead>
+            <tbody>
+            @if ($responsables!=null && $actividad!=null)
+                <input type="hidden" name="actividad_id" value="{{ $actividad->id }}" id="actividad_id">
+                @foreach($responsables as $res)
+                    <tr>
+                        <td>
+                            {{$res->usuario_nombre}}
+                        </td>
+                        <td>
+                            {{$res->area}}
+                        </td>
+                        <td>
+                            @if ($res->active=="true")
+                                {{ "SI" }}
                             @else
-                                @if($res->participantes!=null || $res->evidencias!=null || $res->validado=="true")
-                                    <label class="control control--checkbox">
-                                        <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
-                                        <div class="control__indicator"></div>
-                                    </label>
-                                @else
-                                    <label class="control control--checkbox">
-                                        <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}">
-                                        <div class="control__indicator"></div>
-                                    </label>
-                                @endif
-                               
+                                {{ "NO" }}
                             @endif
-                            </label>
-                      @else
-                        {{ "Ninguna" }}
-                      @endif
+                        </td>
+                        <td>
+                            @if($actividad->vigente=="true")
+                                <label>
+                                @if($res->actividad_nombre==null)
+                                    
+                                    @if ($res->active=="false")
+                                        <label class="control control--checkbox">
+                                            <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
+                                            <div class="control__indicator"></div>
+                                        </label>
+                                    @else
+                                        <label class="control control--checkbox">
+                                            <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}">
+                                            <div class="control__indicator"></div>
+                                        </label>
+                                    @endif
+                                @else
+                                    @if($res->participantes!=null || $res->evidencias!=null || $res->validado=="true")
+                                        <label class="control control--checkbox">
+                                            <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
+                                            <div class="control__indicator"></div>
+                                        </label>
+                                    @else
+                                        <label class="control control--checkbox">
+                                            <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}">
+                                            <div class="control__indicator"></div>
+                                        </label>
+                                    @endif
+                                
+                                @endif
+                                </label>
+                        @else
+                            {{ "Ninguna" }}
+                        @endif
 
-                    </td>
+                        </td>
+                    </tr>
+                @endforeach
+
+            @else
+                <tr>
+                    <td colspan="3">No se encontraron resultados</td>
                 </tr>
-            @endforeach
-
-        @else
-            <tr>
-                <td colspan="3">No se encontraron resultados</td>
-            </tr>
-        @endif
-        
-        </tbody>
-    </table>
+            @endif
+            
+            </tbody>
+        </table>
+    </div>
+   
     @if ($responsables!=null && $actividad!=null)
         <input type="submit" name="" value="Agregar" id="submit-reponsables" class="btn btn-primary">
     @endif
