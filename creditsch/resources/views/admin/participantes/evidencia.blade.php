@@ -6,7 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="{{ asset('cssGaleria/galeria.css') }}">
 @endsection
 @section('ruta')
-	<a href="{{ route('alumnos.actividades') }}">Actividades</a>
+	<a href="{{ route('participantes.index') }}">Participantes</a>
 	/
 	<label class="label label-success">Evidencias</label>
 @endsection
@@ -28,14 +28,26 @@
 	</div>
 	<div class="resetear"></div>
 	<div class="pull-left">
-		<p><strong>Alumno: </strong>{{ Auth::User()->nombre }}</p>
+		<p><strong>Alumno: </strong>{{ $alumno->nombre }}</p>
 	</div>
 	<div class="resetear"></div>
 	<div id="mensaje-parte-superior">
 		
-	</div>
+    </div>
+    <div>
+		@if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_ACTIVIDAD','VERIFICAR_EVIDENCIA']))
+			@if ($validado->count()!=0)
+				@if ($validado[0]->validado == "false" || ($participante_data->momento_agregado == "posteriormente" && $participante_data->evidencia_validada == "no"))
+					{!! Form::open(['route' => 'participantes.validar_evidencia','method' => 'post']) !!}
+						{!! Form::hidden('participante_id', $participante->id, []) !!}      
+						{!! Form::submit('Validar evidencia', ['class' => 'btn btn-primary']) !!}
+					{!! Form::close() !!}
+				@endif
+			@endif
+		@endif
+    </div>
 	<div>
-		@foreach ($evidencias as $evidencia)
+        @foreach ($evidencias as $evidencia)
 			<div class="gallery">
 				<a href="{{ asset('storage/evidencias/'.$evidencia->actividad_nombre.'/'.$evidencia->evidencia_nombre) }}">
 					@php
@@ -78,16 +90,16 @@
 								var actividad = $(this).attr('data-actividad');
 								var archivo_id = $(this).attr('data-archivo');
 								var archivo_nombre = $(this).attr('data-archivo_nombre');
-								var mensaje_tipo = "";
 								var referencia = $(this);
 								$.ajax({
 									type: "get",
 									dataType: "json",
-									url: "{{ route('alumnos.eliminar_evidencia') }}",
+									url: "{{ route('participantes.eliminar_evidencia') }}",
 									data:{
 										actividad: actividad,
 										archivo: archivo_id,
-										archivo_nombre: archivo_nombre
+										archivo_nombre: archivo_nombre,
+                                        no_control: "{{ $alumno->no_control }}"
 									}, 
 									success: function(response){
 										mostrarMensaje(response['mensaje'],'mensaje-parte-superior',response['tipo']);

@@ -21,13 +21,19 @@
     <!--Link para uso de algunos iconos -->
     <script src='https://kit.fontawesome.com/a076d05399.js'></script>
 
-    <!--  Estilo de la barra de progreso   -->
+    <!--  Estilo de la barra de progreso -->
     <style>
         .progress { position:relative; width:30%; border: 1px solid #7F98B2; padding: 1px; border-radius: 5px;}
         .bar { background-color: #B4F5B4; width:0%; height:25px; border-radius: 3px; }
         .percent { position:absolute; display:inline-block; top:0px; left:48%; color: #7F98B2;}
+    </style>
+    <!-- Estilos y clases personalizadas -->
+    <style>
         .white-icon{
             -webkit-filter: invert(100%);
+        }
+        .alerta-padding{
+            padding: 10px;
         }
     </style>
     @yield('links')
@@ -53,21 +59,23 @@
                     @endif                 
                 </div>
                 <div class="collapse navbar-collapse" id="myNavbar">
-                  <ul class="nav navbar-nav">
-                    <li class="active">
-                        @if (Auth::User()->can('VIP')|| Auth::User()->can('VER_ACTIVIDAD') || Auth::User()->can('VIP_ACTIVIDAD') || Auth::User()->can('VIP_SOLO_LECTURA'))                           
-                            <a class="colMen" href="{{route('actividades.index')}}">
-                                <i class="fa fa-futbol-o" style="font-size:15px"></i>                           
-                            </a>                          
-                        @endif 
-                    </li> 
-                    <li>
-                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']))             
-                            <a class="colMen" href="{{route('participantes.index')}}">
-                                <i class="fa fa-users" style="font-size:15px"></i>                           
-                            </a>                        
-                        @endif
-                    </li>
+                    <ul class="nav navbar-nav">
+                    @if (Auth::Guard('web')->check())
+                        <li class="active">
+                            @if (Auth::User()->can('VIP')|| Auth::User()->can('VER_ACTIVIDAD') || Auth::User()->can('VIP_ACTIVIDAD') || Auth::User()->can('VIP_SOLO_LECTURA'))                           
+                                <a class="colMen" href="{{route('actividades.index')}}">
+                                    <i class="fa fa-futbol-o" style="font-size:15px"></i>                           
+                                </a>                          
+                            @endif 
+                        </li> 
+                        <li>
+                            @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']))             
+                                <a class="colMen" href="{{route('participantes.index')}}">
+                                    <i class="fa fa-users" style="font-size:15px"></i>                           
+                                </a>                        
+                            @endif
+                        </li>
+                    @endif
                     <li> 
                         @if(!Auth::guard('alumno')->check())             
                             <a class="colMen" href="{{ route('mensajes.index') }}">
@@ -150,7 +158,34 @@
 
     <!-- Paquete para los mensajes tipo bootstrap, para notificaciones en formularios -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    
+    <script type="text/javascript">
+        // Funcion para manejar mensajes desde javascript 
+        function mostrarMensaje(mensaje_texto,mensaje_id,mensaje_tipo){
+            var mensaje = document.getElementById(mensaje_id);
+            switch (mensaje_tipo){
+                case "error":
+                    mensaje.innerHTML= "<div class='alert-danger alerta-padding' id='mensaje-unico-mds'><p class='text-center'>"+
+                    mensaje_texto+"</p></p></div>";
+                break;
+                case "exito":
+                    mensaje.innerHTML= "<div class='alert-success alerta-padding' id='mensaje-unico-mds'><p class='text-center'>"+
+                    mensaje_texto+"</p></div>";
+                break;  
+                case "neutral":
+                    mensaje.innerHTML= "<div class='alert-info alerta-padding' id='mensaje-unico-mds'><p class='text-center'>"+
+                    mensaje_texto+"</p></div>";
+                break;
+                case "advertencia":
+                    mensaje.innerHTML= "<div class='alert-warning alerta-padding' id='mensaje-unico-mds'><p class='text-center'>"+
+                    mensaje_texto+"</p></div>";
+                break;
+                default:
+                    mensaje.innerHTML= "<div class='alert-info alerta-padding' id='mensaje-unico-mds'><p class='text-center'>"+
+                    mensaje_texto+"</p></div>";
+            }
+            $('#mensaje-unico-mds').delay(5000).fadeOut(2000);
+        }
+    </script>
     @yield('js')
     <!-- The Modal -->
     <div class="modal" id="myModal">
@@ -160,7 +195,6 @@
                 @include('template.partes.menu')
             @endif                   
         </div>
-       
     </div>
 </body>
 </html>

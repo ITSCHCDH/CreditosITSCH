@@ -36,7 +36,7 @@
 		</div>
 		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 pull-left">
 			{!! Form::label('busqueda','Busqueda') !!}
-			<input type="text" name="busqueda" class="form-control" placeholder="Nombre - No Control">
+			<input type="text" name="busqueda" class="form-control" placeholder="Nombre - No Control" value="{{ $busqueda }}">
 		</div>
 		{!! Form::submit('Consultar',['class' => 'btn btn-primary pull-left','style' => 'margin-top: 24px; margin-left: 25px;']) !!}
 	{!! Form::close() !!}

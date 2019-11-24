@@ -137,13 +137,13 @@ class VerificaEvidenciaController extends Controller
                 $participantes_lista = DB::table('participantes as p')->join('actividad_evidencia as ae','ae.id','=','p.id_evidencia')->where('ae.id','=',$request->id_evidencias[$x])->select('p.no_control')->get();
                 // Se le asigna el porcentaje de crédito a los participantes una vez validada
                 for ($i=0; $i < count($participantes_lista); $i++) {
-                    $temp = Avance::where([
+                    $credito_avance = Avance::where([
                         ['no_control','=',$participantes_lista[$i]->no_control],
                         ['id_credito','=',$actividad->id_actividad]
                     ])->get();
                     //Si no existe un registro con su numero de control y el id del credito se le crea uno en caso contrario se le suma el procentaje de liberacion
-                    if($temp->count()>0){
-                        $avance = Avance::find($temp[0]->id);
+                    if($credito_avance->count()>0){
+                        $avance = Avance::find($credito_avance[0]->id);
                         $avance->por_credito += (int)$actividad->por_cred_actividad;
                         $avance->save();
                     }else{
@@ -221,10 +221,16 @@ class VerificaEvidenciaController extends Controller
                 $join->where('ae.validado','=','true');
             })->join('evidencia as e',function($join){
                 $join->on('e.id_asig_actividades','=','ae.id');
-            })->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->join('avance as av',function($join) use ($request){
+            })->join('actividad as a','a.id','=','ae.actividad_id')
+            ->join('creditos as c','c.id','=','a.id_actividad')
+            ->join('avance as av',function($join) use ($request){
     			$join->on('av.id_credito','=','c.id');
     			$join->where('av.no_control','=',$request->get('no_control'));
-    		})->join('areas','alu.carrera','=','areas.id')->select('alu.no_control','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
+            })->join('areas','alu.carrera','=','areas.id')
+            ->where(function($query){
+                $query->where('p.evidencia_validada','=','na')->orwhere('p.evidencia_validada','=','si');
+            })->where('ae.validado','=','true')
+            ->select('alu.no_control','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
             $liberado = $this->alumnoLiberado($request->get('no_control'));
             //Validamos que el alumnos tenga algun avance
     		if($alumno_data->count()==0){
@@ -264,12 +270,6 @@ class VerificaEvidenciaController extends Controller
                 $reportes_data = null;
                 $suma_creditos = null;
             }
-            return view('admin.verifica_evidencia.reportes')
-            ->with('reportes_data',$reportes_data)
-            ->with('creditos',$creditos)
-            ->with('suma_creditos',$suma_creditos)
-            ->with('carreras',$carreras)
-            ->with('carrera_seleccionada',$carrera);
         }else{
             $carrera = null;
             if($request->has('generacion')){
@@ -285,14 +285,14 @@ class VerificaEvidenciaController extends Controller
                 $suma_creditos = null;
             }
             $carreras = Area::where('id','=',Auth::User()->area)->get();
-            return view('admin.verifica_evidencia.reportes')
-            ->with('reportes_data',$reportes_data)
-            ->with('creditos',$creditos)
-            ->with('suma_creditos',$suma_creditos)
-            ->with('carreras',$carreras)
-            ->with('carrera_seleccionada',$carrera);
         }
-    	
+        return view('admin.verifica_evidencia.reportes')
+        ->with('reportes_data',$reportes_data)
+        ->with('creditos',$creditos)
+        ->with('suma_creditos',$suma_creditos)
+        ->with('carreras',$carreras)
+        ->with('carrera_seleccionada',$carrera)
+        ->with('busqueda', $busqueda);
     }
 
     public function verEvidencia($id){

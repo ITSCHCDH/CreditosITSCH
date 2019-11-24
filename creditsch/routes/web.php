@@ -100,8 +100,11 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('participantes/peticion','ParticipantesController@peticionAjax')->name('participantes.peticion');
     Route::post('participantes/guardar','ParticipantesController@ajaxGuardar')->name('participantes.guardar');
     Route::get('participantes/actividad/responsables','ParticipantesController@peticionAjaxResponsables')->name('participantes.actividad_responsables');
+    Route::get('participantes/ver_evidencia','ParticipantesController@verEvidencia')->name('participantes.ver_evidencia');
+    Route::get('participantes/eliminar_evidencia','ParticipantesController@eliminarEvidencia')->name('participantes.eliminar_evidencia');
+    Route::post('participantes/validar_evidencia','ParticipantesController@validarEvidencia')->name('participantes.validar_evidencia');
 
-    /****Rutas para el controlador de participantes*****/
+    /**** Rutas para el controlador de participantes ****/
     Route::resource('participantes','ParticipantesController');
 
     //La siguiente nos crea las rutas para el controlador de participantes(Bajas)

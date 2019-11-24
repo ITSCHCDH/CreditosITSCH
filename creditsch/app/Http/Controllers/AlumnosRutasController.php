@@ -15,6 +15,7 @@ use App\Evidencia;
 use App\ALumno;
 use App\ConstanciaComplemento;
 use App\Folio;
+use App\Participante;
 use DB;
 use PDF;
 class AlumnosRutasController extends Controller
@@ -36,10 +37,17 @@ class AlumnosRutasController extends Controller
             $join->where('ae.validado','=','true');
         })->join('evidencia as e',function($join){
             $join->on('e.id_asig_actividades','=','ae.id');
-        })->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','c.id','=','a.id_actividad')->join('avance as av',function($join){
+        })->join('actividad as a','a.id','=','ae.actividad_id')
+        ->join('creditos as c','c.id','=','a.id_actividad')
+        ->join('avance as av',function($join){
 			$join->on('av.id_credito','=','c.id');
 			$join->where('av.no_control','=',Auth::User()->no_control);
-		})->join('areas','areas.id','=','alu.carrera')->select('alu.no_control','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
+        })
+        ->join('areas','areas.id','=','alu.carrera')
+        ->where(function($query){
+            $query->where('p.evidencia_validada','=','na')->orwhere('p.evidencia_validada','=','si');
+        })->where('ae.validado','=','true')
+        ->select('alu.no_control','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
         $liberado = $this->alumnoLiberado();
         //Validamos que el alumnos tenga algun avance
 		if($alumno_data->count()==0){
@@ -102,7 +110,7 @@ class AlumnosRutasController extends Controller
             $datos_globales[0]->numero_oficio = $datos_globales[0]->numero_oficio+1;
             $datos_globales[0]->save();
             $folio_object = new Folio();
-            $folio_object->no_control = $request->no_control;
+            $folio_object->no_control = Auth::User()->no_control;
             $folio_object->no_folio = $datos_globales[0]->numero_oficio;
             $folio_object->save();
             $folio = $folio_object->no_folio;
@@ -132,34 +140,42 @@ class AlumnosRutasController extends Controller
         if(count($alumno_data)!=5) return false;
         return true;
     }
+
     public function actividades(){
     	$actividades = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join){
     		$join->on('ae.id','=','p.id_evidencia');
     		$join->where('p.no_control','=',Auth::User()->no_control);
-    	})->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','a.id_actividad','=','c.id')->select('a.nombre as actividad_nombre','a.id as actividad_id','a.por_cred_actividad as actividad_porcentaje','a.alumnos','ae.validado','ae.user_id','c.nombre as credito_nombre')->orderBy('actividad_nombre','ASC')->get();
+    	})->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','a.id_actividad','=','c.id')->select('a.nombre as actividad_nombre','a.id as actividad_id','a.por_cred_actividad as actividad_porcentaje','a.alumnos','ae.validado','ae.user_id','c.nombre as credito_nombre','p.momento_agregado','p.evidencia_validada')->orderBy('actividad_nombre','ASC')->get();
     	return view('alumnos.actividades')
     	->with('actividades',$actividades);
     }
+
     public function subirEvidencia(Request $request){
-        $existe_actividad = Actividad_Evidencia::where([
+        $actividad_evidencia = DB::table('actividad_evidencia')->where([
             ['user_id','=',$request->id_responsable],
             ['actividad_id','=',$request->id_actividad]
-        ])->get();
-        if($existe_actividad->count()==0){
+        ])->select('id','user_id','actividad_id','validado','validador_id')->get();
+        $actividad = Actividad::find($request->id_actividad);
+        if($actividad_evidencia->count() == 0){
             return redirect()->back();
-        }else if($existe_actividad[0]->validado=="true"){
-            return redirect()->route('alumnos.actividades');
+        }else if($actividad_evidencia[0]->validado == "true"){
+            $participante = Participante::where([
+                ['id_evidencia','=',$actividad_evidencia[0]->id],
+                ['no_control','=',Auth::User()->no_control]
+                ])->get()[0];
+            if($actividad->alumnos == "true" && ($participante->momento_agregado == "anteriormente" || $participante->evidencia_validada == "si")){
+                return redirect()->route('alumnos.actividades');
+            }
         }
-    	$validador = User::find($existe_actividad[0]->validador_id);
-    	$responsable = User::select('id','name')->where('id','=',$request->id_responsable)->get();
-    	$actividad = Actividad::select('id','nombre')->where('id','=',$request->id_actividad)->get();
-    	if($actividad->count()==0 || $responsable->count()==0){
+    	$validador = User::find($actividad_evidencia[0]->validador_id);
+        $responsable = User::find($request->id_responsable);
+    	if($actividad->count() == null || $responsable == null){
     	    Flash::error('No actividad o responsable seleccinado');
     	    return redirect()->route('participantes.index');
     	}
     	return view('alumnos.subir_evidencia')
-    	->with('responsable',$responsable[0])
-    	->with('actividad',$actividad[0])
+    	->with('responsable',$responsable)
+    	->with('actividad',$actividad)
     	->with('validador',$validador);
     }
 
@@ -221,6 +237,12 @@ class AlumnosRutasController extends Controller
     }
 
     public function evidencia(Request $request){
+        if(!$request->has('user_id') && !$request->has('actividad_id')){
+            return redirect()->route('alumnos.home_avance');
+        }
+        if(User::find($request->user_id) == null || Actividad::find($request->actividad_id) == null){
+            return redirect()->route('alumnos.home_avance');
+        }
     	$evidencias = DB::table('actividad_evidencia as ae')->join('evidencia as e', function($join) use($request){
     		$join->on('e.id_asig_actividades','=','ae.id');
     		$join->where('ae.user_id','=',$request->user_id);
@@ -237,11 +259,19 @@ class AlumnosRutasController extends Controller
         $validado = Actividad_Evidencia::where([
             ['user_id','=',$request->user_id],
             ['actividad_id','=',$request->actividad_id]
-        ])->select('validado')->get();
+        ])->select('validado','id')->get();
+        $participante_data = Participante::where([
+            ['id_evidencia','=',$validado[0]->id],
+            ['no_control','=',Auth::User()->no_control]
+        ])->get();
+        if($participante_data->count() == 0){
+            return redirect()->route('alumnos.actividades');
+        }
     	return view('alumnos.evidencia')
     	->with('evidencias',$evidencias)
     	->with('actividad',$actividad)
-        ->with('validado',$validado);
+        ->with('validado',$validado)
+        ->with('participante_data',$participante_data[0]);
     }
 
     public function eliminarEvidencia(Request $request){
@@ -249,12 +279,18 @@ class AlumnosRutasController extends Controller
             $validado = DB::table('evidencia as e')->join('actividad_evidencia as ae', function($join) use($request){
                 $join->on('ae.id','=','e.id_asig_actividades');
                 $join->where('e.id','=',$request->get('archivo'));
-            })->select('ae.validado')->get();
+            })->select('ae.validado','ae.id')->get();
             if($validado->count()==0){
                 return response()->json(array('mensaje' => 'Error al eliminar la evidencia', 'tipo' => 'error'));
             }else{
-                if($validado[0]->validado=="true"){
-                    return response()->json(array('mensaje' => 'La evidencia ya ha sido validada', 'tipo' => 'error'));
+                if($validado[0]->validado == "true"){
+                    $participante_data = Participante::where([
+                        ['id_evidencia','=',$validado[0]->id],
+                        ['no_control','=',Auth::User()->no_control]
+                    ])->get()[0];
+                    if($participante_data->momento_agregado == "posteriormente" && $participante_data->evidencia_validada == "si"){
+                        return response()->json(array('mensaje' => 'La evidencia ya ha sido validada', 'tipo' => 'error'));
+                    }
                 }
             }
     	    Evidencia::destroy($request->get('archivo'));
