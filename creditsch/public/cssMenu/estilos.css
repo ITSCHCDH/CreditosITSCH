@@ -54,8 +54,10 @@
 }
 /*Color de los botones del menu*/
 .card{
-   background-color: rgb(4, 19, 34) !important;
-   border: 0.5px solid #0D0D0D !important;
+   background-color: rgb(21, 22, 22) !important;
+   border-style: ridge !important;
+   border-radius: 3px !important;
+   border-color: black !important;
 }
 /*Color al pasar sobre el menu*/
 .card:hover{
@@ -70,7 +72,8 @@
 /*Color de fondo de los submenus*/
 .card-body{
     background-color: #fff !important;
-    border-style: ridge !important;    
+    border-style: ridge !important;  
+    border-radius: 3px !important;  
 }
 /*Color y forma del menu superior*/
 #menVar{

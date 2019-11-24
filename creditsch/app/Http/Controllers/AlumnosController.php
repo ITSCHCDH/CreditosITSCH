@@ -140,7 +140,7 @@ class AlumnosController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
+    {           
         //Codigo de bajas
         $alumno=Alumno::find($id);//Busca el registro
         if($alumno==null){
