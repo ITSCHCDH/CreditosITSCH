@@ -1,7 +1,7 @@
 <!-- Tabla para los mensajes de alerta y busqueda -->
                
             <!-- Menu para cerrar la sesion--> 
-              
+                
             @if (Auth::guard('alumno')->check())
                 <!-- Link para cambiar perfil y cerrar cesión en la seccion alumnos -->     
                     {{ Auth::guard('alumno')->user()->nombre }}                  
@@ -15,13 +15,13 @@
                     </div>
                 </li>
             @else
-                  <!-- Link para cambiar perfil y cerrar cesión en la seccion administrativos-->
-                     {{ Auth::user()->name }}                   
+                    <!-- Link para cambiar perfil y cerrar cesión en la seccion administrativos-->
+                    {{ Auth::user()->name }}                   
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="{{ route('perfil.index')}}">Mi perfil</a>
                         <a class="dropdown-item" href="{{ route('logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar sesión</a>                             
                         <form id="logout-form" action="{{ route('logout')}}" method="POST" style="display: none;">
-                           {{ csrf_field() }}
+                            {{ csrf_field() }}
                         </form>                       
                     </div>
                 </li>

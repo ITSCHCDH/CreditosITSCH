@@ -36,11 +36,13 @@
         .alerta-padding{
             padding: 10px;
         }
+        .hover-color:hover{
+            background-color: black !important;
+        }
     </style>
     @yield('links')
 </head>
 <body>  
-    <div>
         <nav class="navbar navbar-expand-sm" id="menVar">
             <div class="container">             
                 <div class="navbar-header ">                          
@@ -87,7 +89,7 @@
                   </ul>
                   <ul class="nav navbar-nav navbar-right">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle colMen" href="#" id="navbardrop" data-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle colMen" style="background-color: black !important;" href="#" id="navbardrop" data-toggle="dropdown">
                             <span class="glyphicon glyphicon-log-in">
                                 <!-- Incluye menu de usuario -->
                                 @include('template.partes.menUser')
@@ -145,7 +147,6 @@
     @if(Auth::guard('web')->check())
         <script src="{{asset('js2/js2.js')}}"> </script>
     @endif
-    <script  src="{{ asset('plugins/jsTable/jquery.dataTables.min.js') }}"></script>
     <!-- Script para ocultar los mensajes de Flash -->
 
     <script>
@@ -185,6 +186,7 @@
             $('#mensaje-unico-mds').delay(5000).fadeOut(2000);
         }
     </script>
+    <script src="{{ asset('plugins/jsTable/jquery.dataTables.min.js') }}"></script>
     @yield('js')
     <!-- The Modal -->
     <div class="modal" id="myModal">

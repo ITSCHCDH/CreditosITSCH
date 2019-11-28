@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Laracasts\Flash\Flash;
+use Illuminate\Support\Facades\Auth;
 
 class Handler extends ExceptionHandler
 {
@@ -63,6 +64,12 @@ class Handler extends ExceptionHandler
             $post_max_size = (int)ini_get('post_max_size');
             Flash::error('Verificar que la suma del peso de los archivos no exceda los '.$post_max_size.' Mb');
             return redirect()->back();
+        }
+
+        if($exception instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException){
+            if(!Auth::Guard('web')->check() && !Auth::Guard('alumno')->check()){
+                return redirect('/');
+            }
         }
         return parent::render($request, $exception);
     }
