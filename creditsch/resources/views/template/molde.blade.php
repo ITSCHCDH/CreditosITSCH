@@ -28,22 +28,11 @@
         .bar { background-color: #B4F5B4; width:0%; height:25px; border-radius: 3px; }
         .percent { position:absolute; display:inline-block; top:0px; left:48%; color: #7F98B2;}
     </style>
-    <!-- Estilos y clases personalizadas -->
-    <style>
-        .white-icon{
-            -webkit-filter: invert(100%);
-        }
-        .alerta-padding{
-            padding: 10px;
-        }
-        .hover-color:hover{
-            background-color: black !important;
-        }
-    </style>
+   
     @yield('links')
 </head>
 <body>  
-    <div class="container" id="menVar">
+    <div id="menVar">
         <nav class="navbar navbar-expand-sm" >                        
             <div class="navbar-header ">                          
                 <!-- Imagen ITSCH -->               
@@ -103,8 +92,7 @@
     <br>       
     <div>    
         <div class="row">            
-            <div class="col-sm-1">
-                
+            <div class="col-sm-1">                
             </div>           
             <div class="col-sm-10">
                 <div style="box-shadow: 4px 4px 10px #000;">                  
@@ -132,21 +120,15 @@
                     @yield('contenido','Default')<!-- Contenido general del sistema -->
                 </div>                                 
             </div>
-            <div class="col-sm-1">
-              
+            <div class="col-sm-1">              
             </div>
       </div>
     </div>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-1"></div>
-            <div class="col-sm-10" id="footer"> 
-                Copyright © ITSCH 2017|CEDEITSCH
-            </div>
-            <div class="col-sm-1"></div>
-        </div>
-    </div>  
+    <div id="footer"> 
+        Copyright © ITSCH 2017|CEDEITSCH
+    </div>
+   
    
          
     @if(Auth::guard('web')->check())
@@ -195,18 +177,12 @@
     @yield('js')
 
     <!-- Modal para el menu -->    
-    <div class="modal" id="myModal">
-        <div class="menu">
-            <!-- Incluye el menu al sistema -->
-            <div class="row">
-                <div class="col-sm-1"></div>
-                <div class="col-sm-10">
-                    @if(Auth::guard('web')->check())
-                        @include('template.partes.menu')
-                    @endif 
-                </div>
-                <div class="col-sm-1"></div>
-            </div>                             
+    <div class="modal" id="myModal" >
+        <div class="menu" style=" overflow-y: auto;">
+            <!-- Incluye el menu al sistema -->           
+            @if(Auth::guard('web')->check())
+                @include('template.partes.menu')
+            @endif                    
         </div>
     </div>
 </body>
