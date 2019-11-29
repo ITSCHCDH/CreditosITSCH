@@ -151,7 +151,7 @@
                             }
                         });
                     });
-                }
+                }                
                 $(document).ready(function(){
                     inicializarArreglo();
                     $('#tabla-responsables').DataTable({
