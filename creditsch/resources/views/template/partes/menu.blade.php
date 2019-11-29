@@ -1,7 +1,6 @@
 <!-- Menu del sistema -->
-<div>
-    <p>
-        
+
+    <p>        
         @if(Auth::guard('web')->check())
             <label for="check" class="fa fa-bars colMen " data-toggle="modal" data-target="#myModal">Menu</label>
         @endif
@@ -211,7 +210,7 @@
             @endif 
         @endif            
     </div>                  
-</div>
+
 
        
        

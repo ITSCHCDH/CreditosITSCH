@@ -80,26 +80,15 @@
         background-color: #000 !important;
         border-radius: 0px;
     }
+
 /*Estilo del menu vertical*/
 .menu{
     position: fixed;
     top: 60px;
-    /*Es el minimo que reduce al dar click*/
-    width: 240px;
     /*Para que ocupe toda la pantalla en lo alto*/
     height: 100%;
     /*color del fondo del menu*/
-    background: #000;
-    /*Para que el cambio no sea tan brusco*/
-    transition: all 500ms cubic-bezier(1,0,0,1);
-    /*Para cambiar la animacion cambiamos el ultimo numero*/
-    transition-timing-function: cubic-bezier(1,0,0,2);
-    /*para que no se vean las letras fuera del menu*/
-    overflow: hidden;
-    /* Agregamos un scroll a nuestro menu */
-    /*overflow: scroll;*/
-    /*Ocultamos el scroll horizontal */
-    /*overflow-x: hidden;*/
+    background: #000;    
     /*Para mantener siempre por encima*/
     z-index: 10;
 }
@@ -111,22 +100,11 @@
     
 }*/
 
-
-/*Pie de pagina*/
-footer{
-    background-color: #000;
-    position: fixed;
+#footer{
+    background-color:#000;
+    color: #fff;
     bottom: 0;
-    width: 100%;
-    height: 40px;
-    color: white;
     text-align: center;
-    padding: 15px;    
+    height: 40px;
+    position: fixed;
 }
-
-
-/*Css del pie de pagina*/
-footer div p{
-   align-content: center;
-}
- 
