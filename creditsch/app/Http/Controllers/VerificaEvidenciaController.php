@@ -202,7 +202,7 @@ class VerificaEvidenciaController extends Controller
     	if($request->has('no_control')){
             //Verificamos que el numero de control exista
     		$alumno = DB::table('alumnos')->where('no_control','=',$request->get('no_control'))->get();
-    		if($alumno->count()==0){
+    		if($alumno->count() == 0){
     			Flash::error('El numero de control no exite');
     			return redirect()->route('verifica_evidencia.avance_alumno');
 

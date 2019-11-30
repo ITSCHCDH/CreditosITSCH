@@ -238,7 +238,10 @@ class ParticipantesController extends Controller
         $participantes_data = DB::table('participantes as p')
         ->join('alumnos as a','a.no_control','=','p.no_control')
         ->join('areas','areas.id','=','a.carrera')
-        ->leftJoin('evidencia as e','e.alumno_no_control','=','p.no_control')
+        ->leftJoin('evidencia as e', function ($join) use($id_actividad_evidencia){
+            $join->on('e.alumno_no_control','=','p.no_control');
+            $join->on('e.id_asig_actividades','=',DB::raw($id_actividad_evidencia[0]->id));
+        })
         ->where('p.id_evidencia','=',$id_actividad_evidencia[0]->id)
         ->select('a.nombre','areas.nombre as carrera','p.id','p.id_evidencia','a.no_control','e.alumno_no_control as tiene_evidencia','p.momento_agregado','p.evidencia_validada')->groupBy('p.no_control')->get();
         if($participantes_data->count() == 0){
@@ -526,7 +529,10 @@ class ParticipantesController extends Controller
         ->select('ae.id as ae_id','p.no_control','act.nombre','c.vigente as credito_vigente','act.vigente as actividad_vigente','act.alumnos as alumnos_responsables','act.id_user as administrador_id','act.id as actividad_id','act.por_cred_actividad','ae.validado as actividad_validada','c.id as credito_id')->get();
         if($actividad_data->count() == 0) return back();
         $actividad_data = $actividad_data[0];
-
+        if($actividad_data->actividad_validada == "false"){
+            Flash::error('Error: hasta que la actividad haya sido validada se puede validar la evidencia de los participantes de forma individual');
+            return redirect()->route('participantes.index');
+        }
         if($actividad_data->actividad_vigente == "false" || $actividad_data->credito_vigente == "false"){
             Flash::error('La actividad no vigente, ya no puede ser modificada');
             return redirect()->route('participantes.index');

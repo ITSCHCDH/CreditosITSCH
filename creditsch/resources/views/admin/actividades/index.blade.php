@@ -16,7 +16,6 @@
     <div class="row">    
         <div class="col-sm-4">
             <!-- Boton de busqueda en la pagina -->
-                          
                 <div class="input-group">
                     {!! Form::text('nombre',null,['class'=>'form-control','placeholder'=>'Buscar.....','aria-describedby'=>'search']) !!}
                     <div class="input-group-btn">
@@ -31,9 +30,9 @@
         </div>
         <div class="col-sm-4">            
             @if ($vigente == "true")
-                <input type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="vigentes"/>
+                <input type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="vigente"/>
             @else
-                <input type="checkbox" id="checkbox5" class="css-checkbox" name="vigentes"/>
+                <input type="checkbox" id="checkbox5" class="css-checkbox" name="vigente"/>
             @endif
             <label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades vigentes</label> 
         </div>  
@@ -41,7 +40,7 @@
             @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))
                 <div class="toltip">
                     <a href="{{route('actividades.create')}}" class="btn btn-warning btn-sm">
-                    <i class='far fa-edit'></i>
+                        <i class='far fa-edit'></i>
                     </a>
                     <span class="toltiptext">Nueva actividad</span>
                 </div>
@@ -145,7 +144,7 @@
             </tbody>
         </table>
     </div>    
-    {!! $actividad->appends(['nombre'=> $nombre])->render() !!}
+    {!! $actividad->appends(['nombre'=> $nombre,'vigente' => $vigente])->render() !!}
     <div style="margin-bottom: 50px;"></div>
     @section('js')
         <script>

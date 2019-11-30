@@ -27,11 +27,10 @@ class ActividadesController extends Controller
     public function index(Request $request)
     {
         $vigente = 'true';
-        if(!$request->has('vigentes')){
+        if(!$request->has('vigente')){
             if($request->has('nombre'))
                 $vigente = 'false';
         }
-        
         //Aqui mandamos llamar todos los datos de las actividades creadas
         if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])){
             $act = DB::table('actividad as a')->leftjoin('actividad_evidencia as act_evi',function($join){
