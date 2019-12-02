@@ -32,65 +32,69 @@
     @yield('links')
 </head>
 <body>  
-    <div id="menVar">
-        <nav class="navbar navbar-expand-sm" >                        
-            <div class="navbar-header ">                          
-                <!-- Imagen ITSCH -->               
-                @if(Auth::guard('web')->check())
-                    <a href="{{ url('/home') }}">
-                        <div style="text-align: center;">
-                            <img src="{{ asset('images/itsch.jpg') }}"  width="35" height="40" >
-                        </div>
-                    </a>
-                @else
-                    <a href="{{ route('alumnos.home_avance')}}">
-                        <div >
-                            <img src="{{ asset('images/itsch.jpg') }}"  width="35" height="40" >
-                        </div>
-                    </a>
-                @endif                 
-            </div>
-            <div class="collapse navbar-collapse" id="myNavbar">
-                <ul class="nav navbar-nav">
-                @if (Auth::Guard('web')->check())
-                    <li class="active">
-                        @if (Auth::User()->can('VIP')|| Auth::User()->can('VER_ACTIVIDAD') || Auth::User()->can('VIP_ACTIVIDAD') || Auth::User()->can('VIP_SOLO_LECTURA'))                           
-                            <a class="colMen" href="{{route('actividades.index')}}">
-                                <i class="fa fa-futbol-o" style="font-size:15px"></i>                           
-                            </a>                          
+    <!--Menu superior del sistema -->
+    <div class="fixed-top" id="menVar" >
+        <div class="container-fluid">
+            <nav class="navbar navbar-expand-sm  " >                        
+                <div class="navbar-header ">                          
+                    <!-- Imagen ITSCH -->               
+                    @if(Auth::guard('web')->check())
+                        <a href="{{ url('/home') }}">
+                            <div style="text-align: center;">
+                                <img src="{{ asset('images/itsch.jpg') }}"  width="35" height="40" >
+                            </div>
+                        </a>
+                    @else
+                        <a href="{{ route('alumnos.home_avance')}}">
+                            <div >
+                                <img src="{{ asset('images/itsch.jpg') }}"  width="35" height="40" >
+                            </div>
+                        </a>
+                    @endif                 
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                    @if (Auth::Guard('web')->check())
+                        <li class="active">
+                            @if (Auth::User()->can('VIP')|| Auth::User()->can('VER_ACTIVIDAD') || Auth::User()->can('VIP_ACTIVIDAD') || Auth::User()->can('VIP_SOLO_LECTURA'))                           
+                                <a class="colMen" href="{{route('actividades.index')}}">
+                                    <i class="fa fa-futbol-o" style="font-size:15px"></i>                           
+                                </a>                          
+                            @endif 
+                        </li> 
+                        <li>
+                            @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']))             
+                                <a class="colMen" href="{{route('participantes.index')}}">
+                                    <i class="fa fa-users" style="font-size:15px"></i>                           
+                                </a>                        
+                            @endif
+                        </li>
+                    @endif
+                    <li> 
+                        @if(!Auth::guard('alumno')->check())             
+                            <a class="colMen" href="{{ route('mensajes.index') }}">
+                                <i class="material-icons " style="font-size:15px">contact_mail</i>
+                            </a>                         
                         @endif 
-                    </li> 
-                    <li>
-                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']))             
-                            <a class="colMen" href="{{route('participantes.index')}}">
-                                <i class="fa fa-users" style="font-size:15px"></i>                           
-                            </a>                        
-                        @endif
                     </li>
-                @endif
-                <li> 
-                    @if(!Auth::guard('alumno')->check())             
-                        <a class="colMen" href="{{ route('mensajes.index') }}">
-                            <i class="material-icons " style="font-size:15px">contact_mail</i>
-                        </a>                         
-                    @endif 
-                </li>
-                </ul>                 
-            </div>      
-            <ul class="nav navbar-nav navbar-right">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle colMen" style="background-color: black !important;" href="#" id="navbardrop" data-toggle="dropdown">
-                        <span class="glyphicon glyphicon-log-in">
-                            <!-- Incluye menu de usuario -->
-                            @include('template.partes.menUser')
-                        </span>                    
-                    </a>
-                </li>
-            </ul>
-        </nav>
+                    </ul>                 
+                </div>      
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle colMen" style="background-color: black !important;" href="#" id="navbardrop" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-log-in">
+                                <!-- Incluye menu de usuario -->
+                                @include('template.partes.menUser')
+                            </span>                    
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        
     </div>
     <br>       
-    <div>    
+    <div class="container">    
         <div class="row">            
             <div class="col-sm-1">                
             </div>           
@@ -98,12 +102,14 @@
                 <div style="box-shadow: 4px 4px 10px #000;">                  
                     <ul class="breadcrumb" >
                         <li>
-                            @if(Auth::guard('web')->check())
-                                <label for="check" class="fa fa-bars colMen2 " data-toggle="modal" data-target="#myModal"></label>
+                            @if(Auth::guard('web')->check()) 
+                                <a href="#">
+                                    <i class="fa fa-bars colMen2" data-toggle="modal" data-target="#myModal" style="font-size:20px"></i>
+                                </a>                        
                             @endif
                         </li>
                         <li class="breadcrumb-item">
-                            @if (Auth::guard('alumno')->check())
+                            @if (Auth::guard('alumno')->check())                                
                                 <label class="label label-primary">{{ Auth::User()->nombre }}</label>
                             @else
                                 <a href="{{ url('/home') }}">Inicio</a>

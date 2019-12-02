@@ -8,10 +8,20 @@
 
 @section('contenido')
 	@if (Auth::User()->hasAnyPermission(['VIP','CREAR_ROLES']))
-		<a href="{{ route('roles.roles_crear')}}" class="btn btn-primary">Crear Rol</a>
+	<div class="row">
+		<div class="col"></div>
+		<div class="col"></div>
+		<div class="col text-right">
+			<a href="{{ route('roles.roles_crear')}}" class="btn btn-success btn-sm">
+			<i class='fas fa-address-card'></i>	
+			Crear Rol</a>
+		</div>
+	</div>
+		
 	@endif
-	<table class="table table-striped" id="tabla_roles">
-	   <thead>
+	<br>
+	<table class="table" id="tabla_roles">
+	   <thead class="thead-dark">
 	       <th>ID</th>
 	       <th>Nombre</th>
 	       <th>Ver permisos</th>

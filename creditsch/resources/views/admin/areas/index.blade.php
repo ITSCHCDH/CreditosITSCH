@@ -7,10 +7,21 @@
 
 @section('contenido')
 	@if(Auth::User()->hasAnyPermission(['VIP','CREAR_AREAS']))
-		<a href="{{ route('areas.crear') }}" class="btn btn-primary">Nueva area</a>
+	<div class="row">
+		<div class="col"></div>
+		<div class="col"></div>
+		<div class="col text-right">
+			<a href="{{ route('areas.crear') }}" class="btn btn-success btn-sm">
+				<i class='fab fa-buysellads'></i>	
+				Nueva area
+			</a>
+		</div>
+	</div>
+		
 	@endif
-	<table class="table table-striped" id="tabla-areas">
-	    <thead>
+	<br>
+	<table class="table" id="tabla-areas">
+	    <thead class="thead-dark">
 	    <th>ID</th>
 	    <th>Nombre</th>
 	    <th>Tipo</th>

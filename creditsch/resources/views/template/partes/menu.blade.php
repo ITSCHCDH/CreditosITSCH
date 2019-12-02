@@ -10,7 +10,7 @@
         @if (Auth::guard('alumno')->check())
             <div class="card ">
                 <div class="card-header">
-                    <a class="card-link colMen" href="/alumnos/home">
+                    <a class="card-link colMen" href={{ route('alumnos.home_avance')}}>
                         <i class="fa fa-home" style="font-size:15px"></i>
                         <span> &nbsp;&nbsp;Inicio</span>
                     </a>
@@ -19,7 +19,7 @@
         @else
             <div class="card">
                 <div class="card-header">
-                    <a class="card-link colMen" href="/home">
+                    <a class="card-link colMen" href={{ url('/home') }}>
                         <i class="fa fa-home" style="font-size:15px"></i>
                         <span >&nbsp;&nbsp;Inicio</span>
                     </a>

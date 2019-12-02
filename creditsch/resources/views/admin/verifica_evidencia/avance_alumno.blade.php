@@ -21,23 +21,24 @@
 
 @section('contenido')
 	<!-- Input text donde se podra buscar a los participantes por nombre -->
-	<div class="">
+	
 		{!! Form::open(['route' => 'verifica_evidencia.avance_alumno', 'method' => 'GET','class' => 'form-inline pull-right']) !!}
-			<div class="input-group">
+			<div class="input-group  mb-3">
 				{{ Form::label('no_control','No Control') }}
 			    {!! Form::text('no_control',null,['class'=>'form-control','placeholder'=>'Numero de control','aria-describedby'=>'search','required','id' => 'no_control']) !!}
 			    <div class="input-group-btn">
-			        <button type="submit" class="btn btn-primary" style="margin-top: 25px;"> Buscar
-			            <span class="badge  label label-primary glyphicon glyphicon-search"></span>
+			        <button type="submit" class="btn btn-primary" > 
+						<i class='fas fa-search'></i>
 			        </button>
 			    </div>
 			</div>
+			
 		{!! Form::close() !!}
 		<div class="autocomplete pull-right" style="width:300px; margin-right: 40px;">
 		    {!! Form::label('alumno','Alumno') !!}
 		    <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
 		</div>	
-	</div>
+	
 
 	<div class="resetear"></div>
 	<br><br>
@@ -45,38 +46,46 @@
 		<p style="font-size: 0.9vw;"><strong>No se encuentran asignados los jefes de crédito para poder llenar los campos de la constancia.</strong></p>
 	</div>
 	<div class="container-fluid ">
-		
-	  	<h1>Información del alumno</h1>
-	    <div class="row">
-		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px" ><p style="font-weight: bold;" class="center">Nombre</p></div>
-		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px;" >
-		    	<p class="center">
-			    	@if ($alumno_data!=null)
-					{{ $alumno_data[0]->nombre_alumno }}
-					@endif
-				</p>
+		<div class="container">
+			<h1>Información del alumno</h1>
+			<div class="row">
+				<div class="col-sm-1" style="background-color:#426986;color:white; " ><h4>Nombre</h4></div>
+				<div class="col-sm-3" style="background-color:#426986;color:blak; " >
+					<h4>
+						<b>
+							@if ($alumno_data!=null)
+							{{ $alumno_data[0]->nombre_alumno }}
+							@endif
+						</b>
+					</h4>
+				</div>
+				<div class="col-sm-2" style="background-color:#426986;color:white; " ><h4>Numero de control</h4></div> 
+				<div class="col-sm-2" style="background-color:#426986;color:blak; " >
+					<h4>
+						<b>
+							@if ($alumno_data!=null)
+							{{ $alumno_data[0]->no_control }}
+							@endif
+						</b>
+					</h4>
+				</div>
+				<div class="col-sm-1" style="background-color:#426986;color:white; " ><h4>Carrera</h4></div>
+				<div class="col-sm-3" style="background-color:#426986;color:blak; " >
+					<h4>
+						<b>
+							@if ($alumno_data!=null)
+							{{ $alumno_data[0]->carrera }}
+							@endif
+							</b>
+					</h4>
+				</div> 
 			</div>
-		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px" ><p style="font-weight: bold;" class="center">Numero de control</p></div> 
-		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px;" >
-		    	<p class="center">
-			    	@if ($alumno_data!=null)
-					{{ $alumno_data[0]->no_control }}
-					@endif
-				</p>
-			</div>
-		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px" ><p style="font-weight: bold;" class="center">Carrera</p></div>
-		    <div class="col-sm-2" style="background-color:rgb(29,156,216,1);color:white; min-height: 40px;" >
-		    	<p class="center">
-			    	@if ($alumno_data!=null)
-					{{ $alumno_data[0]->carrera }}
-					@endif
-				</p>
-			</div> 
-	    </div>
+		</div>
+	  	
     
-		
-		<table class="table table-condensed" style="margin: 30px auto 0 auto; width:60%;">
-			<thead>
+		<br>
+		<table class="table ">
+			<thead class="thead-dark">
 				<th>Credito</th>
 				<th>Actividades</th>
 				<th>Porcentaje</th>
@@ -140,7 +149,7 @@
 								</tr>
 								<tr>
 									<td></td>
-									<td>No actividades registradas</td>
+									<td>Actividades registradas</td>
 									<td>0%</td>
 								</tr>
 								<tr>
@@ -169,7 +178,7 @@
 							</tr>
 							<tr>
 								<td></td>
-								<td>No actividades registradas</td>
+								<td>Actividades registradas</td>
 								<td>0%</td>
 							</tr>
 							<tr>
@@ -194,7 +203,7 @@
 							<td><strong>Total de creditos</strong></td>
 					</tr>
 					<tr>						
-						<td colspan="3" style="background-color:rgb(29,156,216,1); color:white; text-align: right;"><h3>{{ $suma_creditos.' creditos' }}</h3></td>
+						<td colspan="3" style="background-color:#426986; color:white; text-align: right;"><h3>{{ $suma_creditos.' creditos' }}</h3></td>
 					</tr>
 				@endif
 			</tbody>

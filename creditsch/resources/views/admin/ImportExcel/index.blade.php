@@ -14,13 +14,13 @@
 @endsection
 
 @section('contenido')
-	<div class="col-sm-12 bg-primary text-white">		
+	<div class="col-sm-12 bg-primary text-white text-center">		
   			<h5>Este modulo permite la importacion masiva de alumnos para modificar las contraseñas de aquellos que ya han sido registrados previamente, para ello necesitaremos un archivo de excel que contenga los siguientes datos: <p></p> <b>Para modificar:</b><p></p>Columnas del excel:<p></p><b>No., Numero de control y Password</b> </h5>		
 	</div>
-	<div class="row">
+	<div class="row ">
 		<div class="col-sm-2 ">			
 		</div>
-		<div class="col-sm-8 links">
+		<div class="col-sm-8 text-center">
 			<div class="col-sm-12">
 				<h3>Modificar alumnos existentes</h3>
 			</div>	    

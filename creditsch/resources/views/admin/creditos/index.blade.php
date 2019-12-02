@@ -9,7 +9,7 @@
 @section('contenido')
 <div class="container">
     @if ($faltan_jefes)
-        <div class="alert-warning" role="alert" style="padding:1rem;">
+        <div class="alert-info" role="alert" style="padding:1rem;">
             <p style="font-size:large; text-align: center !important;">
                 Se encuentran créditos sin jefe asignado, lo cual no permitirá la impresión de constancias
             </p>
@@ -17,15 +17,16 @@
     @endif
     <br>
     @if (Auth::User()->can('VIP') || Auth::User()->can('CREAR_CREDITOS'))
-        <div class="toltip pull-left">
-            <a href="{{route('creditos.create')}}" class="btn btn-success btn-circle">
-            <i class='fas fa-plus-circle' style='font-size:24px'></i>
+        <div class="toltip pull-right">
+            <a href="{{route('creditos.create')}}" class="btn btn-success btn-sm">
+                <i class='fas fa-plus-circle' style='font-size:22px'></i>
             </a>
             <span class="toltiptext">Crear un nuevo crédito</span>
         </div>
     @endif
     <br>
         <div class="table-responsive">
+            <br>
             <table class="table">
                 <thead class="thead-dark">
                     <th>ID</th>

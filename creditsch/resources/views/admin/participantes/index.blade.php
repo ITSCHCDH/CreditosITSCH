@@ -23,7 +23,15 @@
     {!! Form::open(['route' => 'evidencias.create', 'method' => 'GET']) !!}
         <input type="hidden" name="id_actividad" value='-1' id='input_id_actividad'>
         <input type="hidden" name="id_responsable" value='-1' id='input_id_responsable'>
-        <input type='submit' name='' class='btn btn-primary' value='Agregar Evidencia'>
+        <div class="toltip">
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="material-icons">
+                    add_a_photo
+                </i>          
+            </button>
+            <span class="toltiptext">Agregar evidencia</span>  
+        </div>
+       
     {!! Form::close() !!}
 @endif
 
@@ -35,7 +43,7 @@
     <p id="parrafo-validado" style="display: none;">Validado: <strong id="validado">NO</strong></p>
 </div>
 <div class="resetear"></div>
-<div>
+<div class="container">
     <div class="input-group form-inline my-2 my-lg-0 mr-lg-2 pull-left" style="width: 250px;">
         <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
             al que estan asignados los participantes -->
@@ -81,7 +89,11 @@
 
 <!---------------------------------------------------------------------------------------------->
 <!-- Tabla donde se muestran los participantes -->
-<table class="table mt-3" id="mitabla">
+<br>
+<input class="form-control pull-right" id="myInput" type="text" placeholder="Buscar.." style="width: 250px;">
+<br>
+<br>
+<table class="table" id="mitabla">
     <!-- instancia al archivo table, dentro de este mismo direcctorio -->
    <thead class="thead-dark">
         <th>ID</th>
@@ -96,6 +108,17 @@
 <div style="margin-bottom: 50px;"></div>
 
 @section('js')
+<script>
+    $(document).ready(function(){
+    $("#myInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#mitabla tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+    });
+</script>
+
 <script>
     //Header necesarios para las peticiones Ajax
     $.ajaxSetup( {
