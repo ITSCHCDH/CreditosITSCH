@@ -39,58 +39,56 @@
                 </div>                      
             </div>
         </div>
-    </div>
-    <section id="main">
-        <aside id="horizontal-scroll">
-            <table class="table" id="tabla-alumnos">
-                <thead class="thead-dark">
-                <th>ID</th>
-                <th>Numero de Control</th>
-                <th>Nombre</th>
-                <th>Carrera</th>
-                <th>Estatus</th>
-                @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS','MODIFICAR_ALUMNOS']))
-                    <th>Acción</th>
-                @endif
-                </thead>
-                <tbody>
-                @foreach($alumno as $alu)
-                    <tr>
-                        <td>{{$alu->id}}</td>
-                        <td>{{$alu->no_control}}</td>
-                        <td>{{$alu->nombre}}</td>
-                        <td>{{$alu->carrera}}</td>
-                        <td>
-                            @if($alu->status == "Pendiente" || $alu->status == "pendiente")
-                                <span class="label label-danger">Pendiente</span>
-                            @else
-                                <span class="label label-primary">Liberado</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ALUMNOS']))
-                                <div class="toltip">
-                                    <a href="{{ route('alumnos.edit',[$alu->id]) }}" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
-                                    <span class="toltiptext">Modificar alumno</span>     
-                                </div>      
-                            @endif
-                            @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS']))
-                                <div class="toltip">
-                                    <a  class="btn btn-danger btn-sm" onclick="undo_alumno({{$alu->id}})" data-toggle="modal" data-target="#myModalMsg">
-                                        <span class="glyphicon glyphicon-remove-circle" aria-hidden="true">                                            
-                                        </span>
-                                    </a>
-                                    <span class="toltiptext">Eliminar alumno</span>     
-                                </div>    
-                            @endif
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        </aside>
-    </section>
-
+    </div> 
+    <div class="table-responsive">
+        
+    </div>  
+    <table class="table" id="tabla-alumnos">
+        <thead class="thead-dark">
+        <th>ID</th>
+        <th>Numero de Control</th>
+        <th>Nombre</th>
+        <th>Carrera</th>
+        <th>Estatus</th>
+        @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS','MODIFICAR_ALUMNOS']))
+            <th>Acciónes</th>
+        @endif
+        </thead>
+        <tbody>
+        @foreach($alumno as $alu)
+            <tr>
+                <td>{{$alu->id}}</td>
+                <td>{{$alu->no_control}}</td>
+                <td>{{$alu->nombre}}</td>
+                <td>{{$alu->carrera}}</td>
+                <td>
+                    @if($alu->status == "Pendiente" || $alu->status == "pendiente")
+                        <span class="label label-danger">Pendiente</span>
+                    @else
+                        <span class="label label-primary">Liberado</span>
+                    @endif
+                </td>
+                <td>
+                    @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ALUMNOS']))
+                        <div class="toltip">
+                            <a href="{{ route('alumnos.edit',[$alu->id]) }}" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+                            <span class="toltiptext">Modificar alumno</span>     
+                        </div>      
+                    @endif
+                    @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS']))
+                        <div class="toltip">
+                            <a  class="btn btn-danger btn-sm" onclick="undo_alumno({{$alu->id}})" data-toggle="modal" data-target="#myModalMsg">
+                                <span class="glyphicon glyphicon-remove-circle" aria-hidden="true">                                            
+                                </span>
+                            </a>
+                            <span class="toltiptext">Eliminar alumno</span>     
+                        </div>    
+                    @endif
+                </td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
     <!--Modal para mensajes del sistema-->    
     <div class="modal" id="myModalMsg">
         <div class="modal-dialog modal-sm">

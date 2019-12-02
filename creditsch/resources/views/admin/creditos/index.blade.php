@@ -7,7 +7,7 @@
 @endsection
 
 @section('contenido')
-<div class="container">
+<div>
     @if ($faltan_jefes)
         <div class="alert-info" role="alert" style="padding:1rem;">
             <p style="font-size:large; text-align: center !important;">

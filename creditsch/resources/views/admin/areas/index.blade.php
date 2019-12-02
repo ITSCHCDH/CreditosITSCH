@@ -34,12 +34,12 @@
 	    			<td>{{ $area->nombre }}</td>
 	    			<td>{{ $area->tipo }}</td>
 	    			<td>
-	    				<a href="{{ route('areas.usuarios',$area->id) }}" class="btn btn-primary"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+	    				<a href="{{ route('areas.usuarios',$area->id) }}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
 	    				@if(Auth::User()->hasAnyPermission(['VIP','MODIFICAR_AREAS']))
-	    					<a href="{{ route('areas.editar',$area->id) }}" class="btn btn-warning"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+	    					<a href="{{ route('areas.editar',$area->id) }}" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
 	    				@endif
 	    				@if(Auth::User()->hasAnyPermission(['VIP','ELIMINAR_AREAS']))
-	    					<a href="{{ route('areas.eliminar',$area->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+	    					<a href="{{ route('areas.eliminar',$area->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
 	    				@endif
 	    			</td>
 	    		</tr>
