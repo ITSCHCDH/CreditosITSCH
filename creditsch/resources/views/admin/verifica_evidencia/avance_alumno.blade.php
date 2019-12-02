@@ -46,38 +46,38 @@
 		<p style="font-size: 0.9vw;"><strong>No se encuentran asignados los jefes de crédito para poder llenar los campos de la constancia.</strong></p>
 	</div>
 	<div class="container-fluid ">
-		<div class="container">
-			<h1>Información del alumno</h1>
+		<div>
+			<h3>Información del alumno</h3>
 			<div class="row">
-				<div class="col-sm-1" style="background-color:#426986;color:white; " ><h4>Nombre</h4></div>
+				<div class="col-sm-1" style="background-color:#426986;color:white; " ><h5>Nombre</h5></div>
 				<div class="col-sm-3" style="background-color:#426986;color:blak; " >
-					<h4>
+					<h5>
 						<b>
 							@if ($alumno_data!=null)
 							{{ $alumno_data[0]->nombre_alumno }}
 							@endif
 						</b>
-					</h4>
+					</h5>
 				</div>
-				<div class="col-sm-2" style="background-color:#426986;color:white; " ><h4>Numero de control</h4></div> 
+				<div class="col-sm-2" style="background-color:#426986;color:white; " ><h5>No. control</h5></div> 
 				<div class="col-sm-2" style="background-color:#426986;color:blak; " >
-					<h4>
+					<h5>
 						<b>
 							@if ($alumno_data!=null)
 							{{ $alumno_data[0]->no_control }}
 							@endif
 						</b>
-					</h4>
+					</h5>
 				</div>
-				<div class="col-sm-1" style="background-color:#426986;color:white; " ><h4>Carrera</h4></div>
+				<div class="col-sm-1" style="background-color:#426986;color:white; " ><h5>Carrera</h5></div>
 				<div class="col-sm-3" style="background-color:#426986;color:blak; " >
-					<h4>
+					<h5>
 						<b>
 							@if ($alumno_data!=null)
 							{{ $alumno_data[0]->carrera }}
 							@endif
 							</b>
-					</h4>
+					</h5>
 				</div> 
 			</div>
 		</div>
