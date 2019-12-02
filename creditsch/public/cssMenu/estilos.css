@@ -79,6 +79,7 @@
 #menVar{
         background-color: #000 !important;
         border-radius: 0px;
+        position: absolute;
     }
 
 /*Estilo del menu vertical*/

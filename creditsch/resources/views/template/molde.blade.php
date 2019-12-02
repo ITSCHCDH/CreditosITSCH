@@ -33,7 +33,7 @@
 </head>
 <body>  
     <!--Menu superior del sistema -->
-    <div class="fixed-top" id="menVar" >
+    <div class="fixed-top" id="menVar">
         <div class="container-fluid">
             <nav class="navbar navbar-expand-sm  " >                        
                 <div class="navbar-header ">                          
@@ -94,10 +94,11 @@
         
     </div>
     <br>       
-    <div class="container">    
+    <div class="container" style="margin-top: 70px">    
         <div class="row">            
             <div class="col-sm-1">                
-            </div>           
+            </div>     
+            <!--Barra con la ruta recorrida en el sistema  -->      
             <div class="col-sm-10">
                 <div style="box-shadow: 4px 4px 10px #000;">                  
                     <ul class="breadcrumb" >
