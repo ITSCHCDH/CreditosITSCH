@@ -84,7 +84,7 @@
                         </div>               
                 </div>
             @endif
-            @if (Auth::User()->hasAnyPermission('VIP','VIP_AVANCE_ALUMNO','VER_AVANCE_ALUMNO','VIP_CONSTANCIAS','MODIFICAR_CONSTANCIAS_CARRERA','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VER_REPORTES_CARRERA','VIP_REPORTES'))
+            @if (Auth::User()->hasAnyPermission('VIP','VIP_AVANCE_ALUMNO','VER_AVANCE_ALUMNO','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VER_REPORTES_CARRERA','VIP_REPORTES'))
                 <div class="card">
                     <div class="card-header">
                         <a class="collapsed card-link colMen" data-toggle="collapse" href="#collapseTwo">
@@ -107,14 +107,6 @@
                                 <a class="colTxtSub" href="{{ route('verifica_evidencia.index') }}">
                                     <i class="fa fa-calendar-check-o" style="font-size:10px"></i>
                                     <span >&nbsp;&nbsp;Verificar evidencia</span>
-                                </a>
-                            </div>
-                        @endif
-                        @if (Auth::User()->hasAnyPermission('VIP','VIP_CONSTANCIAS','MODIFICAR_CONSTANCIAS_CARRERA'))
-                            <div class="card-body">
-                                <a class="colTxtSub" href="{{ route('constancias.index') }}">
-                                    <i class="fa fa-print" style="font-size:10px"></i>
-                                    <span >&nbsp;&nbsp;Constancias</span>
                                 </a>
                             </div>
                         @endif
@@ -165,6 +157,14 @@
                             <a class="colTxtSub" href="{{ route('areas.inicio') }}">
                                 <i class="fa fa-map-marker" style="font-size:10px"></i>
                                 <span >&nbsp;&nbsp;Areas</span>
+                            </a>
+                        </div>
+                    @endif
+                    @if (Auth::User()->hasAnyPermission('VIP','VIP_CONSTANCIAS','MODIFICAR_CONSTANCIAS_CARRERA'))
+                        <div class="card-body">
+                            <a class="colTxtSub" href="{{ route('constancias.index') }}">
+                                <i class="fa fa-print" style="font-size:10px"></i>
+                                <span >&nbsp;&nbsp;Constancias</span>
                             </a>
                         </div>
                     @endif

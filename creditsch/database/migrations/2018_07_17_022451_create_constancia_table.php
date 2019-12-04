@@ -36,7 +36,6 @@ class CreateConstanciaTable extends Migration
             $table->string('certificador_enunciado');//Puesto/posicion de quien certifica
             $table->string('imagen_encabezado');
             $table->string('imagen_pie');
-            $table->string('plan_de_estudios'); // El plan de estudios ISIC-2010-224
             $table->integer('numero_oficio');
             $table->foreign('jefe_depto')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('certificador')->references('id')->on('users')->onDelete('cascade');

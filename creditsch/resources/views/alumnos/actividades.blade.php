@@ -29,7 +29,7 @@
 							<td>{{ $actividad->actividad_porcentaje }}%</td>
 							<td>
 								@if ($actividad->validado == "true")
-									@if ($actividad->alumnos == "true" && (($actividad->momento_agregado == "posteriormente" && $actividad->evidencia_validada == "si") || ($actividad->momento_agregado == "anteriormente")))
+									@if (( $actividad->alumnos == "true" && $actividad->momento_agregado == "posteriormente" && $actividad->evidencia_validada == "si") || ($actividad->momento_agregado == "anteriormente"))
 										{{ "SI" }}
 									@else
 										@php

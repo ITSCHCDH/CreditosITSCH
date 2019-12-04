@@ -34,7 +34,10 @@ class VerificaEvidenciaController extends Controller
             $actividades_link = 'true';
         }
         if($request->has('validadas') || (!$request->has('validadas') && !$request->has('busqueda'))){
-            $validadas = 'false';
+            if($request->has('validadas') && $request->validadas == 'true')
+                $validadas = 'true';
+            else
+                $validadas = 'false';
         }
         if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA'])){
             $evidencias_data = DB::table('evidencia as e')

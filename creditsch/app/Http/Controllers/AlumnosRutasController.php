@@ -92,15 +92,15 @@ class AlumnosRutasController extends Controller
         $jefe_division = DB::table('alumnos as alu')->join('constancia as c', function($join){
             $join->on('alu.carrera','=','c.carrera');
             $join->where('alu.no_control','=',Auth::User()->no_control);
-        })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division')->get();
+        })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division','c.plan_de_estudios')->get();
         if($jefe_depto->count()==0 || $certificador->count()==0 || $jefe_division->count()==0 || $datos_globales->count()==0){
             Flash::error('Falta de integridad en los datos de la constancia');
             return redirect()->back();
         }
         $alumno = DB::table('alumnos')->join('areas','areas.id','=','alumnos.carrera')->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.nombre','alumnos.no_control','areas.nombre as carrera')->get();
         $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
-        if(count($alumno_data)!=5){
-            Flash::error('Si ya tienes tus 5 créditos liberados y no se muestra tu constancia.<br>Probablemente no sea han asignados jefes de crédito.');
+        if(count($alumno_data)<5){
+            Flash::error('Si ya tienes tus 5 créditos liberados y no se muestra tu constancia.<br>Probablemente falten datos de la misma.');
             return back();
         }
         sort($alumno_data);
@@ -128,7 +128,8 @@ class AlumnosRutasController extends Controller
             'jefe_division' => $jefe_division[0],
             'alumno' => $alumno[0],
             'alumno_data' => $alumno_data,
-            'no_oficio' => $folio
+            'no_oficio' => $folio,
+            'plan_de_estudios' => $jefe_division[0]->plan_de_estudios
         ];
         $pdf = PDF::loadView('admin.constancias.constancia_alumno', compact('data'));
         //return view('admin.constancias.constancia');

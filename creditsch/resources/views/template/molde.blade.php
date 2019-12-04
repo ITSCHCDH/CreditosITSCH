@@ -27,6 +27,9 @@
         .progress { position:relative; width:30%; border: 1px solid #7F98B2; padding: 1px; border-radius: 5px;}
         .bar { background-color: #B4F5B4; width:0%; height:25px; border-radius: 3px; }
         .percent { position:absolute; display:inline-block; top:0px; left:48%; color: #7F98B2;}
+        .alerta-padding{
+            padding: 10px;
+        }
     </style>
    
     @yield('links')

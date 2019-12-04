@@ -24,16 +24,52 @@ class ConstanciasController extends Controller
     }
     	
     public function index(){
-    	return view('admin.constancias.index');
+    	if (Auth::User()->hasAnyPermission(['VIP','VIP_CONSTANCIAS'])) {
+            //Cosuntamos si existen los datos globales
+            $datos_globales = ConstanciaComplemento::where([
+                ['id','=',1],
+                ['imagen_encabezado','<>',null],
+                ['imagen_encabezado','<>',null]
+            ])->get();
+            $carreras = Area::where('tipo','=','carrera')->get();
+            $abreviaturas = $this->obternerAbreviaturas();
+            $users = User::select('name','id')->where('email','<>','admin@itsch.com')->orderBy('name','ASC')->get();
+            return view('admin.constancias.index')
+            ->with('carreras',$carreras)
+            ->with('abreviaturas',$abreviaturas)
+            ->with('users',$users)
+            ->with('datos_globales',$datos_globales);
+        }else{
+            //Cosuntamos si existen los datos globales
+            $datos_globales = ConstanciaComplemento::where([
+                ['id','=',1],
+                ['imagen_encabezado','<>',null],
+                ['imagen_encabezado','<>',null]
+            ])->get();
+
+            $carreras = Area::where([
+                ['tipo','=','carrera'],
+                ['id','=',Auth::User()->id]
+            ])->get();
+            $abreviaturas = $this->obternerAbreviaturas();
+            $users = User::select('name','id')->where([
+                ['email','<>','admin@itsch.com'],
+                ['area','=',Auth::User()->area]
+            ])->orderBy('name','ASC')->get();
+            return view('admin.constancias.index')
+            ->with('carreras',$carreras)
+            ->with('abreviaturas',$abreviaturas)
+            ->with('users',$users)
+            ->with('datos_globales',$datos_globales);
+        }
     }
     public function visualizar(Request $request){
         if(!$request->has('carrera')){
             Flash::error('Error datos inconcistentes');
             return redirect()->route('constancias.editar');
         }
-        $jefe_division = DB::table('constancia as c')->join('users as u','u.id','=','c.jefe_division')->where('c.carrera','=',$request->get('carrera'))->select('u.name','c.profesion_jefe_division','c.division_enunciado')->get();
-
-        if($jefe_division->count()==0){
+        $datos_especificos_por_carrera = DB::table('constancia as c')->join('users as u','u.id','=','c.jefe_division')->where('c.carrera','=',$request->get('carrera'))->select('u.name','c.profesion_jefe_division','c.division_enunciado','c.plan_de_estudios')->get();
+        if($datos_especificos_por_carrera->count() == 0){
             Flash::error('Error datos inconcistentes');
             return redirect()->route('constancias.editar');
         }
@@ -68,7 +104,8 @@ class ConstanciasController extends Controller
             'jefe_depto' => $jefe_depto[0],
             'raiz' => $raiz,
             'certificador' => $certificador[0],
-            'jefe_division' => $jefe_division[0]
+            'jefe_division' => $datos_especificos_por_carrera[0],
+            'plan_de_estudios' => $datos_especificos_por_carrera[0]->plan_de_estudios
         ];
         $pdf = PDF::loadView('admin.constancias.constancia', compact('data'));
         //return view('admin.constancias.constancia');
@@ -107,7 +144,7 @@ class ConstanciasController extends Controller
         $jefe_division = DB::table('alumnos as alu')->join('constancia as c', function($join) use($request){
             $join->on('alu.carrera','=','c.carrera');
             $join->where('alu.no_control','=',$request->no_control);
-        })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division')->get();
+        })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division','c.plan_de_estudios')->get();
         if($jefe_depto->count()==0 || $certificador->count()==0 || $jefe_division->count()==0 || $datos_globales->count()==0){
             Flash::error('Falta de integridad en los datos de la constancia');
             return redirect()->back();
@@ -143,68 +180,26 @@ class ConstanciasController extends Controller
             'jefe_division' => $jefe_division[0],
             'alumno' => $alumno[0],
             'alumno_data' => $alumno_data,
-            'no_oficio' => $folio
+            'no_oficio' => $folio,
+            'plan_de_estudios' => $jefe_division[0]->plan_de_estudios
+
         ];
         $pdf = PDF::loadView('admin.constancias.constancia_alumno', compact('data'));
         //return view('admin.constancias.constancia');
         return $pdf->stream('constancia.pdf');
     }
-    public function editarConstancia(){
-        if (Auth::User()->hasAnyPermission(['VIP','VIP_CONSTANCIAS'])) {
-            //Cosuntamos si existen los datos globales
-            $datos_globales = ConstanciaComplemento::where([
-                ['id','=',1],
-                ['imagen_encabezado','<>',null],
-                ['imagen_encabezado','<>',null]
-            ])->get();
-            $carreras = Area::where('tipo','=','carrera')->get();
-            $abreviaturas = $this->obternerAbreviaturas();
-            $users = User::select('name','id')->where('email','<>','admin@itsch.com')->orderBy('name','ASC')->get();
-            return view('admin.constancias.editar')
-            ->with('carreras',$carreras)
-            ->with('abreviaturas',$abreviaturas)
-            ->with('users',$users)
-            ->with('datos_globales',$datos_globales);
-        }else{
-            //Cosuntamos si existen los datos globales
-            $datos_globales = ConstanciaComplemento::where([
-                ['id','=',1],
-                ['imagen_encabezado','<>',null],
-                ['imagen_encabezado','<>',null]
-            ])->get();
-
-            $carreras = Area::where([
-                ['tipo','=','carrera'],
-                ['id','=',Auth::User()->id]
-            ])->get();
-            $abreviaturas = $this->obternerAbreviaturas();
-            $users = User::select('name','id')->where([
-                ['email','<>','admin@itsch.com'],
-                ['area','=',Auth::User()->area]
-            ])->orderBy('name','ASC')->get();
-            return view('admin.constancias.editar')
-            ->with('carreras',$carreras)
-            ->with('abreviaturas',$abreviaturas)
-            ->with('users',$users)
-            ->with('datos_globales',$datos_globales);
-        }
-        
-    }
 
     public function guardarDatosGlobales(Request $request){
-        $plan_de_estudios = "ISIC-2010-224";
         $datos_globales = ConstanciaComplemento::where('id','=',1)->get();
 
         if($datos_globales->count()>0){
             $datos_globales = ConstanciaComplemento::find(1);
             $datos_globales->fill($request->all());
-
-            if($request->plan_de_estudios==null)$datos_globales->plan_de_estudios = $plan_de_estudios;
             if($request->hasFile('imagen_encabezado')){
                 $check = $this->extensionEsValida('imagen_encabezado',$request);
                 if(!$check){
                     Flash::error('La extensión '.$request->file('imagen_encabezado')->getClientOriginalExtension().' no es valida.');
-                    return redirect()->route('constancias.editar');
+                    return redirect()->route('constancias.index');
                 }
                 $datos_globales->imagen_encabezado = $this->guardarImagen('encabezado','imagen_encabezado','encabezado',$request);
                 $datos_globales->save();
@@ -214,7 +209,7 @@ class ConstanciasController extends Controller
                 $check = $this->extensionEsValida('imagen_pie',$request);
                 if(!$check){
                     Flash::error('La extensión '.$request->file('imagen_pie')->getClientOriginalExtension().' no es valida.');
-                    return redirect()->route('constancias.editar');
+                    return redirect()->route('constancias.index');
                 }
                 $datos_globales->imagen_pie = $this->guardarImagen('pie_de_pagina','imagen_pie','pie_de_pagina',$request);
                 $datos_globales->save();
@@ -227,26 +222,25 @@ class ConstanciasController extends Controller
                 $check = $this->extensionEsValida('imagen_encabezado',$request);
                 if(!$check){
                     Flash::error('La extensión '.$request->file('imagen_encabezado')->getClientOriginalExtension().' no es valida.');
-                    return redirect()->route('constancias.editar');
+                    return redirect()->route('constancias.index');
                 }
             }else{
                 Flash::error('No se encontro la imagen para el encabezado');
-                return redirect()->route('constancias.editar');
+                return redirect()->route('constancias.index');
             }
             if($request->hasFile('imagen_pie')){
                 $check = $this->extensionEsValida('imagen_pie',$request);
                 if(!$check){
                     Flash::error('La extensión '.$request->file('imagen_pie')->getClientOriginalExtension().' no es valida.');
-                    return redirect()->route('constancias.editar');
+                    return redirect()->route('constancias.index');
                 }
             }else{
                 Flash::error('No se encontro la imagen para el pie de página');
-                return redirect()->route('constancias.editar');
+                return redirect()->route('constancias.index');
             }
 
             $datos_globales = new ConstanciaComplemento($request->all());
             $datos_globales->id = 1;
-            if($request->plan_de_estudios==null)$datos_globales->plan_de_estudios = $plan_de_estudios;
             $datos_globales->imagen_encabezado = $this->guardarImagen('encabezado','imagen_encabezado','encabezado',$request);
             $datos_globales->imagen_pie = $this->guardarImagen('pie_de_pagina','imagen_pie','pie_de_pagina',$request);
             $datos_globales->numero_oficio = 0;
@@ -254,7 +248,7 @@ class ConstanciasController extends Controller
         }
         
         Flash::success("Datos guardados correctamente");
-        return redirect()->route('constancias.editar');
+        return redirect()->route('constancias.index');
     }
     public function extensionEsValida($nombre_request, $request){
         $allowedfileExtension=['jpg','png','jpeg'];
