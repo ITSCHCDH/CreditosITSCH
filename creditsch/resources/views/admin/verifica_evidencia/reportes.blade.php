@@ -35,7 +35,7 @@
 		    </select>
 		</div>
 		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 pull-left">
-			{!! Form::label('busqueda','Busqueda') !!}
+			{!! Form::label('busqueda','Busqueda') !!}			
 			<input type="text" name="busqueda" class="form-control" placeholder="Nombre - No Control" value="{{ $busqueda }}">
 		</div>
 		{!! Form::submit('Consultar',['class' => 'btn btn-primary pull-left','style' => 'margin-top: 24px; margin-left: 25px;']) !!}
@@ -54,7 +54,7 @@
 					<p class="pull-left" style="width: 100%; max-width: 100%;">{{ ($suma_creditos[$alumno]->credito_suma*100)/500 }}%</p>
 					<div style="width: {{ ($suma_creditos[$alumno]->credito_suma*100)/500 }}%">
 					</div>
-				</div>
+				</div>				
 				<p class="btn btn-primary boton-desplegar pull-left" id="{{ $suma_creditos[$alumno]->alumno_id }}">Ver más</p>
 				@if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
 					{!! Form::open(['route' => 'verifica_evidencia.avance_alumno', 'method' => 'get','style' => 'width: 100px;','class' =>'pull-left']) !!}
@@ -73,6 +73,15 @@
 						{!! Form::hidden('no_control', $suma_creditos[$alumno]->no_control) !!}
 						{!! Form::submit('Ver avance del alumno',['class' => 'btn btn-primary pull-left alumno-avance'])!!}
 					{!! Form::close() !!}
+				@endif
+
+				@if($suma_creditos[$alumno]->credito_suma=='500' && (Auth::User()->hasAnyPermission(['VIP','IMPRIMIR_CONSTANCIAS'])))
+
+					<form action="{{ route('constancias.imprimir') }}"  method="post">
+						{{ csrf_field() }}
+						<input type="hidden" name="no_control" value="{{  $reportes_data[$alumno_index]->no_control }}">
+						<input type="submit" name="" value="Imprimir constancia" class="btn btn-primary">
+					</form>
 				@endif
 				
 				
