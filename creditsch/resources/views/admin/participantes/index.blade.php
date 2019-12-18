@@ -89,22 +89,25 @@
 
 <!---------------------------------------------------------------------------------------------->
 <!-- Tabla donde se muestran los participantes -->
-<br>
-<input class="form-control pull-right" id="myInput" type="text" placeholder="Buscar.." style="width: 250px;">
-<br>
-<br>
-<table class="table" id="mitabla">
-    <!-- instancia al archivo table, dentro de este mismo direcctorio -->
-   <thead class="thead-dark">
-        <th>ID</th>
-        <th>Numero de Control</th>
-        <th>Nombre</th>
-        <th>Carrera</th>
-        <th>Acción</th>
-   </thead>
-   <tbody>
-   </tbody>
-</table>
+
+    <br>
+    <input class="form-control pull-right" id="myInput" type="text" placeholder="Buscar.." style="width: 250px;">
+    <br>
+    <br>
+<div class="table-responsive">
+    <table class="table" id="mitabla">
+        <!-- instancia al archivo table, dentro de este mismo direcctorio -->
+       <thead class="thead-dark">
+            <th>ID</th>
+            <th>Numero de Control</th>
+            <th>Nombre</th>
+            <th>Carrera</th>
+            <th>Acción</th>
+       </thead>
+       <tbody>
+       </tbody>
+    </table>
+</div>
 <div style="margin-bottom: 50px;"></div>
 
 @section('js')

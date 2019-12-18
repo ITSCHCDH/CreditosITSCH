@@ -17,7 +17,7 @@
 	width: 220px;
 	height: 25px;
 	background: white;
-	border: 1px solid black;
+	border: 1px solid black;	
 }
 .porcentaje div{
 	height: 100%;
@@ -37,18 +37,11 @@ li .porcentaje div{
 	padding: 0px !important;
 }
 .alumno-avance{
-	height: 25px;
-	margin-left: 15px;
+	height: 25px;	
 	padding: 0px 10px 0px 10px !important;
 }
 .lista{
-	list-style-type: none;
-	margin-left: 30px;
-	text-align: left;
-}
-.lista li{
-	margin-top: 5px;
-	margin-bottom: 5px;
+	list-style:none;
 }
 .credito{
 	height: 25px;

@@ -5,25 +5,36 @@
 	<label class="label label-success">Mensajes</label>
 @endsection
 @section('contenido')
-	<div class="pull-right">
-		<div class="toltip">
-			<a href="{{ route('mensajes.crear') }}" class="btn btn-primary btn-sm" style="padding: 2px;">
-				<i class='fas fa-envelope' style="font-size:24px"></i>
-			</a>
-			<span class="toltiptext">Nuevo mensaje</span>
+	<div class="row">
+		<div class="col-sm-4">
+			<div class="toltip">
+				<a  href="{{ route('verifica_evidencia.index') }}" class="btn btn-info btn-sm" style="padding: 2px;">
+					<i class='fas fa-search-plus' style='font-size:24px; color:#000;'></i>
+				</a>
+				<span class="toltiptext">Verificar evidencias</span>
+			</div>
 		</div>
-		<div class="toltip">
-			<a href="{{ route('mensajes.enviados') }}" class="btn btn-warning" style="padding: 2px;">
-				<i class="fa fa-send" style="font-size:24px"></i>
-			</a>
-			<span class="toltiptext">Mensajes enviados</span>
-		</div>
-		<div class="toltip">
-			<a href="{{ route('mensajes.vistos') }}" class="btn btn-success" style="padding: 2px;">
-				<i class='fas fa-envelope-open-text' style="font-size:24px"></i>
-			</a>
-			<span class="toltiptext">Mensajes vistos</span>
-		</div>
+		<div class="col-sm-4"></div>
+		<div class="col-sm-4" style="text-align: right;">
+			<div class="toltip">
+				<a href="{{ route('mensajes.crear') }}" class="btn btn-primary btn-sm" style="padding: 2px;">
+					<i class='fas fa-envelope' style="font-size:24px"></i>
+				</a>
+				<span class="toltiptext">Nuevo mensaje</span>
+			</div>
+			<div class="toltip">
+				<a href="{{ route('mensajes.enviados') }}" class="btn btn-warning" style="padding: 2px;">
+					<i class="fa fa-send" style="font-size:24px"></i>
+				</a>
+				<span class="toltiptext">Mensajes enviados</span>
+			</div>
+			<div class="toltip">
+				<a href="{{ route('mensajes.vistos') }}" class="btn btn-success" style="padding: 2px;">
+					<i class='fas fa-envelope-open-text' style="font-size:24px"></i>
+				</a>
+				<span class="toltiptext">Mensajes vistos</span>
+			</div>
+		</div>		
 	</div>
 	<div style="clear: both;"></div>
 	<br>

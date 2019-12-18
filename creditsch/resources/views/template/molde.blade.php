@@ -38,8 +38,15 @@
     <!--Menu superior del sistema -->
     <div class="fixed-top" id="menVar">
         <div class="container-fluid">
-            <nav class="navbar navbar-expand-sm  " >                        
-                <div class="navbar-header ">                          
+            <nav class="navbar navbar-expand-sm  " >
+                <div>
+                    @if(Auth::guard('web')->check()) 
+                        <a href="#">
+                            <i class="fa fa-bars" data-toggle="modal" data-target="#myModal" style="font-size:20px; color:#fff;"> </i>
+                        </a>                        
+                    @endif     
+                </div>                        
+                <div class="navbar-header ">                                     
                     <!-- Imagen ITSCH -->               
                     @if(Auth::guard('web')->check())
                         <a href="{{ url('/home') }}">
@@ -97,9 +104,9 @@
         
     </div>
     <br>       
-    <div class="container" style="margin-top: 70px">    
-        <div class="row">            
-            <div class="col-sm-1">                
+  
+        <div class="row" style="margin-top: 75px">            
+            <div class="col-sm-1">         
             </div>     
             <!--Barra con la ruta recorrida en el sistema  -->      
             <div class="col-sm-10">
@@ -130,10 +137,9 @@
                     @yield('contenido','Default')<!-- Contenido general del sistema -->
                 </div>                                 
             </div>
-            <div class="col-sm-1">              
+            <div class="col-sm-1">      
             </div>
-      </div>
-    </div>
+      </div>    
 
     <div id="footer"> 
         Copyright © ITSCH 2017|CEDEITSCH
