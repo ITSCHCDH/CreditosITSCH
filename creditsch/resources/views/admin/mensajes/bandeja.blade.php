@@ -7,12 +7,14 @@
 @section('contenido')
 	<div class="row">
 		<div class="col-sm-4">
-			<div class="toltip">
-				<a  href="{{ route('verifica_evidencia.index') }}" class="btn btn-info btn-sm" style="padding: 2px;">
-					<i class='fas fa-search-plus' style='font-size:24px; color:#000;'></i>
-				</a>
-				<span class="toltiptext">Verificar evidencias</span>
-			</div>
+			@if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA']))
+				<div class="toltip">
+					<a  href="{{ route('verifica_evidencia.index') }}" class="btn btn-info btn-sm" style="padding: 2px;">
+						<i class='fas fa-search-plus' style='font-size:24px; color:#000;'></i>
+					</a>
+					<span class="toltiptext">Verificar evidencias</span>
+				</div> 
+			@endif
 		</div>
 		<div class="col-sm-4"></div>
 		<div class="col-sm-4" style="text-align: right;">
