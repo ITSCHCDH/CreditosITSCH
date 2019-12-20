@@ -166,7 +166,7 @@ class Actividad_EvidenciasController extends Controller
 			$actividad = Actividad::find($request->actividad_id);
 			$mensaje = new Mensaje();
 			$mensaje->creador_id = Auth::User()->id;
-			$mensaje->mensaje = "Has sido asignado a la actividad ".$actividad->nombre.".";
+			$mensaje->mensaje = "Has sido asignado a la actividad ".$actividad->nombre.". #".$actividad->id;
 			$mensaje->notificacion = "Nueva actividad asignada";
 			$mensaje->save();
 			for ($i = 0; $i < count($diferencia_agregar); $i++) {

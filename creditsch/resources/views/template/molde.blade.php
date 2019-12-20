@@ -42,8 +42,9 @@
                 <div>
                     @if(Auth::guard('web')->check()) 
                         <a href="#">
-                            <i class="fa fa-bars" data-toggle="modal" data-target="#myModal" style="font-size:20px; color:#fff;"> </i>
-                        </a>                        
+                            <i class="fa fa-bars" data-toggle="modal" data-target="#myModal" style="font-size:35px; color:#fff;"> </i>
+                        </a>  
+                        &nbsp;&nbsp;&nbsp;                      
                     @endif     
                 </div>                        
                 <div class="navbar-header ">                                     

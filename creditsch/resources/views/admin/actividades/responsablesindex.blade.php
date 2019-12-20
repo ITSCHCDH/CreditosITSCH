@@ -20,7 +20,7 @@
     @if ($actividad!=null)
         <input type="hidden" name="actividad_id" value="{{ $actividad->id }}" id="actividad_id">
     @endif
-    <div class="table-responsive">
+    <div class="table-responsive"> 
         <table class="table" id="tabla-responsables">
             <thead class="thead-dark">
                 <th>Nombre</th>

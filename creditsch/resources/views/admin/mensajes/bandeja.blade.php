@@ -46,7 +46,7 @@
 	    <th>Ver mensaje</th>
 	    <th>Usuario</th>
 	    <th>Asunto o Alerta</th>
-	    <th>Fecha</th>
+	    <th>Fecha</th>	   
 	    </thead>
 	    <tbody>
 	    	@foreach ($mensajes as $msj)
@@ -57,7 +57,7 @@
 		    			</td>
 		    			<td>{{ $msj->usuario_nombre }}</td>
 		    			<td>{{ $msj->notificacion }}</td>
-		    			<td>{{ $msj->fecha }}</td>
+		    			<td>{{ $msj->fecha }}</td>		    		
 		    		</tr>
 		    	@else
 					<tr>
@@ -66,7 +66,7 @@
 						</th>
 						<th>{{ $msj->usuario_nombre }}</th>
 						<th>{{ $msj->notificacion }}</th>
-						<th>{{ $msj->fecha }}</th>
+						<th>{{ $msj->fecha }}</th>					
 					</tr>
 		    	@endif
 	    	@endforeach

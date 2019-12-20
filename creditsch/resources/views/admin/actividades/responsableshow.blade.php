@@ -12,13 +12,19 @@
     @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
         @if ($actividad!=null)
             @if($actividad->vigente=="true")
-                <a href="{{route('responsables.index',$actividad->id)}}" class="btn btn-primary btn-sm">Asignar Responsables</a>
+                <div class="toltip">
+                    <a href="{{route('responsables.index',$actividad->id)}}" class="btn btn-primary btn-sm"><i class="material-icons" style="font-size:18px;">person_add</i> </a>
+                    <span class="toltiptext">Agregar Responsable</span>     
+                </div>                  
             @endif
         @endif
     @elseif(Auth::User()->hasAllPermissions(['AGREGAR_RESPONSABLES','ELIMINAR_RESPONSABLES']))
         @if ($actividad!=null)
             @if ($actividad->id_user==Auth::User()->id && $actividad->vigente=="true")
-                <a href="{{route('responsables.index',$actividad->id)}}" class="btn btn-primary btn-sm">Asignar Responsables</a>
+                <div class="toltip">
+                    <a href="{{route('responsables.index',$actividad->id)}}" class="btn btn-primary btn-sm"><i class="material-icons" style="font-size:18px;">person_add</i> </a>
+                    <span class="toltiptext">Agregar Responsable</span>     
+                </div>                
             @endif
         @endif
     @endif
@@ -52,7 +58,10 @@
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
                                     @if($actividad->vigente=="true")
                                         <td>
-                                        <a href="{{ route('actividad_evidencias.destroy',$res->actividad_evidencia_id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                                            <div class="toltip">
+                                                <a href="{{ route('actividad_evidencias.destroy',$res->actividad_evidencia_id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                                                <span class="toltiptext">Eliminar Responsable</span>     
+                                            </div>                                             
                                         </td>
                                     @else
                                         <td>
@@ -62,7 +71,10 @@
                                 @elseif($actividad->id_user==Auth::User()->id)
                                     @if($actividad->vigente=="true")
                                         <td>
-                                        <a href="{{ route('actividad_evidencias.destroy',$res->actividad_evidencia_id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                                            <div class="toltip">
+                                                 <a href="{{ route('actividad_evidencias.destroy',$res->actividad_evidencia_id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                                                <span class="toltiptext">Eliminar Responsable</span>     
+                                            </div>                                            
                                         </td>
                                     @else
                                         <td>

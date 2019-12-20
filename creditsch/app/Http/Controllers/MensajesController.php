@@ -13,6 +13,7 @@ use DB;
 
 class MensajesController extends Controller
 {
+    
     public function index(){
 		$mensajes = Receptor::where('user_id','=',Auth::User()->id)->whereNull('fecha_visto')->join('mensajes','mensajes.id','=','receptores.mensaje_id')->join('users','users.id','=','mensajes.creador_id')->select('users.name as usuario_nombre','mensajes.notificacion','mensajes.id as mensaje_id','mensajes.created_at as fecha','receptores.visto','receptores.id as receptor_id')->paginate(5);
 		return view('admin.mensajes.bandeja')
@@ -28,7 +29,7 @@ class MensajesController extends Controller
     }
     public function ver(Request $request){
     	$mensaje = Mensaje::where('mensajes.id','=',$request->mensaje_id)->join('users','users.id','=','mensajes.creador_id')->get();
-    	$ruta = $request->has('ruta');
+        $ruta = $request->has('ruta');
     	if ($request->has('receptor_id')) {
     		$receptor = Receptor::find($request->receptor_id);
     		if ($receptor->visto=="false") {
@@ -37,9 +38,17 @@ class MensajesController extends Controller
     			$receptor->save();
     		}	
     	}
+        $mensaje = $mensaje[0];
+        $actividad_id = null;
+        $pos = strpos($mensaje->mensaje, "#",0);
+        if($pos != false){
+            $actividad_id = substr($mensaje->mensaje,$pos+1);
+            $mensaje->mensaje = substr($mensaje->mensaje, 0,$pos);
+        }      
     	return view('admin.mensajes.ver')
-    	->with('mensaje',$mensaje[0])
-    	->with('ruta',$ruta);
+    	->with('mensaje',$mensaje)
+    	->with('ruta',$ruta)
+        ->with('actividad_id',$actividad_id);
     }
 
     public function enviar(Request $request){
