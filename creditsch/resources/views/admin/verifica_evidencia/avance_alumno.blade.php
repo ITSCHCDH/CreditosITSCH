@@ -108,11 +108,10 @@
 								<tr>
 									<td colspan="3" style="text-align:left; padding: 0;">
 										<div style="position: relative;">
-											<div style="background: #27ce1e; padding: 5; width: {{$temp_porcentaje}}%; height: 35px;max-width: 100%";>
+											<div style="background: #27ce1e; padding: 5; width: {{$temp_porcentaje}}%; height: 35px;max-width: 100%;";>
 												<div style="position: absolute;">
 													<strong>{{ $alumno_data[$y]->nombre_credito }}</strong>
 												</div>
-												
 											</div>
 										</div>
 									</td>

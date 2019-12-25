@@ -226,7 +226,7 @@
                 Cookies.set('participantes_responsable',temp_respon_cookie,{ expires:1});
                 $.ajax({
                     type:"GET",
-                    url: "{{ url('admin/participantes/peticion')}}",
+                    url: "{{ url('admin/participantes/peticion') }}",
                     cache:false,
                     data:{id_actividad:id_actividad, id_responsable:id_responsable},
                     dataType:'json',
@@ -234,7 +234,7 @@
                         var len = response['participantes_data'].length;
                         $('#mitabla tbody').empty(); // vaciamos la tabla de los participantes
                         //Llenamos la tabla con los valores retornados mediante json
-                        var tiene_permisos = "{{ Auth::User()->hasAnyPermission(['VIP']) }}"=="1"? true: false;
+                        var tiene_permisos = "{{ Auth::User()->hasAnyPermission(['VIP']) }}"=="1"? true : false;
 
                         if(response['participantes_data'][0]['id']!=-1){
                             for(var x=0; x<len; x++){
@@ -253,9 +253,9 @@
                                     if(tiene_permisos || ("{{ Auth::User()->can('ELIMINAR_PARTICIPANTES') }}" == "1" || response['user_id'] == "{{ Auth::User()->id}}") || (response['validador_id'] == "{{ Auth::User()->id }}")){
                                         if(alumnos_responsables){
                                             if(tiene_evidencia == null){
-                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar partiipante</text></div>"+advertencia+"</td></tr>");
+                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar partcipante</text></div>"+advertencia+"</td></tr>");
                                             }else{
-                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar partiipante</text></div>"+ver_evidencia+"</td></tr>");
+                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar participante</text></div>"+ver_evidencia+"</td></tr>");
                                             }
                                         }else{
                                             $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar participante</text></div></td></tr>");
@@ -264,14 +264,14 @@
                                         $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td><td>Ninguna</td></tr>");
                                     }
                                 }else if(response['validado'] == "true"){
-                                    if(tiene_permisos || ("{{ Auth::User()->can('ELIMINAR_PARTICIPANTES') }}" == "1" || response['user_id'] == "{{ Auth::User()->id}}") || (response['validador_id'] == "{{ Auth::User()->id }}")){
+                                    if(tiene_permisos || response['validador_id'] == "{{ Auth::User()->id }}"){
                                         if(alumnos_responsables){
                                             if(tiene_evidencia == null){
-                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar partiipante</text></div>"+advertencia+"</td></tr>");
+                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar participante</text></div>"+advertencia+"</td></tr>");
                                             }else if(response['participantes_data'][x]['evidencia_validada'] == 'no' && response['participantes_data'][x]['momento_agregado'] == 'posteriormente'){
-                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar partiipante</text></div>"+ver_evidencia+validar_evidencia_advertencia+"</td></tr>");
+                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar participante</text></div>"+ver_evidencia+validar_evidencia_advertencia+"</td></tr>");
                                             }else{
-                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar partiipante</text></div>"+ver_evidencia+"</td></tr>");
+                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar participante</text></div>"+ver_evidencia+"</td></tr>");
                                             }
                                         }else{
                                             $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <div class='toltip'><a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}'><span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span></a><span class='toltiptext'>Eliminar participante</text></div></td></tr>");

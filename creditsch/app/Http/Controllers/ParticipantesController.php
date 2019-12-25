@@ -184,13 +184,21 @@ class ParticipantesController extends Controller
             return response()->json(array("mensaje" => "El participante ha sido eliminado de la actividad","mensaje_tipo" => "advertencia"));
         }if(Auth::User()->can('ELIMINAR_PARTICIPANTES')){
             // Consulta para saber si el participante a eliminar, pertenece a la actividad del responsable
-            $participante_ajeno = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join) use($id){
+            $participante_ajeno = DB::table('participantes as p')
+            ->join('actividad_evidencia as ae', function($join) use($id){
                 $join->on('ae.id','=','p.id_evidencia');
                 $join->where('p.id','=',$id);
                 $join->where('ae.user_id','<>',Auth::User()->id);
-            })->get()->count()>0? true: false;
+            })->get();
+            // Varible boleana para saber si el usuario actual es quien creo la actividad
+            $es_creador_actividad = DB::table('participantes as p')
+            ->join('actividad_evidencia as ae', function($join) use($id){
+                $join->on('ae.id','=','p.id_evidencia');
+                $join->where('p.id','=',$id);
+            })->select('ae.validador_id')->get()[0]->validador_id == Auth::User()->id;
+
             // Validamos que el respondable no intente eliminar participantes de otras actividades ajenas
-            if($participante_ajeno){
+            if($participante_ajeno->count() > 0 && !$es_creador_actividad){
                 return response()->json(array('mensaje' => 'Este participante no pertenece a tu actividad','mensaje_tipo' => 'error'));
             }
             // Consulta para saber si la evidencia ya ha sido validada
@@ -200,9 +208,9 @@ class ParticipantesController extends Controller
             })->join('actividad as act','act.id','=','ae.actividad_id')
             ->where('p.id','=',$participante->id)->select('ae.actividad_id','ae.validado','act.alumnos as alumnos_responsables')->get()[0];
 
-            if($actividad_evidencia->alumnos_responsables == "false" && $actividad_evidencia->validado == "true"){
+            if(!$es_creador_actividad && $actividad_evidencia->alumnos_responsables == "false" && $actividad_evidencia->validado == "true"){
                 return response()->json(array('mensaje' => 'La actividad ya ha sido validada, ya no puede recibir modificaciones','mensaje_tipo' => 'error'));
-            }else if($actividad_evidencia->alumnos_responsables == "true" && $actividad_evidencia->validado == "true" && ($participante->evidencia_validada == "si" || $participante->evidencia_validada == "na")){
+            }else if(!$es_creador_actividad && $actividad_evidencia->alumnos_responsables == "true" && $actividad_evidencia->validado == "true" && ($participante->evidencia_validada == "si" || $participante->evidencia_validada == "na")){
                 return response()->json(array('mensaje' => 'La actividad ya ha sido validada, ya no puede recibir modificaciones','mensaje_tipo' => 'error'));
             }else{
                 // Eliminamos al participante
@@ -299,6 +307,7 @@ class ParticipantesController extends Controller
         if($actividad == null){
             return response()->json(array('mensaje' => 'La actividad no existe', 'mensaje_tipo' => 'error'));
         }
+        $es_creador_actividad = $actividad->id_user == Auth::User()->id;
         // Validamos que la actividad este vigente
         if($actividad->vigente == 'false'){
             return response()->json(array('mensaje' => 'La actividad ya no se encuentra vigente, no puede ser modificada','mensaje_tipo' => 'error'));
@@ -347,7 +356,7 @@ class ParticipantesController extends Controller
         if($actividad->vigente == 'false'){
             return response()->json(array('mensaje' => 'La actividad '.$actividad->nombre.' ya no se encuentra vigente','mensaje_tipo' => 'error' ));
         }
-        if($evidencias[0]->validado == 'true' && $actividad->alumnos == 'true'){
+        if($evidencias[0]->validado == 'true' && $actividad->alumnos == 'true' && (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']) || $es_creador_actividad)){
             $tiene_avance = Avance::where([
                 ['no_control','=',$request->get('no_control')],
                 ['id_credito','=',$actividad->id_actividad]
@@ -370,7 +379,7 @@ class ParticipantesController extends Controller
             }
             return response()->json(array('mensaje' => 'No estas autorizado para realizar las modificaciones que solicitas','mensaje_tipo' => 'error' ));
         }else{
-            if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])){
+            if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']) || $es_creador_actividad){
                 if($evidencias[0]->validado == 'true'){
                     $tiene_avance = Avance::where([
                         ['no_control','=',$request->get('no_control')],
@@ -407,6 +416,9 @@ class ParticipantesController extends Controller
                 $this->liberar($request->get('no_control'));
                 return response()->json(array('mensaje' => 'Participante agregado correctamente','mensaje_tipo' => 'exito' ));
             }else{
+                if($evidencias[0]->validado == 'true'){
+                    return response()->json(array('mensaje' => 'La actividad ya ha sido validada','mensaje_tipo' => 'error' ));
+                }
                 if(Auth::User()->id == $actividad->id_user || Auth::User()->id == $request->get('id_responsable')){
                     $participante = new Participante();
                     $participante->no_control = $request->get('no_control');
