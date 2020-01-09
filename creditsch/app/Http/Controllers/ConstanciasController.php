@@ -49,7 +49,7 @@ class ConstanciasController extends Controller
 
             $carreras = Area::where([
                 ['tipo','=','carrera'],
-                ['id','=',Auth::User()->id]
+                ['id','=',Auth::User()->area]
             ])->get();
             $abreviaturas = $this->obternerAbreviaturas();
             $users = User::select('name','id')->where([
