@@ -254,6 +254,8 @@ class VerificaEvidenciaController extends Controller
         if(count($alumno_data)!=5) return false;
         return true;
     }
+  
+
     public function reportes(Request $request){
     	$creditos_count = Credito::all();
     	$creditos = count($creditos_count);
@@ -288,7 +290,7 @@ class VerificaEvidenciaController extends Controller
                 $suma_creditos = null;
             }
             $carreras = Area::where('id','=',Auth::User()->area)->get();
-        }
+        }        
         return view('admin.verifica_evidencia.reportes')
         ->with('reportes_data',$reportes_data)
         ->with('creditos',$creditos)
@@ -296,6 +298,7 @@ class VerificaEvidenciaController extends Controller
         ->with('carreras',$carreras)
         ->with('carrera_seleccionada',$carrera)
         ->with('busqueda', $busqueda);
+       
     }
 
     public function verEvidencia($id){

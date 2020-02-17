@@ -134,7 +134,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     ]);
 
     Route::get('verifica_evidencia/{id}/ver_evidencia','VerificaEvidenciaController@verEvidencia')->name('verifica_evidencia.ver_evidencia');
-    Route::get('verifica_evidencia/reportes','VerificaEvidenciaController@reportes')->name('verifica_evidencia.reportes');
+    Route::get('verifica_evidencia/reportes','VerificaEvidenciaController@reportes')->name('verifica_evidencia.reportes');    
     Route::get('verifica_evidencia/visualizar/{archivo}','VerificaEvidenciaController@visualizar')->name('verificar_evidencia.visualizar');
     Route::get('verifica_evidencia/avance_alumno','VerificaEvidenciaController@avanceAlumno')->name('verifica_evidencia.avance_alumno');
     Route::get('verifica_evidencia/alumno/busqueda','VerificaEvidenciaController@alumnosBusqueda')->name('verifica_evidencia.alumnos_busqueda');
