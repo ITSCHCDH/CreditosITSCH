@@ -42,7 +42,7 @@
 				</div>
 				<div class="col-sm-3">
 					{!! Form::label('busqueda','Busqueda') !!}			
-					<input type="text" name="busqueda" class="form-control" placeholder="Nombre - No Control" value="{{ $busqueda }}">
+					<input type="text" name="busqueda" id="Control" class="form-control" placeholder="Nombre - No Control" value="{{ $busqueda }}">
 				</div>
 				<div class="col-sm-3">
 					<br>
@@ -163,14 +163,14 @@
 			@else	
 				@section('js')
 					<script>
-					  $("#myModal").modal("show");
+						if($("#Control").val().length > 0){  $("#alerta").modal("show");}
 					</script>
 				@endsection						
 
 			@endif
 
 			<!-- The Modal -->
-				<div class="modal" id="myModal">
+				<div class="modal" id="alerta">
 				  <div class="modal-dialog">
 				    <div class="modal-content">
 
@@ -182,7 +182,7 @@
 
 				      <!-- Modal body -->
 				      <div class="modal-body">
-				        <strong>No se encontro el alumno en la base de datos, con estos criterios de filtrado.</strong>
+				        <strong>Alumno no encontrado!.</strong>
 				        <br>
 				        Nota:
 				        <br>
