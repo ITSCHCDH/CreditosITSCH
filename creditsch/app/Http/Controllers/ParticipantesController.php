@@ -368,16 +368,13 @@ class ParticipantesController extends Controller
                 $avance->id_credito=$actividad->id_actividad;
                 $avance->save();
             }
-            if(Auth::User()->id == $actividad->id_user || Auth::User()->id == $request->get('id_responsable')){
-                $participante = new Participante();
-                $participante->no_control = $request->get('no_control');
-                $participante->id_evidencia = $evidencias[0]->id;
-                $participante->momento_agregado = 'posteriormente';
-                $participante->evidencia_validada = 'no';
-                $participante->save();
-                return response()->json(array('mensaje' => 'Participante agregado correctamente','mensaje_tipo' => 'exito' ));
-            }
-            return response()->json(array('mensaje' => 'No estas autorizado para realizar las modificaciones que solicitas','mensaje_tipo' => 'error' ));
+            $participante = new Participante();
+            $participante->no_control = $request->get('no_control');
+            $participante->id_evidencia = $evidencias[0]->id;
+            $participante->momento_agregado = 'posteriormente';
+            $participante->evidencia_validada = 'no';
+            $participante->save();
+            return response()->json(array('mensaje' => 'Participante agregado correctamente','mensaje_tipo' => 'exito' ));
         }else{
             if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']) || $es_creador_actividad){
                 if($evidencias[0]->validado == 'true'){
@@ -596,7 +593,7 @@ class ParticipantesController extends Controller
             Flash::success('Evidencia validada con exito');
             return redirect()->route('participantes.index');
         }
-        Flash::error('No tienes autorizacición para validar esta evidencia');
+        Flash::error('No tienes autorización para validar esta evidencia');
         return redirect()->route('participantes.index');
     }
 }
