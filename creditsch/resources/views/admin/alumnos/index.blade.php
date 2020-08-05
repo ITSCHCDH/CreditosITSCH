@@ -111,8 +111,7 @@
             <div class="modal-footer">
                 <a  class="btn btn-danger" id="prueba">Aceptar</a>
                 <button type="button" class="btn btn-success" data-dismiss="modal">Cancelar</button>
-            </div>
-            
+            </div>            
         </div>
         </div>
     </div>

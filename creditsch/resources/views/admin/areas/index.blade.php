@@ -2,7 +2,8 @@
 
 @section('title','Areas')
 @section('ruta')
-	<label class="label label-success">Areas</label>
+	<label class="label label-success">Areas</label>   
+	<h5>Hola Mundo</h5>
 @endsection
 
 @section('contenido')
