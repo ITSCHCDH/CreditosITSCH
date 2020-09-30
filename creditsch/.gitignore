@@ -33,3 +33,5 @@ composer.lock
 /public/sql_server/
 /public/sta/
 /public/fichas2/
+tags
+*.swp

@@ -12,6 +12,8 @@ use App\Constancia;
 use App\Area;
 use App\Alumno;
 use App\Folio;
+use App\Credito;
+use App\Avance;
 use PDF;
 use DB;
 use Laracasts\Flash\Flash;
@@ -63,6 +65,7 @@ class ConstanciasController extends Controller
             ->with('datos_globales',$datos_globales);
         }
     }
+
     public function visualizar(Request $request){
         if(!$request->has('carrera')){
             Flash::error('Error datos inconcistentes');
@@ -122,6 +125,7 @@ class ConstanciasController extends Controller
             Flash::error('El número de control no existe');
             return redirect()->back();
         }
+
         $meses = [
             'enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'
         ];
@@ -318,6 +322,7 @@ class ConstanciasController extends Controller
         }
         return response()->json($constancias_faltantes);
     }
+
     public function obternerAbreviaturas(){
         $abreviaturas = [
             ['abreviatura' => 'Abgdo', 'profesion' => 'Abogado'],
