@@ -16,6 +16,7 @@ use App\ALumno;
 use App\ConstanciaComplemento;
 use App\Folio;
 use App\Participante;
+use App\Avance;
 use DB;
 use PDF;
 class AlumnosRutasController extends Controller
@@ -48,7 +49,9 @@ class AlumnosRutasController extends Controller
             $query->where('p.evidencia_validada','=','na')->orwhere('p.evidencia_validada','=','si');
         })->where('ae.validado','=','true')
         ->select('alu.no_control','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
-        $liberado = $this->alumnoLiberado();
+
+        $liberado = $this->verificarProgreso();
+
         //Validamos que el alumnos tenga algun avance
 		if($alumno_data->count()==0){
             //SI no tiene avance solo retornamos los datos del alumno los datos del alumno
@@ -136,10 +139,52 @@ class AlumnosRutasController extends Controller
         return $pdf->stream('constancia.pdf');
     }
 
-    public function alumnoLiberado(){
-        $alumno_data = DB::select('select c.nombre as credito_nombre from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 order by c.id limit 5');
-        if(count($alumno_data)!=5) return false;
-        return true;
+    public function verificarProgreso() {
+        $no_control = Auth::Guard('alumno')->user()->no_control;
+
+        $avance_data = DB::table('participantes as p')
+        ->join('actividad_evidencia as ae', 'ae.id', '=', 'p.id_evidencia')
+        ->join('actividad as act', 'act.id', '=', 'ae.actividad_id')
+        ->join('creditos as c', 'c.id', '=', 'act.id_actividad')
+        ->where([
+            ['ae.validado', '=', 'true'],
+            ['p.no_control', '=', $no_control]
+        ])
+        ->whereIn('p.evidencia_validada', ['na', 'si'])
+        ->select('act.nombre as act_nombre', 'act.por_cred_actividad as porcentaje',
+            'act.id_actividad as act_cred_id')
+        ->get();
+        
+        $creditos_cant = (int)Credito::max('id');
+        $cred_porcen = array_fill(0, $creditos_cant + 1, 0);
+
+        foreach ($avance_data as $avance) {
+            $cred_porcen[$avance->act_cred_id] += $avance->porcentaje;
+        }
+
+        $avance_alu = Avance::where('no_control', $no_control)->get();
+        $creditos_liberados = 0;
+        foreach($avance_alu as $avance) {
+            if ($cred_porcen[$avance->id_credito] !== (int)$avance->por_credito) {
+                $avance->por_credito = $cred_porcen[$avance->id_credito];
+                $avance->save();
+            }
+            
+            if ($avance->por_credito >= 100)
+                ++$creditos_liberados;
+        }
+
+        if ($creditos_liberados >= 5 && Auth::guard('alumno')->user()->status === 'pendiente') {
+            $alumno = Alumno::find(Auth::guard('alumno')->user()->id);
+            $alumno->status = 'Liberado';
+            $alumno->save();
+        } else if (Auth::guard('alumno')->user()->status === 'Liberado') {
+            $alumno = Alumno::find(Auth::guard('alumno')->user()->id);
+            $alumno->status = 'pendiente';
+            $alumno->save();
+        }
+
+        return $creditos_liberados >= 5;
     }
 
     public function actividades(){

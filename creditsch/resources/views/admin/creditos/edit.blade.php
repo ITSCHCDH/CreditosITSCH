@@ -28,8 +28,7 @@
                     <option value="{{ $area->id }}">{{ $area->nombre }}</option>
                 @else
                     <option value="{{ $area->id }}" selected>{{ $area->nombre }}</option>
-                @endif
-                
+                @endif                
             @endforeach
         </select>
     </div>
