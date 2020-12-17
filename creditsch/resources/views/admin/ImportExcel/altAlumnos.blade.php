@@ -15,7 +15,8 @@
 
 @section('contenido')
 	<div class="col-sm-12 bg-success text-white text-center">		
-  			<h5>Este modulo permite la importacion masiva de alumnos, para darlos de alta, para ello necesitaremos un archivo de excel que contenga los siguientes datos: <p></p> <b>Para dar de alta:</b> <p></p> Columnas del archivo:<br> <b>No., Numero de control, Nombre del alumno, Password, Nombre de carrera y Id_Carrera</b> </h5>		
+  		<h5>Este modulo permite la importacion masiva de alumnos, para darlos de alta, para ello necesitaremos un archivo de excel que contenga los siguientes datos: <p></p> <b>Para dar de alta:</b> <p></p> Columnas del archivo:<br> <b>No., Numero de control, Nombre del alumno, Password, Nombre de carrera y Id_Carrera</b><p><b>Ejemplo:</b></p>9 |	C17030393 |	ALEJANDRO ROMAN GONZALEZ |	P-n58N_ |	ING. INDUSTRIAL |	2
+		</h5>		
 	</div>
 	<div class="row">			
 		<div class="col-sm-2 ">				
