@@ -21,7 +21,7 @@ class ExcelController extends Controller
 
   public function importClaves(Request $request)
   {      
-  
+       
        ini_set('max_execution_time',0);  //Quita el limite de tiempo a la ejecucion de archivos
        $array = Excel::toArray(new AlumnosImport,$request->excel->path());    //Importa el archivo de excel a la base de datos
        if ($array) 
