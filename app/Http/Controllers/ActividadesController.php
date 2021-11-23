@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Credito;
 use Illuminate\Http\Request;
-use Laracasts\Flash\Flash;
-use App\Actividad;
-use App\Actividad_Evidencia;
+use App\Models\Actividad;
+use App\Models\Actividad_Evidencia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use DB;
@@ -73,7 +72,8 @@ class ActividadesController extends Controller
     public function create()
     {
         if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
-            $creditos = Credito::where('vigente','=','true')->orderBy('nombre','asc')->pluck('nombre','id');
+            $creditos = Credito::where('vigente','=','true')->orderBy('nombre','asc')->get();
+           
         }else{
             $creditos = Credito::leftjoin('creditos_areas as ca','ca.credito_id','=','creditos.id')->where([
                 ['ca.credito_area','=',Auth::User()->area],
@@ -106,34 +106,25 @@ class ActividadesController extends Controller
                     $tiene_permitido = true;
                 }
             }
-            if(!$tiene_permitido){
-                Flash::error('No puedes crear actividades de este crédito');
-                return redirect()->back();
+            if(!$tiene_permitido){                
+                return redirect()->back()
+                ->with("error","No puedes crear actividades de este crédito");
             }
         }
-        if($actividad_con_mismo_nombre->count()>0){
-            Flash::error('El nombre '.$act->nombre.' ya ha sido tomado, ingrese uno diferente');
-            return back()->withInput();
+        if($actividad_con_mismo_nombre->count()>0){            
+            return back()->withInput()
+            ->with("error","El nombre ".$act->nombre." ya ha sido tomado, ingrese uno diferente");
         }
-        if($act->por_cred_actividad>100){
-            Flash::error('El porcentaje de liberación no debe exceder el 100% del credito');
-            return back()->withInput();
+        if($act->por_cred_actividad>100){           
+            return back()->withInput()
+            ->with("error","El porcentaje de liberación no debe exceder el 100% del credito");
         }
-        $act->save(); //Guarda el articulo en su tabla
-        Flash::success('La actividad '.$act->nombre.' se registro de forma correcta');
-        return redirect()->route('actividades.index');
+        $act->save(); //Guarda el articulo en su tabla        
+        return redirect()->route('actividades.index')
+        ->with("success","La actividad ".$act->nombre." se registro de forma correcta");
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+   
 
     /**
      * Show the form for editing the specified resource.
@@ -144,9 +135,9 @@ class ActividadesController extends Controller
     public function edit($id)
     {
         $act=Actividad::find($id);//Busca el registro        
-        if($act==null){
-            Flash::error('La actividad no existe');
-            return redirect()->route('actividades.index');
+        if($act==null){            
+            return redirect()->route('actividades.index')
+            ->with("error","La actividad no existe");
         }
         if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
             
@@ -176,14 +167,14 @@ class ActividadesController extends Controller
         $act_nueva->fill($request->all());
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act_nueva->nombre)->get();
         if($actividad_con_mismo_nombre->count()>0){
-            if($actividad_con_mismo_nombre[0]->id!=$id){
-                Flash::error('El nombre '.$act_nueva->nombre.' ya ha sido tomado, ingrese uno diferente');
-                return back()->withInput();
+            if($actividad_con_mismo_nombre[0]->id!=$id){                
+                return back()->withInput()
+                ->with("error","El nombre ".$act_nueva->nombre." ya ha sido tomado, ingrese uno diferente");
             }
         }
-        if($act_nueva->por_cred_actividad>100){
-            Flash::error('El porcentaje de liberación no debe exceder el 100% del credito');
-            return back()->withInput();
+        if($act_nueva->por_cred_actividad>100){            
+            return back()->withInput()
+            ->with("error","El porcentaje de liberación no debe exceder el 100% del credito");
         }
         if($act_anterior->id_actividad != $act_nueva->id_actividad || $act_anterior->por_cred_actividad != $act_nueva->por_cred_actividad){
             $tiene_foraneas = DB::table('actividad as a')->join('actividad_evidencia as ae', function($join) use($id){
@@ -194,9 +185,9 @@ class ActividadesController extends Controller
                     ['ae.validado','=','true']
                 ]);
             })->get()->count()>0? true: false;
-            if($tiene_foraneas){
-                Flash::error('La actividad ya tiene evidencias validadas');
-                return redirect()->back();
+            if($tiene_foraneas){                
+                return redirect()->back()
+                ->with("error","La actividad ya tiene evidencias validadas");
             }
         }
         $act_nueva->save();
@@ -227,8 +218,9 @@ class ActividadesController extends Controller
                 Storage::deleteDirectory('public/evidencias/'.$act_anterior->nombre);
             }
         }
-        Flash::warning('La actividad '.$act_nueva->nombre.' ha sido editada con exito');
-        return redirect()->route('actividades.index');
+        
+        return redirect()->route('actividades.index')
+        ->with("warning","La actividad ".$act_nueva->nombre." ha sido editada con exito");
     }
 
     /**
@@ -240,30 +232,31 @@ class ActividadesController extends Controller
     public function destroy($id)
     {
         $act=Actividad::find($id);
-        if($act==null){
-            Flash::error('La actividad no existe');
-            return redirect()->route('actividades.index');
+        if($act==null){            
+            return redirect()->route('actividades.index')
+            ->with("error","La actividad no existe");
         }
         if (Auth::User()->hasAnyPermission(['VIP_ACTIVIDAD','VIP'])) {
             $asignada = Actividad_Evidencia::where('actividad_id','=',$act->id)->get()->count()>0?true: false;
-            if($asignada){
-                Flash::error('La actividad no puede ser eliminada debido a que cuenta con responsables asignados.');
-                return redirect()->route('actividades.index');
+            if($asignada){               
+                return redirect()->route('actividades.index')
+                ->with("error","La actividad no puede ser eliminada debido a que cuenta con responsables asignados.");
             }
-            $act->delete();
-            Flash::error('La actividad '.$act->nombre.' ha sido borrada con exito');
+            $act->delete();            
+            return redirect()->route('actividades.index')
+            ->with("error","La actividad ".$act->nombre." ha sido borrada con exito");
         }else if(Auth::User()->can('ELIMINAR_ACTIVIDAD') && Auth::User()->id==$act->id_user){
             $asignada = Actividad_Evidencia::where('actividad_id','=',$act->id)->get()->count()>0?true: false;
-            if($asignada){
-                Flash::error('La actividad no puede ser eliminada debido a que cuenta con responsables asignados.');
-                return redirect()->route('actividades.index');
+            if($asignada){               
+                return redirect()->route('actividades.index')
+                ->with("error","La actividad no puede ser eliminada debido a que cuenta con responsables asignados.");
             }
-            $act->delete();
-            Flash::error('La actividad '.$act->nombre.' ha sido borrada con exito');
-        }else{
-            Flash::error('No tienes permisos para eliminar esta actividad');
-        }
-        
-        return redirect()->route('actividades.index');
+            $act->delete();            
+            return redirect()->route('actividades.index')
+                ->with("warning","La actividad '.$act->nombre.' ha sido borrada con exito");
+        }else{            
+            return redirect()->route('actividades.index')
+            ->with("error","No tienes permisos para eliminar esta actividad");
+        }      
     }
 }

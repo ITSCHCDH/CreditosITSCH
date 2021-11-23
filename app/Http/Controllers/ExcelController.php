@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Alumno;
+use App\Models\Alumno;
 use App\Imports\AlumnosImport;
-use App\Imports\AlumnosAgregar;
 use Maatwebsite\Excel\Facades\Excel;
-use Laracasts\Flash\Flash;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+
+
 
 class ExcelController extends Controller
 {

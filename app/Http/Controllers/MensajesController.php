@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
-use Laracasts\Flash\Flash;
 use App\User;
-use App\Mensaje;
-use App\Receptor;
-use DB;
+use App\Models\Mensaje;
+use App\Models\Receptor;
+use Illuminate\Support\Facades\DB;
 
 class MensajesController extends Controller
 {

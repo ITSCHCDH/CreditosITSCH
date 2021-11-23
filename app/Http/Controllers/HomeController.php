@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Receptor;
+use App\Models\Receptor;
 
 class HomeController extends Controller
 {

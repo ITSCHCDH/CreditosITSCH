@@ -16,6 +16,8 @@
 @section('contenido')
 	<div class="col-sm-12 bg-success text-white text-center">		
   		<h5>Este modulo permite la importacion masiva de alumnos, para darlos de alta, para ello necesitaremos un archivo de excel que contenga los siguientes datos: <p></p> <b>Para dar de alta:</b> <p></p> Columnas del archivo:<br> <b>No., Numero de control, Nombre del alumno, Password, Nombre de carrera y Id_Carrera</b><p><b>Ejemplo:</b></p>9 |	C17030393 |	ALEJANDRO ROMAN GONZALEZ |	P-n58N_ |	ING. INDUSTRIAL |	2
+			<p>Para los ID de las carreras usar la siguiente formula:</p>
+			<b><p>"=SI(E2="ING. INDUSTRIAL",2,SI(E2="ING. SIST COMP",3,SI(E2="ING. MECATRONICA",5,SI(E2="ING. BIOQUIMICA",6,SI(E2="ING. EN GES EMP",7,SI(E2="ING. EN TICS",9,SI(E2="ING. NANOTEC",10,"")))))))"</p></b>
 		</h5>		
 	</div>
 	<div class="row">			

@@ -3,16 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Alumno;
-use App\Imports\AlumnosImport;
+use App\Models\Alumno;
 use App\Imports\AlumnosAgregar;
 use Maatwebsite\Excel\Facades\Excel;
-use Laracasts\Flash\Flash;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class altaAlumnosController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {     
     	return view('admin.ImportExcel.altAlumnos');
   	}

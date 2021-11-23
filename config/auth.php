@@ -77,7 +77,7 @@ return [
 
         'alumnos' => [
             'driver' => 'eloquent',
-            'model' => App\Alumno::class,
+            'model' => App\Models\Alumno::class,
         ],
         // 'users' => [
         //     'driver' => 'database',

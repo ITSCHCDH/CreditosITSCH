@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Credito; //Es el nombre del modelo con el que va a trabajar el controlador
-use App\Area;
-use App\CreditoArea;
-use App\User;
-use Laracasts\Flash\Flash; //Es el paquete para poder usar los mensajes de alerta tipo bootstrap
-use Spatie\Permission\Models\Permission;
+use App\Models\Area;
+use App\Models\CreditoArea;
+use App\Models\User;
 use DB;
 
 class CreditosController extends Controller

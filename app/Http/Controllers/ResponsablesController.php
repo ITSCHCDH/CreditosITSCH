@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\User;
-use App\Actividad;
-use App\AlumnosResponsables;
-use Illuminate\Support\Facades\DB;
+use App\Models\Actividad;
 use Illuminate\Support\Facades\Auth;
 class ResponsablesController extends Controller
 {

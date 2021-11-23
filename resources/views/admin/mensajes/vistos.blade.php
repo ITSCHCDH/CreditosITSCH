@@ -7,19 +7,13 @@
 	<label class="label label-success">Mensajes vistos</label>
 @endsection
 @section('contenido')
-	<div class="pull-right">
-		<div class="toltip">
-			<a href="{{ route('mensajes.crear') }}" class="btn btn-primary" style="padding: 2px;">
-				<img src="{{ asset('images/new_message.png') }}" alt="Nuevo mensaje" class="white-icon" style="width: 40px; heigth: 40px;">
-			</a>
-			<span class="toltiptext">Nuevo mensaje</span>
-		</div>
-		<div class="toltip">
-			<a href="{{ route('mensajes.enviados') }}" class="btn btn-warning" style="padding: 2px;">
-				<img src="{{ asset('images/paper-plane.png') }}" alt="Nuevo mensaje" class="white-icon" style="width: 40px; heigth: 40px;">
-			</a>
-			<span class="toltiptext">Mensajes enviados</span>
-		</div>
+	<div class="pull-right">	
+		<a href="{{ route('mensajes.crear') }}" class="btn btn-primary btn-sm" title="Crear mensajes" >
+			<i class="far fa-envelope" style="font-size:20px"></i>
+		</a>	
+		<a href="{{ route('mensajes.enviados') }}" class="btn btn-warning btn-sm" title="Mensajes enviados" >
+			<i class="fas fa-share-square" style="font-size:20px"></i>
+		</a>	
 	</div>
 	<div style="clear: both;"></div>
 	<br>

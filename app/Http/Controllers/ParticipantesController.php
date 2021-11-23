@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Participante; //Es el nombre del modelo con el que va a trabajar el controlador
-use Laracasts\Flash\Flash; //Es el paquete para poder usar los mensajes de alerta tipo bootstrap
-use App\Actividad;
-use App\Evidencia;
-use App\Avance;
-use App\Alumno;
-use App\Actividad_Evidencia;
+use App\Models\Participante; //Es el nombre del modelo con el que va a trabajar el controlador
+use App\Models\Actividad;
+use App\Models\Evidencia;
+use App\Models\Avance;
+use App\Models\Alumno;
+use App\Models\Actividad_Evidencia;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;

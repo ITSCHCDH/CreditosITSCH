@@ -6,6 +6,3 @@
     <label class="label label-success"> Home</label>
 @endsection
 
-@section('contenido')
-    HOLA
-@endsection

@@ -12,12 +12,12 @@
 @endsection
 
 @section('contenido')
-{!! Form::open(['route'=>'actividades.index','method'=>'GET','id' => 'actividades-submit']) !!}
+<form action="{{ route('actividades.index') }}" method="GET" id="actividades-submit">
     <div class="row">    
         <div class="col-sm-4">
             <!-- Boton de busqueda en la pagina -->
-                <div class="input-group">
-                    {!! Form::text('nombre',null,['class'=>'form-control','placeholder'=>'Buscar.....','aria-describedby'=>'search']) !!}
+                <div class="input-group">                    
+                    <input type="text" class="form-control" placeholder="Buscar..." name="nombre">
                     <div class="input-group-btn">
                         <button type="submit" class="btn btn-primary"> Buscar
                             <span class="badge  label label-primary glyphicon glyphicon-search">
@@ -47,7 +47,7 @@
             @endif
         </div>
     </div> 
-{!! Form::close() !!}
+</form>
     <br>         
     <div class="table-responsive">
         <table class="table">

@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Alumno; //Es el nombre del modelo con el que va a trabajar el controlador
-use App\Area;
-use Laracasts\Flash\Flash; //Es el paquete para poder usar los mensajes de alerta tipo bootstrap
+use App\Models\Alumno; //Es el nombre del modelo con el que va a trabajar el controlador
+use App\Models\Area;
 use DB;
 
 class AlumnosController extends Controller
@@ -23,7 +22,7 @@ class AlumnosController extends Controller
      */
     public function index(Request $request)
     {
-        $alumnos = DB::table('alumnos as alu')->join('areas as a','a.id','=','alu.carrera')->where('alu.nombre','LIKE',"%".$request->valor."%")->orwhere('no_control','LIKE',"%$request->valor%")->orwhere('a.nombre','LIKE',"%$request->valor%")->orderBy('alu.id')->select('alu.nombre','alu.no_control','alu.status','alu.id','a.nombre as carrera')->paginate(5);
+        $alumnos = DB::table('alumnos as alu')->join('areas as a','a.id','=','alu.carrera')->where('alu.nombre','LIKE',"%".$request->valor."%")->orwhere('no_control','LIKE',"%$request->valor%")->orwhere('a.nombre','LIKE',"%$request->valor%")->orderBy('alu.id')->select('alu.nombre','alu.no_control','alu.status','alu.id','a.nombre as carrera')->get();
         return view('admin.alumnos.index')
         ->with('alumno',$alumnos)
         ->with('valor',$request->valor); //Llama a la vista y le envia los usuarios
@@ -55,13 +54,13 @@ class AlumnosController extends Controller
         $alumno->password=bcrypt($request->password);
         //Comando para guardar el registro
         $no_control_existe = Alumno::where('no_control','=',$request->no_control)->select('no_control')->get();
-        if($no_control_existe->count()>0){
-            Flash::error('El No de control ya existe');
-            return redirect()->back()->withInput();
+        if($no_control_existe->count()>0){           
+            return redirect()->back()->withInput()
+            ->with('error','El No de control ya existe');
         }
-        $alumno->save();
-        Flash::success('El alumno  '.$alumno->name.' se ha registrado de forma exitosa');
-        return redirect()->route('alumnos.index');
+        $alumno->save();        
+        return redirect()->route('alumnos.index')
+        ->with('success','El alumno  '.$alumno->name.' se ha registrado de forma exitosa');
     }
 
     /**
@@ -85,15 +84,17 @@ class AlumnosController extends Controller
     {
         //Codigo de modificaciones
         $alumno=Alumno::find($id);//Busca el registro
-        if($alumno==null){
-            Flash::error('El alumno no existe');
-            return redirect()->back();
+        if($alumno==null){           
+            return redirect()->back()
+            ->with('error','El alumno no existe');
         }
      
 
-        $areas = Area::all()->pluck('nombre', 'id');    
+        $areas = Area::all();    
         
-        return view('admin.alumnos.edit',compact('alumno','areas'));
+        return view('admin.alumnos.edit')
+        ->with('alumno',$alumno)
+        ->with('areas',$areas);
     }
 
     /**
@@ -108,9 +109,9 @@ class AlumnosController extends Controller
         //Ejecuta la modificacion
 
         $alumno= Alumno::find($id);
-        if($alumno==null){
-            Flash::error('El alumno no existe');
-            return redirect()->back();
+        if($alumno==null){            
+            return redirect()->back()
+            ->with('error','El alumno no existe');
         }
         $avance = DB::table('avance')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
         $participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;       
@@ -123,14 +124,14 @@ class AlumnosController extends Controller
                 $alumno->password= bcrypt($request->password);
             }
             else
-            {
-                Flash::error('Error de credenciales, las contraseñas deben ser iguales para el alumno: '.$alumno->nombre);
-                return redirect()->route('alumnos.index');
+            {                
+                return redirect()->route('alumnos.index')
+                ->with('error','Error de credenciales, las contraseñas deben ser iguales para el alumno: '.$alumno->nombre);
             }
         }
-        $alumno->save();
-        Flash::warning('El alumno '. $alumno->nombre .' a sido editado de forma exitosa');//Envia mensaje
-        return redirect('admin/alumnos');//llama a la pagina de consultas
+        $alumno->save();        
+        return redirect('admin/alumnos')
+        ->with('warning','El alumno '. $alumno->nombre .' a sido editado de forma exitosa');//llama a la pagina de consultas
     }
 
     /**

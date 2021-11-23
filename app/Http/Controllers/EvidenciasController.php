@@ -3,15 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Evidencia;
+use App\Models\Evidencia;
 use App\User;
-use App\Actividad;
-use App\Actividad_Evidencia;
-use App\Http\Requests\EvidenciasRequest;
-use Laracasts\Flash\Flash; //Es el paquete para poder usar los mensajes de alerta tipo bootstrap
+use App\Models\Actividad;
+use App\Models\Actividad_Evidencia;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
-use PDF;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 

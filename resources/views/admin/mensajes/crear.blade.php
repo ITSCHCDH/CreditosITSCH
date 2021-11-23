@@ -32,18 +32,18 @@
 		<input type="submit" name="" value="Enviar" class="btn btn-primary">
 	</form>
 	<div style="padding: 30px;"></div>
+	
 	@section('js')
-	<script src="{{ asset('plugins/Trumbowyg-master/dist/trumbowyg.min.js') }}"></script>
-	<script src="{{ asset('plugins/chosen/chosen.jquery.js') }}"></script>
-	<script type="text/javascript">
-		$(".chosen-select").chosen({
-			no_results_text: "No se encontrarón resultados"
-		}); 
-		$("#textarea-mensaje").trumbowyg({
-		    lang: 'es',
-		    autogrow: true
-		});
-	</script>
-		
+		<script src="{{ asset('plugins/Trumbowyg-master/dist/trumbowyg.min.js') }}"></script>
+		<script src="{{ asset('plugins/chosen/chosen.jquery.js') }}"></script>
+		<script type="text/javascript">
+			$(".chosen-select").chosen({
+				no_results_text: "No se encontrarón resultados"
+			}); 
+			$("#textarea-mensaje").trumbowyg({
+				lang: 'es',
+				autogrow: true
+			});
+		</script>		
 	@endsection
 @endsection

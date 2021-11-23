@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Area;
+use App\Models\Area;
 use App\User;
-use App\Constancia;
-use App\ALumno;
-use Illuminate\Support\Fecades\Auth;
-use Laracasts\Flash\Flash;
+use App\Models\ALumno;
 class AreasController extends Controller
 {
 

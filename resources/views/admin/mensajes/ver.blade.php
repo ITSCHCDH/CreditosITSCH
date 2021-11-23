@@ -25,22 +25,19 @@
         <div class="col-sm-3"></div>
         <div class="col-sm-6">
             <div class="form-group">
-                {!! Form::label('nombre','De') !!}
-                {!! Form::text('nombre',$mensaje->name,['class'=>'form-control','placeholder'=>'Nombre de la actividad','required','disabled']) !!}
+                <label for="nombre">De</label>
+                <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Nombre de la actividad" required disabled value="{{ $mensaje->name }}">        
             </div>
             <div class="form-group">
-                {!! Form::label('asunto','Asunto') !!}
-                {!! Form::text('asunto',$mensaje->notificacion,['class'=>'form-control','placeholder'=>'Nombre de la actividad','required','disabled']) !!}
+                <label for="asunto">Asunto</label>
+                <input type="text" name="asunto" id="asunto" class="form-control" placeholder="Nombre de la actividad" required disabled value="{{ $mensaje->notificacion }}">                
             </div>
             <div class="form-group">
-                {!! Form::label('nombre','Nombre de la actividad') !!}
+                <label for="nombre">Nombre de la actividad</label>                
                 <textarea class="form-control" style="text-align: left; font-size: large;" disabled id="textarea-mensaje">{{ $mensaje->mensaje }}</textarea>
             </div>
-            @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']) && $actividad_id != null)
-               <div class="toltip">
-                    <a href="#" onclick="redireccionar({{$actividad_id}});" class="btn btn-success btn-sm"><i class='fas fa-person-booth' style='font-size:18px'></i> Participantes</a>
-                    <span class="toltiptext">Agregar participantes</span>
-                </div>  
+            @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']) && $actividad_id != null)               
+                <a href="#" onclick="redireccionar({{$actividad_id}});" class="btn btn-success btn-sm"><i class='fas fa-person-booth' style='font-size:18px'></i> Participantes</a>               
             @endif
         </div>
         <div class="col-sm-3"></div>

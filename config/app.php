@@ -78,7 +78,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'es',
 
     /*
     |--------------------------------------------------------------------------
@@ -91,7 +91,7 @@ return [
     |
     */
 
-    'fallback_locale' => 'en',
+    'fallback_locale' => 'es',
 
     /*
     |--------------------------------------------------------------------------
@@ -183,8 +183,8 @@ return [
         /*
        * Providers personales
        */
-        App\Providers\AnnotationsServiceProvider::class,
-        Laracasts\Flash\FlashServiceProvider::class,
+        App\Providers\AnnotationsServiceProvider::class,        
+        Spatie\Permission\PermissionServiceProvider::class,
 
     ],
 

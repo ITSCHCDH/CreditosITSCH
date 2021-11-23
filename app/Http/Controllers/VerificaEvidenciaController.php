@@ -5,15 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Laracasts\Flash\Flash;
-use App\Evidencia;
-use App\Avance;
-use App\Alumno;
-use App\Credito;
-use App\Participante;
-use App\Actividad_Evidencia;
-use App\Actividad;
-use App\Area;
+use App\Models\Avance;
+use App\Models\Alumno;
+use App\Models\Credito;
+use App\Models\Participante;
+use App\Models\Actividad_Evidencia;
+use App\Models\Actividad;
+use App\Models\Area;
 
 class VerificaEvidenciaController extends Controller
 {

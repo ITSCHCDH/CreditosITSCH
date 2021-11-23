@@ -7,16 +7,14 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\User;
-use App\ConstanciaComplemento;
-use App\Constancia;
-use App\Area;
-use App\Alumno;
-use App\Folio;
-use App\Credito;
-use App\Avance;
+use App\Models\ConstanciaComplemento;
+use App\Models\Constancia;
+use App\Models\Area;
+use App\Models\Alumno;
+use App\Models\Folio;
 use PDF;
 use DB;
-use Laracasts\Flash\Flash;
+
 class ConstanciasController extends Controller
 {
     public function __construct(){
