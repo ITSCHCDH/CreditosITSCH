@@ -1,6 +1,43 @@
-vendor/
-node_modules/
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+/.idea
+/.vagrant
+Homestead.json
+Homestead.yaml
 npm-debug.log
+yarn-error.log
+.env
+composer.lock
+/moodledata/
+/moodledatadreava/
+/public/BecasM/
+/public/dreava/
+/public/encuestasitsch/
+/public/eventos/
+/public/eventosAcademicos/
+/public/fichas/
+/public/fichasAdm/
+/public/hidden/
+/public/itschMovil/
+/public/itzone/
+/public/mmbecas/img/
+/public/mmbecas/js/guardar/
+/public/mmbecas/php/
+/public/mmbecas/vistas/cabeza.html
+/public/mmbecas/vistas/cabeza_login.html
+/public/mmbecas/vistas/solicitudes_alumno.php
+/public/moodle/
+/public/sql_server/
+/public/sta/
+/public/fichas2/
+tags
+*.swp
+
+
+
 
 # Laravel 4 specific
 bootstrap/compiled.php
@@ -22,3 +59,5 @@ Homestead.json
 
 #Composer
 composer.lock
+
+/storage/
