@@ -2,7 +2,7 @@
 
 use Faker\Generator as Faker;
 
-$factory->define(App\Alumno::class, function (Faker $faker) {
+$factory->define(App\Models\Alumno::class, function (Faker $faker) {
     $id_carrera = $faker->randomElement($array = array(1,2,3,4,5,6,7));
     $iniciales = ["S","T","N","I","G","M","B",""];
     return [

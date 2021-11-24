@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Credito;
-use App\CreditoArea;
+use App\Models\Credito;
+
 
 class CrearCreditos extends Seeder
 {

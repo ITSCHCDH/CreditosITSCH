@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Area;
+use App\Models\Area;
 
 class CrearAreas extends Seeder
 {

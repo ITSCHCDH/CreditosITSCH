@@ -11,6 +11,6 @@ class GenerarAlumnos extends Seeder
      */
     public function run()
     {
-        $alumnos = factory(App\Alumno::class,500)->create();
+        $alumnos = factory(App\Models\Alumno::class,500)->create();
     }
 }
