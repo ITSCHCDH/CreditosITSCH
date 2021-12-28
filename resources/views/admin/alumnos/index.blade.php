@@ -11,17 +11,17 @@
         <div class="col-sm-4"></div>
         <div class="col-sm-4"></div>
         <div class="col-sm-4">
-            <div style="text-align: right;">                 
+            <div style="text-align: right;">
                 @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ALUMNOS']))
                     <a href="{{route('alumnos.create')}}" class="btn btn-info btn-sm" title="Agregar alumno">
                         <i class="fas fa-user-plus" style="font-size:20px"></i>
                     </a>
-                @endif                                                
+                @endif
             </div>
         </div>
-    </div> 
-    
-    <div class="table-responsive"> 
+    </div>
+
+    <div class="table-responsive">
         <table class="table table-striped table-bordered" id="tabla-alumnos">
             <thead>
             <th>ID</th>
@@ -34,64 +34,42 @@
             @endif
             </thead>
             <tbody>
-                @foreach($alumno as $alu)
-                    <tr>
-                        <td>{{$alu->id}}</td>
-                        <td>{{$alu->no_control}}</td>
-                        <td>{{$alu->nombre}}</td>
-                        <td>{{$alu->carrera}}</td>
-                        <td>
-                            @if($alu->status == "Pendiente" || $alu->status == "pendiente")
-                                <span class="label label-danger">Pendiente</span>
-                            @else
-                                <span class="label label-primary">Liberado</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ALUMNOS']))                            
-                                <a href="{{ route('alumnos.edit',[$alu->id]) }}" class="btn btn-warning btn-sm" title="Modificar alumno"><i class="fas fa-user-edit" style="font-size:14px"></i></a>                      
-                            @endif
-                            @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS']))                            
-                                <a  class="btn btn-danger btn-sm" onclick="undo_alumno({{$alu->id}})" data-toggle="modal" data-target="#myModalMsg" title="Eliminar alumno"><i class="far fa-trash-alt" style="font-size:14px"></i></a>                                                     
-                            @endif
-                        </td>
-                    </tr>
-                @endforeach
             </tbody>
         </table>
     </div>
-    <!--Modal para mensajes del sistema-->    
+    <!--Modal para mensajes del sistema-->
     <div class="modal" id="myModalMsg">
         <div class="modal-dialog modal-sm">
         <div class="modal-content">
-        
+
             <!-- Modal Header -->
             <div class="modal-header">
             <h4 class="modal-title">Mensaje</h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            
+
             <!-- Modal body -->
             <div class="modal-body" id="uno">
-                ¿Estas seguro que deseas eliminar el alumno? 
+                ¿Estas seguro que deseas eliminar el alumno?
                 <input type="text" id="e_id" name="id"  readonly onFocus="this.blur()" style="border: none">
 
             </div>
-            
+
             <!-- Modal footer -->
             <div class="modal-footer">
                 <a  class="btn btn-danger" id="prueba">Aceptar</a>
                 <button type="button" class="btn btn-success" data-dismiss="modal">Cancelar</button>
-            </div>            
+            </div>
         </div>
         </div>
-    </div> 
-    
+    </div>
+
     @section('js')
         <script>
             //Codigo para adornar las tablas con datatables
+
             $(document).ready(function() {
-                $('#tabla-alumnos').DataTable({                  
+                $('#tabla-alumnos').DataTable({
 
                     dom: 'Bfrtip',
 
@@ -125,20 +103,32 @@
                         { extend: 'colvis', text: 'Columnas visibles' },
                         { extend:'pageLength',text:'Ver registros'},
                     ],
-                    "language": {
-                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
-                }
+                    language: {
+                        url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                    },
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('admin.alumnos.cargar.ajax') }}",
+                        type: "get",
+                    },
+                    columns: [
+                        {data: 'alumno_id', searchable: false},
+                        {data: 'no_control'},
+                        {data: 'nombre'},
+                        {data: 'carrera'},
+                        {data: 'status', orderable: false, searchable: false},
+                        {data: 'acciones', orderable: false, searchable: false}
+                    ],
                 });
             });
 
-            //Script para pasasr el id del alumno a eliminar para que se use en el modal
+
+            //Script para pasar el id del alumno a eliminar para que se use en el modal
             function undo_alumno(n)
-            {	            
-                document.getElementById("e_id").value = n;	           					
+            {
+                document.getElementById("e_id").value = n;
                 document.getElementById("prueba").href = "alumnos/"+n+"/destroy";
             }
         </script>
     @endsection
-
-    
 @endsection

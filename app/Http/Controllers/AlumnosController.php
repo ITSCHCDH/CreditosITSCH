@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Utilities\DataTableAttr;
+use App\Http\Controllers\Utilities\DataTableHelper;
 use Illuminate\Http\Request;
-use App\Models\Alumno; //Es el nombre del modelo con el que va a trabajar el controlador
+use App\Models\Alumno;
 use App\Models\Area;
-use DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AlumnosController extends Controller
 {
     public function __construct(){
-        $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_ALUMNOS')->only(['index','show']);
+        $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_ALUMNOS')->only(['index','show', 'cargarAlumnosAjax']);
         $this->middleware('permission:VIP|CREAR_ALUMNOS')->only(['store','create']);
         $this->middleware('permission:VIP|MODIFICAR_ALUMNOS')->only(['edit','update']);
         $this->middleware('permission:VIP|ELIMINAR_ALUMNOS')->only(['destroy']);
@@ -20,12 +23,42 @@ class AlumnosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $alumnos = DB::table('alumnos as alu')->join('areas as a','a.id','=','alu.carrera')->where('alu.nombre','LIKE',"%".$request->valor."%")->orwhere('no_control','LIKE',"%$request->valor%")->orwhere('a.nombre','LIKE',"%$request->valor%")->orderBy('alu.id')->select('alu.nombre','alu.no_control','alu.status','alu.id','a.nombre as carrera')->get();
-        return view('admin.alumnos.index')
-        ->with('alumno',$alumnos)
-        ->with('valor',$request->valor); //Llama a la vista y le envia los usuarios
+        return view('admin.alumnos.index');
+    }
+
+    public function cargarAlumnosAjax(Request $request) {
+        $selectColumns = ['alu.nombre','alu.no_control','alu.status','alu.id as alumno_id','a.nombre as carrera'];
+        $dtAttr = new DataTableAttr($request, $selectColumns);
+
+        $alumnos = DB::table('alumnos as alu')
+            ->join('areas as a','a.id','=','alu.carrera')
+            ->select($selectColumns);
+
+        DataTableHelper::applyAll($alumnos, $dtAttr, ['paginatorResponse']);
+
+        foreach ($alumnos as $alumno) {
+            $alumno->status = ucwords($alumno->status);
+            $alumno->acciones = "";
+
+            if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ALUMNOS'])) {
+                $alumno->acciones = $alumno->acciones . '<a href="'.route('alumnos.edit',[$alumno->alumno_id]) .'"
+                    class="btn btn-warning btn-sm" title="Modificar alumno"><i class="fas fa-user-edit" style="font-size:14px"></i></a>';
+            }
+
+            if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS'])) {
+                $alumno->acciones = $alumno->acciones . '<a  class="btn btn-danger btn-sm ml-1" onclick="undo_alumno(' .
+                    $alumno->alumno_id . ')" data-toggle="modal" data-target="#myModalMsg" title="Eliminar alumno">
+                    <i class="far fa-trash-alt" style="font-size:14px"></i></a>';
+            }
+
+            if (empty($alumno->acciones))
+                $alumno->acciones = 'NA';
+        }
+
+        $paginatorResponse = DataTableHelper::paginatorResponse($alumnos, $dtAttr);
+        return response()->json($paginatorResponse, 200);
     }
 
     /**
@@ -54,11 +87,11 @@ class AlumnosController extends Controller
         $alumno->password=bcrypt($request->password);
         //Comando para guardar el registro
         $no_control_existe = Alumno::where('no_control','=',$request->no_control)->select('no_control')->get();
-        if($no_control_existe->count()>0){           
+        if($no_control_existe->count()>0){
             return redirect()->back()->withInput()
             ->with('error','El No de control ya existe');
         }
-        $alumno->save();        
+        $alumno->save();
         return redirect()->route('alumnos.index')
         ->with('success','El alumno  '.$alumno->name.' se ha registrado de forma exitosa');
     }
@@ -84,14 +117,14 @@ class AlumnosController extends Controller
     {
         //Codigo de modificaciones
         $alumno=Alumno::find($id);//Busca el registro
-        if($alumno==null){           
+        if($alumno==null){
             return redirect()->back()
             ->with('error','El alumno no existe');
         }
-     
 
-        $areas = Area::all();    
-        
+
+        $areas = Area::all();
+
         return view('admin.alumnos.edit')
         ->with('alumno',$alumno)
         ->with('areas',$areas);
@@ -109,27 +142,27 @@ class AlumnosController extends Controller
         //Ejecuta la modificacion
 
         $alumno= Alumno::find($id);
-        if($alumno==null){            
+        if($alumno==null){
             return redirect()->back()
             ->with('error','El alumno no existe');
         }
         $avance = DB::table('avance')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
-        $participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;       
+        $participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
         $alumno->nombre=$request->nombre;
         $alumno->carrera=$request->carrera;
         if($alumno->password!=$request->password)
         {
-            if($request->password==$request->passwordV) 
+            if($request->password==$request->passwordV)
             {
                 $alumno->password= bcrypt($request->password);
             }
             else
-            {                
+            {
                 return redirect()->route('alumnos.index')
                 ->with('error','Error de credenciales, las contraseñas deben ser iguales para el alumno: '.$alumno->nombre);
             }
         }
-        $alumno->save();        
+        $alumno->save();
         return redirect('admin/alumnos')
         ->with('warning','El alumno '. $alumno->nombre .' a sido editado de forma exitosa');//llama a la pagina de consultas
     }
@@ -141,7 +174,7 @@ class AlumnosController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {           
+    {
         //Codigo de bajas
         $alumno=Alumno::find($id);//Busca el registro
         if($alumno==null){

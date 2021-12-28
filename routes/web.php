@@ -12,6 +12,11 @@
 */
 
 //Rutas para funcionamiento del progressbar
+
+use App\Http\Controllers\AlumnosController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+
 Route::post('/getmsg','ExcelController@camMsg')->name('getmsg')->middleware('auth');
 
 Route::get('/fileUploadPost','ExcelController@fileUploadPost')->name('session_variable')->middleware('auth');
@@ -58,6 +63,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 
+    Route::get('alumnos/cargar_alumnos_ajax', [AlumnosController::class, 'cargarAlumnosAjax'])->name('admin.alumnos.cargar.ajax');
     Route::resource('alumnos','AlumnosController');
 
     //La siguiente nos crea las rutas para el controlador de alumnos
@@ -65,6 +71,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
         'uses'=>'AlumnosController@destroy',
         'as'=> 'admin.alumnos.destroy'
     ]);
+
 
     /****Rutas para el controlador de creditos*****/
     Route::resource('creditos','CreditosController');
@@ -134,7 +141,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     ]);
 
     Route::get('verifica_evidencia/{id}/ver_evidencia','VerificaEvidenciaController@verEvidencia')->name('verifica_evidencia.ver_evidencia');
-    Route::get('verifica_evidencia/reportes','VerificaEvidenciaController@reportes')->name('verifica_evidencia.reportes');    
+    Route::get('verifica_evidencia/reportes','VerificaEvidenciaController@reportes')->name('verifica_evidencia.reportes');
     Route::get('verifica_evidencia/visualizar/{archivo}','VerificaEvidenciaController@visualizar')->name('verificar_evidencia.visualizar');
     Route::get('verifica_evidencia/avance_alumno','VerificaEvidenciaController@avanceAlumno')->name('verifica_evidencia.avance_alumno');
     Route::get('verifica_evidencia/alumno/busqueda','VerificaEvidenciaController@alumnosBusqueda')->name('verifica_evidencia.alumnos_busqueda');
