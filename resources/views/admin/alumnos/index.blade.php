@@ -67,7 +67,6 @@
     @section('js')
         <script>
             //Codigo para adornar las tablas con datatables
-
             $(document).ready(function() {
                 $('#tabla-alumnos').DataTable({
 

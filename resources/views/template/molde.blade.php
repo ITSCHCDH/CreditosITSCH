@@ -26,20 +26,26 @@
         <header>
            @include('template.partes.menu')
         </header>
-        <!--Main Navigation-->
+       
 
-        <!--Main layout-->
-        <main class="my-5">
-            <div class="container">
-            <!--Section: Content-->
-            <section class="text-center text-md-start">
-                <h4 class="mb-5"><strong> @yield('ruta','Default') </strong></h4>               
-                @include('template.flash-message')
-                @yield('contenido','Default')<!-- Contenido general del sistema -->               
-            </section>
-            <!--Section: Content-->           
-        </main>
-        <!--Main layout-->
+       
+        
+        <!--Section: Content-->
+        <section class="text-center text-md-start">
+            <h3 class="mb-5"><strong> @yield('ruta','Default') </strong></h3>               
+            @include('template.flash-message')
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-10">
+                    @yield('contenido','Default')<!-- Contenido general del sistema -->      
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+                    
+        </section>
+        <!--Section: Content-->           
+       
+      
 
 
         <!-- Footer -->
@@ -96,10 +102,7 @@
         
         </footer>
         <!-- Footer -->
-
         
-
-
         {{-- MDBootstrap --}}
         <!-- JQuery -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -113,7 +116,7 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs4-4.1.1/jszip-2.5.0/dt-1.10.22/b-1.6.4/b-colvis-1.6.4/b-flash-1.6.4/b-html5-1.6.4/b-print-1.6.4/r-2.2.6/rg-1.1.2/rr-1.2.7/sc-2.0.3/sb-1.0.0/sp-1.2.0/sl-1.3.1/datatables.min.js"></script>
-
+       
         <script>
              //Script qwue cierra los mensajes flash de forma automatica
             $(document).ready(function(event)

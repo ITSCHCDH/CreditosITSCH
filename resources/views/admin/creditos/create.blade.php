@@ -14,40 +14,32 @@
 
 @section('contenido')
 
-    {!! Form::open(['route'=>'creditos.store','method'=>'POST']) !!}
+    <form action="{{ route('creditos.store') }}" method="post">  
 
-    <div class="form-group">
-        {!! Form::label('nombre','Nombre del credito') !!}
-        {!! Form::text('nombre',null,['class'=>'form-control','placeholder'=>'Nombre del credito','required']) !!}
-    </div>
-    <div class="form-group">
-        <label for="areas">Areas</label>
-        <select data-placeholder="Selecciones las aera que podrán crear actividades de este credito" name="areas[]" id = "areas" class="chosen-select form-control" multiple required>
-            @foreach($areas as $area)
-                <option value="{{ $area->id }}">{{ $area->nombre }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="credito_jefe">Jefe</label>
-        <select class="form-control" required name="credito_jefe">
-            <option value="">Jefe del credito</option>
-            @foreach($usuarios as $usuario)
-                <option value="{{ $usuario->id }}">{{ $usuario->name }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div class="form-group">
-        {!! Form::submit('Registrar',['class'=>'btn btn-primary']) !!}
-    </div>
+        <div class="form-group">
+            <label for="nombre">Nombre del crédito</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Nombre del credito" required>           
+        </div>
+        <div class="form-group">
+            <label for="areas">Areas</label>
+            <select name="areas[]" id ="areas" class="form-control" multiple required>
+                @foreach($areas as $area)
+                    <option value="{{ $area->id }}">{{ $area->nombre }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="credito_jefe">Jefe</label>
+            <select class="form-control" required name="credito_jefe">
+                <option value="">Jefe del credito</option>
+                @foreach($usuarios as $usuario)
+                    <option value="{{ $usuario->id }}">{{ $usuario->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Registrar" class="btn btn-primary">            
+        </div>
 
-    {!! Form::close() !!}
-    @section('js')
-        <script src="{{ asset('plugins/chosen/chosen.jquery.js') }}"></script>
-        <script type="text/javascript">
-            $(".chosen-select").chosen({
-                no_results_text: "No se encontrarón resultados"
-            }); 
-        </script>
-    @endsection
+    </form>   
 @endsection

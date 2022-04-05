@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Credito; //Es el nombre del modelo con el que va a trabajar el controlador
+use App\Models\Credito; //Es el nombre del modelo con el que va a trabajar el controlador
 use App\Models\Area;
 use App\Models\CreditoArea;
-use App\Models\User;
+use App\User;
 use DB;
 
 class CreditosController extends Controller
@@ -70,9 +70,9 @@ class CreditosController extends Controller
             $credito_area->credito_id=$credito->id;
             $credito_area->credito_area=$request->areas[$x];
             $credito_area->save();
-        }
-        Flash::success('El credito  '.$credito->nombre.' se ha registrado de forma exitosa');
-        return redirect()->route('creditos.index');
+        }       
+        return redirect()->route('creditos.index')
+        ->with('success','El credito  '.$credito->nombre.' se ha registrado de forma exitosa');
     }
 
     /**

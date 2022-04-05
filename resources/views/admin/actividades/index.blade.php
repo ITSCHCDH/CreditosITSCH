@@ -12,46 +12,32 @@
 @endsection
 
 @section('contenido')
-<form action="{{ route('actividades.index') }}" method="GET" id="actividades-submit">
-    <div class="row">    
-        <div class="col-sm-4">
-            <!-- Boton de busqueda en la pagina -->
-                <div class="input-group">                    
-                    <input type="text" class="form-control" placeholder="Buscar..." name="nombre">
-                    <div class="input-group-btn">
-                        <button type="submit" class="btn btn-primary"> Buscar
-                            <span class="badge  label label-primary glyphicon glyphicon-search">
-                            </span>
-                        </button>
-                    </div>
-                </div>           
-            <!--Nota: Se tiene que agregar el (scope) que es una funcion que se agrega en el modelo y es la encargada de hacer la consulta  -->
-            <!--Fin del boton de busqueda  -->
-        </div>
-        <div class="col-sm-4">            
-            @if ($vigente == "true")
-                <input type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="vigente"/>
-            @else
-                <input type="checkbox" id="checkbox5" class="css-checkbox" name="vigente"/>
-            @endif
-            <label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades vigentes</label> 
-        </div>  
-        <div class="col-sm-4" style="text-align: right !important;">
-            @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))
-                <div class="toltip">
-                    <a href="{{route('actividades.create')}}" class="btn btn-warning btn-sm">
-                        <i class='far fa-edit'></i>
-                    </a>
-                    <span class="toltiptext">Nueva actividad</span>
-                </div>
-            @endif
-        </div>
-    </div> 
-</form>
-    <br>         
+    <form action="{{ route('actividades.index') }}" method="GET" id="actividades-submit">
+        <div class="row">    
+            <div class="col-sm-4">
+            
+            </div>
+            <div class="col-sm-4">            
+                @if ($vigente == "true")
+                    <input type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="vigente"/>
+                @else
+                    <input type="checkbox" id="checkbox5" class="css-checkbox" name="vigente"/>
+                @endif
+                <label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades vigentes</label> 
+            </div>  
+            <div class="col-sm-4" style="text-align: right !important;">
+                @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))            
+                    <span class="table-add float-right mb-3 mr-2"><a href="{{route('actividades.create')}}" class="text-success"><i class="fa fa-plus fa-2x"
+                        aria-hidden="true" title="Agregar actividad"></i></a></span>          
+                @endif
+            </div>
+        </div> 
+    </form>
+    <br>  
+         
     <div class="table-responsive">
-        <table class="table">
-            <thead class="thead-dark">
+        <table class="table" id="tabActividades">
+            <thead>
                 <th>ID</th>
                 <th>Actividad</th>
                 <th>Porcentaje crédito</th>
@@ -91,51 +77,38 @@
                     </td>
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
                         <td>
-                            @if ($act->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))
-                                <div class="toltip">
-                                    <a href="#" class="btn btn-info btn-sm" onclick="redireccionar({{ $act->id }});">
-                                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                                    </a>
-                                    <span class="toltiptext">Agregar participantes (Alumnos) a la actividad</span>
-                                </div>
+                            @if ($act->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
+                                <a href="#" class="btn btn-info btn-sm" onclick="redireccionar({{ $act->id }});" title="Agregar participantes (Alumnos) a la actividad">
+                                    <i class="fas fa-plus" style='font-size:14px'></i>
+                                </a>                              
                             @endif
-                            @if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD']))
-                                <div class="toltip">
-                                    <a href="{{ route('verifica_evidencia.index',['validadas=on','busqueda='.$act->actividad_nombre,"actividades_link=true"]) }}" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></a>
-                                    <span class="toltiptext">Verificar evidencias de esta actividad</span>
-                                </div>
+                            @if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD']))                                
+                                <a href="{{ route('verifica_evidencia.index',['validadas=on','busqueda='.$act->actividad_nombre,"actividades_link=true"]) }}" class="btn btn-success btn-sm" title="Verificar evidencias de esta actividad">
+                                    <i class="far fa-edit" style='font-size:14px'></i>
+                                </a>                                                          
                             @endif
-                            @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ACTIVIDAD','VIP_ACTIVIDAD']))
-                                <div class="toltip">
-                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-                                        <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
-                                    @elseif($act->id_user==Auth::User()->id)
-                                        <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
-                                    @endif
-                                    <span class="toltiptext">Editar actividad</span>
-                                </div>
+                            @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
+                                    <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning btn-sm" title="Editar actividad"><i class="fas fa-pencil-alt" style='font-size:14px'></i></a>
+                                @elseif($act->id_user==Auth::User()->id)
+                                    <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning btn-sm" title="Editar actividad"><i class="fas fa-pencil-alt" style='font-size:14px'></i></a>
+                                @endif                                                            
                             @endif
-                            @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ACTIVIDAD','VIP_ACTIVIDAD']))
-                                <div class="toltip">
-                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-                                    <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                                    @elseif($act->id_user==Auth::User()->id)
-                                    <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                                    @endif
-                                    <span class="toltiptext">Eliminar actividad</span>
-                                </div>
+                            @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ACTIVIDAD','VIP_ACTIVIDAD']))                                
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
+                                <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></a>
+                                @elseif($act->id_user==Auth::User()->id)
+                                <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></a>
+                                @endif                                                         
                             @endif
-                            @if (Auth::User()->hasAnyPermission(['VIP','VER_RESPONSABLES','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
-                                <div class="toltip">
-                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
-                                        <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary btn-sm">
-                                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
-                                    @elseif($act->id_user==Auth::User()->id)
-                                        <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary btn-sm">
-                                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
-                                    @endif
-                                    <span class="toltiptext">Asignar responsables</span>
-                                </div>
+                            @if (Auth::User()->hasAnyPermission(['VIP','VER_RESPONSABLES','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))                                
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
+                                    <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-user-plus" style='font-size:14px' title="Asignar responsables"></i></a>
+                                @elseif($act->id_user==Auth::User()->id)
+                                    <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-user-plus" style='font-size:14px' title="Asignar responsables"></i></a>
+                                @endif                                                             
                             @endif  
                         </td>
                     @endif
@@ -155,6 +128,49 @@
             $('#checkbox5').click(function(event){
                 var value = $(this).is(':checked');
                 $('#actividades-submit').submit();
+            });
+
+             //Codigo para adornar las tablas con datatables
+             $(document).ready(function() {
+                $('#tabActividades').DataTable({
+
+                    dom: 'Bfrtip',
+
+                    responsive: {
+                        breakpoints: [
+                        {name: 'bigdesktop', width: Infinity},
+                        {name: 'meddesktop', width: 1366},
+                        {name: 'smalldesktop', width: 1280},
+                        {name: 'medium', width: 1188},
+                        {name: 'tabletl', width: 1024},
+                        {name: 'btwtabllandp', width: 848},
+                        {name: 'tabletp', width: 768},
+                        {name: 'mobilel', width: 600},
+                        {name: 'mobilep', width: 320}
+                        ]
+                    },
+
+                    lengthMenu: [
+                        [ 5, 10, 25, 50, -1 ],
+                        [ '5 reg', '10 reg', '25 reg', '50 reg', 'Ver todo' ]
+                    ],
+
+                    buttons: [
+                        {extend: 'collection', text: 'Exportar',
+                            buttons: [
+                                { extend: 'copyHtml5', text: 'Copiar' },
+                                'excelHtml5',
+                                'pdfHtml5',
+                                { extend: 'print', text: 'Imprimir' },
+                            ]},
+                        { extend: 'colvis', text: 'Columnas visibles' },
+                        { extend:'pageLength',text:'Ver registros'},
+                    ],
+                    language: {
+                        url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                    },                  
+                   
+                });
             });
         </script>
     @endsection

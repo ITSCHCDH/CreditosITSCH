@@ -17,11 +17,10 @@
     @endif
     <br>
     @if (Auth::User()->can('VIP') || Auth::User()->can('CREAR_CREDITOS'))
-        <div class="toltip pull-right">
-            <a href="{{route('creditos.create')}}" class="btn btn-success btn-sm">
-                <i class='fas fa-plus-circle' style='font-size:22px'></i>
-            </a>
-            <span class="toltiptext">Crear un nuevo crédito</span>
+        <div class="pull-right">
+            <a title="Agregar crédito" href="{{route('creditos.create')}}" class="btn btn-success btn-sm">
+                <i class="fas fa-plus" style='font-size:14px'></i>
+            </a>           
         </div>
     @endif
     <br>
@@ -57,27 +56,26 @@
                             @endif
                         </td>
                         <td>
-                            @if (Auth::User()->can('MODIFICAR_CREDITOS') || Auth::User()->can('VIP'))
-                                <div class="toltip">
-                                    <a href="{{ route('creditos.edit',[$cred->id]) }}" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
-                                    <span class="toltiptext">Editar crédito</span>
-                                </div>
+                            @if (Auth::User()->can('MODIFICAR_CREDITOS') || Auth::User()->can('VIP'))                               
+                                <a title="Modificar crédito" href="{{ route('creditos.edit',[$cred->id]) }}" class="btn btn-warning btn-sm"><i class="far fa-edit" style='font-size:14px'></i></a>                          
                             @endif
                             
-                            @if (Auth::User()->can('ELIMINAR_CREDITOS') || Auth::User()->can('VIP'))
-                                <div class="toltip">
-                                    <a href="{{ route('admin.creditos.destroy',$cred->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                                    <span class="toltiptext">Eliminar crédito</span>
-                                </div>
+                            @if (Auth::User()->can('ELIMINAR_CREDITOS') || Auth::User()->can('VIP'))                                
+                                <a title="Eliminar crédito" href="{{ route('admin.creditos.destroy',$cred->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><i class="far fa-trash-alt" style='font-size:14px'></i></a>                          
                             @endif
                         </td>
                     </tr>
                 @endforeach
-                </tbody>
+                </tbody>                
             </table>
-        </div>  
+        </div>                
     <div style="text-align:center;"> 
         {!! $credito->render() !!}
-    </div>  
-</div>    
+    </div>   
+</div>  
+<br>
+<br>
+<br>
+<br>
+<br>
 @endsection

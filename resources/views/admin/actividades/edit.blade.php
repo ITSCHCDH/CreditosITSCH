@@ -10,37 +10,52 @@
 
 @section('contenido')
 
-    {!! Form::model($actividad, array('route' => array('actividades.update', $actividad->id), 'method' => 'PUT')) !!}
-
-    <div class="form-group">
-        {!! Form::label('nombre','Nombre de la actividad') !!}
-        {!! Form::text('nombre',$actividad->nombre,['class'=>'form-control','placeholder'=>'Nombre de la actividad','required']) !!}
-    </div>
-
-    <div class="form-group">
-        {!! Form::label('avance','Porcentaje de liberación') !!}
-        {!! Form::text('por_cred_actividad',$actividad->por_cred_actividad,['class'=>'form-control','placeholder'=>'Porcentage del credito que se liberara con esta actividad, ej 20','required']) !!}
-    </div>
-
-    <div class="form-group">
-        {!! Form::label('id_actividad','Credito al que pertenece la actividad') !!}
-        {!! Form::select('id_actividad',$creditos,null,['class'=>'form-control select-category','placeholder'=>'Selecciona un credito','required']) !!}
-    </div>
-    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','CREAR_ACTIVIDAD_ALUMNOS']))
+    <form action="{{ route('actividades.update', $actividad->id) }}" method="get">
+    
         <div class="form-group">
-            {!! Form::label('alumnos','Alumnos Responsables')!!}
-            {!! Form::select('alumnos',['false' => 'NO','true' => 'SI'],null,['class'=>'form-control', 'required','placeholder' => '¿Quieres permitir que el alumno suba evidencias de esta actividad?'])!!}
+            <label for="nombre">Nombre de la actividad</label>
+            <input type="text" name="nombre" id="nombre" value="{{ $actividad->nombre }}" class="form-control" placeholder="Nombre de la actividad" required>            
         </div>
-    @endif
-   <div class="form-group">
-       {!! Form::label('vigente','Vigente') !!}
-        {!! Form::select('vigente',['true' => 'SI','false' => 'NO'],$actividad->vigente,['class' => 'form-control','required']) !!}
-    </div>
-    <div class="form-group">
-        {!! Form::submit('Guardar',['class'=>'btn btn-primary']) !!}
-    </div>
+
+        <div class="form-group">
+            <label for="avance">Porcentaje de liberación</label>
+            <input type="text" name="por_cred_actividad" id="nombre" value="{{ $actividad->por_cred_actividad }}" class="form-control" placeholder="Porcentage del credito que se liberara con esta actividad, ej 20" required>             
+        </div>
+
+        <div class="form-group">
+            <label for="id_actividad">Credito al que pertenece la actividad</label>
+            <select name="id_actividad" id="id_actividad" class="form-control select-category" required>
+                <option value="">Selecciona un tipo de credito</option>
+                @foreach($creditos as $cred)
+                    <option value="{{ $cred->id }}">{{ $cred->nombre }}</option>
+                @endforeach              
+            </select>            
+        </div>
+        @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','CREAR_ACTIVIDAD_ALUMNOS']))
+            <div class="form-group">            
+                <label for="alumnos">Alumnos Responsables</label>            
+                <select class="form-control form-control-sm" id="alumnos" required name="alumnos">	
+                    <option value="">¿Actividad dedicada para alumnos responsables?, Si no estas seguro selecciona NO</option>
+                    <option value="false">NO</option>
+                    <option value="true">SI</option>               
+                </select>
+            </div>
+        @endif
+        <div class="form-group">
+            <div class="form-group">            
+                <label for="vigente">Vigente</label>            
+                <select class="form-control form-control-sm" id="vigente" required name="vigente">	
+                    <option value="">¿Actividad dedicada para alumnos responsables?, Si no estas seguro selecciona NO</option>
+                    <option value="false">NO</option>
+                    <option value="true">SI</option>               
+                </select>
+            </div>           
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Guardar" class="btn btn-primary">            
+        </div>
 
 
-    {!! Form::close() !!}
+    </form>
 
 @endsection

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Credito;
+use App\Models\Credito;
 use Illuminate\Http\Request;
 use App\Models\Actividad;
 use App\Models\Actividad_Evidencia;
@@ -141,10 +141,10 @@ class ActividadesController extends Controller
         }
         if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
             
-            $creditos=Credito::orderBy('nombre','asc')->pluck('nombre','id');          
+            $creditos=Credito::orderBy('nombre','asc')->get();         
             return view('admin.actividades.edit')->with('actividad',$act)->with('creditos',$creditos);
         }else{
-            $creditos=Credito::orderBy('nombre','asc')->pluck('nombre','id');
+            $creditos=Credito::orderBy('nombre','asc')->get();
             return view('admin.actividades.edit')->with('actividad',$act)->with('creditos',$creditos);
         }
         //Codigo de modificaciones
@@ -160,7 +160,7 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
+    { dd('Si llega');
 
         $act_anterior=Actividad::find($id);
         $act_nueva=Actividad::find($id);
@@ -259,4 +259,6 @@ class ActividadesController extends Controller
             ->with("error","No tienes permisos para eliminar esta actividad");
         }      
     }
+
+   
 }

@@ -16,7 +16,8 @@
 
 @section('contenido')
 	<!-- Boton de busqueda en la pagina -->
-	{!! Form::open(['route'=>'verifica_evidencia.index','method'=>'GET','class'=>'form-inline my-2 my-lg-0 mr-lg-2 navbar-form pull-right','id' => 'actividades-submit']) !!}
+	<form action="{{ route('verifica_evidencia.index') }}" method="get">
+	
 		@if ($validadas == "false")
 			<input  type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="validadas"/>
 		@else
@@ -24,24 +25,29 @@
 		@endif
 		<label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades sin validar </label>
 		<input type="hidden" name="actividades_link" value="{{ $actividades_link }}">
-		<div class="input-group">
-			{!! Form::text('busqueda',null,['class'=>'form-control','placeholder'=>'Buscar.....','aria-describedby'=>'search']) !!}
-			<div class="input-group-btn">
-				<button type="submit" class="btn btn-primary">
-					<span class="badge  label label-primary glyphicon glyphicon-search">
-					</span>
-				</button>
+		
+		<div class="row">
+			<div class="col-sm-4"></div>
+			<div class="col-sm-4"></div>
+			<div class="col-sm-4">
+				<div class="md-form input-group mb-3">
+					<input type="text" class="form-control" placeholder="Buscar...." aria-label="Recipient's username"
+					  aria-describedby="Caja para Buscar">
+					<div class="input-group-append">
+					  <button class="btn btn-md btn-secondary m-0 px-3" type="submit" id="Buscar"><i class="fas fa-search" style="font-size: 14px"></i></button>
+					</div>
+				</div>	
 			</div>
-		</div>
-	{!! Form::close() !!}
+		</div>			
+	</form>
 	
-	{!! Form::open(['route' => 'verifica_evidencia.store','method' => 'POST']) !!}
+	<form action="{{ route('verifica_evidencia.store') }}" method="post">
 		<input type="hidden" name="actividades_link" value="{{ $actividades_link }}">
 		<br>
 		<br>
 		<div class="table-responsive">
 			<table class="table" id="tabla_evidencia">
-			   <thead class="thead-dark">
+			   <thead>
 			       <th>Actividad</th>
 			       <th>Validador</th>
 			       <th>Responsable</th>
@@ -112,10 +118,9 @@
 			</table>
 		</div>
 		@if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA']))
-			{!! Form::submit('Guardar',['class' => 'btn btn-primary','style' =>'margin-bottom:50px;']) !!}
-		@endif
-		
-	{!! Form::close() !!}
+			<input type="submit" value="Guardar" class="btn btn-primary">			
+		@endif		
+	</form>	
 	<div style="margin-bottom: 50px;"></div>
 	{{ $evidencias_data->appends(['busqueda' => $busqueda,'validadas' => $validadas])->links() }}
 	@section('js')

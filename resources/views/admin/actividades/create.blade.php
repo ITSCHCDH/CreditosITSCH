@@ -46,7 +46,7 @@
 
 
     <div class="form-group">        
-        <input type="submit" value="Registrar actividad" class="btn btn-primary btn-sm">
+        <input type="submit" value="Registrar actividad" class="btn btn-primary">
     </div>
 
 

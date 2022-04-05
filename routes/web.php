@@ -85,6 +85,8 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     /****Rutas para el controlador de actividades*****/
     Route::resource('actividades','ActividadesController');
 
+    Route::get('actividades/update/{id}','ActividadesController@update')->name('actividades.update');
+
     //La siguiente nos crea las rutas para el controlador de actividades(Bajas)
     Route::get('actividades/{id}/destroy',[
         'uses'=>'ActividadesController@destroy',
