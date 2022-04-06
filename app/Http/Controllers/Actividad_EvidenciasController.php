@@ -118,7 +118,7 @@ class Actividad_EvidenciasController extends Controller
 		return $diferencia;
 	}
 
-	public function asignarResponsables(Request $request){
+	public function asignarResponsables(Request $request){ 
 		if(!$request->has('responsables_id')){
 			$actividad_evidencia = Actividad_Evidencia::where('actividad_id','=',$request->actividad_id)->select('user_id')->get();
 			$responsables_anteriores = array();

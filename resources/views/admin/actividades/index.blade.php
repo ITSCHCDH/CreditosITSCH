@@ -51,77 +51,77 @@
                 @endif
             </thead>
             <tbody>
-            @foreach($actividad as $act)
-                <tr>
-                    <td>{{$act->id}}</td>
-                    <td>{{$act->actividad_nombre}}</td>
-                    <td>{{$act->por_cred_actividad}}</td>
-                    <td>{{$act->credito_nombre}}</td>
-                    <td>
-                        @if ($act->alumnos == "true")
-                            {{ "SI" }}
-                        @else
-                            {{ "NO" }}
-                        @endif
-                    </td>
-                    <td>{{ $act->no_alumnos }}</td>
-                    <td>
-                        {{ $act->usuario_nombre }}
-                    </td>
-                    <td>
-                        @if($act->vigente == "true")
-                            {{ "SI" }}
-                        @else
-                            {{ "NO" }}
-                        @endif
-                    </td>
-                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
+                @foreach($actividad as $act)
+                    <tr>
+                        <td>{{$act->id}}</td>
+                        <td>{{$act->actividad_nombre}}</td>
+                        <td>{{$act->por_cred_actividad}}</td>
+                        <td>{{$act->credito_nombre}}</td>
                         <td>
-                            @if ($act->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
-                                <a href="#" class="btn btn-info btn-sm" onclick="redireccionar({{ $act->id }});" title="Agregar participantes (Alumnos) a la actividad">
-                                    <i class="fas fa-plus" style='font-size:14px'></i>
-                                </a>                              
+                            @if ($act->alumnos == "true")
+                                {{ "SI" }}
+                            @else
+                                {{ "NO" }}
                             @endif
-                            @if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD']))                                
-                                <a href="{{ route('verifica_evidencia.index',['validadas=on','busqueda='.$act->actividad_nombre,"actividades_link=true"]) }}" class="btn btn-success btn-sm" title="Verificar evidencias de esta actividad">
-                                    <i class="far fa-edit" style='font-size:14px'></i>
-                                </a>                                                          
-                            @endif
-                            @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-                                    <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning btn-sm" title="Editar actividad"><i class="fas fa-pencil-alt" style='font-size:14px'></i></a>
-                                @elseif($act->id_user==Auth::User()->id)
-                                    <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning btn-sm" title="Editar actividad"><i class="fas fa-pencil-alt" style='font-size:14px'></i></a>
-                                @endif                                                            
-                            @endif
-                            @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ACTIVIDAD','VIP_ACTIVIDAD']))                                
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-                                <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></a>
-                                @elseif($act->id_user==Auth::User()->id)
-                                <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></a>
-                                @endif                                                         
-                            @endif
-                            @if (Auth::User()->hasAnyPermission(['VIP','VER_RESPONSABLES','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))                                
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
-                                    <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-user-plus" style='font-size:14px' title="Asignar responsables"></i></a>
-                                @elseif($act->id_user==Auth::User()->id)
-                                    <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-user-plus" style='font-size:14px' title="Asignar responsables"></i></a>
-                                @endif                                                             
-                            @endif  
                         </td>
-                    @endif
-                </tr>
-            @endforeach
+                        <td>{{ $act->no_alumnos }}</td>
+                        <td>
+                            {{ $act->usuario_nombre }}
+                        </td>
+                        <td>
+                            @if($act->vigente == "true")
+                                {{ "SI" }}
+                            @else
+                                {{ "NO" }}
+                            @endif
+                        </td>
+                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
+                            <td>
+                                @if ($act->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
+                                    <a href="#" class="btn btn-info btn-sm" onclick="redireccionar({{ $act->id }});" title="Agregar participantes (Alumnos) a la actividad">
+                                        <i class="fas fa-plus" style='font-size:14px'></i>
+                                    </a>                              
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD']))                                
+                                    <a href="{{ route('verifica_evidencia.index',['validadas=on','busqueda='.$act->actividad_nombre,"actividades_link=true"]) }}" class="btn btn-success btn-sm" title="Verificar evidencias de esta actividad">
+                                        <i class="far fa-edit" style='font-size:14px'></i>
+                                    </a>                                                          
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
+                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
+                                        <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning btn-sm" title="Editar actividad"><i class="fas fa-pencil-alt" style='font-size:14px'></i></a>
+                                    @elseif($act->id_user==Auth::User()->id)
+                                        <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning btn-sm" title="Editar actividad"><i class="fas fa-pencil-alt" style='font-size:14px'></i></a>
+                                    @endif                                                            
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ACTIVIDAD','VIP_ACTIVIDAD']))                                
+                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
+                                    <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></a>
+                                    @elseif($act->id_user==Auth::User()->id)
+                                    <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></a>
+                                    @endif                                                         
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','VER_RESPONSABLES','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))                                
+                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
+                                        <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-user-plus" style='font-size:14px' title="Asignar responsables"></i></a>
+                                    @elseif($act->id_user==Auth::User()->id)
+                                        <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-user-plus" style='font-size:14px' title="Asignar responsables"></i></a>
+                                    @endif                                                             
+                                @endif  
+                            </td>
+                        @endif
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>    
-    {!! $actividad->appends(['nombre'=> $nombre,'vigente' => $vigente])->render() !!}
+    
     <div style="margin-bottom: 50px;"></div>
     @section('js')
         <script>
-            function redireccionar(actividad_id){
+            function redireccionar(actividad_id){                
                 Cookies.set('participantes_actividad',actividad_id,{ expires: 1});
                 window.location.href = "{{ route('participantes.index',['actividades_link=true']) }}";
             }

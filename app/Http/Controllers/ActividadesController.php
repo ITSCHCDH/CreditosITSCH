@@ -42,7 +42,7 @@ class ActividadesController extends Controller
                 }else{
                     $query->where('a.vigente','=','true');
                 }
-            })->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->paginate(5);
+            })->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->get();
         }else{
             $act = DB::table('actividad as a')->join('users as u', function($join){
                 $join->on('u.id','=','a.id_user');
@@ -55,8 +55,8 @@ class ActividadesController extends Controller
                 }else{
                     $query->where('a.vigente','=','true');
                 }
-            })->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->paginate(5);
-        }
+            })->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->get();
+        }        
         return view('admin.actividades.index')
         ->with('actividad',$act)
         ->with('nombre',$request->nombre)
@@ -160,7 +160,7 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    { dd('Si llega');
+    { 
 
         $act_anterior=Actividad::find($id);
         $act_nueva=Actividad::find($id);

@@ -20,6 +20,6 @@ class Actividad_Evidencia extends Model
     //Relacion muchos as uno
     //Una actividad evidencia puede tener muchas evidencias
     public function evidencias(){
-    	return $this->hasMany('App\Evidencia','id_asig_actividades');
+    	return $this->hasMany('App\Models\Evidencia','id_asig_actividades');
     }
 }

@@ -16,90 +16,87 @@
 @endsection
 
 @section('contenido')
-    
     @if ($actividad!=null)
         <input type="hidden" name="actividad_id" value="{{ $actividad->id }}" id="actividad_id">
     @endif
     <div class="table-responsive"> 
         <table class="table" id="tabla-responsables">
-            <thead class="thead-dark">
+            <thead>
                 <th>Nombre</th>
                 <th>Area</th>
                 <th>Activo</th>
                 <th>Asignar</th>
             </thead>
             <tbody>
-            @if ($responsables!=null && $actividad!=null)
-                <input type="hidden" name="actividad_id" value="{{ $actividad->id }}" id="actividad_id">
-                @foreach($responsables as $res)
-                    <tr>
-                        <td>
-                            {{$res->usuario_nombre}}
-                        </td>
-                        <td>
-                            {{$res->area}}
-                        </td>
-                        <td>
-                            @if ($res->active=="true")
-                                {{ "SI" }}
-                            @else
-                                {{ "NO" }}
-                            @endif
-                        </td>
-                        <td>
-                            @if($actividad->vigente=="true")
-                                <label>
-                                @if($res->actividad_nombre==null)
-                                    
-                                    @if ($res->active=="false")
-                                        <label class="control control--checkbox">
-                                            <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
-                                            <div class="control__indicator"></div>
-                                        </label>
-                                    @else
-                                        <label class="control control--checkbox">
-                                            <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}">
-                                            <div class="control__indicator"></div>
-                                        </label>
-                                    @endif
+                @if ($responsables!=null && $actividad!=null)
+                    <input type="hidden" name="actividad_id" value="{{ $actividad->id }}" id="actividad_id">
+                    @foreach($responsables as $res)
+                        <tr>
+                            <td>
+                                {{$res->usuario_nombre}}
+                            </td>
+                            <td>
+                                {{$res->area}}
+                            </td>
+                            <td>
+                                @if ($res->active=="true")
+                                    {{ "SI" }}
                                 @else
-                                    @if($res->participantes!=null || $res->evidencias!=null || $res->validado=="true")
-                                        <label class="control control--checkbox">
-                                            <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
-                                            <div class="control__indicator"></div>
-                                        </label>
-                                    @else
-                                        <label class="control control--checkbox">
-                                            <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}">
-                                            <div class="control__indicator"></div>
-                                        </label>
-                                    @endif
-                                
+                                    {{ "NO" }}
                                 @endif
-                                </label>
-                        @else
-                            {{ "Ninguna" }}
-                        @endif
+                            </td>
+                            <td>
+                                @if($actividad->vigente=="true")
+                                    <label>
+                                    @if($res->actividad_nombre==null)                                    
+                                        @if ($res->active=="false")
+                                            <label class="control control--checkbox">
+                                                <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
+                                                <div class="control__indicator"></div>
+                                            </label>
+                                        @else
+                                            <label class="control control--checkbox">
+                                                <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" class="responsable-agregado" id="c{{ $res->usuario_id }}">
+                                                <div class="control__indicator"></div>
+                                            </label>
+                                        @endif
+                                    @else
+                                        @if($res->participantes!=null || $res->evidencias!=null || $res->validado=="true")
+                                            <label class="control control--checkbox">
+                                                <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}" disabled>
+                                                <div class="control__indicator"></div>
+                                            </label>
+                                        @else
+                                            <label class="control control--checkbox">
+                                                <input type="checkbox" name="user_id[]" value="{{ $res->usuario_id }}" checked class="responsable-agregado" id="c{{ $res->usuario_id }}">
+                                                <div class="control__indicator"></div>
+                                            </label>
+                                        @endif
+                                    
+                                    @endif
+                                    </label>
+                            @else
+                                {{ "Ninguna" }}
+                            @endif
 
-                        </td>
+                            </td>
+                        </tr>
+                    @endforeach
+
+                @else
+                    <tr>
+                        <td colspan="3">No se encontraron resultados</td>
                     </tr>
-                @endforeach
-
-            @else
-                <tr>
-                    <td colspan="3">No se encontraron resultados</td>
-                </tr>
-            @endif
-            
+                @endif            
             </tbody>
         </table>
     </div>
    
     @if ($responsables!=null && $actividad!=null)
-        <input type="submit" name="" value="Agregar" id="submit-reponsables" class="btn btn-primary">
+        <input type="submit" value="Agregar" id="submit-reponsables" class="btn btn-primary">
     @endif
     
-    <div style="margin-bottom: 50px;"></div>
+    
     @section('js')
         @if ($responsables!=null && $actividad!=null)
             <script type="text/javascript">
@@ -143,6 +140,9 @@
                                 responsables_id:responsables_array,
                                 actividad_id:actividad_id
                             },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
                             success: function(response){
                                 console.log(response);
                                 location.href = "{{ route('responsables',$actividad->id) }}"
@@ -152,10 +152,49 @@
                         });
                     });
                 }                
-                $(document).ready(function(){
+              
+
+                //Codigo para adornar las tablas con datatables
+                $(document).ready(function() {
                     inicializarArreglo();
                     $('#tabla-responsables').DataTable({
-                        "pagingType":"full_numbers"
+
+                        dom: 'Bfrtip',
+
+                        responsive: {
+                            breakpoints: [
+                            {name: 'bigdesktop', width: Infinity},
+                            {name: 'meddesktop', width: 1366},
+                            {name: 'smalldesktop', width: 1280},
+                            {name: 'medium', width: 1188},
+                            {name: 'tabletl', width: 1024},
+                            {name: 'btwtabllandp', width: 848},
+                            {name: 'tabletp', width: 768},
+                            {name: 'mobilel', width: 600},
+                            {name: 'mobilep', width: 320}
+                            ]
+                        },
+
+                        lengthMenu: [
+                            [ 5, 10, 25, 50, -1 ],
+                            [ '5 reg', '10 reg', '25 reg', '50 reg', 'Ver todo' ]
+                        ],
+
+                        buttons: [
+                            {extend: 'collection', text: 'Exportar',
+                                buttons: [
+                                    { extend: 'copyHtml5', text: 'Copiar' },
+                                    'excelHtml5',
+                                    'pdfHtml5',
+                                    { extend: 'print', text: 'Imprimir' },
+                                ]},
+                            { extend: 'colvis', text: 'Columnas visibles' },
+                            { extend:'pageLength',text:'Ver registros'},
+                        ],
+                        language: {
+                            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                        },                  
+                    
                     });
                     agregarResponsablesArreglo();
                     asignarResponsables();

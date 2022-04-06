@@ -35,21 +35,21 @@ class ParticipantesController extends Controller
         if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA','VIP_ACTIVIDAD'])){
           
             //Consultamos todas las actividades disponibles
-            $actividades = Actividad::select('id','nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
+            $actividades = Actividad::select('id','nombre')->orderBy('nombre','ASC')->get();
         }else if(Auth::User()->hasAnyPermission(['CREAR_ACTIVIDAD','VER_ACTIVIDAD'])){
             //Consultamos todas las actividades disponibles
            
             $actividades = DB::table('users as u')->join('actividad_evidencia as ae', function($join){
                 $join->on('ae.user_id','=','u.id');
-            })->join('actividad as a','a.id','=','ae.actividad_id')->where('u.id','=',Auth::User()->id)->orwhere('a.id_user','=',Auth::User()->id)->select('a.id','a.nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
+            })->join('actividad as a','a.id','=','ae.actividad_id')->where('u.id','=',Auth::User()->id)->orwhere('a.id_user','=',Auth::User()->id)->select('a.id','a.nombre')->orderBy('nombre','ASC')->get();
         }else{
             //Consultamos todas las actividades disponibles            
             $actividades = DB::table('users as u')->join('actividad_evidencia as ae', function($join){
                 $join->on('ae.user_id','=','u.id');
                 $join->where('u.id','=',Auth::User()->id);
-            })->join('actividad as a','a.id','=','ae.actividad_id')->select('a.id','a.nombre')->orderBy('nombre','ASC')->pluck('nombre','id');
+            })->join('actividad as a','a.id','=','ae.actividad_id')->select('a.id','a.nombre')->orderBy('nombre','ASC')->get();
           
-        }
+        } 
         //Retorna la vista de Agregar participantes
         return view('admin.participantes.index')
         ->with('actividades',$actividades)

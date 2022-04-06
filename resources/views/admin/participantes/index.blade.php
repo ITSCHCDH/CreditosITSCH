@@ -20,7 +20,7 @@
     
 </div>
 @if (Auth::User()->hasAnyPermission(['VIP','CREAR_EVIDENCIA']))
-    {!! Form::open(['route' => 'evidencias.create', 'method' => 'GET']) !!}
+    <form action="{{ route('evidencias.create') }}" method="get">  
         <input type="hidden" name="id_actividad" value='-1' id='input_id_actividad'>
         <input type="hidden" name="id_responsable" value='-1' id='input_id_responsable'>
         <div class="toltip">
@@ -30,9 +30,8 @@
                 </i>          
             </button>
             <span class="toltiptext">Agregar evidencia</span>  
-        </div>
-       
-    {!! Form::close() !!}
+        </div>       
+    </form>  
 @endif
 
 <div class="pull-right">
@@ -47,21 +46,26 @@
     <div class="input-group form-inline my-2 my-lg-0 mr-lg-2 pull-left" style="width: 250px;">
         <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
             al que estan asignados los participantes -->
-        {!! Form::label('actividades_id','Actividad') !!}
-        {!! Form::select('actividades_id',$actividades,null,['class'=>'form-control','required','placeholder'=>'Seleccione una actividad','method'=>'GET']) !!}
+        <label for="actividades_id">Actividad</label>    
+        <select name="actividades_id" id="actividades_id" required class="form-control">
+            @foreach ($actividades as $act)
+                <option value="{{ $act->id }}">{{ $act->nombre }}</option>
+            @endforeach
+        </select>       
     </div>
 
     <div class="input-group form-inline my-2 my-lg-0 mr-lg-2 mt-lg-10 pull-left" style="width: 250px;">
         <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
             al que estan asignados los participantes -->
-        {!! Form::label('responsables_id','Responsable') !!}
-        {!! Form::select('responsables_id',[],0,['class'=>'form-control','required','placeholder'=>'Responsable','method'=>'GET']) !!}
+        <label for="responsables_id">Responsable</label>
+        <select name="responsables_id[]" id="responsables_id" class="form-control" required></select>
+       
     </div>
     @if (Auth::User()->hasAnyPermission(['AGREGAR_PARTICIPANTES','VIP']))
         <!-- Input text donde se podra buscar a los participantes por nombre -->
         <div class="input-group form-inline my-2 my-lg-0 mr-lg-2 mt-lg-10 pull-left" style="width: 250px;">
             <div class="autocomplete pull-left" style="width:270px;">
-                {!! Form::label('alumno','Alumno') !!}
+                <label for="alumno">Alumno</label>                
                 <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
             </div>
         </div>
