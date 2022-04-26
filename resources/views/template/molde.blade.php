@@ -10,27 +10,23 @@
 
         {{-- MDBootstrap --}}
         <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
-        <!-- Google Fonts -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
-        <!-- Bootstrap core CSS -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
-        <!-- Material Design Bootstrap -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+        <!-- Google Fonts Roboto -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"/>
+        <!-- MDB -->
+        <link rel="stylesheet" href="{{ asset('css/mdb.min.css') }}" />
 
          {{--Links y scripts para funcion de tabledata--}}
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4-4.1.1/jszip-2.5.0/dt-1.10.22/b-1.6.4/b-colvis-1.6.4/b-flash-1.6.4/b-html5-1.6.4/b-print-1.6.4/r-2.2.6/rg-1.1.2/rr-1.2.7/sc-2.0.3/sb-1.0.0/sp-1.2.0/sl-1.3.1/datatables.min.css"/>   
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+    
     </head>
     <body>
         <!--Main Navigation-->
         <header>
            @include('template.partes.menu')
-        </header>
-       
-
-       
+        </header>       
         
         <!--Section: Content-->
         <section class="text-center text-md-start">
@@ -42,17 +38,12 @@
                     @yield('contenido','Default')<!-- Contenido general del sistema -->      
                 </div>
                 <div class="col-sm-1"></div>
-            </div>
-                    
+            </div>                    
         </section>
-        <!--Section: Content-->           
-       
-      
-
-
+        <!--Section: Content-->   
+        
         <!-- Footer -->
-        <footer class="page-footer font-small bg-dark  fixed-bottom">
-
+        <footer class="page-footer font-small fixed-bottom bg-dark text-center text-white">
             <!-- Footer Elements -->
             <div class="container">
         
@@ -97,7 +88,7 @@
             <!-- Footer Elements -->
         
             <!-- Copyright -->
-            <div class="footer-copyright text-center py-3">© 2021 Copyright:
+            <div class="text-center py-3" style="background-color: rgba(0, 0, 0, 0.2);">© 2021 Copyright:
             <a href="https://github.com/kioselsa"> Kioselsar.com</a>
             </div>
             <!-- Copyright -->
@@ -105,22 +96,20 @@
         </footer>
         <!-- Footer -->
         
-        {{-- MDBootstrap --}}
+        
         <!-- JQuery -->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <!-- Bootstrap tooltips -->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
-        <!-- Bootstrap core JavaScript -->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
-        <!-- MDB core JavaScript -->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+        <!-- MDB -->
+        <script type="text/javascript" src="{{ asset('js/mdb.min.js') }}"></script>
+       
         {{-- Scripts para datatable y para pdfmaker --}}
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs4-4.1.1/jszip-2.5.0/dt-1.10.22/b-1.6.4/b-colvis-1.6.4/b-flash-1.6.4/b-html5-1.6.4/b-print-1.6.4/r-2.2.6/rg-1.1.2/rr-1.2.7/sc-2.0.3/sb-1.0.0/sp-1.2.0/sl-1.3.1/datatables.min.js"></script>
        
         <script>
-             //Script qwue cierra los mensajes flash de forma automatica
+            //Script qwue cierra los mensajes flash de forma automatica
             $(document).ready(function(event)
             {
                 $('.mdshide').delay(1500).fadeOut(3000);

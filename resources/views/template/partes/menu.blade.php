@@ -1,6 +1,6 @@
 <!-- Menu del sistema -->
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark elegant-color-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <!-- Navbar brand -->
             <a class="navbar-brand" href="#">
