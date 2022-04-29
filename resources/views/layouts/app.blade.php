@@ -148,7 +148,7 @@
     <script>
         //Cierra los mensajes emergentes
         $(document).ready(function(event){
-            $('.mdshide').delay(2000).fadeOut(300);
+                $('.mdshide').delay(3000).fadeOut(300);
         })
     </script>
 

@@ -84,8 +84,8 @@
 
 <datalist id="list_no_control">
 </datalist>
-<!--------------------------------------------------------------------------------------------- ->
-<!-- Tabla donde se muestran los participantes -->
+{{-- ---------------------------------------------------------------------------------------------------------------- --}}
+{{-- Tabla donde se muestran los participantes  --}}
     <br>
     <input class="form-control pull-right" id="myInput" type="text" placeholder="Buscar........" style="width: 250px;">
     <br>
@@ -104,7 +104,9 @@
        </tbody>
     </table>
 </div>
-<div style="margin-bottom: 50px;"></div>
+<div style="margin-bottom: 200px;"></div>
+
+{{-- Sección JS --}}
 
 @section('js')
     <script>
@@ -333,9 +335,14 @@
                             id_actividad: id_actividad
                         },
                         dataType:'json',
-                        success:function(response){
-                            mostrarMensaje(response['mensaje'],"mensajes-parte-superior",response['mensaje_tipo']);
-                            $('#responsables_id').trigger('change');
+                        success:function(response){                           
+                            //mostrarMensaje(response['mensaje'],"mensajes-parte-superior",response['mensaje_tipo']);
+                            //$('#responsables_id').trigger('change');
+                            document.getElementById('mds-alert-success').innerHTML = response['message'];
+                            $('#mds-alert-success').fadeIn();
+                            setTimeout(function(){
+                                window.location.replace("{{ route('participantes.actividad_responsables') }}");
+                             },2000);
                         },error:function(){
                             console.log('Error al guardar');
                         }
