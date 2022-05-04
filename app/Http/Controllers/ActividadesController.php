@@ -9,6 +9,7 @@ use App\Models\Actividad_Evidencia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use DB;
+use Alert;
 
 class ActividadesController extends Controller
 {
@@ -111,17 +112,22 @@ class ActividadesController extends Controller
                 ->with("error","No puedes crear actividades de este crédito");
             }
         }
-        if($actividad_con_mismo_nombre->count()>0){            
-            return back()->withInput()
-            ->with("error","El nombre ".$act->nombre." ya ha sido tomado, ingrese uno diferente");
+        if($actividad_con_mismo_nombre->count()>0){  
+            Alert::error('Error', 'El nombre '.$act->nombre.' ya ha sido tomado, ingrese uno diferente');            
+            return back()->withInput();           
         }
-        if($act->por_cred_actividad>100){           
-            return back()->withInput()
-            ->with("error","El porcentaje de liberación no debe exceder el 100% del credito");
+        if($act->por_cred_actividad>100){  
+
+            //Llamado a mensajes con la libreria Sweet Alert
+            Alert::error('Error', 'El porcentaje de liberación no debe exceder el 100% del credito');  
+            return back()->withInput();            
         }
-        $act->save(); //Guarda el articulo en su tabla        
-        return redirect()->route('actividades.index')
-        ->with("success","La actividad ".$act->nombre." se registro de forma correcta");
+        $act->save(); //Guarda el articulo en su tabla  
+        
+        //Llamado a mensajes con la libreria Sweet Alert
+        Alert::success('Correcto', 'La actividad '.$act->nombre.' se registro de forma correcta');
+        return redirect()->route('actividades.index');
+        
     }
 
    
@@ -218,9 +224,11 @@ class ActividadesController extends Controller
                 Storage::deleteDirectory('public/evidencias/'.$act_anterior->nombre);
             }
         }
+
+        Alert::warning('Alerta', 'La actividad '.$act_nueva->nombre.' ha sido editada con exito');
         
-        return redirect()->route('actividades.index')
-        ->with("warning","La actividad ".$act_nueva->nombre." ha sido editada con exito");
+        return redirect()->route('actividades.index');
+        
     }
 
     /**

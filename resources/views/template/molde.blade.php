@@ -31,7 +31,7 @@
         <!--Section: Content-->
         <section class="text-center text-md-start">
             <h3 class="mb-5"><strong> @yield('ruta','Default') </strong></h3>               
-            @include('template.flash-message')
+            @include('sweetalert::alert')
             <div class="row">
                 <div class="col-sm-1"></div>
                 <div class="col-sm-10">
@@ -88,7 +88,7 @@
             <!-- Footer Elements -->
         
             <!-- Copyright -->
-            <div class="text-center py-3" style="background-color: rgba(0, 0, 0, 0.2);">© 2021 Copyright:
+            <div class="text-center py-3" style="background-color: rgba(0, 0, 0, 0.2);">© 2022 Copyright:
             <a href="https://github.com/kioselsa"> Kioselsar.com</a>
             </div>
             <!-- Copyright -->
@@ -108,14 +108,6 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs4-4.1.1/jszip-2.5.0/dt-1.10.22/b-1.6.4/b-colvis-1.6.4/b-flash-1.6.4/b-html5-1.6.4/b-print-1.6.4/r-2.2.6/rg-1.1.2/rr-1.2.7/sc-2.0.3/sb-1.0.0/sp-1.2.0/sl-1.3.1/datatables.min.js"></script>
        
-        <script>
-            //Script qwue cierra los mensajes flash de forma automatica
-            $(document).ready(function(event)
-            {
-                $('.mdshide').delay(1500).fadeOut(3000);
-            }); 
-        </script>
-
         @yield('js')
        
     </body>
