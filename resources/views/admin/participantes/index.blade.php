@@ -291,13 +291,14 @@
                 });
         }
         function eliminaParticipante(){
-            $(document).on('click','.claseEliminaParticipante',function(event){
+            $(document).on('click','.claseEliminaParticipante',function(event){   
+                Swal.fire("Esta es una alerta");             
                 var confirmacion = confirm('¡Estas seguro de eliminar al participante?');
                 event.preventDefault();
                 if(confirmacion){
                     var token = $(this).data('token');
                     var id = $(this).attr('value');
-                    $.ajax({
+                    $.ajax({                       
                         type:'GET',
                         url:'participantes/'+id+'/destroy',
                         dataType:'json',
@@ -307,8 +308,7 @@
                             '_token':token
                         },
                         success:function(response){
-                            mostrarMensaje(response['mensaje'],'mensajes-parte-superior',response['mensaje_tipo']);
-                            $('#responsables_id').trigger('change');
+                           //Mensaje
                         },error:function(){
                             console.log('Error al eliminar');
                         }

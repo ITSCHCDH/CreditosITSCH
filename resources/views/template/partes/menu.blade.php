@@ -106,10 +106,15 @@
                     <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ Auth::user()->name }}</a>
                     <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
                         <a class="dropdown-item" href="{{ route('perfil.index') }}">Mi perfil</a> 
-                        <a class="dropdown-item" href="{{ route('logout') }}">Salir</a>
+                        <a class="dropdown-item" href="{{ route('logout') }}"
+                            onclick="event.preventDefault();
+                                        document.getElementById('logout-form').submit();">
+                            <i class="material-icons" style="font-size:15px"></i>
+                            {{ __('Salir') }}
+                        </a>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
-                        </form> 
+                        </form>
                     </div>        
                 </li>
             </ul>            
