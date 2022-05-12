@@ -130,12 +130,10 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
 
-    <!-- particles.js lib - https://github.com/VincentGarreau/particles.js --> 
-    <script src="http://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script> 
+   
     <!-- stats.js lib --> 
     <script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
-    <script  src="jsParticles/index.js"></script>
-
+   
 
     {{-- Scripts para datatable y para pdfmaker --}}
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>

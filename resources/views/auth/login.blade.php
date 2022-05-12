@@ -1,119 +1,119 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>ITSCH</title>
 
-@section('content')
-<div class="container">
-    <div class="row" >
-        <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
-                <div class="panel-heading" >
-                    <p style="font-size: medium" class="pull-left">Inicio</p>
-                    <img src="{{ asset('images/Customer_Male_Light.png') }}" border="0" width="30" height="30" class="img-rounded">
-                    <div style="clear: both;"></div>
-                </div>
-
-                <div class="panel-body">
-                    <form class="form-horizontal" method="POST" action="{{ route('login') }}" id="frm-login">
-                        {{ csrf_field() }}
-
-                        <div class="form-group{{ $errors->has('email') || $errors->has('no_control') ? ' has-error' : '' }}">
-                            <label for="email" id="label-username" class="col-md-4 control-label" style="font-size:medium" >Dirección E-Mail</label>
-                            <div class="col-md-6">
-                                <input id="email" type="text" class="form-control" name="email" required autofocus>
-
-                                @if ($errors->has('email'))
-                                    <span class="help-block">
-                                        <strong style="font-size: small" >{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-                                @if ($errors->has('no_control'))
-                                    <span class="help-block">
-                                        <strong style="font-size: small" >{{ $errors->first('no_control') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-
-                        <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                            <label for="password" class="col-md-4 control-label" style="font-size: medium" >Password</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control" name="password" required>
-
-                                @if ($errors->has('password'))
-                                    <span class="help-block">
-                                        <strong style="font-size: small" >{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="tipo-login" class="col-md-4 control-label" style="font-size: medium;">Tipo</label>
-
-                            <div class="col-md-6">
-                                <select id="tipo-login" name="tipo-login" class="form-control">
-                                    <option value="1" selected>Administrativo</option>
-                                    <option value="0">Alumno</option>
-                                </select>
-                                @if ($errors->has('active'))
-                                    <span class="help-block" style="color:red;">
-                                        <strong style="font-size: small" >{{ $errors->first('active') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-md-6 col-md-offset-4">
-                                <div class="checkbox">
-                                    <label style="font-size: small">
-                                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> Recordar Usuario
-                                    </label>
+        <!-- Font Awesome -->
+        <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+        />
+        <!-- Google Fonts -->
+        <link
+        href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        rel="stylesheet"
+        />
+        <!-- MDB -->
+        <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.css"
+        rel="stylesheet"
+        />
+    </head>
+    <body>
+        <section class="vh-100" style="background-color: #000000;">
+            <div class="container py-5 h-100">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col col-xl-10">
+                        <div class="card" style="border-radius: 1rem;">
+                            <div class="row g-0">
+                                <div class="col-md-6 col-lg-5 d-none d-md-block">
+                                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img1.webp"
+                                    alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem;" />
+                                </div>
+                                <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                                    <div class="card-body p-4 p-lg-5 text-black">
+            
+                                        <form method="POST" action="{{ route('login') }}" id="frm_login">
+                                            @csrf
+                    
+                                            <div class="d-flex align-items-center mb-3 pb-1">
+                                                <img src="{{ asset('images/itsch.jpg') }}" class="img-fluid ${3|rounded-top,rounded-right,rounded-bottom,rounded-left,rounded-circle,|}" alt="Logo ITSCH" style="width: 100px">
+                                                <span class="h1 fw-bold mb-0">ITSCH</span>
+                                            </div>
+                        
+                                            <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sistema de créditos complementarios del ITSCH</h5>
+        
+                                            
+                                            <div class="form-outline mb-4">    
+                                                <Label class="form-label" >Tipo de usuario</Label>                                            
+                                                <select id="tipo-login" name="tipo-login" class="form-control form-control-lg" required>                                                    
+                                                    <option value="1" selected>Administrativo</option>
+                                                    <option value="0">Alumno</option>
+                                                </select>                                                
+                                            </div>
+                        
+                                            <div class="form-outline mb-4">
+                                                <input type="email" id="email" class="form-control form-control-lg"  name="email" required/>
+                                                <label class="form-label" for="email" id="user">Email address</label>
+                                            </div>
+                        
+                                            <div class="form-outline mb-4">
+                                                <input type="password" id="password" class="form-control form-control-lg" name="password" required/>
+                                                <label class="form-label" for="password">Password</label>
+                                            </div>
+                        
+                                            <div class="pt-1 mb-4">
+                                                <button class="btn btn-dark btn-lg btn-block" type="submit">Login</button>
+                                            </div>
+                        
+                                            <a class="small text-muted" href="{{ route('password.request') }}" id="olvidaste">¿Olvidaste tu contraseña?</a>
+                                    
+                                        </form>
+                
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            <div class="col-md-8 col-md-offset-4">
-                                <button type="submit" class="btn btn-primary">
-                                    Inicio
-                                </button>
-                                <a class="btn btn-link" href="{{ route('password.request') }}" id="olvidaste">
-                                    ¿Olvidaste tu contraseña?
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+          </section>
 
-@section('js')
-    <script type="text/javascript">
-        function comboTipo(){
-            $('#tipo-login').change(function(event){
-                event.preventDefault();
-                var tipo_val = $(this).val();
-                var username = document.getElementById('email');
-                var formulario = document.getElementById('frm-login');
-                var label = document.getElementById('label-username');
-                if(tipo_val==0){
-                    email.name = "no_control";
-                    formulario.action = "{{ route('alumnos.login') }}";
-                    label.innerHTML = "No de Control";
-                    $('#olvidaste').css('display','none');
-                }else{
-                    email.name = "email";
-                    formulario.action = "{{ route('login') }}";
-                    label.innerHTML = "Dirección E-Mail";
-                    $('#olvidaste').css('display','inline');
-                }
+        <!-- MDB -->
+        <script
+        type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.js"
+        ></script>
+        <!-- Scripts -->    
+        <script src="{{ asset('js/app.js') }}"></script>
+        <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
+        
+       
+        <script type="text/javascript">
+            function comboTipo(){
+                $('#tipo-login').change(function(event){
+                    event.preventDefault();
+                    var tipo_val = $(this).val();                   
+                    if(tipo_val==0){                                        
+                        $("#user").text("No de Control");    
+                        $('#frm_login').attr('action', "{{ route('alumnos.login') }}");  
+                        $('#email').attr('name','no_control'); 
+                        $('#email').attr('type','text');                  
+                    }else{                       
+                        $("#user").text("Email address"); 
+                        $('#frm_login').attr('action', "{{ route('login') }}");  
+                        $('#email').attr('name','email'); 
+                        $('#email').attr('type','email');                        
+                    }
+                });
+            }
+            $(document).ready(function(){
+                comboTipo();
             });
-        }
-        $(document).ready(function(){
-            comboTipo();
-        });
-    </script>
-@endsection
-@endsection
+        </script>
+        
+    </body>
+</html>
