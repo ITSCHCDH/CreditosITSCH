@@ -100,6 +100,9 @@
         <!-- JQuery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
+        {{-- CDN sweetalert --}}
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
         <!-- MDB -->
         <script type="text/javascript" src="{{ asset('js/mdb.min.js') }}"></script>
        

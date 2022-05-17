@@ -290,10 +290,10 @@
                     });
                 });
         }
+        
         function eliminaParticipante(){
-            $(document).on('click','.claseEliminaParticipante',function(event){   
-                Swal.fire("Esta es una alerta");             
-                var confirmacion = confirm('¡Estas seguro de eliminar al participante?');
+            $(document).on('click','.claseEliminaParticipante',function(event){                           
+                var confirmacion = confirm('¡Estas seguro de eliminar al participante?');                
                 event.preventDefault();
                 if(confirmacion){
                     var token = $(this).data('token');
@@ -308,15 +308,25 @@
                             '_token':token
                         },
                         success:function(response){
-                           //Mensaje
-                        },error:function(){
-                            console.log('Error al eliminar');
+                            //Mensaje
+                            swal({
+                                title: "Se elimino correctamente!",
+                                text: "Puedes dar click para cerrar el mensaje!",
+                                icon: "success",
+                                button: "Cerrar!",
+                            });
+                            setTimeout(function(){
+                                window.location.replace("{{ route('participantes.index') }}");
+                            },2000);
+                        },error:function(e){
+                            console.log('Error al eliminar'+e);
                         }
                     });
                     
                 }  
             });
         }
+
         function agregaParticipante(){
             $('#frm').on('submit',function(event){
                 event.preventDefault();
@@ -336,12 +346,15 @@
                         },
                         dataType:'json',
                         success:function(response){                           
-                            //mostrarMensaje(response['mensaje'],"mensajes-parte-superior",response['mensaje_tipo']);
-                            //$('#responsables_id').trigger('change');
-                            document.getElementById('mds-alert-success').innerHTML = response['message'];
-                            $('#mds-alert-success').fadeIn();
+                           //Mensaje
+                           swal({
+                                title: "El participante se agrego correctamente!",
+                                text: "Puedes dar click para cerrar el mensaje!",
+                                icon: "success",
+                                button: "Cerrar!",
+                            });
                             setTimeout(function(){
-                                window.location.replace("{{ route('participantes.actividad_responsables') }}");
+                                window.location.replace("{{ route('participantes.index') }}");
                              },2000);
                         },error:function(){
                             console.log('Error al guardar');
