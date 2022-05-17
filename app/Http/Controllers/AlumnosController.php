@@ -9,6 +9,7 @@ use App\Models\Alumno;
 use App\Models\Area;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Alert;
 
 class AlumnosController extends Controller
 {
@@ -61,11 +62,7 @@ class AlumnosController extends Controller
         return response()->json($paginatorResponse, 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+   
     public function create()
     {
         $carreras = Area::where('tipo','=','carrera')->orderBy('nombre','ASC')->get();
@@ -73,12 +70,7 @@ class AlumnosController extends Controller
         ->with('carreras',$carreras);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+   
     public function store(Request $request)
     {
         //Recibimos los datos de la vista de altas y en este metodo es donde registramos los datos a la BD
@@ -92,27 +84,14 @@ class AlumnosController extends Controller
             ->with('error','El No de control ya existe');
         }
         $alumno->save();
-        return redirect()->route('alumnos.index')
-        ->with('success','El alumno  '.$alumno->name.' se ha registrado de forma exitosa');
+
+        Alert::success('Correcto', 'El alumno  '.$alumno->name.' se ha registrado de forma exitosa');
+
+        return redirect()->route('alumnos.index');
+       
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+  
     public function edit($id)
     {
         //Codigo de modificaciones
@@ -130,13 +109,9 @@ class AlumnosController extends Controller
         ->with('areas',$areas);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+  
+
+
     public function update(Request $request, $id)
     {
         //Ejecuta la modificacion
@@ -158,38 +133,37 @@ class AlumnosController extends Controller
             }
             else
             {
-                return redirect()->route('alumnos.index')
-                ->with('error','Error de credenciales, las contraseñas deben ser iguales para el alumno: '.$alumno->nombre);
+                Alert::error('Error','Error de credenciales, las contraseñas deben ser iguales para el alumno: '.$alumno->nombre);                
+                return redirect()->route('alumnos.index');
+               
             }
         }
         $alumno->save();
-        return redirect('admin/alumnos')
-        ->with('warning','El alumno '. $alumno->nombre .' a sido editado de forma exitosa');//llama a la pagina de consultas
+        
+        Alert::warning('Alerta','El alumno '. $alumno->nombre .' a sido editado de forma exitosa');
+
+        return redirect('admin/alumnos');
+        
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+   
     public function destroy($id)
     {
         //Codigo de bajas
         $alumno=Alumno::find($id);//Busca el registro
         if($alumno==null){
-            Flash::error('El alumno no existe');
+            Alert::error('Error','El alumno no existe');
             return redirect('/home');
         }
         $participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true:false;
         $evidencia = DB::table('evidencia')->where('alumno_no_control','=',$alumno->no_control)->get()->count()>0?true:false;
         $avance = DB::table('avance')->where('no_control','=',$alumno->no_control)->get()->count()>0?true:false;
         if($participante || $evidencia || $avance){
-            Flash::error('El alumno '.$alumno->nombre.' no puede ser eliminado debido a claves foraneas');
+            Alert::error('Error','El alumno '.$alumno->nombre.' no puede ser eliminado debido a claves foraneas');
             return redirect()->route('alumnos.index');
         }
         $alumno->delete();//Elimina el registro
-        Flash::error('El alumno '. $alumno->nombre .' a sido borrado de forma exitosa');//Envia mensaje
+        Alert::success('Correcto','El alumno '. $alumno->nombre .' a sido borrado de forma exitosa');//Envia mensaje
         return redirect('admin/alumnos');//llama a la pagina de consultas
     }
 }

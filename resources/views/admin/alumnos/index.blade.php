@@ -37,6 +37,14 @@
             </tbody>
         </table>
     </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
     <!--Modal para mensajes del sistema-->
     <div class="modal" id="myModalMsg">
         <div class="modal-dialog modal-sm">

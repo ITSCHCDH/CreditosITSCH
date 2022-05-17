@@ -191,9 +191,10 @@ class ActividadesController extends Controller
                     ['ae.validado','=','true']
                 ]);
             })->get()->count()>0? true: false;
-            if($tiene_foraneas){                
-                return redirect()->back()
-                ->with("error","La actividad ya tiene evidencias validadas");
+            if($tiene_foraneas){     
+                Alert::error('Error','La actividad ya tiene evidencias validadas');           
+                return redirect()->back();
+                
             }
         }
         $act_nueva->save();
