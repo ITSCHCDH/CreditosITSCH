@@ -14,6 +14,7 @@
 //Rutas para funcionamiento del progressbar
 
 use App\Http\Controllers\AlumnosController;
+use App\Http\Controllers\CreditosController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -75,6 +76,8 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 
     /****Rutas para el controlador de creditos*****/
     Route::resource('creditos','CreditosController');
+    Route::get('/creditos/store',[CreditosController::class,'store'])->name('creditos.store');
+
 
     //La siguiente nos crea las rutas para el controlador de creditos(Bajas)
     Route::get('creditos/{id}/destroy',[

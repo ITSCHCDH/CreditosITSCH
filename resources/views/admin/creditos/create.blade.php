@@ -14,7 +14,7 @@
 
 @section('contenido')
 
-    <form action="{{ route('creditos.store') }}" method="post">  
+    <form action="{{ route('creditos.store') }}" method="get">  
 
         <div class="form-group">
             <label for="nombre">Nombre del crédito</label>

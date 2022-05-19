@@ -12,9 +12,8 @@
 		<div class="col"></div>
 		<div class="col"></div>
 		<div class="col text-right">
-			<a href="{{ route('areas.crear') }}" class="btn btn-success btn-sm">
-				<i class='fab fa-buysellads'></i>	
-				Nueva area
+			<a href="{{ route('areas.crear') }}" class="btn btn-primary btn-sm" title="Nueva área">
+				<i class="fas fa-plus-square"></i>				
 			</a>
 		</div>
 	</div>
@@ -35,19 +34,19 @@
 	    			<td>{{ $area->nombre }}</td>
 	    			<td>{{ $area->tipo }}</td>
 	    			<td>
-	    				<a href="{{ route('areas.usuarios',$area->id) }}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+	    				<a href="{{ route('areas.usuarios',$area->id) }}" class="btn btn-primary btn-sm"><i class="fas fa-user-plus"></i></a>
 	    				@if(Auth::User()->hasAnyPermission(['VIP','MODIFICAR_AREAS']))
-	    					<a href="{{ route('areas.editar',$area->id) }}" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+	    					<a href="{{ route('areas.editar',$area->id) }}" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
 	    				@endif
 	    				@if(Auth::User()->hasAnyPermission(['VIP','ELIMINAR_AREAS']))
-	    					<a href="{{ route('areas.eliminar',$area->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+	    					<a href="{{ route('areas.eliminar',$area->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><i class="far fa-trash-alt"></i></a>
 	    				@endif
 	    			</td>
 	    		</tr>
 	    	@endforeach
 	    </tbody>
 	</table>
-	<div style="padding: 25px;"></div>
+	<div style="padding: 100px;"></div>
 	@section('js')
 		<script type="text/javascript">
 			$(document).ready(function() {

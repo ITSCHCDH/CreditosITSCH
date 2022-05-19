@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Area;
 use App\User;
 use App\Models\ALumno;
+use Alert;
+
 class AreasController extends Controller
 {
 
@@ -28,19 +30,19 @@ class AreasController extends Controller
 
     	$nombre_ya_existe = Area::where('nombre','=',$request->nombre)->get()->count() > 0? true: false;
     	if($nombre_ya_existe){
-    		Flash::error('Una area ya existe con este nombre');
+    		Alert::error('Error','Una area ya existe con este nombre');
     		return redirect()->back();
     	}
     	$area = new Area($request->all());
     	$area->save();
-    	Flash::success('La area '.$area->nombre.' se ha guardado correctamente');
+    	Alert::success('Correcto','La area '.$area->nombre.' se ha guardado correctamente');
     	return redirect()->route('areas.inicio');
     }
 
     public function editar($id){
     	$area = Area::find($id);
     	if($area==null){
-    		Flash::error('El area no existe');
+    		Alert::error('Error','El area no existe');
     		return redirect()->back();
     	}
     	return view('admin.areas.editar')
@@ -53,36 +55,36 @@ class AreasController extends Controller
     		['id','<>',$id]
     	])->get()->count()>0?true: false;
     	if($nombre_ya_existe){
-    		Flash::error('El nombre del area ya ha sido tomado');
+    		Alert::error('Error','El nombre del area ya ha sido tomado');
     		return redirect()->back();
     	}
     	$area = Area::find($id);
     	$area->fill($request->all());
     	$area->save();
-    	Flash::success('El area '.$area->nombre.' ha sido guardada correctamente');
+    	Alert::success('Correcto','El area '.$area->nombre.' ha sido guardada correctamente');
     	return redirect()->route('areas.inicio');
     }
 
     public function eliminar($id){
     	$area = Area::find($id);
     	if($area==null){
-    		Flash::error('El area no existe');
+    		Alert::error('Error','El area no existe');
     		return redirect()->back();
     	}
     	$tiene_usuarios = User::where('area','=',$id)->get()->count() > 0? true: false;
     	$tiene_alumnos = Alumno::where('carrera','=',$id)->get()->count() > 0?true: false;
     	if($tiene_alumnos || $tiene_usuarios){
-    		Flash::error('No se puede eliminar debido a claves foraneas');
+    		Alert::error('Error','No se puede eliminar debido a claves foraneas');
     		return redirect()->route('areas.inicio');
     	}
     	$area->delete();
-    	Flash::success('Area eliminada correctamente');
+    	Alert::success('Alert','Area eliminada correctamente');
     	return redirect()->route('areas.inicio');
     }
 
     public function usuarios($id){
     	if(Area::find($id)==null){
-    		Flash::error('El area no existe');
+    		Alert::error('Error','El area no existe');
     		return redirect()->back();
     	}
     	$usuarios = User::where('area','=',$id)->get();

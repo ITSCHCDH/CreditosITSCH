@@ -5,15 +5,8 @@
 @endsection
 @section('contenido')
 	@if (Auth::User()->hasAnyPermission(['VIP','CREAR_USUARIOS']))
-		<div style="text-align: right;"> 
-			<div class="toltip">
-				<a  href="{{ route('usuarios.create')}}" class="btn btn-info btn-sm" >
-					<span class="glyphicon glyphicon-plus"></span>
-	          		<span class="glyphicon glyphicon-user"></span>          	
-	        	</a> 
-        	 	<span class="toltiptext">Agregar nuevo usuario</span>     
-        	</div>  	
-        	<!--<a href="{{ route('usuarios.create')}}" class="btn btn-primary">Nuevo Usuario</a>-->        	
+		<div style="text-align: right;"> 			
+			<a title="Agregar usuario" href="{{ route('usuarios.create')}}" class="btn btn-info btn-sm" ><i class="fas fa-user-plus"></i></a>        	       	
 		</div>			
 	@endif
 	<br>
@@ -42,25 +35,18 @@
 						<td>NO</td>
 					@endif
 					<td>
-						@if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_USUARIOS']))
-							<div class="toltip">
-								<a href="{{ route('usuarios.edit',$user->id) }}" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
-								<span class="toltiptext">Modificar usuario</span>     
-							</div>  
+						@if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_USUARIOS']))							
+							<a href="{{ route('usuarios.edit',$user->id) }}" class="btn btn-warning btn-sm" title="Modificar usuario"><i class="fas fa-user-edit"></i></i></a>							
 						@endif
-						@if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_USUARIOS']))
-							<div class="toltip">
-								<a href="{{ route('admin.usuarios.destroy',$user->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-								<span class="toltiptext">Elimar usuario</span>     
-							</div>  
+						@if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_USUARIOS']))							
+							<a title="Eliminar usuario" href="{{ route('admin.usuarios.destroy',$user->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><i class="fas fa-user-minus"></i></a>							
 						@endif
 						@if (Auth::User()->hasAnyPermission(['VIP','ASIGNAR_REMOVER_ROLES_USUARIOS']))
-							<div class="toltip">
-								<a href="{{ route('usuarios.asignar_roles',$user->id) }}" class="btn btn-info btn-sm" >
-									<i class='fas fa-users-cog' ></i>	   							
+							
+								<a href="{{ route('usuarios.asignar_roles',$user->id) }}" class="btn btn-info btn-sm"  title="Asignar permisos">
+									<i class="fas fa-users-cog"></i>	   							
 								</a>
-								<span class="toltiptext">Asignar rol</span>     
-							</div>  
+							
 						@endif
 					</td>
 				</tr>

@@ -80,15 +80,13 @@ class AlumnosController extends Controller
         //Comando para guardar el registro
         $no_control_existe = Alumno::where('no_control','=',$request->no_control)->select('no_control')->get();
         if($no_control_existe->count()>0){
-            return redirect()->back()->withInput()
-            ->with('error','El No de control ya existe');
+            Alert::error('Error','El No de control ya existe');
+            return redirect()->back()->withInput();          
         }
         $alumno->save();
 
         Alert::success('Correcto', 'El alumno  '.$alumno->name.' se ha registrado de forma exitosa');
-
-        return redirect()->route('alumnos.index');
-       
+        return redirect()->route('alumnos.index');       
     }
 
   
@@ -97,11 +95,10 @@ class AlumnosController extends Controller
         //Codigo de modificaciones
         $alumno=Alumno::find($id);//Busca el registro
         if($alumno==null){
-            return redirect()->back()
-            ->with('error','El alumno no existe');
+            Alert::error('Error','El alumno no existe');
+            return redirect()->back();            
         }
-
-
+       
         $areas = Area::all();
 
         return view('admin.alumnos.edit')
@@ -115,14 +112,14 @@ class AlumnosController extends Controller
     public function update(Request $request, $id)
     {
         //Ejecuta la modificacion
-
+        dd('Si llega');
         $alumno= Alumno::find($id);
         if($alumno==null){
-            return redirect()->back()
-            ->with('error','El alumno no existe');
+            Alert::error('Error','El alumno no existe');
+            return redirect()->back();          
         }
-        $avance = DB::table('avance')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
-        $participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
+        //$avance = DB::table('avance')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
+        //$participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
         $alumno->nombre=$request->nombre;
         $alumno->carrera=$request->carrera;
         if($alumno->password!=$request->password)

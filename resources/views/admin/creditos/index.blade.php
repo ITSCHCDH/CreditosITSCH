@@ -18,7 +18,7 @@
     <br>
     @if (Auth::User()->can('VIP') || Auth::User()->can('CREAR_CREDITOS'))
         <div class="pull-right">
-            <a title="Agregar crédito" href="{{route('creditos.create')}}" class="btn btn-success btn-sm">
+            <a title="Agregar crédito" href="{{route('creditos.create')}}" class="btn btn-primary btn-sm">
                 <i class="fas fa-plus" style='font-size:14px'></i>
             </a>           
         </div>

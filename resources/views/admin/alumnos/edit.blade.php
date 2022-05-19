@@ -13,8 +13,6 @@
     @if ($alumno!=null)
         <form action="{{ route('alumnos.update',$alumno->id) }}" method="POST">
             @csrf
-            {{--  {!! Form::model($alumno, array('route' => array('alumnos.update', $alumno->id), 'method' => 'PUT')) !!} --}}
-
             <div class="form-group">
                 <label for="no_control">Numero de Control</label>
                 <input type="text" name="no_control" id="no_control" value="{{ $alumno->no_control }}" class="form-control" placeholder="Numero de control" required readonly>                                
@@ -30,8 +28,8 @@
                 <select name="carrera" id="carrera" class="form-control" required>
                     <option value="" selected>Selecciona una carrera</option>
                     @foreach ($areas as $ar )
-                        <option value="{{ $ar->id }}">{{ $ar->nombre }}</option>
-                    @endforeach
+                        <option value="{{ $ar->id }}" {{$alumno->carrera == $ar->id ? 'selected' : '' }}>{{ $ar->nombre }}</option>
+                    @endforeach                   
                 </select>     
             </div>
 
