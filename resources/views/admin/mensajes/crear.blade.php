@@ -18,16 +18,23 @@
 			<input type="text" name="user_name" value="{{ Auth::User()->name }}" class="form-control" disabled>
 			<input type="hidden" name="creador_id" value="{{ Auth::User()->id }}">
 			<label>Para:</label>
-			<select data-placeholder = "Seleccione destinatarios" class="form-control chosen-select" multiple required name="destinatarios_id[]">
+			<select class="form-control " multiple required name="destinatarios_id[]">
 				@foreach ($users as $user)
 					<option value="{{ $user->id }}">{{ $user->name }}</option>
 				@endforeach
 			</select>
-			<label>Asunto:</label>
-			<input type="text" name="notificacion" class="form-control" required>
-			<label>Mensaje</label>
-			<textarea class="form-control" name="mensaje" required id="textarea-mensaje">
-			</textarea>
+			<br>
+			<div class="form-outline">
+				<input type="text" id="notificacion" name="notificacion" class="form-control" required />
+				<label class="form-label" for="notificacion">Example label</label>
+			</div>			
+			<br>
+
+			<div class="form-outline">
+				<textarea id="textarea-mensaje" class="form-control" name="mensaje" rows="3" required></textarea>
+				<label class="form-label" for="textarea-mensaje">Mensaje</label>
+			</div>
+			
 		</div>
 		<input type="submit" name="" value="Enviar" class="btn btn-primary">
 	</form>

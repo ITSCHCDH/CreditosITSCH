@@ -10,43 +10,24 @@
 	<label class="label label-success">Creación</label>
 @endsection
 @section('contenido')
-
-	<form class="form-horizontal" method="POST" action="{{ route('usuarios.store') }}">
+	<form method="POST" action="{{ route('usuarios.store') }}">
 	    {{ csrf_field() }}
 
-	    <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
-	        <label for="name" class="col-md-4 control-label">Nombre</label>
+		<div class="form-outline">
+			<input type="text" id="nombre" name="name" class="form-control form-control-lg" autofocus required />
+			<label class="form-label" for="nombre">Nombre</label>
+		</div>	
+		<br>
+		<div class="form-outline">
+			<input type="email" id="email" name="email" class="form-control form-control-lg" required />
+			<label class="form-label" for="email">Dirección E-Mail</label>
+		</div>	   
 
-	        <div class="col-md-6">
-	            <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}"  autofocus>
+	    <div class="form-group">
+	        <label for="area" class="control-label">Area</label>
 
-	            @if ($errors->has('name'))
-	                <span class="help-block">
-	                    <strong>{{ $errors->first('name') }}</strong>
-	                </span>
-	            @endif
-	        </div>
-	    </div>
-
-	    <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-	        <label for="email" class="col-md-4 control-label">Dirección E-Mail</label>
-
-	        <div class="col-md-6">
-	            <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" >
-
-	            @if ($errors->has('email'))
-	                <span class="help-block">
-	                    <strong>{{ $errors->first('email') }}</strong>
-	                </span>
-	            @endif
-	        </div>
-	    </div>
-
-	    <div class="form-group{{ $errors->has('area') ? ' has-error' : '' }}">
-	        <label for="area" class="col-md-4 control-label">Area</label>
-
-	        <div class="col-md-6">
-	            <select id="area" type="text" class="form-control" name="area" value="{{ old('area') }}" >
+	        <div>
+	            <select id="area" type="text" class="form-control" name="area" >
 	            	@if($areas->count()==1)
 	            		<option value="{{ $areas[0]->id }}" selected>{{ $areas[0]->nombre }}</option>
 	            	@else
@@ -56,37 +37,27 @@
 	            		@endforeach
 	            	@endif
 	            	
-	            </select>
-
-	            @if ($errors->has('area'))
-	                <span class="help-block">
-	                    <strong>{{ $errors->first('area') }}</strong>
-	                </span>
-	            @endif
+	            </select>	         
 	        </div>
 	    </div>
 
-	    <div class="form-group{{ $errors->has('active') ? ' has-error' : '' }}">
-	        <label for="active" class="col-md-4 control-label">Activo</label>
+	    <div class="form-group">
+	        <label for="active" class="control-label">Activo</label>
 
-	        <div class="col-md-6">
+	        <div>
 	        	<select id="active" type="select" class="form-control" name="active" >
-	        		<option value="" disabled selected>El usuario actualmente se encuentra es estado activo?</option>
+	        		<option value="" disabled selected>El usuario actualmente se encuentra en estado activo?</option>
 	        		<option value="true">SI</option>
 	        		<option value="false">NO</option>
-	        	</select>
-	        	@if ($errors->has('active'))
-	        	    <span class="help-block">
-	        	        <strong>{{ $errors->first('active') }}</strong>
-	        	    </span>
-	        	@endif
+	        	</select>	        
 	        </div>
 		</div>
+
 		@if (Auth::User()->hasAnyPermission(['VIP','ASIGNAR_REMOVER_ROLES_USUARIOS']))
-			<div class="form-group{{ $errors->has('area') ? ' has-error' : '' }}">
-				<label for="area" class="col-md-4 control-label">Roles</label>
-				<div class="col-md-6">
-					<select id="roles_id" type="text" class="form-control chosen-select" multiple data-placeholder="Seleccionar roles (opcional)" name="roles_id[]" value="{{ old('roles_id[]') }}" >
+			<div class="form-group">
+				<label for="area" class="control-label">Roles</label>
+				<div>
+					<select id="roles_id" type="text" class="form-control" multiple data-placeholder="Seleccionar roles (opcional)" name="roles_id[]" >
 						@foreach ($roles as $rol)
 							<option value="{{ $rol->id }}">{{ $rol->name }}</option>	
 						@endforeach
@@ -94,49 +65,27 @@
 				</div>
 			</div>
 		@endif
+
+		<div class="form-outline">
+			<input type="password" id="password" name="password" class="form-control form-control-lg" required />
+			<label class="form-label" for="password">Password</label>
+		</div>	
+		<br>	
 		
-	    <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-	        <label for="password" class="col-md-4 control-label">Password</label>
-
-	        <div class="col-md-6">
-	            <input id="password" type="password" class="form-control" name="password" >
-
-	            @if ($errors->has('password'))
-	                <span class="help-block">
-	                    <strong>{{ $errors->first('password') }}</strong>
-	                </span>
-	            @endif
-	        </div>
-	    </div>
-
-	    <div class="form-group{{ $errors->has('password_confirmation') ? ' has-error' : '' }}">
-	        <label for="password_confirmation" class="col-md-4 control-label">Confirmar Password</label>
-
-	        <div class="col-md-6">
-	            <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" >
-	            @if ($errors->has('password_confirmation'))
-	                <span class="help-block">
-	                    <strong>{{ $errors->first('password_confirmation') }}</strong>
-	                </span>
-	            @endif
-	        </div>
+		<div class="form-outline">
+			<input type="password" id="password_confirmation" name="password_confirmation" class="form-control form-control-lg" required />
+			<label class="form-label" for="password_confirmation">Confirmar Password</label>
 		</div>
+		<br> 
 		
 	    <div class="form-group">
-	        <div class="col-md-6 col-md-offset-4">
+	        <div class="col-md-offset-4">
 	            <button type="submit" class="btn btn-primary">
 	                Registrar
 	            </button>
 	        </div>
 	    </div>
 	</form>
-	<div style = "margin-bottom: 50px;"></div>
-	@section('js')
-        <script src="{{ asset('plugins/chosen/chosen.jquery.js') }}"></script>
-        <script type="text/javascript">
-            $(".chosen-select").chosen({
-                no_results_text: "No se encontrarón resultados"
-            }); 
-        </script>
-    @endsection
+	<div style = "margin-bottom: 200px;"></div>
+	
 @endsection

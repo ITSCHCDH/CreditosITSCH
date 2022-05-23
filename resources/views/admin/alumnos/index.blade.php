@@ -22,7 +22,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-striped table-bordered" id="tabla-alumnos">
+        <table class="table" id="tabla-alumnos">
             <thead>
             <th>ID</th>
             <th>Numero de Control</th>
@@ -37,14 +37,8 @@
             </tbody>
         </table>
     </div>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
+    <div style="margin-bottom: 200px;"></div>
+    
     <!--Modal para mensajes del sistema-->
     <div class="modal" id="myModalMsg">
         <div class="modal-dialog modal-sm">
@@ -59,8 +53,8 @@
             <!-- Modal body -->
             <div class="modal-body" id="uno">
                 ¿Estas seguro que deseas eliminar el alumno?
-                <input type="text" id="e_id" name="id"  readonly onFocus="this.blur()" style="border: none">
-
+                <input type="hidden" id="e_id" name="id"  readonly style="border: none">
+                <input type="text" id="e_name" readonly onFocus="this.blur()" style="border: none">
             </div>
 
             <!-- Modal footer -->
@@ -131,10 +125,11 @@
 
 
             //Script para pasar el id del alumno a eliminar para que se use en el modal
-            function undo_alumno(n)
+            function undo_alumno(i,n)
             {
-                document.getElementById("e_id").value = n;
-                document.getElementById("prueba").href = "alumnos/"+n+"/destroy";
+                document.getElementById("e_id").value = i;
+                document.getElementById("e_name").value = n;
+                document.getElementById("prueba").href = "alumnos/"+i+"/destroy";
             }
         </script>
     @endsection

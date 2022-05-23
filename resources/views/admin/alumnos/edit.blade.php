@@ -33,27 +33,17 @@
                 </select>     
             </div>
 
-            <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+            <div class="form-group">
                 <label for="password">Contraseña</label>               
                 <div >
-                    <input id="password" type="password" class="form-control" name="password" value="{{ $alumno->password }}"> 
-                    @if ($errors->has('password'))
-                        <span class="help-block">
-                            <strong>{{ $errors->first('password') }}</strong>
-                        </span>
-                    @endif 
+                    <input id="password" type="password" class="form-control" name="password" value="{{ $alumno->password }}">                   
                 </div>         
             </div>
 
-            <div class="form-group{{ $errors->has('password_confirmation') ? ' has-error' : '' }}">
+            <div class="form-group">
                 <label for="password2">Verificar Contraseña</label>                
                 <div>
-                    <input id="passwordV" type="password" class="form-control" name="passwordV" value="{{ $alumno->password }}">   
-                    @if ($errors->has('password_confirmation'))
-                        <span class="help-block">
-                        <strong>{{ $errors->first('password_confirmation') }}</strong>
-                        </span>
-                    @endif                    
+                    <input id="passwordV" type="password" class="form-control" name="passwordV" value="{{ $alumno->password }}">                                
                 </div>    
             </div>      
 

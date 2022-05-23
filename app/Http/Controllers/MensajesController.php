@@ -9,6 +9,7 @@ use App\User;
 use App\Models\Mensaje;
 use App\Models\Receptor;
 use Illuminate\Support\Facades\DB;
+use Alert;
 
 class MensajesController extends Controller
 {
@@ -59,9 +60,10 @@ class MensajesController extends Controller
     		$destinatario->user_id = $request->destinatarios_id[$i];
     		$destinatario->save();
     	}
-    	Flash::success("El mensaje fue enviado correctamente");
+    	Alert::success('Correcto','El mensaje fue enviado correctamente');
     	return redirect()->route('mensajes.index');
     }
+	
     public function enviados(){
     	$mensajes = Mensaje::where('creador_id','=',Auth::User()->id)->paginate(5);
     	return view('admin.mensajes.enviados')

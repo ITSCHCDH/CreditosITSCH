@@ -50,7 +50,7 @@ class AlumnosController extends Controller
 
             if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS'])) {
                 $alumno->acciones = $alumno->acciones . '<a  class="btn btn-danger btn-sm ml-1" onclick="undo_alumno(' .
-                    $alumno->alumno_id . ')" data-toggle="modal" data-target="#myModalMsg" title="Eliminar alumno">
+                    $alumno->alumno_id .','."'". $alumno->nombre . "'". ')" data-toggle="modal" data-target="#myModalMsg" title="Eliminar alumno">
                     <i class="far fa-trash-alt" style="font-size:14px"></i></a>';
             }
 
