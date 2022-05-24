@@ -14,9 +14,7 @@
 @section('contenido')
     <form action="{{ route('actividades.index') }}" method="GET" id="actividades-submit">
         <div class="row">    
-            <div class="col-sm-4">
-            
-            </div>
+            <div class="col-sm-4"></div>
             <div class="col-sm-4">            
                 @if ($vigente == "true")
                     <input type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="vigente"/>
@@ -77,16 +75,6 @@
                         </td>
                         @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
                             <td>
-                                @if ($act->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
-                                    <a href="#" class="btn btn-info btn-sm" onclick="redireccionar({{ $act->id }});" title="Agregar participantes (Alumnos) a la actividad">
-                                        <i class="fas fa-plus" style='font-size:14px'></i>
-                                    </a>                              
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD']))                                
-                                    <a href="{{ route('verifica_evidencia.index',['validadas=on','busqueda='.$act->actividad_nombre,"actividades_link=true"]) }}" class="btn btn-success btn-sm" title="Verificar evidencias de esta actividad">
-                                        <i class="far fa-edit" style='font-size:14px'></i>
-                                    </a>                                                          
-                                @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
                                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
                                         <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning btn-sm" title="Editar actividad"><i class="fas fa-pencil-alt" style='font-size:14px'></i></a>
@@ -101,6 +89,16 @@
                                     <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></a>
                                     @endif                                                         
                                 @endif
+                                @if ($act->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
+                                    <a href="#" class="btn btn-info btn-sm" onclick="redireccionar({{ $act->id }});" title="Agregar participantes (Alumnos) a la actividad">
+                                        <i class="fas fa-plus" style='font-size:14px'></i>
+                                    </a>                              
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD']))                                
+                                    <a href="{{ route('verifica_evidencia.index',['validadas=on','busqueda='.$act->actividad_nombre,"actividades_link=true"]) }}" class="btn btn-success btn-sm" title="Verificar evidencias de esta actividad">
+                                        <i class="far fa-edit" style='font-size:14px'></i>
+                                    </a>                                                          
+                                @endif                               
                                 @if (Auth::User()->hasAnyPermission(['VIP','VER_RESPONSABLES','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))                                
                                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
                                         <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary btn-sm">

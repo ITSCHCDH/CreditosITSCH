@@ -30,7 +30,7 @@
 		    	@if ($msj->visto=="true")
 		    		<tr>
 		    			<td>
-		    				<a href="{{ route('mensajes.ver',['mensaje_id' => $msj->mensaje_id,'receptor_id' => $msj->receptor_id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a>
+		    				<a href="{{ route('mensajes.ver',['mensaje_id' => $msj->mensaje_id,'receptor_id' => $msj->receptor_id]) }}" class="btn btn-warning btn-sm"><i class="far fa-envelope-open"></i></a>
 		    			</td>
 		    			<td>{{ $msj->usuario_nombre }}</td>
 		    			<td>{{ $msj->notificacion }}</td>
@@ -39,7 +39,7 @@
 		    	@else
 					<tr>
 						<th>
-							<a href="{{ route('mensajes.ver',['mensaje_id' => $msj->mensaje_id,'receptor_id' => $msj->receptor_id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a>
+							<a href="{{ route('mensajes.ver',['mensaje_id' => $msj->mensaje_id,'receptor_id' => $msj->receptor_id]) }}" class="btn btn-warning btn-sm"><i class="far fa-envelope-open"></i></a>
 						</th>
 						<th>{{ $msj->usuario_nombre }}</th>
 						<th>{{ $msj->notificacion }}</th>

@@ -75,15 +75,16 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 
 
     /****Rutas para el controlador de creditos*****/
-    Route::resource('creditos','CreditosController');
+    //Route::resource('creditos','CreditosController');
+
+    Route::get('/creditos/index',[CreditosController::class,'index'])->name('creditos.index');
+    Route::get('/creditos/create',[CreditosController::class,'create'])->name('creditos.create');
     Route::get('/creditos/store',[CreditosController::class,'store'])->name('creditos.store');
+    Route::get('/creditos/{id}/edit',[CreditosController::class,'edit'])->name('creditos.edit');
+    Route::get('/creditos/{id}/update',[CreditosController::class,'update'])->name('creditos.update');
+    Route::get('/creditos/{id}/destroy',[CreditosController::class,'destroy'])->name('creditos.destroy');
 
-
-    //La siguiente nos crea las rutas para el controlador de creditos(Bajas)
-    Route::get('creditos/{id}/destroy',[
-        'uses'=>'CreditosController@destroy',
-        'as'=> 'admin.creditos.destroy'
-    ]);
+   
 
     /****Rutas para el controlador de actividades*****/
     Route::resource('actividades','ActividadesController');

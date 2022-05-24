@@ -46,7 +46,7 @@
 	    	@endforeach
 	    </tbody>
 	</table>
-	<div style="padding: 100px;"></div>
+	<div style="padding: 200px;"></div>
 	@section('js')
 		<script type="text/javascript">
 			$(document).ready(function() {

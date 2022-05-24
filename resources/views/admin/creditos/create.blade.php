@@ -15,11 +15,13 @@
 @section('contenido')
 
     <form action="{{ route('creditos.store') }}" method="get">  
-
-        <div class="form-group">
-            <label for="nombre">Nombre del crédito</label>
-            <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Nombre del credito" required>           
+        
+        <div class="form-outline">
+            <input type="text" name="nombre" id="nombre"class="form-control" required />
+            <label class="form-label" for="nombre">Nombre del crédito</label>
         </div>
+        <br>
+        
         <div class="form-group">
             <label for="areas">Areas</label>
             <select name="areas[]" id ="areas" class="form-control" multiple required>

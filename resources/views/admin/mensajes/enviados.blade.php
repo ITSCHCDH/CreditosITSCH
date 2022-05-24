@@ -28,8 +28,8 @@
 						<td>{{ $msj->notificacion }}</td>
 						<td>{{ $msj->created_at }}</td>
 						<td>
-							<a href="{{ route('mensajes.destinatarios',['mensaje_id' => $msj->id]) }}" class="btn btn-primary"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
-							<a href="{{ route('mensajes.ver',['mensaje_id' => $msj->id,'ruta' => 'true']) }}" class="btn btn-warning"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a>
+							<a href="{{ route('mensajes.destinatarios',['mensaje_id' => $msj->id]) }}" class="btn btn-primary" title="Ver destinatarios"><i class="fas fa-users"></i></a>
+							<a href="{{ route('mensajes.ver',['mensaje_id' => $msj->id,'ruta' => 'true']) }}" class="btn btn-warning" title="Ver mensaje"><i class="far fa-eye"></i></a>
 						</td>
 					</tr>
 				@endforeach

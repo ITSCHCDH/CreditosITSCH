@@ -14,11 +14,14 @@
 
 @section('contenido')
 
-    <form action="{{ route('creditos.update', $credito->id) }}" method="post">
-        <div class="form-group">
-            <label for="nombre">Nombre del crédito</label>
-            <input type="text" name="nombre" id="nombre" value="{{ $credito->nombre }}" class="form-control" placeholder="Nombre del crédito" required>      
+    <form action="{{ route('creditos.update', $credito->id) }}" method="get">
+        
+        <div class="form-outline">
+            <input type="text" name="nombre" id="nombre"class="form-control" value="{{ $credito->nombre }}" required />
+            <label class="form-label" for="nombre">Nombre del crédito</label>
         </div>
+        <br>
+
         <div class="form-group">
             <label for="areas">Areas</label>
             <select name="areas[]" id = "areas" class="form-control" multiple required>

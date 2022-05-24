@@ -28,7 +28,7 @@
             <br>
             <table class="table">
                 <thead class="thead-dark">
-                    <th>ID</th>
+                    <th>No</th>
                     <th>Nombre</th>
                     <th>Jefe</th>
                     <th>Vigente</th>
@@ -39,7 +39,7 @@
                 <tbody>
                 @foreach($credito as $cred)
                     <tr>
-                        <td>{{$cred->id}}</td>
+                        <td>{{$loop->iteration}}</td>
                         <td>{{$cred->nombre}}</td>
                         <td>
                             @if( $cred->jefe_nombre==null)
@@ -61,7 +61,7 @@
                             @endif
                             
                             @if (Auth::User()->can('ELIMINAR_CREDITOS') || Auth::User()->can('VIP'))                                
-                                <a title="Eliminar crédito" href="{{ route('admin.creditos.destroy',$cred->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><i class="far fa-trash-alt" style='font-size:14px'></i></a>                          
+                                <a title="Eliminar crédito" data-mdb-toggle="modal" data-mdb-target="#myModalMsg" onclick="undoCredito({{ $cred->id}},'{{ $cred->nombre }}')" class="btn btn-danger btn-sm"><i class="far fa-trash-alt" style='font-size:14px'></i></a>                          
                             @endif
                         </td>
                     </tr>
@@ -71,11 +71,40 @@
         </div>                
     <div style="text-align:center;"> 
         {!! $credito->render() !!}
+    </div> 
+    
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModalMsg" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Eliminar crédito</h5>
+            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estas seguro que deseas eliminar el crédito?
+                <input type="hidden" id="e_id" name="id"  readonly style="border: none">
+                <input type="text" id="e_name" readonly onFocus="this.blur()" style="border: none">
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+            <a type="button" class="btn btn-primary" id="eliminar">Eliminar</a>            
+            </div>
+        </div>
+        </div>
     </div>   
 </div>  
-<br>
-<br>
-<br>
-<br>
-<br>
+<div style="padding: 200px;"></div>
+    @section('js')
+        <script>
+             //Script para pasar el id del alumno a eliminar para que se use en el modal
+            function undoCredito(i,n)
+            {
+                document.getElementById("e_id").value = i;
+                document.getElementById("e_name").value = n;
+                document.getElementById("eliminar").href = i+"/destroy";
+            }
+        </script>   
+    @endsection
 @endsection

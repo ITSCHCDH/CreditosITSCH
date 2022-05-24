@@ -21,11 +21,7 @@ class CreditosController extends Controller
         $this->middleware('permission:VIP|MODIFICAR_CREDITOS')->only(['edit','update']);
     }
 
-    public function show()
-    {
-        dd('show');
-    }
-   
+    
     public function index()
     {
         //Aqui mandamos llamar la vista de la pagina de inicio de alumnos
@@ -52,7 +48,7 @@ class CreditosController extends Controller
  
     public function store(Request $request)
     {
-        dd('Si llega');
+       
         //Recibimos los datos de la vista de altas y en este metodo es donde registramos los datos a la BD
         $credito = new Credito($request->all());
         //Comando para guardar el registro
@@ -78,7 +74,7 @@ class CreditosController extends Controller
         })->select('a.nombre','a.id','ca.credito_id')->orderBy('nombre','ASC')->get();
         $credito=Credito::find($id);//Busca el registro
         if($credito==null){
-            Flash::error('El credito no existe');
+            Alert::error('Error','El credito no existe');
             return redirect()->route('creditos.index');
         }
         $usuarios = User::where('active','=','true')->orwhere('id','=',$credito->credito_jefe)->get();
@@ -106,7 +102,7 @@ class CreditosController extends Controller
             $credito_area->save();
         }
         Alert::warning('Alerta','El credito '. $credito->nombre .' a sido editado de forma exitosa');//Envia mensaje
-        return redirect('admin/creditos');//llama a la pagina de consultas
+        return redirect()->route('creditos.index');
     }
 
   
@@ -128,11 +124,11 @@ class CreditosController extends Controller
             $join->where('c.id','=',$id);
         })->select('c.id')->get()->count()>0?true:false;
         if($tiene_avance || $tiene_actividades){
-            Alert::error('Error','No se puede eliminar debido a claves foraneas');
+            Alert::error('Error','No se puede eliminar debido a que hay actividades registradas en este crédito');
             return redirect()->route('creditos.index');
         }
         $credito->delete();//Elimina el registro
-        Alert::error('Error','El credito '. $credito->nombre .' a sido borrado de forma exitosa');//Envia mensaje
-        return redirect('admin/creditos');//llama a la pagina de consultas
+        Alert::success('Correcto','El credito '. $credito->nombre .' a sido borrado de forma exitosa');
+        return redirect()->route('creditos.index');
     }
 }
