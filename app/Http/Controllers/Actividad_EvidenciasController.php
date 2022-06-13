@@ -10,10 +10,12 @@ use App\Models\Mensaje;
 use App\Models\Receptor;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Alert;
 
 class Actividad_EvidenciasController extends Controller
 {
-	public function destroy($id){
+	public function destroy($id)
+	{
 		$actividad_evidencia = Actividad_Evidencia::find($id);
 		if ($actividad_evidencia!=null) {
 			if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])){
@@ -23,34 +25,35 @@ class Actividad_EvidenciasController extends Controller
 					$join->where('a.id','=',$actividad_evidencia->actividad_id);
 					$join->where('c.vigente','=','true');
 				})->get()->count()>0? true: false;
-				if(!$credito_vigente){					
-					return redirect()->back()
-					->with("error","Error es credito al que pertenece este responsable ya no es vigente por lo que esta operación esta restringida");
+				if(!$credito_vigente){
+					Alert::error('Error','Error es credito al que pertenece este responsable ya no es vigente por lo que esta operación esta restringida');					
+					return redirect()->back();					
 				}
 				$participantes = DB::table('participantes as p')->where('p.id_evidencia','=',$id)->select('no_control')->get();
-				if($actividad_evidencia->validado=="true"){					
-					return redirect()->back()
-					->with("error","Error al eliminar, este responsable ya tiene la evidencia validada");
+				if($actividad_evidencia->validado=="true"){	
+					Alert::error('Error','Error al eliminar, este responsable ya tiene la evidencia validada');				
+					return redirect()->back();					
 				}
-				if(count($actividad_evidencia->evidencias)>0){					
-					return redirect()->back()
-					->with("error","Error al eliminar, el responsable cuenta con evidencias registradas");
+				if(count($actividad_evidencia->evidencias)>0){
+					Alert::error('Error','Error al eliminar, el responsable cuenta con evidencias registradas');				
+					return redirect()->back();				
 				}
-				if($participantes->count()>0){					
-					return redirect()->back()
-					->with("error","Error al eliminar, el responsable cuenta con participantes registrados");
+				if($participantes->count()>0){	
+					Alert::error('Error','Error al eliminar, el responsable cuenta con participantes registrados');				
+					return redirect()->back();					
 				}
 				if(count($actividad_evidencia->evidencias)==0 && $participantes->count()==0 && $actividad_evidencia->validado=="false"){
-					Actividad_Evidencia::destroy($id);					
-					return redirect()->back()
-					->with("error","El responsable fue retirado de la actividad con exito");
+					Actividad_Evidencia::destroy($id);
+					Alert::error('Error','El responsable fue retirado de la actividad con exito');					
+					return redirect()->back();					
 				}
 				
 			}else if(Auth::User()->can('ELIMINAR_RESPONSABLES')){
 				$actividad = Actividad::find($actividad_evidencia->actividad_id);
-				if($actividad->id_user!=Auth::User()->id){					
-					return redirect()->back()
-					->with("error","Error al eliminar, no puedes eliminar responsables de actividades que no te corresponden");
+				if($actividad->id_user!=Auth::User()->id){	
+					Alert::error('Error','Error al eliminar, no puedes eliminar responsables de actividades que no te corresponden');				
+					return redirect()->back();
+					
 				}
 				
 				$credito_vigente = DB::table('creditos as c')->join('actividad as a', function($join) use($actividad_evidencia){
@@ -58,34 +61,33 @@ class Actividad_EvidenciasController extends Controller
 					$join->where('a.id','=',$actividad_evidencia->actividad_id);
 					$join->where('c.vigente','=','true');
 				})->get()->count()>0? true: false;
-				if(!$credito_vigente){					
-					return redirect()->back()
-					->with("error","Error es credito al que pertenece este responsable ya no es vigente por lo que esta operación esta restringida");
+				if(!$credito_vigente){	
+					Alert::error('Error','Error es credito al que pertenece este responsable ya no es vigente por lo que esta operación esta restringida');				
+					return redirect()->back();					
 				}
 				$participantes = DB::table('participantes as p')->where('p.id_evidencia','=',$id)->select('no_control')->get();
-				if($actividad_evidencia->validado=="true"){					
-					return redirect()->back()
-					->with("error","Error al eliminar, este responsable ya tiene la evidencia validada");
+				if($actividad_evidencia->validado=="true"){	
+					Alert::error('Error','Error al eliminar, este responsable ya tiene la evidencia validada');				
+					return redirect()->back();					
 				}
-				if(count($actividad_evidencia->evidencias)>0){					
-					return redirect()->back()
-					->with("error","Error al eliminar, el responsable cuenta con evidencias registradas");
+				if(count($actividad_evidencia->evidencias)>0){	
+					Alert::error('Error','Error al eliminar, el responsable cuenta con evidencias registradas');			
+					return redirect()->back();					
 				}
-				if($participantes->count()>0){					
-					return redirect()->back()
-					->with("error","Error al eliminar, el responsable cuenta con participantes registrados");
+				if($participantes->count()>0){	
+					Alert::error('Error','Error al eliminar, el responsable cuenta con participantes registrados');				
+					return redirect()->back();					
 				}
 				if(count($actividad_evidencia->evidencias)==0 && $participantes->count()==0 && $actividad_evidencia->validado=="false"){
 					Actividad_Evidencia::destroy($id);
-					
-					return redirect()->back()
-					->with("success","El responsable fue retirado de la actividad con exito");
+					Alert::success('Correcto','El responsable fue retirado de la actividad con exito');
+					return redirect()->back();					
 				}
 							
 			}
-		}		
-		return redirect()->back()
-		->with("error","Lo que tratas de eliminar no existe");
+		}
+		Alert::error('Error','Lo que tratas de eliminar no existe');	
+		return redirect()->back();		
 	}
 
 	public function show(){

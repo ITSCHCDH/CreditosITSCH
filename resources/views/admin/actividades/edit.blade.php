@@ -27,7 +27,11 @@
             <select name="id_actividad" id="id_actividad" class="form-control select-category" required>
                 <option value="">Selecciona un tipo de credito</option>
                 @foreach($creditos as $cred)
-                    <option value="{{ $cred->id }}">{{ $cred->nombre }}</option>
+                    @if($cred->id==$actividad->id_actividad)
+                        <option value="{{ $cred->id }}" selected>{{ $cred->nombre }}</option>
+                    @else
+                        <option value="{{ $cred->id }}">{{ $cred->nombre }}</option>
+                    @endif                    
                 @endforeach              
             </select>            
         </div>
@@ -36,8 +40,13 @@
                 <label for="alumnos">Alumnos Responsables</label>            
                 <select class="form-control form-control-sm" id="alumnos" required name="alumnos">	
                     <option value="">¿Actividad dedicada para alumnos responsables?, Si no estas seguro selecciona NO</option>
-                    <option value="false">NO</option>
-                    <option value="true">SI</option>               
+                    @if($actividad->alumnos=="true")
+                        <option value="true" selected>SI</option>  
+                        <option value="false">NO</option>                      
+                    @else
+                        <option value="true">SI</option>  
+                        <option value="false" selected>NO</option>
+                    @endif           
                 </select>
             </div>
         @endif
@@ -45,9 +54,14 @@
             <div class="form-group">            
                 <label for="vigente">Vigente</label>            
                 <select class="form-control form-control-sm" id="vigente" required name="vigente">	
-                    <option value="">¿Actividad dedicada para alumnos responsables?, Si no estas seguro selecciona NO</option>
-                    <option value="false">NO</option>
-                    <option value="true">SI</option>               
+                    <option value="">LA actividad aún esta vigente?</option>
+                    @if ($actividad->vigente=="true")
+                        <option value="false">NO</option>
+                        <option value="true" selected>SI</option>   
+                    @else
+                        <option value="false" selected>NO</option>
+                        <option value="true" >SI</option>   
+                    @endif                               
                 </select>
             </div>           
         </div>

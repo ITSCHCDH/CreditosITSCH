@@ -9,16 +9,10 @@
         <a href="{{ route('actividades.index') }}">Actividades</a>
         /
     @endif
-    <label class="label label-success">Participantes</label>
+    <label>Participantes</label>
 @endsection
 <!-- HTML index de los participantes -->
 @section('contenido')
-<div id="mensaje-actividad-alumnos">
-    
-</div>
-<div id="mensajes-parte-superior" class="alerta-padding">
-    
-</div>
 
 @if (Auth::User()->hasAnyPermission(['VIP','CREAR_EVIDENCIA']))
     <form action="{{ route('evidencias.create') }}" method="get">  
@@ -149,7 +143,7 @@
                         cache:false,
                         data:{id:current_id},
                         dataType: 'json',
-                        success:function(response){
+                        success:function(response){                            
                             //Vaciamos la tabla de los participantes
                             $('#mitabla tbody').empty();
                             //Vaciamos el combobox de los responsables

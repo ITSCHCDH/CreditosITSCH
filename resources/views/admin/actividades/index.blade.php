@@ -84,13 +84,13 @@
                                 @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ACTIVIDAD','VIP_ACTIVIDAD']))                                
                                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-                                    <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></a>
+                                        <button data-mdb-toggle="modal"  data-mdb-target="#modEliminar" onclick="eliminar({{ $act->id  }})" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></button>
                                     @elseif($act->id_user==Auth::User()->id)
-                                    <a href="{{ route('admin.actividades.destroy',$act->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></a>
+                                        <button data-mdb-toggle="modal"  data-mdb-target="#modEliminar" onclick="eliminar({{ $act->id  }})" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></button>
                                     @endif                                                         
                                 @endif
                                 @if ($act->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
-                                    <a href="#" class="btn btn-info btn-sm" onclick="redireccionar({{ $act->id }});" title="Agregar participantes (Alumnos) a la actividad">
+                                    <a href="#" class="btn btn-info btn-sm" onclick="redireccionar( {{ $act->id }} );" title="Agregar participantes (Alumnos) a la actividad">
                                         <i class="fas fa-plus" style='font-size:14px'></i>
                                     </a>                              
                                 @endif
@@ -115,14 +115,40 @@
             </tbody>
         </table>
     </div>    
+
+
+   <!-- Modal -->
+    <div class="modal fade" id="modEliminar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Eliminar actividad</h5>
+            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Estas seguro(a) de eliminar está actividad</div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+            <a id="btnEliminar" type="button" class="btn btn-primary">Eliminar</a>
+            </div>
+        </div>
+        </div>
+    </div>
     
     <div style="margin-bottom: 50px;"></div>
     @section('js')
         <script>
-            function redireccionar(actividad_id){                
+            function eliminar(act)
+            {                
+                r="actividades/"+act+"/destroy";  
+                $('#btnEliminar').attr('href',r);              
+            }
+
+            function redireccionar(actividad_id)
+            {                
                 Cookies.set('participantes_actividad',actividad_id,{ expires: 1});
                 window.location.href = "{{ route('participantes.index',['actividades_link=true']) }}";
             }
+            
             $('#checkbox5').click(function(event){
                 var value = $(this).is(':checked');
                 $('#actividades-submit').submit();

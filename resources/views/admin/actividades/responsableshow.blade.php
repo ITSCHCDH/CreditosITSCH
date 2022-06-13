@@ -56,7 +56,7 @@
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
                                     @if($actividad->vigente=="true")
                                         <td>                                            
-                                            <a href="{{ route('actividad_evidencias.destroy',$res->actividad_evidencia_id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" title="Quitar responsable">
+                                            <a href="#" data-mdb-toggle="modal"  data-mdb-target="#modEliminar" onclick="eliminar({{ $res->actividad_evidencia_id  }})"  title="Quitar responsable">
                                                 <i class="far fa-trash-alt fa-lg red-text"></i>
                                             </a>                                                                            
                                         </td>
@@ -68,10 +68,9 @@
                                 @elseif($actividad->id_user==Auth::User()->id)
                                     @if($actividad->vigente=="true")
                                         <td>
-                                            <div class="toltip">
-                                                 <a href="{{ route('actividad_evidencias.destroy',$res->actividad_evidencia_id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
-                                                <span class="toltiptext">Eliminar Responsable</span>     
-                                            </div>                                            
+                                            <a href="#" data-mdb-toggle="modal"  data-mdb-target="#modEliminar" onclick="eliminar({{ $res->actividad_evidencia_id  }})"  title="Quitar responsable">
+                                                <i class="far fa-trash-alt fa-lg red-text"></i>
+                                            </a>                                            
                                         </td>
                                     @else
                                         <td>
@@ -86,9 +85,37 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modEliminar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Eliminar responsable</h5>
+            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Estas seguro(a) de eliminar este responsable </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+            <a id="btnEliminar" type="button" class="btn btn-primary">Eliminar</a>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
     <div style="margin-bottom: 50px;"></div>
     @section('js')
         <script type="text/javascript">
+            function eliminar(act)
+            {   //Sirve para cambiar una ruta y que no se concatene con lo anterior
+                c="{{ url("")}}";            
+                r=c+"/admin/actividad_evidencias/"+act+"/destroy";  
+                //Agregamos la ruta a una etiqueta a        
+                $('#btnEliminar').attr('href',r);              
+            }
+
+
              //Codigo para adornar las tablas con datatables
              $(document).ready(function() {
                 $('#tabResponsables').DataTable({

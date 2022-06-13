@@ -140,14 +140,15 @@ class ActividadesController extends Controller
      */
     public function edit($id)
     {
-        $act=Actividad::find($id);//Busca el registro        
-        if($act==null){            
-            return redirect()->route('actividades.index')
-            ->with("error","La actividad no existe");
+        $act=Actividad::find($id);//Busca el registro      
+        
+        if($act==null){   
+            Alert::error('Error', 'La actividad no existe');         
+            return redirect()->route('actividades.index');
+           
         }
-        if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
-            
-            $creditos=Credito::orderBy('nombre','asc')->get();         
+        if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {            
+            $creditos=Credito::orderBy('nombre','asc')->get();  
             return view('admin.actividades.edit')->with('actividad',$act)->with('creditos',$creditos);
         }else{
             $creditos=Credito::orderBy('nombre','asc')->get();
@@ -239,33 +240,35 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
+    { 
         $act=Actividad::find($id);
-        if($act==null){            
-            return redirect()->route('actividades.index')
-            ->with("error","La actividad no existe");
+        if($act==null){   
+            Alert::error('Error','La actividad no existe');        
+            return redirect()->route('actividades.index');            
         }
         if (Auth::User()->hasAnyPermission(['VIP_ACTIVIDAD','VIP'])) {
             $asignada = Actividad_Evidencia::where('actividad_id','=',$act->id)->get()->count()>0?true: false;
             if($asignada){               
-                return redirect()->route('actividades.index')
-                ->with("error","La actividad no puede ser eliminada debido a que cuenta con responsables asignados.");
+                Alert::error('Error','La actividad no puede ser eliminada debido a que cuenta con responsables asignados.');
+                return redirect()->route('actividades.index');                
             }
-            $act->delete();            
-            return redirect()->route('actividades.index')
-            ->with("error","La actividad ".$act->nombre." ha sido borrada con exito");
+            $act->delete(); 
+            Alert::success('Correcto','La actividad '.$act->nombre.' ha sido borrada con exito');           
+            return redirect()->route('actividades.index'); 
+
         }else if(Auth::User()->can('ELIMINAR_ACTIVIDAD') && Auth::User()->id==$act->id_user){
             $asignada = Actividad_Evidencia::where('actividad_id','=',$act->id)->get()->count()>0?true: false;
-            if($asignada){               
-                return redirect()->route('actividades.index')
-                ->with("error","La actividad no puede ser eliminada debido a que cuenta con responsables asignados.");
+            if($asignada){
+                Alert::error('Error','La actividad no puede ser eliminada debido a que cuenta con responsables asignados.');               
+                return redirect()->route('actividades.index');
+                
             }
-            $act->delete();            
-            return redirect()->route('actividades.index')
-                ->with("warning","La actividad '.$act->nombre.' ha sido borrada con exito");
-        }else{            
-            return redirect()->route('actividades.index')
-            ->with("error","No tienes permisos para eliminar esta actividad");
+            $act->delete(); 
+            Alert::success('Correcto','La actividad '.$act->nombre.' ha sido borrada con exito');           
+            return redirect()->route('actividades.index');                
+        }else{ 
+            Alert::error('Error','No tienes permisos para eliminar esta actividad');          
+            return redirect()->route('actividades.index');          
         }      
     }
 
