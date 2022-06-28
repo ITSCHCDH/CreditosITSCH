@@ -10,6 +10,7 @@ use App\Models\Actividad_Evidencia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Alert;
 
 class EvidenciasController extends Controller
 {
@@ -28,14 +29,15 @@ class EvidenciasController extends Controller
     {
         $ruta = $request->has('ruta');
         if(Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA')){
-            $actividades = Actividad::select('nombre','id')->orderBy('nombre')->pluck('nombre','id');
+            $actividades = Actividad::select('nombre','id')->orderBy('nombre')->get();
+           
             return view('admin.evidencias.index')
             ->with('actividades',$actividades)
             ->with('ruta',$ruta);
         }else{
             $actividades = DB::table('users as u')->join('actividad_evidencia as ae',function($join){
                 $join->on('ae.user_id','=','u.id');
-            })->join('actividad as a','a.id','=','ae.actividad_id')->where('u.id','=',Auth::guard('web')->User()->id)->orwhere('a.id_user','=',Auth::User()->id)->select('a.nombre','a.id')->orderBy('nombre')->pluck('nombre','id');
+            })->join('actividad as a','a.id','=','ae.actividad_id')->where('u.id','=',Auth::guard('web')->User()->id)->orwhere('a.id_user','=',Auth::User()->id)->select('a.nombre','a.id')->orderBy('nombre')->get();            
             return view('admin.evidencias.index')
             ->with('actividades',$actividades)
             ->with('ruta',$ruta);
@@ -50,7 +52,7 @@ class EvidenciasController extends Controller
     public function create(Request $request)
     {
         if(!$request->has("id_actividad")){
-            Flash::error("Debes seleccionar una actividad");
+            Alert::error('Error',"Debes seleccionar una actividad");
             return redirect()->back();
         }
         $actividad_evidencia = Actividad_Evidencia::where([
@@ -58,14 +60,14 @@ class EvidenciasController extends Controller
             ['actividad_id','=',$request->id_actividad]
         ])->get();
         if($actividad_evidencia->count()==0){
-            Flash::error("No actividad o responsable seleccionado");
+            Alert::error('Error',"No actividad o responsable seleccionado");
             return redirect()->back();
         }
         $validador = User::find($actividad_evidencia[0]->validador_id);
         $responsable = User::select('id','name')->where('id','=',$request->id_responsable)->get();
         $actividad = Actividad::select('id','nombre')->where('id','=',$request->id_actividad)->get();
         if($actividad->count()==0 || $responsable->count()==0){
-            Flash::error('No actividad o responsable seleccinado');
+            Alert::error('Error','No hay actividad o responsable seleccinado');
             return redirect()->back();
         }
         return view('admin.evidencias.create')
@@ -96,7 +98,7 @@ class EvidenciasController extends Controller
                // Funcion para saber si la extension se encuentra dentro de las extensiones permitidas
                $check=in_array($extension,$allowedfileExtension);
                if(!$check){
-                   Flash::error('La extensión '.$extension.' no es valida.');
+                   Alert::error('Error','La extensión '.$extension.' no es valida.');
                    return back()->withInput();
                }
             }
@@ -131,7 +133,7 @@ class EvidenciasController extends Controller
             $actividad_evidencia = Actividad_Evidencia::find($id_actividad_evidencia[0]->id);
             $actividad_evidencia->save();
         }
-        Flash::success('La evidencia fue guardada correctamente');
+        Alert::success('Correcto','La evidencia fue guardada correctamente');
         return redirect()->route('participantes.index');
     }
 
@@ -153,52 +155,7 @@ class EvidenciasController extends Controller
             return response()->json($responsables);   
         }
         
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+    }  
 
     public function peticionGaleria(Request $request){
         if($request->has('responsable_id') && $request->has('actividad_id')){

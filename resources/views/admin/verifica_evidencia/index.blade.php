@@ -63,7 +63,7 @@
 			   			<td>{{ $evi->name }}</td>
 			   			<td>{{ $evi->nombre_credito }}</td>
 			   			<td>
-			   				<a href="{{ route('verifica_evidencia.ver_evidencia',$evi->actividad_evidencia_id)}}" class="btn btn-primary"><span class="glyphicon glyphicon-camera" aria-hidden="true"></span></a>
+			   				<a href="{{ route('verifica_evidencia.ver_evidencia',$evi->actividad_evidencia_id)}}" class="btn btn-primary" title="Ver evidencias"><i class="far fa-eye fa-lg"></i></a>
 			   			</td>
 			   			<td>
 			   				<label>

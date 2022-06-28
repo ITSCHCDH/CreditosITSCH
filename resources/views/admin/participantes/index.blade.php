@@ -14,6 +14,8 @@
 <!-- HTML index de los participantes -->
 @section('contenido')
 
+<div id="mensaje-actividad-alumnos"></div>
+
 @if (Auth::User()->hasAnyPermission(['VIP','CREAR_EVIDENCIA']))
     <form action="{{ route('evidencias.create') }}" method="get">  
         <input type="hidden" name="id_actividad" value='-1' id='input_id_actividad'>

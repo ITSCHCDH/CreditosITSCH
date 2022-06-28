@@ -18,17 +18,22 @@
 @endsection
 
 @section('contenido')
-	<div>
-		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 pull-left" style="width: 250px;">
+	<div class="row">
+		<div class="col-sm-6" >
 		    <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
 		        al que estan asignados los participantes -->
-		    {!! Form::label('actividades_id','Actividad') !!}
-		    {!! Form::select('actividades_id',$actividades,null,['class'=>'form-control','required','placeholder'=>'Seleccione una actividad','method'=>'GET']) !!}
+			<label for="actividades_id">Actividad</label>
+			<select name="actividades_id" id="actividades_id" class="form-control select-input placeholder-active active" required>
+				<option value="" selected>Seleccione una actividad</option>
+				@foreach ($actividades as $act)
+					<option value="{{ $act->id }}">{{ $act->nombre }}</option>
+				@endforeach
+			</select>	   
 		</div>
-		<div class="input-group form-inline my-2 my-lg-0 mr-lg-2 pull-left" style="width: 250px; margin-left: 30px;">
+		<div class="col-sm-6">
 		    <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
 		        al que estan asignados los participantes -->
-		    {!! Form::label('responsables_id','Responsable') !!}
+			<label for="responsables_id">Responsable</label>		   
 		    <select class="form-control" required method="GET" name="responsables_id" id="responsables_id">
 		    	@if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VIP_EVIDENCIA'))
 		    		<option value="nulo">Todos los responsables</option>
@@ -39,12 +44,10 @@
 		</div>
 	</div>
 	<div class="resetear"></div>
-	<div id="mensaje-parte-superior" class="alerta-padding">
-		
-	</div>
-	<div id="div-galeria">
-		
-	</div>
+	<div id="mensaje-parte-superior" class="alerta-padding"></div>
+	<hr>	
+	<div id="div-galeria" class="row"></div>
+	
 	<div class="resetear" style="padding: 30px;"></div>
 	@section('js')
 		<script type="text/javascript">
@@ -126,9 +129,9 @@
 					if(extension == '.pdf'){
 						var alumno_nombre = "NO";
 						if(response[x]['alumno_nombre']!=null)alumno_nombre = response[x]['alumno_nombre'];
-						$('#div-galeria').append("<div class='gallery'>"
+						$('#div-galeria').append("<div class='col-sm-3'>"
 						+"<a target='_blank' href='{{asset('storage/evidencias/')}}/"+response[x]['actividad_nombre']+"/"+archivo+"'>"
-						+"<img src='{{asset('images/pdf_icono2.png')}}' width='300' heigth='200' class='imagenes'>"
+						+"<img src='{{asset('images/pdf_icono2.png')}}' width='100' heigth='120' class='imagenes'>"
 							+eliminar_evidencia
 						+"</a>"
 						+"<div class='desc'>"
@@ -141,7 +144,7 @@
 					}else{
 						var alumno_nombre = "NO";
 						if(response[x]['alumno_nombre']!=null)alumno_nombre = response[x]['alumno_nombre'];
-						$('#div-galeria').append("<div class='gallery'>"
+						$('#div-galeria').append("<div class='col-sm-3'>"
 						+"<a target='_blank' href='{{asset('storage/evidencias/')}}/"+response[x]['actividad_nombre']+"/"+archivo+"'>"
 						+"<img src='{{asset('storage/evidencias/')}}/"+response[x]['actividad_nombre']+"/"+archivo+"' width='300' heigth='200' class='imagenes'>"
 							+eliminar_evidencia

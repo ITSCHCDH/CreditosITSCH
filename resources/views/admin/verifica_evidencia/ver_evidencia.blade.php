@@ -35,14 +35,14 @@
 	<div>
 		@foreach ($evidencias as $evi)
 			<div class="gallery">
-				<a href="{{asset('storage/evidencias/'.$evi->actividad_nombre.'/'.$evi->nom_imagen)}}">
+				<a href="{{asset('storage/evidencias/'.$evi->actividad_nombre.'/'.$evi->nom_imagen)}}" target="_blank">
 					@php
 						$extension = substr($evi->nom_imagen, -3);
 					@endphp
 					@if (strtolower($extension)=='pdf')
-						<img class="imagenes" src="{{ asset('images/pdf_icono2.png')}}" width="300" height="200">
+						<img class="imagenes" src="{{ asset('images/pdf_icono2.png')}}" >
 					@else
-						<img class="imagenes" src="{{ asset('storage/evidencias/'.$evi->actividad_nombre.'/'.$evi->nom_imagen)}}" width="300" height="200">
+						<img class="imagenes" src="{{ asset('storage/evidencias/'.$evi->actividad_nombre.'/'.$evi->nom_imagen)}}" >
 					@endif
 				</a>
 				<div class="desc">

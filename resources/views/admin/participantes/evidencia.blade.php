@@ -38,10 +38,11 @@
 		@if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_ACTIVIDAD','VERIFICAR_EVIDENCIA']))
 			@if ($validado->count()!=0)
 				@if ($validado[0]->validado == "true" && ($participante_data->momento_agregado == "posteriormente" && $participante_data->evidencia_validada == "no"))
-					{!! Form::open(['route' => 'participantes.validar_evidencia','method' => 'post']) !!}
-						{!! Form::hidden('participante_id', $participante->id, []) !!}      
-						{!! Form::submit('Validar evidencia', ['class' => 'btn btn-primary']) !!}
-					{!! Form::close() !!}
+					<form action="{{ route('participantes.validar_evidencia') }}" method="post">
+						@csrf
+						<input type="hidden" name="participante_id[]" value="$participante->id">
+						<button type="submit" class="btn btn-primary">Validar evidencia</button>
+					</form>					
 				@endif
 			@endif
 		@endif

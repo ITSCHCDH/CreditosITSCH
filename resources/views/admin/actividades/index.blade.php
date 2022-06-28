@@ -91,7 +91,7 @@
                                 @endif
                                 @if ($act->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
                                     <a href="#" class="btn btn-info btn-sm" onclick="redireccionar( {{ $act->id }} );" title="Agregar participantes (Alumnos) a la actividad">
-                                        <i class="fas fa-plus" style='font-size:14px'></i>
+                                        <i class="fas fa-users" style='font-size:14px'></i>
                                     </a>                              
                                 @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD']))                                

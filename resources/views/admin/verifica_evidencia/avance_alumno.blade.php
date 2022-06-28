@@ -6,11 +6,11 @@
     
     @if (count($ruta_data)>0)
     	<div style="width: 200px; height: 30px; float:right;">
-    		{!! Form::open(['route' => 'verifica_evidencia.reportes','method' => 'GET','id' => 'ruta_input','style' => 'float: left; margin-right: 5px;']) !!}
-    			{!! Form::hidden('carrera',$ruta_data[0]) !!}
-    			{!! Form::hidden('generacion',$ruta_data[1]) !!}
-    			<a href="#" onclick="document.getElementById('ruta_input').submit()"> Reportes </a>
-    		{!! Form::close() !!}
+			<form action="{{ route('verifica_evidencia.reportes') }}" method="get" id="ruta_input" style="float: left; margin-right: 5px;">
+				<input type="hidden" name="carrera" value="{{ $ruta_data[0] }}">
+				<input type="hidden" name="generacion" value="{{ $ruta_data[1] }}">
+				<a href="#" onclick="document.getElementById('ruta_input').submit()">Reportes</a>
+			</form>    		
     		/
     		<label class="label label-success">Avance alumno</label>
     	</div>
@@ -21,71 +21,65 @@
 
 @section('contenido')
 	<!-- Input text donde se podra buscar a los participantes por nombre -->
-	
-		{!! Form::open(['route' => 'verifica_evidencia.avance_alumno', 'method' => 'GET','class' => 'form-inline pull-right']) !!}
-			<div class="input-group  mb-3">
-				{{ Form::label('no_control','No Control') }}
-			    {!! Form::text('no_control',null,['class'=>'form-control','placeholder'=>'Numero de control','aria-describedby'=>'search','required','id' => 'no_control']) !!}
-			    <div class="input-group-btn">
-			        <button type="submit" class="btn btn-primary" > 
-						<i class='fas fa-search'></i>
-			        </button>
-			    </div>
-			</div>
-			
-		{!! Form::close() !!}
-		<div class="autocomplete pull-right" style="width:300px; margin-right: 40px;">
-		    {!! Form::label('alumno','Alumno') !!}
+	<div class="row">
+		<div class="col-sm-3"></div>
+		<div class="col-sm-3"></div>
+		<div class="col-sm-3">
+			<label for="participante_nombre">Alumno</label>		    
 		    <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
-		</div>	
+		</div>
+		<div class="col-sm-3">
+			<form action="{{ route('verifica_evidencia.avance_alumno') }}" method="get">
+				<label for="no_control">Numero de control</label>
+				<div class="md-form input-group mb-3">
+					<input type="text" class="form-control" name="no_control" id="no_control" required placeholder="Numero de control" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+					<div class="input-group-append">
+					  	<button class="btn btn-md btn-secondary m-0 px-3" type="submit" id="MaterialButton-addon2">Buscar</button>
+					</div>
+				</div>				
+			</form>	
+		</div>
+	</div>
+			
 	
-
 	<div class="resetear"></div>
 	<br><br>
 	<div class="alert-danger" style="padding: 20px; display: none;" id="mensaje-error">
 		<p style="font-size: 0.9vw;"><strong>No se encuentran asignados los jefes de crédito para poder llenar los campos de la constancia.</strong></p>
 	</div>
 	<div class="container-fluid ">
-		<div>
-			<h3>Información del alumno</h3>
-			<div class="row">
-				<div class="col-sm-1" style="background-color:#426986;color:white; " ><h5>Nombre</h5></div>
-				<div class="col-sm-3" style="background-color:#426986;color:blak; " >
-					<h5>
-						<b>
-							@if ($alumno_data!=null)
-							{{ $alumno_data[0]->nombre_alumno }}
-							@endif
-						</b>
-					</h5>
-				</div>
-				<div class="col-sm-2" style="background-color:#426986;color:white; " ><h5>No. control</h5></div> 
-				<div class="col-sm-2" style="background-color:#426986;color:blak; " >
-					<h5>
-						<b>
-							@if ($alumno_data!=null)
-							{{ $alumno_data[0]->no_control }}
-							@endif
-						</b>
-					</h5>
-				</div>
-				<div class="col-sm-1" style="background-color:#426986;color:white; " ><h5>Carrera</h5></div>
-				<div class="col-sm-3" style="background-color:#426986;color:blak; " >
-					<h5>
-						<b>
-							@if ($alumno_data!=null)
-							{{ $alumno_data[0]->carrera }}
-							@endif
-							</b>
-					</h5>
-				</div> 
+		
+		<h3>Información del alumno</h3>
+		<div class="row">
+			<div class="col-sm-1" ><h5>Nombre</h5></div>
+			<div class="col-sm-3">
+				<h6>						
+					@if ($alumno_data!=null)
+					{{ $alumno_data[0]->nombre_alumno }}
+					@endif						
+				</h6>
 			</div>
+			<div class="col-sm-2" ><h5>No. control</h5></div> 
+			<div class="col-sm-2">
+				<h6>						
+					@if ($alumno_data!=null)
+					{{ $alumno_data[0]->no_control }}
+					@endif						
+				</h6>
+			</div>
+			<div class="col-sm-1" ><h5>Carrera</h5></div>
+			<div class="col-sm-3">
+				<h6>						
+					@if ($alumno_data!=null)
+					{{ $alumno_data[0]->carrera }}
+					@endif						
+				</h6>
+			</div> 
 		</div>
-	  	
-    
-		<br>
+	
+		<br><br>
 		<table class="table ">
-			<thead class="thead-dark">
+			<thead>
 				<th>Credito</th>
 				<th>Actividades</th>
 				<th>Porcentaje</th>
@@ -97,8 +91,7 @@
 					$y=0;
 				@endphp
 				@if($alumno_data!=null)
-					@for ($x = 0; $x < count($creditos); $x++)
-						
+					@for ($x = 0; $x < count($creditos); $x++)									
 						@if ( $y < count($alumno_data) && $avance)
 							@if ($alumno_data[$y]->nombre_credito==$creditos[$x]->nombre)
 								@php
@@ -108,7 +101,7 @@
 								<tr>
 									<td colspan="3" style="text-align:left; padding: 0;">
 										<div style="position: relative;">
-											<div style="background: #27ce1e; padding: 5; width: {{$temp_porcentaje}}%; height: 35px;max-width: 100%;";>
+											<div style="background: #27ce1e; padding: 2; width: {{$temp_porcentaje}}%; height: 20px;max-width: 100%;";>
 												<div style="position: absolute;">
 													<strong>{{ $alumno_data[$y]->nombre_credito }}</strong>
 												</div>
@@ -137,7 +130,7 @@
 								<tr>
 									<td colspan="3" style="text-align:left; padding: 0;">
 										<div style="position: relative;">
-											<div style="background: #27ce1e; padding: 5; width: 0%;height: 35px;max-width: 100%";>
+											<div style="background: #27ce1e; padding: 2; width: 0%;height: 20px;max-width: 100%";>
 												<div style="position: absolute;">
 													<strong >{{ $creditos[$x]->nombre }}</strong>
 												</div>
@@ -166,7 +159,7 @@
 							<tr>
 								<td colspan="3" style="text-align:left; padding: 0;">
 									<div style="position: relative;">
-										<div style="background: #27ce1e; padding: 5; width: 0%;height: 35px;max-width: 100%";>
+										<div style="background: #27ce1e; padding: 2; width: 0%;height: 20px;max-width: 100%";>
 											<div style="position: absolute;">
 												<strong >{{ $creditos[$x]->nombre }}</strong>
 											</div>
