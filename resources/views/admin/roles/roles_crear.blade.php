@@ -9,12 +9,12 @@
 @endsection
 
 @section('contenido')
-	{!! Form::open(['route' => 'roles.roles_guardar', 'method' => 'post'])!!}
+	<form action="{{ route('roles.roles_guardar') }}" method="post">	
+		@csrf
 		<div class="form-group">
-			{!! Form::label('name','Nombre') !!}
-			{!! Form::text('name',null,['placeholder' => 'Nombre del rol','required','class'=>'form-control']) !!}
+			<label for="name">Nombre</label>
+			<input type="text" name="name" id="name" placeholder="Nombre del rol" required class="form-control">		
 		</div>
-		
-		{!! Form::submit('Agregar',['class' => 'btn btn-primary']) !!}
-	{!! Form::close() !!}
+		<button type="submit" class="btn btn-primary">Agregar</button>		
+	</form>
 @endsection

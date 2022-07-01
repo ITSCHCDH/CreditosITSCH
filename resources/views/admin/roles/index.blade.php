@@ -20,7 +20,7 @@
 	<br>
 	<div class="table-resposive">
 		<table class="table" id="tabla_roles">
-			<thead class="thead-dark">
+			<thead>
 				<th>ID</th>
 				<th>Nombre</th>
 				<th>Ver permisos</th>

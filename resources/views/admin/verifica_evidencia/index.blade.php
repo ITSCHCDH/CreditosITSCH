@@ -16,8 +16,7 @@
 
 @section('contenido')
 	<!-- Boton de busqueda en la pagina -->
-	<form action="{{ route('verifica_evidencia.index') }}" method="get">
-	
+	<form action="{{ route('verifica_evidencia.index') }}" method="get" id="actividades-submit">	
 		@if ($validadas == "false")
 			<input  type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="validadas"/>
 		@else
@@ -31,10 +30,9 @@
 			<div class="col-sm-4"></div>
 			<div class="col-sm-4">
 				<div class="md-form input-group mb-3">
-					<input type="text" class="form-control" placeholder="Buscar...." aria-label="Recipient's username"
-					  aria-describedby="Caja para Buscar">
+					<input type="text" class="form-control" placeholder="Buscar...." aria-label="Caja para buscar" aria-describedby="Caja para Buscar" name="busqueda">
 					<div class="input-group-append">
-					  <button class="btn btn-md btn-secondary m-0 px-3" type="submit" id="Buscar"><i class="fas fa-search" style="font-size: 14px"></i></button>
+					  <button class="btn btn-md btn-secondary m-0 px-3" type="submit" id="Buscar" title="buscar"><i class="fas fa-search" style="font-size: 14px"></i></button>
 					</div>
 				</div>	
 			</div>
@@ -42,6 +40,7 @@
 	</form>
 	
 	<form action="{{ route('verifica_evidencia.store') }}" method="post">
+		@csrf
 		<input type="hidden" name="actividades_link" value="{{ $actividades_link }}">
 		<br>
 		<br>

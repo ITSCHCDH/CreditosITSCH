@@ -8,13 +8,12 @@
 
 @section('contenido')
 		
-
-	{!! Form::open(['route' => 'verifica_evidencia.reportes','method' => 'GET']) !!}
+	<form action="{{ route('verifica_evidencia.reportes') }}" method="get">	
 		<div><h4>Filtros</h4></div>
 		<hr>
-			<div class="row">
+			<div class="row ml-2">
 				<div class="col-sm-3">
-					{!! Form::label('generacion','Generacion') !!}
+					<label for="generacion">Generacion</label>					
 					<select name='generacion' class='form-control' required placeholder='Año-Generación' method='GET'>
 						@php
 							echo "<option value = 1>Todos</option>";
@@ -26,7 +25,7 @@
 					</select>
 				</div>
 				<div class="col-sm-3">
-				    {!! Form::label('carrera','Carrera') !!}
+					<label for="carrera">Carrera</label>				   
 				    <select class="form-control" required name="carrera" id="carrera">
 				    	@if (Auth::User()->hasAnyPermission(['VIP','VIP_REPORTES','VIP_SOLO_LECTURA']))
 				    		<option value="">Seleccione una carrera</option>
@@ -41,58 +40,39 @@
 				    </select>
 				</div>
 				<div class="col-sm-3">
-					{!! Form::label('busqueda','Busqueda') !!}			
+					<label for="busqueda">Busqueda</label>						
 					<input type="text" name="busqueda" id="Control" class="form-control" placeholder="Nombre - No Control" value="{{ $busqueda }}">
 				</div>
 				<div class="col-sm-3">
 					<br>
-					<button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-filter"></span> Filtrar</button>
+					<button type="submit" class="btn btn-secondary"><span class="glyphicon glyphicon-filter"></span> Filtrar</button>
 					
 				</div>
 			</div>	
 			<hr>
-	{!! Form::close() !!}
-
+	</form>
 	<br>
 	<br>
-	<div class="row">
-		<div class="col-sm-2"></div>
-		<div class="col-sm-8">
+	<div class="row ml-2">		
+		<div class="col-sm-12">
 			@if ($reportes_data != null)
 				@for ($alumno = 0, $alumno_index=0;  $alumno < count($suma_creditos); $alumno++)
-					<div class="row">
-						<div class="col-sm-1"></div>
-						<div class="col-sm-10 bg-dark">
-							<h5 style="color:#ffffff;"><strong>Alumno:</strong>  {{ $suma_creditos[$alumno]->nombre }}</h5>
-						</div>
-						<div class="col-sm-1">
-							
-						</div>
-					</div>		
-					<div class="row">
-						<div class="col-sm-1"></div>
-						<div class="col-sm-10">
-							<p class="alumno_nombre texto" style="text-align: left;"><strong>Numero de control:</strong> {{ $suma_creditos[$alumno]->no_control }}</p>
-						</div>
-						<div class="col-sm-1"></div>
-					</div>
-					<div class="row">
-						<div class="col-sm-1"></div>
+					<div class="row">				
+						<hr>
+						<h5><strong>Alumno:</strong>  {{ $suma_creditos[$alumno]->nombre }}</h5>
+						<p><strong>Numero de control:</strong> {{ $suma_creditos[$alumno]->no_control }}</p>					
+						<p><strong>Completado</strong></p>
+						<div>							
+							<div style="width: {{ ($suma_creditos[$alumno]->credito_suma*100)/500 }}%; background-color:#27ce1e;"><p style="color: white">{{ ($suma_creditos[$alumno]->credito_suma*100)/500 }}%</p></div>
+						</div>	
+					</div>					
+					<div class="row">					
 						<div class="col-sm-4">
-							<p class="texto pull-left" style="margin-right: 10px;"><strong>Completado</strong></p>
-							<div class="porcentaje pull-left">
-								<p class="pull-left" style="width: 100%; max-width: 100%;">{{ ($suma_creditos[$alumno]->credito_suma*100)/500 }}%</p>
-								<div style="width: {{ ($suma_creditos[$alumno]->credito_suma*100)/500 }}%">
-								</div>
-							</div>	
-						</div>
-						
-						<div class="col-sm-2">
-							<button class="btn btn-info btn-sm" id="{{ $suma_creditos[$alumno]->alumno_id }}" data-toggle="modal" data-target="#myModalDetalle{{ $suma_creditos[$alumno]->alumno_id }}"><i class='fas fa-eye'></i> Más</button>
+							<button class="btn btn-info" id="{{ $suma_creditos[$alumno]->alumno_id }}" data-mdb-toggle="modal" data-mdb-target="#myModalDetalle{{ $suma_creditos[$alumno]->alumno_id }}"><i class='fas fa-eye'></i> Más</button>
 						</div>
 						<div class="col-sm-2">
 							@if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
-								{!! Form::open(['route' => 'verifica_evidencia.avance_alumno', 'method' => 'get','style' => 'width: 100px;','class' =>'pull-left']) !!}
+								<form action="{{ route('verifica_evidencia.avance_alumno') }}" method="get">							
 									@php
 										$ruta_carrera = "desconocida";
 										if(isset($_GET['carrera'])){
@@ -103,11 +83,11 @@
 											$ruta_generacion = $_GET['generacion'];
 										}
 									@endphp
-									{!! Form::hidden('ruta_carrera',$ruta_carrera) !!}
-									{!! Form::hidden('ruta_generacion',$ruta_generacion) !!}
-									{!! Form::hidden('no_control', $suma_creditos[$alumno]->no_control) !!}
-									{!! Form::submit('Avance',['class' => 'btn btn-primary btn-sm'])!!}
-								{!! Form::close() !!}
+									<input type="hidden" name="ruta_carrera" id="ruta_carrera" value="{{ $ruta_carrera }}">
+									<input type="hidden" name="ruta_generacion" id="ruta_generacion" value="{{ $ruta_generacion }}">
+									<input type="hidden" name="no_control" id="no_control" value="{{ $suma_creditos[$alumno]->no_control }}">
+									<button type="submit" class="btn btn-primary">Avance</button>									
+								</form>	
 							@endif
 						</div>
 						<div class="col-sm-2">
@@ -120,53 +100,48 @@
 							@endif
 						</div>
 						<div class="col-sm-1"></div>
-					</div>	
-						<!-- The Modal -->
-						<div class="modal" id="myModalDetalle{{ $suma_creditos[$alumno]->alumno_id }}">
-						  <div class="modal-dialog">
-						    <div class="modal-content">
+					</div>						
+					<div style="margin-bottom: 200px"></div>
 
-						      <!-- Modal Header -->
-						      <div class="modal-header">
-						        <h4 class="modal-title">Detalle del alumno: {{$suma_creditos[$alumno]->nombre}}</h4>
-						        <button type="button" class="close" data-dismiss="modal">&times;</button>
-						      </div>
-
-						        <!-- Modal body -->
-						        <div class="modal-body" style="text-align: center;">				      		
-							        <ul class="lista" id="a{{ $suma_creditos[$alumno]->alumno_id }}" style="padding:0;">
+					<!-- Modal -->
+					<div class="modal" id="myModalDetalle{{ $suma_creditos[$alumno]->alumno_id }}" tabindex="-1" aria-labelledby="Resumen del avance del alumno" aria-hidden="true">
+						<div class="modal-dialog modal-lg">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5><strong>Detalle del alumno:</strong>&nbsp{{$suma_creditos[$alumno]->nombre}}</h5>
+								<button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<ul class="list-group list-group-light" id="a{{ $suma_creditos[$alumno]->alumno_id }}" style="padding:0;">
 									@for ($alumno_data = 0; $alumno_data < $creditos; $alumno_data++,$alumno_index++)
-										<li style="text-align: center;">
+										<li class="list-group-item">
 											<div >
-												<h5><strong>{{ $reportes_data[$alumno_index]->nombre_credito }}</strong></h5>
+												<h6>{{ $reportes_data[$alumno_index]->nombre_credito }}</h6>
 											</div>
-											<div class="porcentaje" style="margin:auto;">
-												<p class="pull-left" style="width: 100%; max-width: 100%">{{ $reportes_data[$alumno_index]->por_credito }}%</p>
-												<div style="width: {{ $reportes_data[$alumno_index]->por_credito }}%;">
-												</div>
+											<div>												
+												<div style="width: {{ $reportes_data[$alumno_index]->por_credito }}%; background-color:#27ce1e;"><p style="color: white;">{{ $reportes_data[$alumno_index]->por_credito }}%</p></div>
 											</div>
 										</li>
 										<div class="resetear"></div>
 									@endfor
-									</ul>						
-								</div>
-						      
-						      <!-- Modal footer -->
-						      <div class="modal-footer">
-						        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-						      </div>
+								</ul>	
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Cerrar</button>								
+							</div>
+						</div>
+						</div>
+					</div>
 
-						    </div>
-						  </div>
-						</div>				
+					
+
 				@endfor
 			@else	
 				@section('js')
 					<script>
 						if($("#Control").val().length > 0){  $("#alerta").modal("show");}
 					</script>
-				@endsection						
-
+				@endsection	
 			@endif
 
 			<!-- The Modal -->
@@ -199,7 +174,7 @@
 				</div>
 			  <!-- End Modal -->
 		</div>
-		<div class="col-sm-2"></div>
+		
 	</div>
 	
 	

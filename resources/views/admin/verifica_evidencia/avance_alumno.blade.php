@@ -32,9 +32,9 @@
 			<form action="{{ route('verifica_evidencia.avance_alumno') }}" method="get">
 				<label for="no_control">Numero de control</label>
 				<div class="md-form input-group mb-3">
-					<input type="text" class="form-control" name="no_control" id="no_control" required placeholder="Numero de control" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+					<input type="text" class="form-control" name="no_control" id="no_control" required placeholder="Numero de control" aria-label="Numero de control" aria-describedby="MaterialButton-addon2">
 					<div class="input-group-append">
-					  	<button class="btn btn-md btn-secondary m-0 px-3" type="submit" id="MaterialButton-addon2">Buscar</button>
+					  	<button class="btn btn-md btn-secondary m-0 px-3" type="submit" id="Buscar" title="Buscar"><i class="fas fa-search" style="font-size: 14px"></i></button>
 					</div>
 				</div>				
 			</form>	
@@ -47,36 +47,51 @@
 	<div class="alert-danger" style="padding: 20px; display: none;" id="mensaje-error">
 		<p style="font-size: 0.9vw;"><strong>No se encuentran asignados los jefes de crédito para poder llenar los campos de la constancia.</strong></p>
 	</div>
-	<div class="container-fluid ">
-		
-		<h3>Información del alumno</h3>
-		<div class="row">
-			<div class="col-sm-1" ><h5>Nombre</h5></div>
-			<div class="col-sm-3">
-				<h6>						
-					@if ($alumno_data!=null)
-					{{ $alumno_data[0]->nombre_alumno }}
-					@endif						
-				</h6>
+	<div class="card mb-3" style="max-width: 1550px;">
+		<div class="row g-0">
+			<div class="col-md-1">
+				<img
+				src="{{ asset('images/user.png') }}"
+				alt="Imagen del alumno"
+				class="img-fluid rounded-start"
+				/>
 			</div>
-			<div class="col-sm-2" ><h5>No. control</h5></div> 
-			<div class="col-sm-2">
-				<h6>						
-					@if ($alumno_data!=null)
-					{{ $alumno_data[0]->no_control }}
-					@endif						
-				</h6>
+			<div class="col-md-11">
+				<div class="card-body">
+					<h5 class="card-title">Información del alumno</h5>				
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Nombre</th>
+								<th>No. Control</th>
+								<th>Carrera</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									@if ($alumno_data!=null)
+									{{ $alumno_data[0]->nombre_alumno }}
+									@endif
+								</td>
+								<td>
+									@if ($alumno_data!=null)
+									{{ $alumno_data[0]->no_control }}
+									@endif	
+								</td>
+								<td>
+									@if ($alumno_data!=null)
+									{{ $alumno_data[0]->carrera }}
+									@endif	
+								</td>
+							</tr>
+						</tbody>
+					</table>			
+				</div>
 			</div>
-			<div class="col-sm-1" ><h5>Carrera</h5></div>
-			<div class="col-sm-3">
-				<h6>						
-					@if ($alumno_data!=null)
-					{{ $alumno_data[0]->carrera }}
-					@endif						
-				</h6>
-			</div> 
 		</div>
-	
+	</div>
+	<div class="container-fluid ">				
 		<br><br>
 		<table class="table ">
 			<thead>

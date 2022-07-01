@@ -24,7 +24,7 @@ class VerificaEvidenciaController extends Controller
         $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_AVANCE_ALUMNO|VIP_AVANCE_ALUMNO')->only('alumnosBusqueda');
     }
 
-    public function index(Request $request){
+    public function index(Request $request){       
         $validadas = 'true'; // Variable para filtrar las activides no validadas de las validadas
         $busqueda = $request->busqueda;
         $actividades_link = 'false';
