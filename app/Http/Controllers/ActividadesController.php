@@ -26,11 +26,16 @@ class ActividadesController extends Controller
      */
     public function index(Request $request)
     {
-        $vigente = 'true';
-        if(!$request->has('vigente')){
-            if($request->has('nombre'))
-                $vigente = 'false';
-        }
+       
+        if(is_null($request->input('vigente')))
+        {
+            $vigente=false;
+        }   
+        else
+        {
+            $vigente=true;
+        } 
+        
         //Aqui mandamos llamar todos los datos de las actividades creadas
         if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])){
             $act = DB::table('actividad as a')->leftjoin('actividad_evidencia as act_evi',function($join){
@@ -57,7 +62,7 @@ class ActividadesController extends Controller
                     $query->where('a.vigente','=','true');
                 }
             })->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->get();
-        }        
+        }   
         return view('admin.actividades.index')
         ->with('actividad',$act)
         ->with('nombre',$request->nombre)

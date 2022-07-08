@@ -15,18 +15,19 @@
     <form action="{{ route('actividades.index') }}" method="GET" id="actividades-submit">
         <div class="row">    
             <div class="col-sm-4"></div>
-            <div class="col-sm-4">            
-                @if ($vigente == "true")
+            <div class="col-sm-4">                           
+                @if ($vigente=='true')
                     <input type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="vigente"/>
                 @else
                     <input type="checkbox" id="checkbox5" class="css-checkbox" name="vigente"/>
                 @endif
-                <label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades vigentes</label> 
+                <label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades no vigentes</label> 
             </div>  
             <div class="col-sm-4" style="text-align: right !important;">
-                @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))            
-                    <span class="table-add float-right mb-3 mr-2"><a href="{{route('actividades.create')}}" class="text-success"><i class="fa fa-plus fa-2x"
-                        aria-hidden="true" title="Agregar actividad"></i></a></span>          
+                @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))                  
+                        <a href="{{route('actividades.create')}}" class="text-success">
+                            <i class="fa fa-plus fa-2x" aria-hidden="true" title="Agregar actividad"></i>
+                        </a>                   
                 @endif
             </div>
         </div> 
@@ -134,7 +135,8 @@
         </div>
     </div>
     
-    <div style="margin-bottom: 50px;"></div>
+    <div style="margin-bottom: 200px;"></div>
+
     @section('js')
         <script>
             function eliminar(act)
@@ -150,12 +152,12 @@
             }
             
             $('#checkbox5').click(function(event){
-                var value = $(this).is(':checked');
+                var value = $(this).is(':checked');                
                 $('#actividades-submit').submit();
             });
 
              //Codigo para adornar las tablas con datatables
-             $(document).ready(function() {
+             $(document).ready(function() {               
                 $('#tabActividades').DataTable({
 
                     dom: 'Bfrtip',

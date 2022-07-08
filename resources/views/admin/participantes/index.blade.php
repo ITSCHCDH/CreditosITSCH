@@ -102,6 +102,33 @@
 </div>
 <div style="margin-bottom: 200px;"></div>
 
+<!-- The Modal -->
+<div class="modal" id="modEliminar">
+    <div class="modal-dialog">
+        <div class="modal-content">
+    
+            <!-- Modal Header -->
+            <div class="modal-header">
+            <h4 class="modal-title">Eliminar participante</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+    
+            <!-- Modal body -->
+            <div class="modal-body">
+                Estas seguro de eliminar este participante?
+            </div>
+    
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <a class="btn btn-danger btn-ok">Eliminar</a>
+                <button type="button" class="btn btn-success" data-dismiss="modal">Cancelar</button>
+            </div>
+    
+        </div>
+    </div>
+  </div>
+
+
 {{-- Sección JS --}}
 
 @section('js')
@@ -289,8 +316,14 @@
         
         function eliminaParticipante(){
             $(document).on('click','.claseEliminaParticipante',function(event){                           
-                var confirmacion = confirm('¡Estas seguro de eliminar al participante?');                
-                event.preventDefault();
+                //var confirmacion = confirm('¡Estas seguro de eliminar al participante?'); 
+                event.preventDefault(); 
+                $("#modEliminar").modal("show");  
+                $('#modEliminar').on('show.bs.modal', function(e) {
+                    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));                    
+                    confirmacion=true;
+                });            
+                
                 if(confirmacion){
                     var token = $(this).data('token');
                     var id = $(this).attr('value');
