@@ -5,7 +5,7 @@
 @section('ruta')
     
     @if (count($ruta_data)>0)
-    	<div style="width: 200px; height: 30px; float:right;">
+    	<div>
 			<form action="{{ route('verifica_evidencia.reportes') }}" method="get" id="ruta_input" style="float: left; margin-right: 5px;">
 				<input type="hidden" name="carrera" value="{{ $ruta_data[0] }}">
 				<input type="hidden" name="generacion" value="{{ $ruta_data[1] }}">

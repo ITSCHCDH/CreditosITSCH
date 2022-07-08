@@ -24,7 +24,7 @@
 			
 		</div>
 		<h3>Datos globales de la constancia</h3>
-		{!! Form::open(['route' => 'constancias.guardar_datos_globales','method' => 'post','files' => true]) !!}
+		<form action="{{ route('constancias.guardar_datos_globales') }}" method="post" enctype="multipart/form-data">		
 			{{ csrf_field() }}
 			<div class="form-group" >
 				<label>Jefe de Servicio Escolares</label>
@@ -169,7 +169,7 @@
 				</div>
 			@endif
 			<input type="submit" name="" value="Guardar" class="btn btn-primary btn-sm" style="margin: 5px;">
-		{!! Form::close() !!}
+		</form>
 	@endif
 
 	<!-- Segundo formulario -->
@@ -231,7 +231,7 @@
 		</div>
 		<input type="submit" name="" value="Guardar" class="btn btn-primary btn-sm" style="margin: 5px;">
 	</form>
-	<div style="margin-bottom: 80px;"></div>
+	<div style="margin-bottom: 200px;"></div>
 	@section('js')
 		<script type="text/javascript">
 			$.ajaxSetup( {

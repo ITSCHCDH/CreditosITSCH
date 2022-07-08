@@ -27,7 +27,7 @@
         <div class="table-responsive">
             <br>
             <table class="table">
-                <thead class="thead-dark">
+                <thead>
                     <th>No</th>
                     <th>Nombre</th>
                     <th>Jefe</th>
