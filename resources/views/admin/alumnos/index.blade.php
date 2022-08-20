@@ -117,7 +117,7 @@
                         {data: 'no_control'},
                         {data: 'nombre'},
                         {data: 'carrera'},
-                        {data: 'status', orderable: false, searchable: false},
+                        {data: 'status', orderable: true, searchable: true},
                         {data: 'acciones', orderable: false, searchable: false}
                     ],
                 });

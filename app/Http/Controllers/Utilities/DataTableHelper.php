@@ -46,7 +46,7 @@ class DataTableHelper {
 
     static function paginatorResponse(&$paginator, DataTableAttr &$dtAttr) {
         if (!($paginator instanceof LengthAwarePaginator))
-            throw new InvalidArgumentException('Invalid argument: must be of type Illuminate\\Pagination\LengthAwarePaginator');
+            throw new InvalidArgumentException('Invalid argument: must be of type Illuminate\\Pagination\\LengthAwarePaginator');
         $data_attr = json_decode(json_encode($paginator));
         return [
             'draw' => $dtAttr->getDraw(),
