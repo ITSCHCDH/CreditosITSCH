@@ -8,19 +8,45 @@ use InvalidArgumentException;
 
 class DataTableHelper {
 
-    static function applyAll(Builder &$query, DataTableAttr &$dtAttr, array $except = []) {
-        if (!(in_array('whereLike', $except)))
+    const WHERE = 'whereLike';
+    const ORDER_BY = 'sortBy';
+    const PAGINATE = 'paginate';
+    const PAGINATOR = 'paginatorResponse';
+
+    static function applyAllExcept(Builder &$query, DataTableAttr &$dtAttr, array $except = []) {
+        if (!(in_array(self::WHERE, $except)))
             self::whereLike($query, $dtAttr);
 
-        if (!(in_array('sortBy', $except)))
+        if (!(in_array(self::ORDER_BY, $except)))
             self::sortBy($query, $dtAttr);
 
-        if (!(in_array('paginate', $except)))
+        if (!(in_array(self::PAGINATE, $except)))
             self::paginate($query, $dtAttr);
 
-        if (!(in_array('paginatorResponse', $except)))
+        if (!(in_array(self::PAGINATOR, $except)))
             return self::paginatorResponse($query, $dtAttr);
     }
+
+    static function applyOnly(Builder &$query, DataTableAttr &$dtAttr, array $only) {
+        if (in_array(self::WHERE, $only))
+            self::whereLike($query, $dtAttr);
+
+        if (in_array(self::ORDER_BY, $only))
+            self::sortBy($query, $dtAttr);
+
+        if (in_array(self::PAGINATE, $only))
+            self::paginate($query, $dtAttr);
+
+        if (in_array(self::PAGINATOR, $only))
+            return self::paginatorResponse($query, $dtAttr);
+    }
+
+    static function applyAllSqlFilters(Builder &$query, DataTableAttr &$dtAttr) {
+        self::whereLike($query, $dtAttr);
+        self::sortBy($query, $dtAttr);
+        self::paginate($query, $dtAttr);
+    }
+
     static function sortBy(Builder &$query, DataTableAttr &$dtAttr) {
         $query->orderBy($dtAttr->getOrderColumnName(), $dtAttr->getDir());
     }
@@ -33,14 +59,23 @@ class DataTableHelper {
         if (!$dtAttr->getSearchRegex() || $dtAttr->getSearchValue() == '')
             return;
 
+        $whereLikeClausesList = [];
         $searchValue = $dtAttr->getSearchValue();
         foreach ($dtAttr->getColumns() as $column) {
             if ($column->isSearchable()) {
                 $canonicalFieldName = self::getCanonicalColumn($dtAttr->getSelectColumns(), $column->getFieldName());
-
-                if (!is_null($canonicalFieldName))
-                    $query->orWhere($canonicalFieldName, 'LIKE', "%$searchValue%");
+                if (!is_null($canonicalFieldName)) {
+                    array_push($whereLikeClausesList, [$canonicalFieldName, 'LIKE', "%$searchValue%"]);
+                }
             }
+        }
+
+        if (!empty($whereLikeClausesList)) {
+            $query->where(function($query) use (&$whereLikeClausesList) {
+                foreach ($whereLikeClausesList as $whereLikeClause) {
+                    $query->orWhere(array($whereLikeClause));
+                }
+            });
         }
     }
 
@@ -60,16 +95,21 @@ class DataTableHelper {
         foreach ($selectColumns as $selCol) {
             $pos = strpos($selCol, $alias);
             if ($pos !== false) {
-                // Primer caso: si a columna seleccionada no tiene alias, entonces esta es la que estamos buscando
+                // Caso 1: la columna tiene prefijo
+                preg_match('/[a-zA-Z_]+\.[a-zA-Z_]+/', $selCol, $matches);
+                if (!empty($matches)) {
+                    return $matches[0];
+                }
+
+                // Caso 2: si a columna seleccionada no tiene alias, entonces esta es la que estamos buscando
                 $alias_keywork_pos = strpos($selCol, ' as ');
                 if ($alias_keywork_pos === false) {
                     return $selCol;
                 }
 
-                // Caso 2: si el alias se encuentra despues del 'as' keyword, entonces esta columna es la que estamos buscando
+                // Caso 3: si tiene alias 'as' returnamos la columna que se encuentra antes del alias
                 if ($alias_keywork_pos < $pos)
-                    // Solo retornamos el campo formato tabla.columna: ejem usuarios.nombre as apodo, solo retornariamos 'usuarios.nombre'
-                    return substr($selCol, 0, $alias_keywork_pos);
+                    return trim(substr($selCol, 0, $alias_keywork_pos));
             }
         }
         return null;

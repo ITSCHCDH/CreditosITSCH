@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Utilities;
 
 use Illuminate\Http\Request;
+use InvalidArgumentException;
 
 class DataTableColumn {
 
@@ -75,6 +76,10 @@ class DataTableAttr {
     }
 
     private function initColumns($columns) {
+        if (!isset($columns)) {
+            throw new InvalidArgumentException('No columns where received from Client.');
+        }
+
         foreach ($columns as $item) {
             $dtColumn = new DataTableColumn($item);
             array_push($this->columns, $dtColumn);
