@@ -3,7 +3,7 @@
 @section('title','Alumnos')
 
 @section('ruta')
-    <label class="label label-success"> Alumnos</label>
+    <label class="label label-success">Alumnos</label>
 @endsection
 
 @section('contenido')
@@ -38,7 +38,7 @@
         </table>
     </div>
     <div style="margin-bottom: 200px;"></div>
-    
+
     <!--Modal para mensajes del sistema-->
     <div class="modal" id="myModalMsg">
         <div class="modal-dialog modal-sm">
@@ -117,7 +117,7 @@
                         {data: 'no_control'},
                         {data: 'nombre'},
                         {data: 'carrera'},
-                        {data: 'status', orderable: true, searchable: true},
+                        {data: 'status', orderable: true, searchable: false},
                         {data: 'acciones', orderable: false, searchable: false}
                     ],
                 });

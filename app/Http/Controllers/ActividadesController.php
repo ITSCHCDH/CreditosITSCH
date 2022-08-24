@@ -8,8 +8,12 @@ use App\Models\Actividad;
 use App\Models\Actividad_Evidencia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use DB;
 use Alert;
+use App\Http\Controllers\Utilities\DataTableAttr;
+use App\Http\Controllers\Utilities\DataTableHelper;
+use App\Http\Controllers\Utilities\HttpCode;
+use Exception;
+use Illuminate\Support\Facades\DB;
 
 class ActividadesController extends Controller
 {
@@ -26,48 +30,122 @@ class ActividadesController extends Controller
      */
     public function index(Request $request)
     {
-       
-        if(is_null($request->input('vigente')))
-        {
-            $vigente=false;
-        }   
-        else
-        {
-            $vigente=true;
-        } 
-        
-        //Aqui mandamos llamar todos los datos de las actividades creadas
-        if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])){
-            $act = DB::table('actividad as a')->leftjoin('actividad_evidencia as act_evi',function($join){
-                $join->on('act_evi.actividad_id','=','a.id');
-            })->leftjoin('participantes as par','par.id_evidencia','=','act_evi.id')->leftjoin('users as u','u.id','=','a.id_user')->leftjoin('creditos as c','c.id','=','a.id_actividad')->where(function($query) use($request){
-                $query->where('a.nombre','LIKE',"%$request->nombre%")->orwhere('u.name','like',"%$request->nombre%")->orwhere('c.nombre','like',"%$request->nombre%");
-            })->where(function($query) use($vigente){
-                if($vigente == 'false'){
-                    $query->where('a.vigente','=','false');
-                }else{
-                    $query->where('a.vigente','=','true');
-                }
-            })->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->get();
-        }else{
-            $act = DB::table('actividad as a')->join('users as u', function($join){
+        return view('admin.actividades.index');
+    }
+
+    public function cargarActividadesAjax(Request $request)
+    {
+        try {
+            $mostrar_no_vigentes = $request->input('vigente');
+
+            $selectColumns = [
+                'a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente',
+                'a.alumnos','c.nombre as credito_nombre','u.name as administrador','a.id_user',
+                DB::raw('count(par.id) as no_alumnos'), DB::raw('DATE_FORMAT(a.created_at, "%d-%m-%Y") as fecha_creacion')
+            ];
+
+            $dtAttr = new DataTableAttr($request, $selectColumns);
+
+            $actividades = DB::table('actividad as a')
+                ->leftjoin('users as u',$this->indexActFiltroJoinVIP())
+                ->leftjoin('actividad_evidencia as act_evi', 'act_evi.actividad_id', '=', 'a.id')
+                ->leftjoin('participantes as par','par.id_evidencia','=','act_evi.id')
+                ->leftjoin('creditos as c','c.id','=','a.id_actividad')
+                ->select($selectColumns)
+                ->groupBy('a.id');
+
+            DataTableHelper::applyOnly($actividades, $dtAttr, [DataTableHelper::WHERE, DataTableHelper::ORDER_BY]);
+
+            $actividades->where('a.vigente','<>', $mostrar_no_vigentes);
+
+            DataTableHelper::applyOnly($actividades, $dtAttr, [DataTableHelper::PAGINATE]);
+
+            $this->agregarActividadesAcciones($actividades);
+
+            $paginatorResponse = DataTableHelper::paginatorResponse($actividades, $dtAttr);
+
+            return response()->json($paginatorResponse, HttpCode::SUCCESS);
+        } catch (Exception $e) {
+            return response()->json($e->getMessage(), HttpCode::NOT_ACCEPTABLE);
+        }
+    }
+
+    private function indexActFiltroJoinVIP()
+    {
+        if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])) {
+            return function($join){
+                $join->on('u.id','=','a.id_user');
+            };
+        } else {
+            return function($join) {
                 $join->on('u.id','=','a.id_user');
                 $join->where('u.id','=',Auth::User()->id);
-            })->leftjoin('creditos as c','c.id','=','a.id_actividad')->leftjoin('actividad_evidencia as act_evi','act_evi.actividad_id','=','a.id')->leftjoin('participantes as par','par.id_evidencia','=','act_evi.id')->where(function($query) use($request){
-                $query->where('a.nombre','LIKE',"%$request->nombre%")->orwhere('u.name','like',"%$request->nombre%")->orwhere('c.nombre','like',"%$request->nombre%");
-            })->where(function($query) use($vigente){
-                if($vigente == 'false'){
-                    $query->where('a.vigente','=','false');
-                }else{
-                    $query->where('a.vigente','=','true');
-                }
-            })->select('a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente','a.alumnos','c.nombre as credito_nombre','u.name as usuario_nombre','a.id_user',DB::raw('count(par.id) as no_alumnos'))->groupBy('a.id')->orderby('id','asc')->get();
-        }   
-        return view('admin.actividades.index')
-        ->with('actividad',$act)
-        ->with('nombre',$request->nombre)
-        ->with('vigente',$vigente);
+            };
+        }
+    }
 
+    private function agregarActividadesAcciones(&$actividades)
+    {
+        foreach ($actividades as $actividad) {
+            $actividad->acciones = "";
+
+            if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA'])) {
+                if ($actividad->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD'])) {
+                    $actividad->acciones .= '<a href="#" class="btn btn-info btn-sm ms-1" ' .
+                        'onclick="redireccionar(' . $actividad->id . ');" title="Agregar participantes (Alumnos) a la actividad">' .
+                        '<i class="fas fa-users" style="font-size:14px"></i></a>';
+                }
+
+                if (Auth::User()->hasAnyPermission(['VIP','VER_RESPONSABLES','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])) {
+                    if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])) {
+                        $actividad->acciones .= '<a href="' . route('responsables',$actividad->id) . '" ' .
+                            'class="btn btn-primary btn-sm ms-1">' .
+                            '<i class="fas fa-user-plus" style="font-size:14px" title="Ver/Asignar responsables"></i></a>';
+                    } else if ($actividad->id_user == Auth::User()->id) {
+                        $actividad->acciones .= '<a href="' . route('responsables',$actividad->id) . '" ' .
+                            'class="btn btn-primary btn-sm ms-1">' .
+                            '<i class="fas fa-user-plus" style="font-size:14px" title="Ver/Asignar responsables"></i></a>';
+                    }
+                }
+
+                if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD'])) {
+                    $actividad->acciones .= '<a href="' . route('verifica_evidencia.index',
+                        [
+                            'validadas=on',
+                            'busqueda=' . $actividad->actividad_nombre,
+                            'actividades_link=true'
+                        ]) .
+                        '" class="btn btn-success btn-sm ms-1" title="Verificar evidencias de esta actividad">' .
+                        '<i class="far fa-edit" style="font-size:14px"></i></a>';
+                }
+
+                if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ACTIVIDAD','VIP_ACTIVIDAD'])) {
+                    if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
+                        $actividad->acciones .= '<a href="' . route('actividades.edit',[$actividad->id]) .
+                            '" class="btn btn-warning btn-sm ms-1" title="Editar actividad"><i class="fas fa-pencil-alt" ' .
+                            'style="font-size:14px"></i></a>';
+                    } else if ($actividad->id_user==Auth::User()->id) {
+                        $actividad->acciones .= '<a href="' . route('actividades.edit',[$act->id]) .
+                            '" class="btn btn-warning btn-sm ms-1" title="Editar actividad"><i class="fas fa-pencil-alt" ' .
+                            'style="font-size:14px"></i></a>';
+                    }
+                }
+
+                if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ACTIVIDAD','VIP_ACTIVIDAD'])) {
+                    if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
+                        $actividad->acciones .= '<button data-mdb-toggle="modal"  data-mdb-target="#modEliminar" ' .
+                            'onclick="eliminar(' . $actividad->id . ')" class="btn btn-danger btn-sm ms-1" title="Eliminar actividad">' .
+                            '<i class="far fa-trash-alt" style="font-size:14px"></i></button>';
+                    } else if ($act->id_user==Auth::User()->id) {
+                        $actividad->acciones .= '<button data-mdb-toggle="modal"  data-mdb-target="#modEliminar" ' .
+                            'onclick="eliminar(' . $actividad->id . ')" class="btn btn-danger btn-sm ms-1" title="Eliminar actividad">' .
+                            '<i class="far fa-trash-alt" style="font-size:14px"></i></button>';
+                    }
+                }
+            } else {
+                $actividad->acciones .= 'NA';
+            }
+        }
     }
 
     /**
@@ -79,14 +157,14 @@ class ActividadesController extends Controller
     {
         if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
             $creditos = Credito::where('vigente','=','true')->orderBy('nombre','asc')->get();
-           
+
         }else{
             $creditos = Credito::leftjoin('creditos_areas as ca','ca.credito_id','=','creditos.id')->where([
                 ['ca.credito_area','=',Auth::User()->area],
                 ['creditos.vigente','=','true']
             ])->groupBy('creditos.id')->orderBy('creditos.nombre','asc')->pluck('creditos.nombre','creditos.id');
         }
-        
+
        return view('admin.actividades.create')->with('creditos',$creditos);
     }
 
@@ -112,30 +190,30 @@ class ActividadesController extends Controller
                     $tiene_permitido = true;
                 }
             }
-            if(!$tiene_permitido){                
+            if(!$tiene_permitido){
                 return redirect()->back()
                 ->with("error","No puedes crear actividades de este crédito");
             }
         }
-        if($actividad_con_mismo_nombre->count()>0){  
-            Alert::error('Error', 'El nombre '.$act->nombre.' ya ha sido tomado, ingrese uno diferente');            
-            return back()->withInput();           
+        if($actividad_con_mismo_nombre->count()>0){
+            Alert::error('Error', 'El nombre '.$act->nombre.' ya ha sido tomado, ingrese uno diferente');
+            return back()->withInput();
         }
-        if($act->por_cred_actividad>100){  
+        if($act->por_cred_actividad>100){
 
             //Llamado a mensajes con la libreria Sweet Alert
-            Alert::error('Error', 'El porcentaje de liberación no debe exceder el 100% del credito');  
-            return back()->withInput();            
+            Alert::error('Error', 'El porcentaje de liberación no debe exceder el 100% del credito');
+            return back()->withInput();
         }
-        $act->save(); //Guarda el articulo en su tabla  
-        
+        $act->save(); //Guarda el articulo en su tabla
+
         //Llamado a mensajes con la libreria Sweet Alert
         Alert::success('Correcto', 'La actividad '.$act->nombre.' se registro de forma correcta');
         return redirect()->route('actividades.index');
-        
+
     }
 
-   
+
 
     /**
      * Show the form for editing the specified resource.
@@ -145,23 +223,23 @@ class ActividadesController extends Controller
      */
     public function edit($id)
     {
-        $act=Actividad::find($id);//Busca el registro      
-        
-        if($act==null){   
-            Alert::error('Error', 'La actividad no existe');         
+        $act=Actividad::find($id);//Busca el registro
+
+        if($act==null){
+            Alert::error('Error', 'La actividad no existe');
             return redirect()->route('actividades.index');
-           
+
         }
-        if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {            
-            $creditos=Credito::orderBy('nombre','asc')->get();  
+        if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
+            $creditos=Credito::orderBy('nombre','asc')->get();
             return view('admin.actividades.edit')->with('actividad',$act)->with('creditos',$creditos);
         }else{
             $creditos=Credito::orderBy('nombre','asc')->get();
             return view('admin.actividades.edit')->with('actividad',$act)->with('creditos',$creditos);
         }
         //Codigo de modificaciones
-        
-        
+
+
     }
 
     /**
@@ -172,19 +250,19 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    { 
+    {
 
         $act_anterior=Actividad::find($id);
         $act_nueva=Actividad::find($id);
         $act_nueva->fill($request->all());
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act_nueva->nombre)->get();
         if($actividad_con_mismo_nombre->count()>0){
-            if($actividad_con_mismo_nombre[0]->id!=$id){                
+            if($actividad_con_mismo_nombre[0]->id!=$id){
                 return back()->withInput()
                 ->with("error","El nombre ".$act_nueva->nombre." ya ha sido tomado, ingrese uno diferente");
             }
         }
-        if($act_nueva->por_cred_actividad>100){            
+        if($act_nueva->por_cred_actividad>100){
             return back()->withInput()
             ->with("error","El porcentaje de liberación no debe exceder el 100% del credito");
         }
@@ -197,10 +275,10 @@ class ActividadesController extends Controller
                     ['ae.validado','=','true']
                 ]);
             })->get()->count()>0? true: false;
-            if($tiene_foraneas){     
-                Alert::error('Error','La actividad ya tiene evidencias validadas');           
+            if($tiene_foraneas){
+                Alert::error('Error','La actividad ya tiene evidencias validadas');
                 return redirect()->back();
-                
+
             }
         }
         $act_nueva->save();
@@ -233,9 +311,9 @@ class ActividadesController extends Controller
         }
 
         Alert::warning('Alerta', 'La actividad '.$act_nueva->nombre.' ha sido editada con exito');
-        
+
         return redirect()->route('actividades.index');
-        
+
     }
 
     /**
@@ -245,37 +323,37 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    { 
+    {
         $act=Actividad::find($id);
-        if($act==null){   
-            Alert::error('Error','La actividad no existe');        
-            return redirect()->route('actividades.index');            
+        if($act==null){
+            Alert::error('Error','La actividad no existe');
+            return redirect()->route('actividades.index');
         }
         if (Auth::User()->hasAnyPermission(['VIP_ACTIVIDAD','VIP'])) {
             $asignada = Actividad_Evidencia::where('actividad_id','=',$act->id)->get()->count()>0?true: false;
-            if($asignada){               
+            if($asignada){
                 Alert::error('Error','La actividad no puede ser eliminada debido a que cuenta con responsables asignados.');
-                return redirect()->route('actividades.index');                
+                return redirect()->route('actividades.index');
             }
-            $act->delete(); 
-            Alert::success('Correcto','La actividad '.$act->nombre.' ha sido borrada con exito');           
-            return redirect()->route('actividades.index'); 
+            $act->delete();
+            Alert::success('Correcto','La actividad '.$act->nombre.' ha sido borrada con exito');
+            return redirect()->route('actividades.index');
 
         }else if(Auth::User()->can('ELIMINAR_ACTIVIDAD') && Auth::User()->id==$act->id_user){
             $asignada = Actividad_Evidencia::where('actividad_id','=',$act->id)->get()->count()>0?true: false;
             if($asignada){
-                Alert::error('Error','La actividad no puede ser eliminada debido a que cuenta con responsables asignados.');               
+                Alert::error('Error','La actividad no puede ser eliminada debido a que cuenta con responsables asignados.');
                 return redirect()->route('actividades.index');
-                
+
             }
-            $act->delete(); 
-            Alert::success('Correcto','La actividad '.$act->nombre.' ha sido borrada con exito');           
-            return redirect()->route('actividades.index');                
-        }else{ 
-            Alert::error('Error','No tienes permisos para eliminar esta actividad');          
-            return redirect()->route('actividades.index');          
-        }      
+            $act->delete();
+            Alert::success('Correcto','La actividad '.$act->nombre.' ha sido borrada con exito');
+            return redirect()->route('actividades.index');
+        }else{
+            Alert::error('Error','No tienes permisos para eliminar esta actividad');
+            return redirect()->route('actividades.index');
+        }
     }
 
-   
+
 }

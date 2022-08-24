@@ -13,109 +13,40 @@
 
 @section('contenido')
     <form action="{{ route('actividades.index') }}" method="GET" id="actividades-submit">
-        <div class="row">    
+        <div class="row">
             <div class="col-sm-4"></div>
-            <div class="col-sm-4">                           
-                @if ($vigente=='true')
-                    <input type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="vigente"/>
-                @else
-                    <input type="checkbox" id="checkbox5" class="css-checkbox" name="vigente"/>
-                @endif
-                <label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades no vigentes</label> 
-            </div>  
+            <div class="col-sm-4">
+                <input type="checkbox" id="vigente" class="css-checkbox" name="vigente"/>
+                <label for="vigente" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades no vigentes</label>
+            </div>
             <div class="col-sm-4" style="text-align: right !important;">
-                @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))                  
-                        <a href="{{route('actividades.create')}}" class="text-success">
-                            <i class="fa fa-plus fa-2x" aria-hidden="true" title="Agregar actividad"></i>
-                        </a>                   
+                @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))
+                    <a href="{{route('actividades.create')}}" class="text-success">
+                        <i class="fa fa-plus fa-2x" aria-hidden="true" title="Agregar actividad"></i>
+                    </a>
                 @endif
             </div>
-        </div> 
+        </div>
     </form>
-    <br>  
-         
+    <br>
+
     <div class="table-responsive">
         <table class="table" id="tabActividades">
             <thead>
-                <th>ID</th>
                 <th>Actividad</th>
-                <th>Porcentaje crédito</th>
-                <th>Crédito</th>
-                <th>Alumnos</th>
                 <th>No Alumnos</th>
+                <th>Porcentaje crédito</th>
                 <th>Administrador</th>
+                <th>Crédito</th>
+                <th>Creado</th>
+                <th title='Indica si los alumnos pueden subir su propia evidencia'>Alumnos Resp.</th>
                 <th>Vigente</th>
-                @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
-                    <th>Acción</th>
-                @endif
+                <th>Acción</th>
             </thead>
             <tbody>
-                @foreach($actividad as $act)
-                    <tr>
-                        <td>{{$act->id}}</td>
-                        <td>{{$act->actividad_nombre}}</td>
-                        <td>{{$act->por_cred_actividad}}</td>
-                        <td>{{$act->credito_nombre}}</td>
-                        <td>
-                            @if ($act->alumnos == "true")
-                                {{ "SI" }}
-                            @else
-                                {{ "NO" }}
-                            @endif
-                        </td>
-                        <td>{{ $act->no_alumnos }}</td>
-                        <td>
-                            {{ $act->usuario_nombre }}
-                        </td>
-                        <td>
-                            @if($act->vigente == "true")
-                                {{ "SI" }}
-                            @else
-                                {{ "NO" }}
-                            @endif
-                        </td>
-                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA']))
-                            <td>
-                                @if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
-                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-                                        <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning btn-sm" title="Editar actividad"><i class="fas fa-pencil-alt" style='font-size:14px'></i></a>
-                                    @elseif($act->id_user==Auth::User()->id)
-                                        <a href="{{ route('actividades.edit',[$act->id]) }}" class="btn btn-warning btn-sm" title="Editar actividad"><i class="fas fa-pencil-alt" style='font-size:14px'></i></a>
-                                    @endif                                                            
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ACTIVIDAD','VIP_ACTIVIDAD']))                                
-                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-                                        <button data-mdb-toggle="modal"  data-mdb-target="#modEliminar" onclick="eliminar({{ $act->id  }})" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></button>
-                                    @elseif($act->id_user==Auth::User()->id)
-                                        <button data-mdb-toggle="modal"  data-mdb-target="#modEliminar" onclick="eliminar({{ $act->id  }})" class="btn btn-danger btn-sm" title="Eliminar actividad"> <i class="far fa-trash-alt" style='font-size:14px'></i></button>
-                                    @endif                                                         
-                                @endif
-                                @if ($act->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))                               
-                                    <a href="#" class="btn btn-info btn-sm" onclick="redireccionar( {{ $act->id }} );" title="Agregar participantes (Alumnos) a la actividad">
-                                        <i class="fas fa-users" style='font-size:14px'></i>
-                                    </a>                              
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD']))                                
-                                    <a href="{{ route('verifica_evidencia.index',['validadas=on','busqueda='.$act->actividad_nombre,"actividades_link=true"]) }}" class="btn btn-success btn-sm" title="Verificar evidencias de esta actividad">
-                                        <i class="far fa-edit" style='font-size:14px'></i>
-                                    </a>                                                          
-                                @endif                               
-                                @if (Auth::User()->hasAnyPermission(['VIP','VER_RESPONSABLES','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))                                
-                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA']))
-                                        <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-user-plus" style='font-size:14px' title="Asignar responsables"></i></a>
-                                    @elseif($act->id_user==Auth::User()->id)
-                                        <a href="{{ route('responsables',$act->id) }}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-user-plus" style='font-size:14px' title="Asignar responsables"></i></a>
-                                    @endif                                                             
-                                @endif  
-                            </td>
-                        @endif
-                    </tr>
-                @endforeach
             </tbody>
         </table>
-    </div>    
+    </div>
 
 
    <!-- Modal -->
@@ -134,31 +65,26 @@
         </div>
         </div>
     </div>
-    
+
     <div style="margin-bottom: 200px;"></div>
 
     @section('js')
         <script>
             function eliminar(act)
-            {                
-                r="actividades/"+act+"/destroy";  
-                $('#btnEliminar').attr('href',r);              
+            {
+                r="actividades/"+act+"/destroy";
+                $('#btnEliminar').attr('href',r);
             }
 
             function redireccionar(actividad_id)
-            {                
+            {
                 Cookies.set('participantes_actividad',actividad_id,{ expires: 1});
                 window.location.href = "{{ route('participantes.index',['actividades_link=true']) }}";
             }
-            
-            $('#checkbox5').click(function(event){
-                var value = $(this).is(':checked');                
-                $('#actividades-submit').submit();
-            });
 
              //Codigo para adornar las tablas con datatables
-             $(document).ready(function() {               
-                $('#tabActividades').DataTable({
+             $(document).ready(function() {
+                var dataTable = $('#tabActividades').DataTable({
 
                     dom: 'Bfrtip',
 
@@ -194,10 +120,47 @@
                     ],
                     language: {
                         url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
-                    },                  
-                   
+                    },
+                    serverSide: true,
+                    ajax: function(data, callback, settings) {
+                        data.vigente = document.getElementById('vigente').checked;
+                        $.ajax({
+                            url: "{{ route('actividades.cargar.ajax') }}",
+                            type: "get",
+                            data: data
+                        }).done(function(response) {
+
+                            for (let i = 0; i < response.data.length; ++i) {
+                                response.data[i]['alumnos'] = (response.data[i]['alumnos'] == 'true' ? 'Si' : 'No');
+                                response.data[i]['vigente'] = (response.data[i]['vigente'] == 'true' ? 'Si' : 'No');
+                            }
+
+                            callback({
+                                draw:response.draw,
+                                data:response.data,
+                                recordsTotal:response.recordsTotal,
+                                recordsFiltered:response.recordsFiltered
+                            });
+                        });
+                    },
+                    columns: [
+                        {data: 'actividad_nombre'},
+                        {data: 'no_alumnos', orderable: true, searchable: false},
+                        {data: 'por_cred_actividad', orderable: true, searchable: false},
+                        {data: 'administrador', orderable: true, searchable: true},
+                        {data: 'credito_nombre'},
+                        {data: 'fecha_creacion'},
+                        {data: 'alumnos', orderable: false, searchable: false},
+                        {data: 'vigente', orderable: false, searchable: false},
+                        {data: 'acciones', orderable: false, searchable: false}
+                    ],
+
+                });
+
+                $('#vigente').click(function(event){
+                    dataTable.ajax.reload();
                 });
             });
         </script>
     @endsection
-@endsection 
+@endsection

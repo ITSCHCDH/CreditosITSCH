@@ -13,6 +13,7 @@
 
 //Rutas para funcionamiento del progressbar
 
+use App\Http\Controllers\ActividadesController;
 use App\Http\Controllers\AlumnosController;
 use App\Http\Controllers\CreditosController;
 use Illuminate\Support\Facades\Auth;
@@ -84,12 +85,12 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('/creditos/{id}/update',[CreditosController::class,'update'])->name('creditos.update');
     Route::get('/creditos/{id}/destroy',[CreditosController::class,'destroy'])->name('creditos.destroy');
 
-   
+
 
     /****Rutas para el controlador de actividades*****/
+    Route::get('actividades/cargar_actividades', [ActividadesController::class, 'cargarActividadesAjax'])->name('actividades.cargar.ajax');
+    Route::get('actividades/update/{id}',[ActividadesController::class, 'update'])->name('actividades.update');
     Route::resource('actividades','ActividadesController');
-
-    Route::get('actividades/update/{id}','ActividadesController@update')->name('actividades.update');
 
     //La siguiente nos crea las rutas para el controlador de actividades(Bajas)
     Route::get('actividades/{id}/destroy',[

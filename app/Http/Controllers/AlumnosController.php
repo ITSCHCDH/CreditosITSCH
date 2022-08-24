@@ -10,6 +10,8 @@ use App\Models\Area;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Alert;
+use App\Http\Controllers\Utilities\HttpCode;
+use Exception;
 
 class AlumnosController extends Controller
 {
@@ -30,39 +32,42 @@ class AlumnosController extends Controller
     }
 
     public function cargarAlumnosAjax(Request $request) {
-        $selectColumns = ['alu.nombre','alu.no_control','alu.status','alu.id as alumno_id','a.nombre as carrera'];
-        $dtAttr = new DataTableAttr($request, $selectColumns);
+        try {
+            $selectColumns = ['alu.nombre','alu.no_control','alu.status','alu.id as alumno_id','a.nombre as carrera'];
+            $dtAttr = new DataTableAttr($request, $selectColumns);
 
-        $alumnos = DB::table('alumnos as alu')
-            ->join('areas as a','a.id','=','alu.carrera')
-            ->select($selectColumns);
+            $alumnos = DB::table('alumnos as alu')
+                ->join('areas as a','a.id','=','alu.carrera')
+                ->select($selectColumns);
 
-        DataTableHelper::applyAll($alumnos, $dtAttr, ['paginatorResponse']);
+            DataTableHelper::applyAllExcept($alumnos, $dtAttr, [DataTableHelper::PAGINATOR]);
 
-        foreach ($alumnos as $alumno) {
-            $alumno->status = ucwords($alumno->status);
-            $alumno->acciones = "";
+            foreach ($alumnos as $alumno) {
+                $alumno->status = ucwords($alumno->status);
+                $alumno->acciones = "";
 
-            if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ALUMNOS'])) {
-                $alumno->acciones = $alumno->acciones . '<a href="'.route('alumnos.edit',[$alumno->alumno_id]) .'"
-                    class="btn btn-warning btn-sm" title="Modificar alumno"><i class="fas fa-user-edit" style="font-size:14px"></i></a>';
+                if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ALUMNOS'])) {
+                    $alumno->acciones = $alumno->acciones . '<a href="'.route('alumnos.edit',[$alumno->alumno_id]) .'"
+                        class="btn btn-warning btn-sm" title="Modificar alumno"><i class="fas fa-user-edit" style="font-size:14px"></i></a>';
+                }
+
+                if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS'])) {
+                    $alumno->acciones = $alumno->acciones . '<a  class="btn btn-danger btn-sm ml-1" onclick="undo_alumno(' .
+                        $alumno->alumno_id .','."'". $alumno->nombre . "'". ')" data-toggle="modal" data-target="#myModalMsg" title="Eliminar alumno">
+                        <i class="far fa-trash-alt" style="font-size:14px"></i></a>';
+                }
+
+                if (empty($alumno->acciones))
+                    $alumno->acciones = 'NA';
             }
 
-            if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS'])) {
-                $alumno->acciones = $alumno->acciones . '<a  class="btn btn-danger btn-sm ml-1" onclick="undo_alumno(' .
-                    $alumno->alumno_id .','."'". $alumno->nombre . "'". ')" data-toggle="modal" data-target="#myModalMsg" title="Eliminar alumno">
-                    <i class="far fa-trash-alt" style="font-size:14px"></i></a>';
-            }
-
-            if (empty($alumno->acciones))
-                $alumno->acciones = 'NA';
+            $paginatorResponse = DataTableHelper::paginatorResponse($alumnos, $dtAttr);
+            return response()->json($paginatorResponse, HttpCode::SUCCESS);
+        } catch (Exception $e) {
+            return response()->json($e->getMessage(), HttpCode::NOT_ACCEPTABLE);
         }
-
-        $paginatorResponse = DataTableHelper::paginatorResponse($alumnos, $dtAttr);
-        return response()->json($paginatorResponse, 200);
     }
 
-   
     public function create()
     {
         $carreras = Area::where('tipo','=','carrera')->orderBy('nombre','ASC')->get();
@@ -70,7 +75,7 @@ class AlumnosController extends Controller
         ->with('carreras',$carreras);
     }
 
-   
+
     public function store(Request $request)
     {
         //Recibimos los datos de la vista de altas y en este metodo es donde registramos los datos a la BD
@@ -81,24 +86,24 @@ class AlumnosController extends Controller
         $no_control_existe = Alumno::where('no_control','=',$request->no_control)->select('no_control')->get();
         if($no_control_existe->count()>0){
             Alert::error('Error','El No de control ya existe');
-            return redirect()->back()->withInput();          
+            return redirect()->back()->withInput();
         }
         $alumno->save();
 
         Alert::success('Correcto', 'El alumno  '.$alumno->name.' se ha registrado de forma exitosa');
-        return redirect()->route('alumnos.index');       
+        return redirect()->route('alumnos.index');
     }
 
-  
+
     public function edit($id)
     {
         //Codigo de modificaciones
         $alumno=Alumno::find($id);//Busca el registro
         if($alumno==null){
             Alert::error('Error','El alumno no existe');
-            return redirect()->back();            
+            return redirect()->back();
         }
-       
+
         $areas = Area::all();
 
         return view('admin.alumnos.edit')
@@ -106,7 +111,7 @@ class AlumnosController extends Controller
         ->with('areas',$areas);
     }
 
-  
+
 
 
     public function update(Request $request, $id)
@@ -116,7 +121,7 @@ class AlumnosController extends Controller
         $alumno= Alumno::find($id);
         if($alumno==null){
             Alert::error('Error','El alumno no existe');
-            return redirect()->back();          
+            return redirect()->back();
         }
         //$avance = DB::table('avance')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
         //$participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
@@ -130,20 +135,19 @@ class AlumnosController extends Controller
             }
             else
             {
-                Alert::error('Error','Error de credenciales, las contraseñas deben ser iguales para el alumno: '.$alumno->nombre);                
+                Alert::error('Error','Error de credenciales, las contraseñas deben ser iguales para el alumno: '.$alumno->nombre);
                 return redirect()->route('alumnos.index');
-               
+
             }
         }
         $alumno->save();
-        
+
         Alert::warning('Alerta','El alumno '. $alumno->nombre .' a sido editado de forma exitosa');
 
         return redirect('admin/alumnos');
-        
     }
 
-   
+
     public function destroy($id)
     {
         //Codigo de bajas
