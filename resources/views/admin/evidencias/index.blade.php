@@ -21,26 +21,34 @@
 	<div class="row">
 		<div class="col-sm-6" >
 		    <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
-		        al que estan asignados los participantes -->
-			<label for="actividades_id">Actividad</label>
-			<select name="actividades_id" id="actividades_id" class="form-control select-input placeholder-active active" required>
-				<option value="" selected>Seleccione una actividad</option>
-				@foreach ($actividades as $act)
-					<option value="{{ $act->id }}">{{ $act->nombre }}</option>
-				@endforeach
-			</select>	   
+		        al que estan asignados los participantes -->			
+			<div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text bg-info">Actividad</span>
+                </div>           
+				<select name="actividades_id" id="actividades_id" class="form-control select-input placeholder-active active" required>
+					<option value="" selected>Seleccione una actividad</option>
+					@foreach ($actividades as $act)
+						<option value="{{ $act->id }}">{{ $act->nombre }}</option>
+					@endforeach
+				</select>	
+			</div>   
 		</div>
 		<div class="col-sm-6">
 		    <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
-		        al que estan asignados los participantes -->
-			<label for="responsables_id">Responsable</label>		   
-		    <select class="form-control" required method="GET" name="responsables_id" id="responsables_id">
-		    	@if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VIP_EVIDENCIA'))
-		    		<option value="nulo">Todos los responsables</option>
-		    	@else
-		    		<option value="{{ Auth::User()->id }}">{{ Auth::User()->name }}</option>
-		    	@endif
-		    </select>
+		        al que estan asignados los participantes -->			
+			<div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text bg-info">Responsable</span>
+                </div> 		   
+				<select class="form-control" required method="GET" name="responsables_id" id="responsables_id">
+					@if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VIP_EVIDENCIA'))
+						<option value="nulo">Todos los responsables</option>
+					@else
+						<option value="{{ Auth::User()->id }}">{{ Auth::User()->name }}</option>
+					@endif
+				</select>
+			</div>
 		</div>
 	</div>
 	<div class="resetear"></div>

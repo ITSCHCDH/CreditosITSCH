@@ -168,13 +168,14 @@
 					<img src="{{ asset('/storage/constancia_imagenes/pie_de_pagina/'.$datos_globales[0]->imagen_pie) }}" width="100%" height="150px">
 				</div>
 			@endif
-			<input type="submit" name="" value="Guardar" class="btn btn-primary btn-sm" style="margin: 5px;">
+			<input type="submit" name="" value="Guardar" class="btn btn-primary btn-sm pull-right" style="margin: 5px;">
 		</form>
 	@endif
 
 	<!-- Segundo formulario -->
 	<!-- Datos especificos de constancia por carrera -->
-
+	<br>
+	<br>
 	<div class="alert-warning alerta-padding ocultar-formulario" id = "constancias-faltantes">
 		<p class="text-center">
 			Es importante proporcionar los datos requeridos de todas las constancias de las carreras para evitar problemas al realizar consultas de las mismas. Ha continuación se muestran las constancias que faltan se dichos datos.
@@ -187,8 +188,7 @@
 	<h3 class="ocultar-formulario">Datos específicos de constancia por carrera</h3>
 	<div id="mensajes-parte_media">
 		
-	</div>
-	<a href="#" class="btn btn-primary pull-left ocultar-formulario" id="constancia-vista-previa" style="visibility: hidden;">Vista previa</a>
+	</div>	
 	<div class="resetear"></div>
 	<form class="ocultar-formulario" method = "post" id = "form-datos-especificos">
 		<input type="hidden" value="{{ csrf_token() }}" id="token">
@@ -229,9 +229,13 @@
 			<label for="plan_de_estudios">Plan de estudios</label>
 			<input type="text" name="plan_de_estudios" id="plan_de_estudios" class="form-control" required placeholder="Plan de estudios. Ejem: ISIC-2010-224">
 		</div>
-		<input type="submit" name="" value="Guardar" class="btn btn-primary btn-sm" style="margin: 5px;">
+		<input type="submit" name="" value="Guardar" class="btn btn-primary btn-sm pull-right" style="margin: 5px;">
 	</form>
-	<div style="margin-bottom: 200px;"></div>
+	<br>
+	<br>
+	<hr>
+	<a href="#" class="btn btn-success pull-right ocultar-formulario" id="constancia-vista-previa" style="visibility: hidden;">Vista previa</a>
+	<div style="margin-bottom: 300px;"></div>
 	@section('js')
 		<script type="text/javascript">
 			$.ajaxSetup( {
@@ -338,11 +342,23 @@
 						data:constancia_data,
 						url: ruta,
 						success: function(response){
-							mostrarMensaje(response['mensaje'],'mensajes-parte_media',response['mensaje_tipo']);
+							//Mensaje
+							swal({
+								title: "Correcto!",
+								text: "Los datos se gusrdarón correctamente",
+								icon: "success",
+								button: "Cerrar!",
+							});							
 							mostrarConstanciasFaltantes();
 							$('#carrera').trigger('change');
-						},error: function(){
-							mostrarMensaje("Error al guardar datos especificos de la constancia",'mensajes-parte_media','error');
+						},error: function(){							
+							//Mensaje
+							swal({
+								title: "Error",
+								text: "Error al guardar datos especificos de la constancia",
+								icon: "error",
+								button: "Cerrar!",
+							});
 						}
 					});
 				});
@@ -366,8 +382,14 @@
 							$('#constancias-faltantes div ul').empty();
 							$('#constancias-faltantes').fadeOut();
 						}
-					},error: function(){
-						mostrarMensaje("Error al obtener las constancias faltantes","constancias-faltantes","error");
+					},error: function(){						
+						//Mensaje
+						swal({
+								title: "Error",
+								text: "Error al obtener las constancias faltantes",
+								icon: "error",
+								button: "Cerrar!",
+							});
 					}
 				});
 			}

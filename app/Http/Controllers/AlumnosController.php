@@ -116,8 +116,7 @@ class AlumnosController extends Controller
 
     public function update(Request $request, $id)
     {
-        //Ejecuta la modificacion
-        dd('Si llega');
+        //Ejecuta la modificacion       
         $alumno= Alumno::find($id);
         if($alumno==null){
             Alert::error('Error','El alumno no existe');
@@ -144,7 +143,7 @@ class AlumnosController extends Controller
 
         Alert::warning('Alerta','El alumno '. $alumno->nombre .' a sido editado de forma exitosa');
 
-        return redirect('admin/alumnos');
+        return redirect()->route('alumnos.index');
     }
 
 

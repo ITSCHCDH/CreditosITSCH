@@ -14,6 +14,7 @@ use App\Models\Alumno;
 use App\Models\Folio;
 use PDF;
 use DB;
+use Alert;
 
 class ConstanciasController extends Controller
 {
@@ -66,12 +67,12 @@ class ConstanciasController extends Controller
 
     public function visualizar(Request $request){
         if(!$request->has('carrera')){
-            Flash::error('Error datos inconcistentes');
+            Alert::error('Error','Error datos inconcistentes');           
             return redirect()->route('constancias.editar');
         }
         $datos_especificos_por_carrera = DB::table('constancia as c')->join('users as u','u.id','=','c.jefe_division')->where('c.carrera','=',$request->get('carrera'))->select('u.name','c.profesion_jefe_division','c.division_enunciado','c.plan_de_estudios')->get();
         if($datos_especificos_por_carrera->count() == 0){
-            Flash::error('Error datos inconcistentes');
+            Alert::error('Error','Error datos inconcistentes');
             return redirect()->route('constancias.editar');
         }
         $meses = [
@@ -115,12 +116,12 @@ class ConstanciasController extends Controller
 
     public function imprimir(Request $request){
         if(!$request->has('no_control')){
-            Flash::error('Estas intentando acceder de forma ilegal');
+            Alert::error('Error','Estas intentando acceder de forma ilegal');
             return redirect('/home');
         }
         $existe_alumno = Alumno::where('no_control','=',$request->no_control)->get()->count()>0? true: false;
         if(!$existe_alumno){
-            Flash::error('El número de control no existe');
+            Alert::error('Error','El número de control no existe');
             return redirect()->back();
         }
 
@@ -148,13 +149,13 @@ class ConstanciasController extends Controller
             $join->where('alu.no_control','=',$request->no_control);
         })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division','c.plan_de_estudios')->get();
         if($jefe_depto->count()==0 || $certificador->count()==0 || $jefe_division->count()==0 || $datos_globales->count()==0){
-            Flash::error('Falta de integridad en los datos de la constancia');
+            Alert::error('Error','Falta de integridad en los datos de la constancia');
             return redirect()->back();
         }
         $alumno = DB::table('alumnos')->join('areas','areas.id','=','alumnos.carrera')->where('alumnos.no_control','=',$request->no_control)->select('alumnos.nombre','alumnos.no_control','areas.nombre as carrera')->get();
         $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.$request->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
         if(count($alumno_data)!=5){
-            Flash::error('El alumno aun no liberado todos sus credito complementarios');
+            Alert::error('Error','El alumno aun no liberado todos sus credito complementarios');
             return redirect('/home');
         }
         $obtener_folio = Folio::where('no_control','=',$request->no_control)->get();
@@ -200,7 +201,7 @@ class ConstanciasController extends Controller
             if($request->hasFile('imagen_encabezado')){
                 $check = $this->extensionEsValida('imagen_encabezado',$request);
                 if(!$check){
-                    Flash::error('La extensión '.$request->file('imagen_encabezado')->getClientOriginalExtension().' no es valida.');
+                    Alert::error('Error','La extensión '.$request->file('imagen_encabezado')->getClientOriginalExtension().' no es valida.');
                     return redirect()->route('constancias.index');
                 }
                 $datos_globales->imagen_encabezado = $this->guardarImagen('encabezado','imagen_encabezado','encabezado',$request);
@@ -210,7 +211,7 @@ class ConstanciasController extends Controller
             if($request->hasFile('imagen_pie')){
                 $check = $this->extensionEsValida('imagen_pie',$request);
                 if(!$check){
-                    Flash::error('La extensión '.$request->file('imagen_pie')->getClientOriginalExtension().' no es valida.');
+                    Alert::error('Error','La extensión '.$request->file('imagen_pie')->getClientOriginalExtension().' no es valida.');
                     return redirect()->route('constancias.index');
                 }
                 $datos_globales->imagen_pie = $this->guardarImagen('pie_de_pagina','imagen_pie','pie_de_pagina',$request);
@@ -223,21 +224,21 @@ class ConstanciasController extends Controller
             if($request->hasFile('imagen_encabezado')){
                 $check = $this->extensionEsValida('imagen_encabezado',$request);
                 if(!$check){
-                    Flash::error('La extensión '.$request->file('imagen_encabezado')->getClientOriginalExtension().' no es valida.');
+                    Alert::error('Error','La extensión '.$request->file('imagen_encabezado')->getClientOriginalExtension().' no es valida.');
                     return redirect()->route('constancias.index');
                 }
             }else{
-                Flash::error('No se encontro la imagen para el encabezado');
+                Alert::error('Error','No se encontro la imagen para el encabezado');
                 return redirect()->route('constancias.index');
             }
             if($request->hasFile('imagen_pie')){
                 $check = $this->extensionEsValida('imagen_pie',$request);
                 if(!$check){
-                    Flash::error('La extensión '.$request->file('imagen_pie')->getClientOriginalExtension().' no es valida.');
+                    Alert::error('Error','La extensión '.$request->file('imagen_pie')->getClientOriginalExtension().' no es valida.');
                     return redirect()->route('constancias.index');
                 }
             }else{
-                Flash::error('No se encontro la imagen para el pie de página');
+                Alert::error('Error','No se encontro la imagen para el pie de página');
                 return redirect()->route('constancias.index');
             }
 
@@ -249,7 +250,7 @@ class ConstanciasController extends Controller
             $datos_globales->save();
         }
         
-        Flash::success("Datos guardados correctamente");
+        Alert::success('Correcto',"Datos guardados correctamente");
         return redirect()->route('constancias.index');
     }
     public function extensionEsValida($nombre_request, $request){

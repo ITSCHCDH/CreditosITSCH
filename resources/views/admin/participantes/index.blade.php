@@ -40,42 +40,53 @@
     <div class="col-sm-3">
         <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
         al que estan asignados los participantes -->
-        <label for="actividades_id">Actividad</label>    
-        <select name="actividades_id" id="actividades_id" required class="form-control">
-            @foreach ($actividades as $act)
-                <option value="{{ $act->id }}">{{ $act->nombre }}</option>
-            @endforeach
-        </select>   
+       
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text bg-info">Actividad</span>
+            </div>   
+            <select name="actividades_id" id="actividades_id" required class="form-control">
+                @foreach ($actividades as $act)
+                    <option value="{{ $act->id }}">{{ $act->nombre }}</option>
+                @endforeach
+            </select>  
+        </div> 
     </div>  
     <div class="col-sm-3">
         <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
-        al que estan asignados los participantes -->
-        <label for="responsables_id">Responsable</label>
-        <select name="responsables_id[]" id="responsables_id" class="form-control" required></select>   
-    </div>
-    <div class="col-sm-6">
-        @if (Auth::User()->hasAnyPermission(['AGREGAR_PARTICIPANTES','VIP']))
-            <div class="row">
-                <div class="col-sm-6">
-                    <label for="alumno">Alumno</label>                
-                    <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
+        al que estan asignados los participantes -->        
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text bg-info">Responsable</span>
+            </div>   
+            <select name="responsables_id[]" id="responsables_id" class="form-control" required></select>   
+        </div>
+    </div>    
+    @if (Auth::User()->hasAnyPermission(['AGREGAR_PARTICIPANTES','VIP']))       
+        <div class="col-sm-3">            
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text bg-info">Alumno</span>
+                </div>                   
+                <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
+            </div>
+        </div>
+        <div class="col-sm-3">
+                <!-- Abrimos el formulario para guardar los participantes -->       
+            <form id="frm" method="POST" class="form-inline">                                    
+                <div class="input-group mb-3">  
+                    <div class="input-group-prepend">
+                        <span class="input-group-text bg-info">N. Control</span>
+                    </div>                            
+                    <input type="hidden" value="{{ csrf_token() }}" id="token">    
+                    <input type="hidden" name="id_actividad" id="id_actividad_oculto" value="-1">
+                    <input type="hidden" name="id_responsable" id="responsable_oculto" value='-1'>
+                    <input type="text" name="no_control" id="no_control" placeholder="No Control" class="form-control" list="list_no_control">                           
+                    <input type="submit" value="Agregar"  class="btn btn-outline-primary btn-sm" data-mdb-ripple-color="dark">                         
                 </div>
-                <div class="col-sm-6">
-                        <!-- Abrimos el formulario para guardar los participantes -->       
-                    <form id="frm" method="POST" class="form-inline">
-                        <label for="no_control">Numero de Control</label> <br>                     
-                        <div class="input-group mb-3">                            
-                            <input type="hidden" value="{{ csrf_token() }}" id="token">    
-                            <input type="hidden" name="id_actividad" id="id_actividad_oculto" value="-1">
-                            <input type="hidden" name="id_responsable" id="responsable_oculto" value='-1'>
-                            <input type="text" name="no_control" id="no_control" placeholder="No Control" class="form-control" list="list_no_control">                           
-                            <input type="submit" value="Agregar"  class="btn btn-outline-primary btn-sm" data-mdb-ripple-color="dark">                         
-                        </div>
-                    </form>    
-                </div>
-            </div>              
-        @endif
-    </div>   
+            </form>    
+        </div>                   
+    @endif     
 </div>  
 
 <datalist id="list_no_control">

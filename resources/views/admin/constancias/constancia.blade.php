@@ -17,7 +17,7 @@
 		border-collapse: collapse;
 	}
 	#tabla-constancia thead{
-		background-color: #4CAF50;
+		background-color: #26355f;
 	}
 	#tabla-constancia td{
 		padding: 3px;
@@ -27,6 +27,7 @@
 	#tabla-constancia th{
 		border: 1px solid black;
 		font-size: 14px;
+		color: white;
 		padding: 1px;
 	}
 	.centrado{
@@ -60,7 +61,7 @@
 	}
 	#fecha{
 		display: inline-block;
-		background-color: green;
+		background-color: rgb(39, 38, 38);
 		color: white;
 		margin-left: 5px;
 	}
@@ -99,7 +100,7 @@
 		display: inline-block;
 	}
 	.firmas{
-		width: 250px;
+		width: 290px;
 	}
 	#pie-pagina{
 		position:fixed;
@@ -132,11 +133,11 @@
 	@php
 		$cadena = substr($data['jefe_depto']->profesion_jefe_depto,5);
 	@endphp
-	<p class="jefa">{{ strtoupper($cadena) }}. {{ strtoupper((string)$data['jefe_depto']->name) }}</p>
+	<p class="jefa">{{ mb_strtoupper($cadena) }}. {{ mb_strtoupper((string)$data['jefe_depto']->name) }}</p>
 @else
-	<p class="jefa">{{ strtoupper($data['jefe_depto']->profesion_jefe_depto) }}. {{ strtoupper((string)$data['jefe_depto']->name) }}</p>
+	<p class="jefa">{{ mb_strtoupper($data['jefe_depto']->profesion_jefe_depto) }}. {{ mb_strtoupper((string)$data['jefe_depto']->name) }}</p>
 @endif
-<P class="jefa">{{ strtoupper((string)$data['jefe_depto']->jefe_depto_enunciado) }}</P>
+<P class="jefa">{{ mb_strtoupper((string)$data['jefe_depto']->jefe_depto_enunciado) }}</P>
 <P class="jefa">PRESENTE</P>
 <div class="marco">
 	<p class="parrafo">Por medio del presente le envió un coordial saludo, y aprovecho la oportunidad para hacer de su conocimiento que de acuerdo a lo establecido en el lineamiento para la acreditación de actividades complementarias para el plan de estudios {{ strtoupper($data['plan_de_estudios']) }}, el(a) alumno(a) <strong>Jehú Jair Ruiz Villegas</strong> con el numero de control <strong>15030205</strong> de la carrera INGENIERÍA EN SISTEMAS COMPUTACIONALES ha <strong style="text-decoration: underline;">concluido satisfactoriamente</strong> con las actividades necesarias para liberar los créditos complementarios. Dichas actividades se resumen a continuación: </p>
@@ -193,13 +194,13 @@
 				@php
 					$cadena = substr($data['jefe_division']->profesion_jefe_division,5);
 				@endphp
-				<p class="jefa no-margen-izq">{{ strtoupper($cadena) }}. {{ strtoupper((string)$data['jefe_division']->name) }}
+				<p class="jefa no-margen-izq">{{ mb_strtoupper($cadena) }}. {{ mb_strtoupper((string)$data['jefe_division']->name) }}
 				</p>
 			@else
-				<p class="jefa no-margen-izq">{{ strtoupper($data['jefe_division']->profesion_jefe_division) }}. {{ strtoupper((string)$data['jefe_division']->name) }}
+				<p class="jefa no-margen-izq">{{ mb_strtoupper($data['jefe_division']->profesion_jefe_division) }}. {{ mb_strtoupper((string)$data['jefe_division']->name) }}
 				</p>
 			@endif
-			<p class="jefa no-margen-izq">{{ $data['jefe_division']->division_enunciado }}</p>
+			<p class="jefa no-margen-izq">{{ mb_strtoupper($data['jefe_division']->division_enunciado) }}</p>
 		</div>
 		<div class="firmas f-derecha">
 			<p class="jefa no-margen-izq">Vo.Bo</p>
@@ -210,11 +211,11 @@
 				@php
 					$cadena = substr($data['certificador']->profesion_certificador,5);
 				@endphp
-				<p class="jefa no-margen-izq"=>{{ strtoupper($cadena) }}. {{ strtoupper((string)$data['certificador']->name) }}</p>
+				<p class="jefa no-margen-izq"=>{{ mb_strtoupper($cadena) }}. {{ mb_strtoupper((string)$data['certificador']->name) }}</p>
 			@else
-				<p class="jefa no-margen-izq">{{ strtoupper($data['certificador']->profesion_certificador) }}. {{ strtoupper((string)$data['certificador']->name) }}</p>
+				<p class="jefa no-margen-izq">{{ mb_strtoupper($data['certificador']->profesion_certificador) }}. {{ mb_strtoupper((string)$data['certificador']->name) }}</p>
 			@endif
-			<p class="jefa no-margen-izq">{{ strtoupper($data['certificador']->certificador_enunciado) }}</p>
+			<p class="jefa no-margen-izq">{{ mb_strtoupper($data['certificador']->certificador_enunciado) }}</p>
 		</div>
 	</div>
 	<div id="pie-pagina">

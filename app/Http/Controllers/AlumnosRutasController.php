@@ -18,6 +18,8 @@ use App\Models\Participante;
 use App\Models\Avance;
 use DB;
 use PDF;
+use Alert;
+
 class AlumnosRutasController extends Controller
 {
 
@@ -69,7 +71,7 @@ class AlumnosRutasController extends Controller
     public function imprimir(){
         $existe_alumno = Alumno::where('no_control','=',Auth::User()->no_control)->get()->count()>0? true: false;
         if(!$existe_alumno){
-            Flash::error('El número de control no existe.');
+            Alert::error('Error','El número de control no existe.');
             return redirect()->back();
         }
         $meses = [
@@ -96,13 +98,13 @@ class AlumnosRutasController extends Controller
             $join->where('alu.no_control','=',Auth::User()->no_control);
         })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division','c.plan_de_estudios')->get();
         if($jefe_depto->count()==0 || $certificador->count()==0 || $jefe_division->count()==0 || $datos_globales->count()==0){
-            Flash::error('Falta de integridad en los datos de la constancia');
+            Alert::error('Error','Falta de integridad en los datos de la constancia');
             return redirect()->back();
         }
         $alumno = DB::table('alumnos')->join('areas','areas.id','=','alumnos.carrera')->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.nombre','alumnos.no_control','areas.nombre as carrera')->get();
         $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
         if(count($alumno_data)<5){
-            Flash::error('Si ya tienes tus 5 créditos liberados y no se muestra tu constancia.<br>Probablemente falten datos de la misma.');
+            Alert::error('Error','Si ya tienes tus 5 créditos liberados y no se muestra tu constancia.<br>Probablemente falten datos de la misma.');
             return back();
         }
         sort($alumno_data);
@@ -215,7 +217,7 @@ class AlumnosRutasController extends Controller
     	$validador = User::find($actividad_evidencia[0]->validador_id);
         $responsable = User::find($request->id_responsable);
     	if($actividad->count() == null || $responsable == null){
-    	    Flash::error('No actividad o responsable seleccinado');
+    	    Alert::error('Error','No actividad o responsable seleccinado');
     	    return redirect()->route('participantes.index');
     	}
     	return view('alumnos.subir_evidencia')
@@ -240,7 +242,7 @@ class AlumnosRutasController extends Controller
     	       // Función para saber si la extensión se encuentra dentro de las extensiones permitidas
     	       $check=in_array($extension,$allowedfileExtension);
     	       if(!$check){
-    	           Flash::error('La extensión '.$extension.' no es valida.');
+    	           Alert::error('Error','La extensión '.$extension.' no es valida.');
     	           return back()->withInput();
     	       }
     	    }
@@ -277,7 +279,7 @@ class AlumnosRutasController extends Controller
     	    $actividad_evidencia = Actividad_Evidencia::find($id_actividad_evidencia[0]->id);
     	    $actividad_evidencia->save();
     	}
-    	Flash::success('La evidencia fue guardada correctamente');
+    	Alert::success('Error','La evidencia fue guardada correctamente');
     	return redirect()->route('alumnos.actividades');
     }
 

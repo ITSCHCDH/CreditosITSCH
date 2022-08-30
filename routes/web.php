@@ -64,15 +64,17 @@ Route::get('/home', 'HomeController@index')->name('home');
 /****Rutas para el controlador de alumnos, con el group::resource, nos crean todas las rutas, para el controlador especificado*****/
 
 Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
+    /****Rutas para el controlador de alumnos*****/
+    //Route::resource('alumnos','AlumnosController'); 
+    Route::get('alumnos/cargar_alumnos_ajax', [AlumnosController::class, 'cargarAlumnosAjax'])->name('admin.alumnos.cargar.ajax');  
+    Route::get('/alumnos/index',[AlumnosController::class,'index'])->name('alumnos.index'); 
+    Route::get('/alumnos/{id}/edit',[AlumnosController::class,'edit'])->name('alumnos.edit'); 
+    Route::post('/alumnos/{id}/update',[AlumnosController::class,'update'])->name('alumnos.update');
+    Route::post('/alumnos/create',[AlumnosController::class,'create'])->name('alumnos.create');
+    Route::get('/alumnos/{id}/destroy',[AlumnosController::class,'destroy'])->name('alumnos.destroy');   
+   
 
-    Route::get('alumnos/cargar_alumnos_ajax', [AlumnosController::class, 'cargarAlumnosAjax'])->name('admin.alumnos.cargar.ajax');
-    Route::resource('alumnos','AlumnosController');
-
-    //La siguiente nos crea las rutas para el controlador de alumnos
-    Route::get('alumnos/{id}/destroy',[
-        'uses'=>'AlumnosController@destroy',
-        'as'=> 'admin.alumnos.destroy'
-    ]);
+    
 
 
     /****Rutas para el controlador de creditos*****/

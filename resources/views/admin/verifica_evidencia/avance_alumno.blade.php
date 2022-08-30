@@ -228,10 +228,9 @@
 			@php
 				$mostrarMensaje = 1;
 			@endphp
-		@endif
-
-		<div style="padding: 5px 0 50px 0;"></div>
+		@endif	
 	</div>
+	<div style="margin-bottom: 300px;"></div>
 	@section('js')
 		<script type="text/javascript">
 			function autocompletar(entrada){
