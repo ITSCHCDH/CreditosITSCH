@@ -4,7 +4,7 @@
         <div class="container-fluid">
             <!-- Navbar brand -->
             <a class="navbar-brand" href="#">
-            <img src="https://mdbootstrap.com/img/logo/mdb-transaprent-noshadows.png" height="16" alt="" loading="lazy"
+            <img src="{{ asset('images/itsch.jpg') }}" height="22" alt="Logo del ITSCH" loading="lazy"
                 style="margin-top: -3px;" />
             </a>
             <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarExample01"
