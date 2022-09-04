@@ -1,4 +1,4 @@
-@extends('template.molde');
+@extends('template.molde')
 
 @section('title','Avance alumnos')
 
@@ -348,7 +348,7 @@
 				if(posicionActual >= current.length) posicionActual=0;
 				if(posicionActual < 0) posicionActual = current.length-1;
 				current[posicionActual].classList.add("autocomplete-active");
-				scrollToElement(posicionActual, current.length);
+				scrollToElement(posicionActual);
 			}
 
 
@@ -356,7 +356,7 @@
 			  return element.scrollHeight > element.clientHeight;
 			}
 
-			function scrollToElement(targetPosition, size) {
+			function scrollToElement(targetPosition) {
 				let scrollable = document.getElementById('div-autocomplete-list');
 				const firstPixelPosition = Math.floor(scrollable.childNodes[0].getBoundingClientRect().top);
 				const targetPixelPosition = Math.floor(scrollable.childNodes[targetPosition].getBoundingClientRect().top);
