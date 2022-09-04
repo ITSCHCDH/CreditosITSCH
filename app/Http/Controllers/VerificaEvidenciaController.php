@@ -15,6 +15,8 @@ use App\Models\Area;
 
 class VerificaEvidenciaController extends Controller
 {
+    const MAX_FETCH_SIZE_LIMIT = 100;
+
     public function __construct(){
         $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VIP_REPORTES|VER_REPORTES_CARRERA')->only('reportes');
         $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VIP_EVIDENCIA|VERIFICAR_EVIDENCIA')->only(['index','show']);
@@ -24,7 +26,7 @@ class VerificaEvidenciaController extends Controller
         $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_AVANCE_ALUMNO|VIP_AVANCE_ALUMNO')->only('alumnosBusqueda');
     }
 
-    public function index(Request $request){       
+    public function index(Request $request){
         $validadas = 'true'; // Variable para filtrar las activides no validadas de las validadas
         $busqueda = $request->busqueda;
         $actividades_link = 'false';
@@ -352,26 +354,25 @@ class VerificaEvidenciaController extends Controller
     public function alumnosBusqueda(Request $request){
         if (Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO'])) {
             if($request->peticion == 0){
-                $lista_alumnos = Alumno::select('nombre','no_control')->where('nombre','like',"%$request->nombre%")->orderBy('nombre')->get();
+                $lista_alumnos = Alumno::select('nombre','no_control')->where('nombre','like',"%$request->nombre%")->orderBy('nombre');
             }else{
-                $lista_alumnos = Alumno::select('nombre')->where('no_control','=',$request->no_control)->get();
+                $lista_alumnos = Alumno::select('nombre')->where('no_control','=',$request->no_control);
             }
-            return response()->json($lista_alumnos);
         }else{
             if($request->peticion == 0){
                 $lista_alumnos = Alumno::select('nombre','no_control')->where([
                     ['nombre','like',"%$request->nombre%"],
                     ['carrera','=',Auth::User()->area]
-                ])->orderBy('nombre')->get();
+                ])->orderBy('nombre');
             }else{
                 $lista_alumnos = Alumno::select('nombre')->where([
                     ['no_control','=',$request->no_control],
                     ['carrera','=',Auth::User()->area]
-                ])->get();
+                ]);
             }
-            return response()->json($lista_alumnos);
         }
-
+        $lista_alumnos = $lista_alumnos->limit(100)->get();
+        return response()->json($lista_alumnos);
     }
 
 }

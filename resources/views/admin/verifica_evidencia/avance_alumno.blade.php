@@ -2,15 +2,19 @@
 
 @section('title','Avance alumnos')
 
+@section('links')
+	<link rel="stylesheet" href="{{ asset('cssAutocompletar/autocompletar.css') }}" />
+@endsection
+
 @section('ruta')
-    
+
     @if (count($ruta_data)>0)
     	<div>
 			<form action="{{ route('verifica_evidencia.reportes') }}" method="get" id="ruta_input" style="float: left; margin-right: 5px;">
 				<input type="hidden" name="carrera" value="{{ $ruta_data[0] }}">
 				<input type="hidden" name="generacion" value="{{ $ruta_data[1] }}">
 				<a href="#" onclick="document.getElementById('ruta_input').submit()">Reportes</a>
-			</form>    		
+			</form>
     		/
     		<label class="label label-success">Avance alumno</label>
     	</div>
@@ -25,23 +29,23 @@
 		<div class="col-sm-3"></div>
 		<div class="col-sm-3"></div>
 		<div class="col-sm-3">
-			<label for="participante_nombre">Alumno</label>		    
-		    <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
+			<label for="alumno_nombre">Alumno</label>
+			<input id="alumno_nombre" type="text" placeholder="Nombre" class="form-control">
 		</div>
 		<div class="col-sm-3">
 			<form action="{{ route('verifica_evidencia.avance_alumno') }}" method="get">
-				<label for="no_control">Numero de control</label>
+				<label for="no_control">Número de control</label>
 				<div class="md-form input-group mb-3">
-					<input type="text" class="form-control" name="no_control" id="no_control" required placeholder="Numero de control" aria-label="Numero de control" aria-describedby="MaterialButton-addon2">
+					<input type="text" class="form-control" name="no_control" id="no_control" required placeholder="Número de control" aria-label="Número de control" aria-describedby="MaterialButton-addon2">
 					<div class="input-group-append">
 					  	<button class="btn btn-md btn-secondary m-0 px-3" type="submit" id="Buscar" title="Buscar"><i class="fas fa-search" style="font-size: 14px"></i></button>
 					</div>
-				</div>				
-			</form>	
+				</div>
+			</form>
 		</div>
 	</div>
-			
-	
+
+
 	<div class="resetear"></div>
 	<br><br>
 	<div class="alert-danger" style="padding: 20px; display: none;" id="mensaje-error">
@@ -58,7 +62,7 @@
 			</div>
 			<div class="col-md-11">
 				<div class="card-body">
-					<h5 class="card-title">Información del alumno</h5>				
+					<h5 class="card-title">Información del alumno</h5>
 					<table class="table">
 						<thead>
 							<tr>
@@ -77,21 +81,21 @@
 								<td>
 									@if ($alumno_data!=null)
 									{{ $alumno_data[0]->no_control }}
-									@endif	
+									@endif
 								</td>
 								<td>
 									@if ($alumno_data!=null)
 									{{ $alumno_data[0]->carrera }}
-									@endif	
+									@endif
 								</td>
 							</tr>
 						</tbody>
-					</table>			
+					</table>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="container-fluid ">				
+	<div class="container-fluid ">
 		<br><br>
 		<table class="table ">
 			<thead>
@@ -106,7 +110,7 @@
 					$y=0;
 				@endphp
 				@if($alumno_data!=null)
-					@for ($x = 0; $x < count($creditos); $x++)									
+					@for ($x = 0; $x < count($creditos); $x++)
 						@if ( $y < count($alumno_data) && $avance)
 							@if ($alumno_data[$y]->nombre_credito==$creditos[$x]->nombre)
 								@php
@@ -149,7 +153,7 @@
 												<div style="position: absolute;">
 													<strong >{{ $creditos[$x]->nombre }}</strong>
 												</div>
-												
+
 											</div>
 										</div>
 									</td>
@@ -178,7 +182,7 @@
 											<div style="position: absolute;">
 												<strong >{{ $creditos[$x]->nombre }}</strong>
 											</div>
-											
+
 										</div>
 									</div>
 								</td>
@@ -209,7 +213,7 @@
 							<td></td>
 							<td><strong>Total de creditos</strong></td>
 					</tr>
-					<tr>						
+					<tr>
 						<td colspan="3" style="background-color:#426986; color:white; text-align: right;"><h3>{{ $suma_creditos.' creditos' }}</h3></td>
 					</tr>
 				@endif
@@ -228,106 +232,178 @@
 			@php
 				$mostrarMensaje = 1;
 			@endphp
-		@endif	
+		@endif
 	</div>
 	<div style="margin-bottom: 300px;"></div>
 	@section('js')
 		<script type="text/javascript">
-			function autocompletar(entrada){
-				var posicionActual;
-				var participantes_arr = [];
-				entrada.addEventListener("input", function(event){
-					var divPadre, divHijo, valor = this.value;
-					posicionActual = -1;
-					removeAllLists();
-					if(!valor) return false;
-					$.ajax({
-						type: "GET",
-						url: "{{ route('verifica_evidencia.alumnos_busqueda') }}",
-						dataType: "json",
-						data:{
-							nombre: valor,
-							peticion: 0
-						},
-						success: function(response){
-							participantes_arr = [];
-							for(var x=0; x<response.length; x++){
-								participantes_arr.push(response[x]);
-							}
-							removeAllLists();
-							divPadre.setAttribute("id",entrada.id+"autocomplete-list");
-							divPadre.setAttribute("class","autocomplete-items");
-							entrada.parentNode.appendChild(divPadre);
-							for(var x=0; x<participantes_arr.length; x++){
-								divHijo = document.createElement("div");
-								divHijo.innerHTML = "<p style='text-align: left;'><strong>"+participantes_arr[x]['nombre']+"</strong>-"+participantes_arr[x]['no_control']+"</p>";
-								divHijo.innerHTML += "<input type = 'hidden' value='"+participantes_arr[x]['nombre']+"'>";
-								divHijo.innerHTML += "<input type = 'hidden' value='"+participantes_arr[x]['no_control']+"'>";
-								divHijo.addEventListener("click", function(event){
-									event.preventDefault();
-									var temp = document.getElementById("participante_nombre");
-									temp.value = this.getElementsByTagName("input")[0].value;
-									var temp2 = document.getElementById("no_control");
-									temp2.value = this.getElementsByTagName("input")[1].value;
-									removeAllLists();
-								});
-								divPadre.appendChild(divHijo);
-							}
-						}, error: function(){
-							console.log("Error :(");
-						}
-					});
-					divPadre = document.createElement("div");
-					
-				});
+			var alumnoNombreInput = document.getElementById("alumno_nombre");
+			var alumnoNoControlInput = document.getElementById("no_control");
+			var busquedaTimeout = null;
+			var posicionActual = -1;
 
-				entrada.addEventListener("keydown", function(event){
-					var lista_participantes = document.getElementById(this.id+"autocomplete-list");
-					if(lista_participantes) lista_participantes = lista_participantes.getElementsByTagName("div");
-					if(event.keyCode == 40){
-						++posicionActual;
-						addActive(lista_participantes);
-					}else if(event.keyCode == 38){
-						--posicionActual;
-						addActive(lista_participantes);
-					}else if(event.keyCode == 13 && posicionActual >= 0){
-						this.value = lista_participantes[posicionActual].getElementsByTagName("input")[0].value;
-						var temp = document.getElementById("no_control");
-						temp.value = lista_participantes[posicionActual].getElementsByTagName("input")[1].value;
-						removeAllLists();
+			function ucwords(text) {
+				let token_list = text.split(' ');
+				let result = '';
+				for (let i = 0; i < token_list.length; ++i) {
+					if (i > 0) {
+						result += ' ';
 					}
-				});
-				function addActive(current){
-					if(current == null) return false;
-					removeActive(current);
-					if(posicionActual >= current.length) posicionActual=0;
-					if(posicionActual < 0) posicionActual = current.length-1;
-					current[posicionActual].classList.add("autocomplete-active");
+					let token = String(token_list[i]);
+					let word = token.charAt(0).toUpperCase() + token.slice(1).toLowerCase();
+					result += word;
 				}
-				function removeActive(current){
-					for(var x = 0; x<current.length; x++){
-						current[x].classList.remove("autocomplete-active");
-					}
-				}
-				function removeAllLists(elemento){
-					var lista_items = document.getElementsByClassName("autocomplete-items");
-					for(var x = 0; x < lista_items.length; x++){
-						if(elemento == lista_items[x] && elemento == entrada)continue;
-						lista_items[x].parentNode.removeChild(lista_items[x]);
-					}
-				}
-				document.addEventListener("click", function (event) {
-					removeAllLists(event.target);
-				});
+				return result;
 			}
 
-			function busqueda(entrada){
+			function limpiarListaResultados(){
+				let listaItems = document.getElementsByClassName("autocomplete-items");
+				for(var x = 0; x < listaItems.length; x++){
+					listaItems[x].parentNode.removeChild(listaItems[x]);
+				}
+			}
+
+			function removerResultadosDandoClicEnDocumento(clickedElement){
+				let listaItems = document.getElementsByClassName("autocomplete-items");
+				for(var x = 0; x < listaItems.length; x++){
+					if (clickedElement == listaItems[x] && clickedElement == entrada) {
+						continue;
+					}
+					listaItems[x].parentNode.removeChild(listaItems[x]);
+				}
+			}
+
+			function getDatosPorNombreAjax(busqueda) {
+				if(!busqueda)
+					return false;
+
+				var participantes_arr = [];
+				var divPadre = document.createElement("div");
+				divPadre.setAttribute("id","div-autocomplete-list");
+				divPadre.setAttribute("class","autocomplete-items");
+
+				$.ajax({
+					type: "GET",
+					url: "{{ route('verifica_evidencia.alumnos_busqueda') }}",
+					dataType: "json",
+					data:{
+						nombre: busqueda,
+						peticion: 0
+					},
+					success: function(response){
+						let busqueda_actual = $("#alumno_nombre").val();
+						if (busqueda_actual != busqueda) {
+							limpiarListaResultados();
+							return;
+						}
+
+						participantes_arr = [];
+						for(var x=0; x<response.length; x++){
+							participantes_arr.push(response[x]);
+						}
+						limpiarListaResultados();
+						alumnoNombreInput.parentNode.appendChild(divPadre);
+						for(var x=0; x<participantes_arr.length; x++){
+							let divHijo = document.createElement("div");
+							divHijo.innerHTML = "<p><strong>"+ucwords(participantes_arr[x]['nombre'])+"</strong> &rarr; "+participantes_arr[x]['no_control']+"</p>";
+							divHijo.innerHTML += "<input type = 'hidden' value='"+participantes_arr[x]['nombre']+"'>";
+							divHijo.innerHTML += "<input type = 'hidden' value='"+participantes_arr[x]['no_control']+"'>";
+
+							divHijo.addEventListener("click", function(event){
+								event.preventDefault();
+								let temp = document.getElementById("alumno_nombre");
+								temp.value = this.getElementsByTagName("input")[0].value;
+								let temp2 = document.getElementById("no_control");
+								temp2.value = this.getElementsByTagName("input")[1].value;
+								limpiarListaResultados();
+							});
+
+							divPadre.appendChild(divHijo);
+						}
+					}, error: function(response){
+						console.log("Error :(");
+						console.log(response);
+					}
+				});
+
+			}
+
+			function getDatosPorNombre() {
+				limpiarListaResultados();
+
+				if (busquedaTimeout != null) {
+					clearTimeout(busquedaTimeout);
+				}
+
+				busquedaTimeout = setTimeout(function() {
+					let busqueda = $("#alumno_nombre").val();
+					getDatosPorNombreAjax(busqueda);
+				}, 400);
+
+			}
+
+			function addActive(current){
+				if(current == null) return false;
+				removeActive(current);
+				if(posicionActual >= current.length) posicionActual=0;
+				if(posicionActual < 0) posicionActual = current.length-1;
+				current[posicionActual].classList.add("autocomplete-active");
+				scrollToElement(posicionActual, current.length);
+			}
+
+
+			function isOverflownY(element) {
+			  return element.scrollHeight > element.clientHeight;
+			}
+
+			function scrollToElement(targetPosition, size) {
+				let scrollable = document.getElementById('div-autocomplete-list');
+				const firstPixelPosition = Math.floor(scrollable.childNodes[0].getBoundingClientRect().top);
+				const targetPixelPosition = Math.floor(scrollable.childNodes[targetPosition].getBoundingClientRect().top);
+				const marginSize = 4 * 32;
+
+				if (isOverflownY(scrollable)) {
+					if (targetPosition >= 0 && targetPosition <= 4) {
+						scrollable.scrollTop = 0;
+					} else {
+						let scrollToTarget = targetPixelPosition - firstPixelPosition - marginSize;
+						scrollable.scrollTop = scrollToTarget;
+					}
+				}
+			}
+
+			function removeActive(current){
+				for(var x = 0; x<current.length; x++){
+					current[x].classList.remove("autocomplete-active");
+				}
+			}
+
+			function scrollList() {
+				var lista_participantes = document.getElementById("div-autocomplete-list");
+				if(lista_participantes) lista_participantes = lista_participantes.getElementsByTagName("div");
+				if(event.keyCode == 40){
+					++posicionActual;
+					addActive(lista_participantes);
+				}else if(event.keyCode == 38){
+					--posicionActual;
+					addActive(lista_participantes);
+				}else if(event.keyCode == 13 && posicionActual >= 0){
+					this.value = lista_participantes[posicionActual].getElementsByTagName("input")[0].value;
+					var temp = document.getElementById("no_control");
+					temp.value = lista_participantes[posicionActual].getElementsByTagName("input")[1].value;
+					limpiarListaResultados();
+				}
+			}
+
+			function busquedaPorNoControl(entrada){
 				event.preventDefault();
-				var temp = document.getElementById("participante_nombre");
-				temp.value="";
+				alumnoNombreInput.value="";
+
 				var valor = entrada.value;
-				if(!valor) return false;
-				if(valor.length < 8 || valor.length > 10) return false;
+				if(!valor || valor.length < 8 || valor.length > 10) {
+					return false;
+				}
+
 				$.ajax({
 					type: "GET",
 					url: "{{ route('verifica_evidencia.alumnos_busqueda') }}",
@@ -338,31 +414,38 @@
 					},
 					success: function(response){
 						if(response.length>0){
-							temp.value = response[0]['nombre'];
+							alumnoNombreInput.value = response[0]['nombre'];
 						}
 					},error: function(response){
-						console.log("error :(");
+						console.log("Error :(");
+						console.log(response);
 					}
 				});
 			}
-			function noControlParticipante(entrada){
-				entrada.addEventListener("input", function(event){
-					busqueda(entrada);
+
+			function agregarEventosAElementos() {
+				alumnoNombreInput.addEventListener("input", getDatosPorNombre);
+				document.addEventListener("click",removerResultadosDandoClicEnDocumento);
+
+				alumnoNoControlInput.addEventListener("input", function(event){
+					busquedaPorNoControl(alumnoNoControlInput);
 				});
 
-				entrada.addEventListener("click", function(event){
-					busqueda(entrada);
-				  });
+				alumnoNoControlInput.addEventListener("click", function(event){
+					busquedaPorNoControl(alumnoNoControlInput);
+				});
+
+				alumnoNombreInput.addEventListener("keydown", scrollList);
 			}
 
 			$(document).ready(function(){
-				autocompletar(document.getElementById("participante_nombre"));
-				noControlParticipante(document.getElementById("no_control"));
+				agregarEventosAElementos();
 				var mostrarMensaje = "{{ $mostrarMensaje }}";
 				if(mostrarMensaje == 1){
 					$('#mensaje-error').css('display','block');
 				}
 			});
+
 		</script>
 	@endsection
 @endsection
