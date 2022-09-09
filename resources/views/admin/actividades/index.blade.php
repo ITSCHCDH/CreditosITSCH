@@ -17,7 +17,7 @@
             <div class="col-sm-4"></div>
             <div class="col-sm-4">
                 <input type="checkbox" id="vigente" class="css-checkbox" name="vigente"/>
-                <label for="vigente" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades no vigentes</label>
+                <label for="vigente" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades cerradas</label>
             </div>
             <div class="col-sm-4" style="text-align: right !important;">
                 @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))
@@ -38,9 +38,8 @@
                 <th>Porcentaje crédito</th>
                 <th>Administrador</th>
                 <th>Crédito</th>
-                <th>Creado</th>
-                <th title='Indica si los alumnos pueden subir su propia evidencia'>Alumnos Resp.</th>
-                <th>Vigente</th>
+                <th>Creado</th>               
+                <th>Cierre</th>
                 <th>Acción</th>
             </thead>
             <tbody>
@@ -149,9 +148,8 @@
                         {data: 'por_cred_actividad', orderable: true, searchable: false},
                         {data: 'administrador', orderable: true, searchable: true},
                         {data: 'credito_nombre'},
-                        {data: 'fecha_creacion'},
-                        {data: 'alumnos', orderable: false, searchable: false},
-                        {data: 'vigente', orderable: false, searchable: false},
+                        {data: 'fecha_creacion'},                        
+                        {data: 'fecCierre', orderable: false, searchable: false},
                         {data: 'acciones', orderable: false, searchable: false}
                     ],
 

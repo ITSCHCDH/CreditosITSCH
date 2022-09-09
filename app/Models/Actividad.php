@@ -10,7 +10,7 @@ class Actividad extends Model
     protected $table="actividad";
     //Datos visibles para los objetos json
     protected $fillable=[
-        'nombre','por_cred_actividad','id_actividad','id_user','alumnos','vigente'
+        'nombre','por_cred_actividad','id_actividad','id_user','alumnos','vigente','fecCierre'
     ];
 
     //Relacion con la tablas de actividad(uno) - evidencia(muchos)
