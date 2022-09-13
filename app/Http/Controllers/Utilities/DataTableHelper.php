@@ -52,7 +52,11 @@ class DataTableHelper {
     }
 
     static function paginate(Builder &$query, DataTableAttr &$dtAttr) {
-        $query = $query->paginate($dtAttr->getLength(), ['*'], 'page', $dtAttr->getPageNumber());
+        if ($dtAttr->getAllResults()) {
+            $query = $query->get();
+        } else {
+            $query = $query->paginate($dtAttr->getLength(), ['*'], 'page', $dtAttr->getPageNumber());
+        }
     }
 
     static function whereLike(Builder &$query, DataTableAttr &$dtAttr) {
@@ -79,16 +83,23 @@ class DataTableHelper {
         }
     }
 
-    static function paginatorResponse(&$paginator, DataTableAttr &$dtAttr) {
-        if (!($paginator instanceof LengthAwarePaginator))
-            throw new InvalidArgumentException('Invalid argument: must be of type Illuminate\\Pagination\\LengthAwarePaginator');
-        $data_attr = json_decode(json_encode($paginator));
-        return [
-            'draw' => $dtAttr->getDraw(),
-            'data' => $data_attr->data,
-            'recordsTotal' => $data_attr->total,
-            'recordsFiltered' => $data_attr->total
-        ];
+    static function paginatorResponse(&$queryResults, DataTableAttr &$dtAttr) {
+        if ($queryResults instanceof LengthAwarePaginator) {
+            $paginatorDecode = json_decode(json_encode($queryResults));
+            return [
+                'draw' => $dtAttr->getDraw(),
+                'data' => $paginatorDecode->data,
+                'recordsTotal' => $paginatorDecode->total,
+                'recordsFiltered' => $paginatorDecode->total
+            ];
+        } else {
+            return [
+                'draw' => $dtAttr->getDraw(),
+                'data' => $queryResults,
+                'recordsTotal' => $queryResults->count(),
+                'recordsFiltered' => $queryResults->count()
+            ];
+        }
     }
 
     static private function getCanonicalColumn($selectColumns, $alias) {

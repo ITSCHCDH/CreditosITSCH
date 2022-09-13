@@ -133,4 +133,8 @@ class DataTableAttr {
     public function getSelectColumns() {
         return $this->selectColumns;
     }
+
+    public function getAllResults() : bool {
+        return $this->length == -1;
+    }
 }
