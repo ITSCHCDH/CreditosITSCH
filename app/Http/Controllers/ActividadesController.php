@@ -14,6 +14,7 @@ use App\Http\Controllers\Utilities\DataTableHelper;
 use App\Http\Controllers\Utilities\HttpCode;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class ActividadesController extends Controller
 {
@@ -41,10 +42,12 @@ class ActividadesController extends Controller
             $selectColumns = [
                 'a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente',
                 'a.alumnos','c.nombre as credito_nombre','u.name as administrador','a.id_user',
-                DB::raw('count(par.id) as no_alumnos'), DB::raw('DATE_FORMAT(a.created_at, "%d-%m-%Y") as fecha_creacion')
+                DB::raw('count(par.id) as no_alumnos'), DB::raw('DATE_FORMAT(a.created_at, "%d-%m-%Y") as fecha_creacion'), DB::raw('DATE_FORMAT(a.fecCierre,"%d-%m-%Y") as fecCierre')
             ];
 
             $dtAttr = new DataTableAttr($request, $selectColumns);
+
+            $fecHoy = Carbon::now();
 
             $actividades = DB::table('actividad as a')
                 ->leftjoin('users as u',$this->indexActFiltroJoinVIP())
@@ -56,7 +59,7 @@ class ActividadesController extends Controller
 
             DataTableHelper::applyOnly($actividades, $dtAttr, [DataTableHelper::WHERE, DataTableHelper::ORDER_BY]);
 
-            $actividades->where('a.vigente','<>', $mostrar_no_vigentes);
+            $actividades->where('a.vigente','<>', $mostrar_no_vigentes)->where('fecCierre','>=',$fecHoy);
 
             DataTableHelper::applyOnly($actividades, $dtAttr, [DataTableHelper::PAGINATE]);
 
@@ -175,7 +178,7 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    { 
         $act=new Actividad($request->all()); //Obtiene todos los datos de la vista para guardarlos en la BD
         $act->id_user = Auth::User()->id;
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act->nombre)->get();
@@ -263,8 +266,8 @@ class ActividadesController extends Controller
             }
         }
         if($act_nueva->por_cred_actividad>100){
-            return back()->withInput()
-            ->with("error","El porcentaje de liberación no debe exceder el 100% del credito");
+            Alert::error('Error','El porcentaje de liberación no debe exceder el 100% del credito');
+            return back()->withInput();
         }
         if($act_anterior->id_actividad != $act_nueva->id_actividad || $act_anterior->por_cred_actividad != $act_nueva->por_cred_actividad){
             $tiene_foraneas = DB::table('actividad as a')->join('actividad_evidencia as ae', function($join) use($id){
@@ -315,6 +318,8 @@ class ActividadesController extends Controller
         return redirect()->route('actividades.index');
 
     }
+
+  
 
     /**
      * Remove the specified resource from storage.

@@ -92,13 +92,12 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     /****Rutas para el controlador de actividades*****/
     Route::get('actividades/cargar_actividades', [ActividadesController::class, 'cargarActividadesAjax'])->name('actividades.cargar.ajax');
     Route::get('actividades/update/{id}',[ActividadesController::class, 'update'])->name('actividades.update');
-    Route::resource('actividades','ActividadesController');
-
-    //La siguiente nos crea las rutas para el controlador de actividades(Bajas)
-    Route::get('actividades/{id}/destroy',[
-        'uses'=>'ActividadesController@destroy',
-        'as'=> 'admin.actividades.destroy'
-    ]);
+    Route::get('actividades/index',[ActividadesController::class,'index'])->name('actividades.index');
+    Route::get('actividades/create',[ActividadesController::class,'create'])->name('actividades.create');
+    Route::get('actividades/store',[ActividadesController::class,'store'])->name('actividades.store');
+    Route::get('actividades/{id}/edit',[ActividadesController::class,'edit'])->name('actividades.edit');
+    Route::get('actividades/{id}/destroy',[ActividadesController::class,'destroy'])->name('actividades.destroy');
+   
 
     /****Rutas para el controlador de usuarios *****/
     Route::get('usuarios/{id}/asignar_roles','UsersController@asignarRoles')->name('usuarios.asignar_roles');

@@ -21,6 +21,7 @@ class AddTableActividad extends Migration
             $table->integer('id_actividad')->unsigned();
             $table->enum('vigente',['true','false'])->default('true');
             $table->enum('alumnos',['true','false'])->default('false');
+            $table->date('fecCierre')->nullable();
             $table->foreign('id_user')->references('id')->on('users')->ondelete('cascade');
             $table->foreign('id_actividad')->references('id')->on('creditos')->ondelete('cascade');
             $table->timestamps(); 
