@@ -28,7 +28,7 @@
 	<div class="row">
 		<div class="col-sm-3"></div>
 		<div class="col-sm-3"></div>
-		<div class="col-sm-3">
+		<div class="col-sm-3 autocomplete">
 			<label for="alumno_nombre">Alumno</label>
 			<input id="alumno_nombre" type="text" placeholder="Nombre" class="form-control">
 		</div>
