@@ -11,57 +11,57 @@
 	<form action="{{ route('verifica_evidencia.reportes') }}" method="get">	
 		<div><h4>Filtros</h4></div>
 		<hr>
-			<div class="row ml-2">
-				<div class="col-sm-3">					
-					<div class="input-group mb-3">
-						<div class="input-group-prepend">
-						  <span class="input-group-text bg-info">Generación</span>
-						</div> 						
-						<select name='generacion' class='form-control' required placeholder='Año-Generación' method='GET'>
-							@php
-								echo "<option value = 1>Todos</option>";
-								$anio_actual = (int)explode("-",Carbon\Carbon::now())[0];
-								for($anio = 2013; $anio <= $anio_actual; ++$anio){
-									echo "<option value = $anio>$anio</option>";
-								}
-							@endphp
-						</select>
-					</div>
+		<div class="row ml-2">
+			<div class="col-sm-3">					
+				<div class="input-group mb-3">
+					<div class="input-group-prepend">
+						<span class="input-group-text bg-info">Generación</span>
+					</div> 						
+					<select name='generacion' class='form-control' required placeholder='Año-Generación' method='GET'>
+						@php
+							echo "<option value = 1>Todos</option>";
+							$anio_actual = (int)explode("-",Carbon\Carbon::now())[0];
+							for($anio = 2013; $anio <= $anio_actual; ++$anio){
+								echo "<option value = $anio>$anio</option>";
+							}
+						@endphp
+					</select>
 				</div>
-				<div class="col-sm-3">					
-					<div class="input-group mb-3">
-						<div class="input-group-prepend">
-						  <span class="input-group-text bg-info">Carrera</span>
-						</div> 			   
-						<select class="form-control" required name="carrera" id="carrera">
-							@if (Auth::User()->hasAnyPermission(['VIP','VIP_REPORTES','VIP_SOLO_LECTURA']))
-								<option value="">Seleccione una carrera</option>
+			</div>
+			<div class="col-sm-3">					
+				<div class="input-group mb-3">
+					<div class="input-group-prepend">
+						<span class="input-group-text bg-info">Carrera</span>
+					</div> 			   
+					<select class="form-control" required name="carrera" id="carrera">
+						@if (Auth::User()->hasAnyPermission(['VIP','VIP_REPORTES','VIP_SOLO_LECTURA']))
+							<option value="">Seleccione una carrera</option>
+						@endif
+						@foreach($carreras as $carrera)
+							@if($carrera_seleccionada == $carrera->id)
+								<option value="{{ $carrera->id }}" selected>{{ $carrera->nombre }}</option>
+							@else
+								<option value="{{ $carrera->id }}">{{ $carrera->nombre }}</option>
 							@endif
-							@foreach($carreras as $carrera)
-								@if($carrera_seleccionada == $carrera->id)
-									<option value="{{ $carrera->id }}" selected>{{ $carrera->nombre }}</option>
-								@else
-									<option value="{{ $carrera->id }}">{{ $carrera->nombre }}</option>
-								@endif
-							@endforeach
-						</select>
-					</div>
+						@endforeach
+					</select>
 				</div>
-				<div class="col-sm-3">					
-					<div class="input-group mb-3">
-						<div class="input-group-prepend">
-						  <span class="input-group-text bg-info">Busqueda</span>
-						</div>					
-						<input type="text" name="busqueda" id="Control" class="form-control" placeholder="Nombre - No Control" value="{{ $busqueda }}">
-					</div>
+			</div>
+			<div class="col-sm-3">					
+				<div class="input-group mb-3">
+					<div class="input-group-prepend">
+						<span class="input-group-text bg-info">Busqueda</span>
+					</div>					
+					<input type="text" name="busqueda" id="Control" class="form-control" placeholder="Nombre - No Control" value="{{ $busqueda }}">
 				</div>
-				<div class="col-sm-3">
-					
-					<button type="submit" class="btn btn-secondary"><span class="glyphicon glyphicon-filter"></span> Filtrar</button>
-					
-				</div>
-			</div>	
-			<hr>
+			</div>
+			<div class="col-sm-3">
+				
+				<button type="submit" class="btn btn-secondary"><span class="glyphicon glyphicon-filter"></span> Filtrar</button>
+				
+			</div>
+		</div>	
+		<hr>
 	</form>
 	<br>
 	<br>
@@ -144,9 +144,6 @@
 						</div>
 						</div>
 					</div>
-
-					
-
 				@endfor
 			@else	
 				@section('js')
@@ -188,9 +185,4 @@
 		</div>
 		
 	</div>
-	
-	
-@section('js')
-	
-@endsection
 @endsection

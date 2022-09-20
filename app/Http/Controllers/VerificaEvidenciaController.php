@@ -179,14 +179,6 @@ class VerificaEvidenciaController extends Controller
         }
     }
 
-    public function destroy($id){
-
-    }
-
-    public function show(){
-
-    }
-
     public function visualizar($imagen){
         $file= public_path(). "/images/evidencias/".$imagen;
         return response()->file($file);
@@ -300,7 +292,7 @@ class VerificaEvidenciaController extends Controller
         return $creditos_liberados >= 5;
     }
 
-    public function reportes(Request $request){
+    public function reportes(Request $request){        
     	$creditos_count = Credito::all();
     	$creditos = count($creditos_count);
         $carreras = Area::where('tipo','=','carrera')->get();
