@@ -59,8 +59,9 @@ class AlumnosRutasController extends Controller
             $avance = false;
             $alumno_data = DB::table('alumnos')->join('areas', function($join){
                 $join->on('areas.id','=','alumnos.carrera');
-            })->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.nombre as nombre_alumno','areas.nombre as carrera','alumnos.no_control')->get();
+            })->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.id as alumno_id','alumnos.nombre as nombre_alumno','areas.nombre as carrera','alumnos.no_control')->get();
         }
+        
     	return view('alumnos.avance')
     	->with('alumno_data',$alumno_data)
     	->with('creditos',$creditos)

@@ -166,4 +166,17 @@ class AlumnosController extends Controller
         Alert::success('Correcto','El alumno '. $alumno->nombre .' a sido borrado de forma exitosa');//Envia mensaje
         return redirect('admin/alumnos');//llama a la pagina de consultas
     }
+
+    public function perfil($id)
+    {
+        $selectColumns = ['alu.nombre','alu.no_control','alu.foto','alu.id as alumno_id','a.nombre as carrera'];      
+
+        $alumno_data = DB::table('alumnos as alu')
+            ->join('areas as a','a.id','=','alu.carrera')
+            ->select($selectColumns)
+            ->where('alu.id',$id)->get();          
+
+        return view('alumnos.perfil')
+        ->with('alumno_data',$alumno_data);
+    }
 }

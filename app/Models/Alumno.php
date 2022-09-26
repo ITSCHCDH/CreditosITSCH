@@ -12,7 +12,7 @@ class Alumno extends Authenticatable
     //Nombre de la tabla
     protected $table="alumnos";
     //Datos visibles para los objetos json
-    protected $fillable=['no_control','password','nombre','carrera','status'];
+    protected $fillable=['no_control','password','nombre','carrera','status','foto'];
 
 
     //Relacion con la tablas de alumno(uno) a participante(muchos)

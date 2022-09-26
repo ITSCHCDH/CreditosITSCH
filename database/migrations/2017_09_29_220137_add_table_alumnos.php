@@ -20,6 +20,7 @@ class AddTableAlumnos extends Migration
             $table->string('password',255);
             $table->integer('carrera')->unsigned();
             $table->string('status',35);
+            $table->string('foto',30);
             $table->foreign('carrera')->references('id')->on('areas');
             $table->timestamps();
         });

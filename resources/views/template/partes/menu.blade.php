@@ -113,6 +113,8 @@
                     <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
                         @if (!Auth::guard('alumno')->check())
                             <a class="dropdown-item" href="{{ route('perfil.index') }}">Mi perfil</a> 
+                        @else
+                            <a class="dropdown-item" href="{{ route('alumnos.perfil',$alumno_data[0]->alumno_id) }}">Mi perfil</a>
                         @endif
                         <a class="dropdown-item" href="{{ route('logout') }}"
                             onclick="event.preventDefault();
