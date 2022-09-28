@@ -169,7 +169,7 @@ class AlumnosController extends Controller
 
     public function perfil($id)
     {
-        $selectColumns = ['alu.nombre','alu.no_control','alu.foto','alu.id as alumno_id','a.nombre as carrera'];      
+        $selectColumns = ['alu.nombre','alu.no_control','alu.foto','alu.id as alumno_id','alu.password','a.nombre as carrera'];      
 
         $alumno_data = DB::table('alumnos as alu')
             ->join('areas as a','a.id','=','alu.carrera')
@@ -178,5 +178,10 @@ class AlumnosController extends Controller
 
         return view('alumnos.perfil')
         ->with('alumno_data',$alumno_data);
+    }
+
+    public function editPerfil($id)
+    {
+        dd('Si llega');
     }
 }
