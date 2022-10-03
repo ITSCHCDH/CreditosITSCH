@@ -233,9 +233,9 @@ class VerificaEvidenciaController extends Controller
     		if($alumno_data->count()==0){
                 //SI no tiene avance solo retornamos los datos del alumno los datos del alumno
                 $avance = false;
-                $alumno_data= DB::table('alumnos as alu')->join('areas as a','a.id','=','alu.carrera')->select('alu.nombre as nombre_alumno','a.nombre as carrera','alu.no_control')->where('alu.no_control','=',$request->get('no_control'))->get();
+                $alumno_data= DB::table('alumnos as alu')->join('areas as a','a.id','=','alu.carrera')->select('alu.nombre as nombre_alumno','a.nombre as carrera','alu.no_control','alu.foto')->where('alu.no_control','=',$request->get('no_control'))->get();
             }
-        }
+        } 
     	return view('admin.verifica_evidencia.avance_alumno')
         ->with('alumno_data',$alumno_data)
         ->with('creditos',$creditos)

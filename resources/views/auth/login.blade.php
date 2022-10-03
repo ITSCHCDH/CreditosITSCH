@@ -47,7 +47,7 @@
                                             <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sistema de créditos complementarios del ITSCH</h5>
         
                                             
-                                            <div class="form-outline mb-4">    
+                                            <div class="mb-4">    
                                                 <Label class="form-label" >Tipo de usuario</Label>                                            
                                                 <select id="tipo-login" name="tipo-login" class="form-control form-control-lg" required>                                                    
                                                     <option value="1" selected>Administrativo</option>
@@ -59,11 +59,18 @@
                                                 <input type="email" id="email" class="form-control form-control-lg"  name="email" required/>
                                                 <label class="form-label" for="email" id="user">Email address</label>
                                             </div>
-                        
-                                            <div class="form-outline mb-4">
-                                                <input type="password" id="password" class="form-control form-control-lg" name="password" required/>
-                                                <label class="form-label" for="password">Password</label>
-                                            </div>
+                                            
+                                           <div class="row" >
+                                                <div class="col-sm-10">
+                                                    <div class="form-outline mb-4">
+                                                        <input type="password" id="password" class="form-control form-control-lg" name="password" required/>                                                
+                                                        <label class="form-label" for="password">Password</label>                                                
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <button type="button" class="btn btn-primary btn-lg" onclick="mostrarPassword()" title="Ver password"><i class="fa fa-eye-slash" id="icon1"></i></button>
+                                                </div>
+                                           </div>                                       
                         
                                             <div class="pt-1 mb-4">
                                                 <button class="btn btn-dark btn-lg btn-block" type="submit">Login</button>
@@ -110,9 +117,21 @@
                     }
                 });
             }
+
             $(document).ready(function(){
                 comboTipo();
             });
+
+            function mostrarPassword(){
+                var cambio = document.getElementById("password");
+                if(cambio.type == "password"){
+                    cambio.type = "text";
+                    $('#icon1').removeClass('fa fa-eye-slash').addClass('fa fa-eye');
+                }else{
+                    cambio.type = "password";
+                    $('#icon1').removeClass('fa fa-eye').addClass('fa fa-eye-slash');
+                }
+            } 
         </script>
         
     </body>

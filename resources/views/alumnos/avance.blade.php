@@ -8,16 +8,24 @@
 
 @section('contenido')
 	
-	<a href="{{ route('alumnos.actividades') }}" class="btn btn-primary">Actividades</a>
+	<a href="{{ route('alumnos.actividades') }}" class="btn btn-primary" title="Ver actividades asignadas"><i class="far fa-eye"></i> Actividades</a>
 	<hr>
 	<div class="card mb-3" style="max-width: 1550px;">
 		<div class="row g-0">
 			<div class="col-md-2">
-				<img
-					src="{{ asset('images/user.png') }}"
-					alt="Imagen del alumno"
-					class="img-fluid rounded-start"
-				/>
+				@if($alumno_data[0]->foto==null)
+					<img
+						src="{{ asset('images/user.png') }}"
+						alt="Imagen del alumno"
+						class="img-fluid rounded-start"
+					/>
+				@else
+					<img
+						src="{{ asset('storage/alumnos/img/'.$alumno_data[0]->foto) }}"
+						alt="Imagen del alumno"
+						class="img-fluid rounded-start"
+					/>
+				@endif
 			</div>
 			<div class="col-md-10">
 				<div class="card-body">

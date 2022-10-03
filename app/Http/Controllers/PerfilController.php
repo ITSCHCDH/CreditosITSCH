@@ -23,13 +23,13 @@ class PerfilController extends Controller
 
     public function passwordUpdate(PasswordResetRequest $request){
     	if(!Hash::check($request->old_password, Auth::User()->password)){
-    		Flash::error("La contraseña actual no es correcta");
+    		Alert::error("Error","La contraseña actual no es correcta");
     		return redirect()->back();
     	}
     	$user = User::find(Auth::User()->id);
     	$user->password = bcrypt($request->new_password);
     	$user->save();
-    	Flash::success("Contraseña reseteada correctamente");
+    	Alert::success("Correcto","Contraseña reseteada correctamente");
     	return redirect()->route('perfil.index');
     }
 }

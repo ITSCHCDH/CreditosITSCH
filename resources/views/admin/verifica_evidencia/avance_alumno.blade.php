@@ -54,11 +54,19 @@
 	<div class="card mb-3" style="max-width: 1550px;">
 		<div class="row g-0">
 			<div class="col-md-1">
-				<img
-				src="{{ asset('images/user.png') }}"
-				alt="Imagen del alumno"
-				class="img-fluid rounded-start"
-				/>
+				@if(empty($alumno_data[0]->foto))
+					<img
+						src="{{ asset('images/user.png') }}"
+						alt="Imagen del alumno"
+						class="img-fluid rounded-start"
+					/>
+				@else
+					<img
+						src="{{ asset('storage/alumnos/img/'.$alumno_data[0]->foto) }}"
+						alt="Imagen del alumno"
+						class="img-fluid rounded-start"
+					/>
+				@endif
 			</div>
 			<div class="col-md-11">
 				<div class="card-body">

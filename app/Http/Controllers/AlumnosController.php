@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Alert;
 use App\Http\Controllers\Utilities\HttpCode;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 
 class AlumnosController extends Controller
 {
@@ -180,8 +181,75 @@ class AlumnosController extends Controller
         ->with('alumno_data',$alumno_data);
     }
 
-    public function editPerfil($id)
+    public function editPerfil($id, Request $request)
     {
-        dd('Si llega');
+        try
+        {
+            if(!Storage::has('public/alumnos/img')){
+                Storage::makeDirectory('public/alumnos/img');
+            }
+            $alumno = Alumno::find($id);
+            if($request->has('foto'))
+            {
+                // Creamos un arrelglo con las extensiones validas
+                $allowedfileExtension=['jpg','png','jpeg'];           
+                $file = $request->foto; 
+                // Obtenemos la extension original del archivo
+                $extension = strtolower($file->getClientOriginalExtension());
+                // Funcion para saber si la extension se encuentra dentro de las extensiones permitidas
+                $check=in_array($extension,$allowedfileExtension);
+                if(!$check){
+                    Alert::error('Error','La extensión '.$extension.' no es valida.');
+                    return back()->withInput();
+                }
+                //Verificamos  el ancho y largo de la imagen, antes de subirla:
+
+                $imgsize=getimagesize($file); 
+
+                $width=$imgsize[0];
+
+                $height=$imgsize[1];              
+
+                if($width<700  &&  $height<700 )
+                { 
+                    Alert::error('Error','El tamaño de las imagenes debe ser de mas de 600px de alto y 600px de ancho');
+                    return back()->withInput();
+                }
+                //Generamos la ruta donde se guardaran las imagenes de los articulos
+                $path=storage_path().'/app/public/alumnos/img';
+                $path_to_verify = 'public/alumnos/img';
+                if(!Storage::has($path_to_verify)){
+                    Storage::makeDirectory($path_to_verify);
+                }          
+                //Para evitar nombres repetidos en las imagenes, creamos un nombre antes de guardar
+                $name='foto_'.$alumno->no_control.'.'.strtolower($file->getClientOriginalExtension());
+                //Guardamos la imagen en la carpeta creada en la ruta que marcamos anteriormente
+                $file->move($path,$name);  
+                $alumno->foto=$name;//Obtiene el nombre de la imagen para guardarlo en la bd
+                $alumno->save();//Guarda el perfil del usuario                   
+            }  
+            if($request->txtPassword!=$alumno->password)
+            {
+                if($request->txtPassword==$request->txtConfirmPassword && strlen($request->txtPassword)>=6)
+                {                           
+                    $alumno->password=bcrypt($request->txtPassword);               
+                    $alumno->save();//Guarda el perfil del usuario          
+                }
+                else
+                {
+                    Alert::error('Error','Las contraseñas no son iguales y recuerda que minimo deben ser 6 caracteres');
+                    return back()->withInput();
+                }  
+            }          
+          
+          
+        }
+        catch (\Exception $e)
+        {    
+            Alert::error('Error','Ocurrio un error inesperado '.$e);
+            return back()->withInput();
+        }      
+        Alert::success('Correcto','Su perfil fue modificado con exito');
+        return redirect()->route('alumnos.perfil',$id);
     }
 }

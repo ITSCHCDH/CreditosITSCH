@@ -17,14 +17,15 @@
                     @if($alumno_data[0]->foto==null)
                         <img src="{{ asset('images/user.png') }}" class="img-fluid"/>
                     @else
-                        <img src="{{ asset('images/user2.png') }}" class="img-fluid"/>
+                        <img src="{{ asset('storage/alumnos/img/'.$alumno_data[0]->foto) }}" class="img-fluid"/>
                     @endif
                   <a href="#!">
                     <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
                   </a>
+                  <p>Las imagenes deben de ser de mas de 600px de alto y de ancho</p>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('alumnos.edit.perfil',$alumno_data[0]->alumno_id) }}" method="post">
+                    <form action="{{ route('alumnos.edit.perfil',$alumno_data[0]->alumno_id) }}" method="post" enctype="multipart/form-data">
                         @csrf
                         <h5 class="card-title">{{ $alumno_data[0]->nombre }}</h5>
                         <p class="card-text">
@@ -35,13 +36,13 @@
                         <input type="file" name="foto" id="foto">
                         <hr>
                         <div class="input-group mb-3">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Password</span>
-                            <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="password" id="txtPassword" required value=" {{ $alumno_data[0]->password }}"/>
+                            <span class="input-group-text">Password</span>
+                            <input type="password" class="form-control" name="txtPassword" id="txtPassword" required value=" {{ $alumno_data[0]->password }}"/>
                             <button type="button" class="btn btn-primary" onclick="mostrarPassword()"><i class="fa fa-eye-slash" id="icon1"></i></button>
                         </div>
                         <div class="input-group mb-3">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Confirm Password</span>
-                            <input type="password" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" name="txtConfirmPassword" id="txtConfirmPassword" required value=" {{ $alumno_data[0]->password }}"/>
+                            <span class="input-group-text">Confirm Password</span>
+                            <input type="password" class="form-control" name="txtConfirmPassword" id="txtConfirmPassword" required value=" {{ $alumno_data[0]->password }}"/>
                             <button type="button" class="btn btn-primary" onclick="mostrarConfPassword()"><i class="fa fa-eye-slash" id="icon2"></i></button>
                         </div>
                         <p id="msjPassword" style="color: orange"></p>
