@@ -122,18 +122,16 @@
                     },
                     serverSide: true,
                     ajax: function(data, callback, settings) {
-                        data.vigente = document.getElementById('vigente').checked;
+                        data.vigente = document.getElementById('vigente').checked; 
                         $.ajax({
                             url: "{{ route('actividades.cargar.ajax') }}",
                             type: "get",
-                            data: data
-                        }).done(function(response) {
-
+                            data: data 
+                        }).done(function(response) {                            
                             for (let i = 0; i < response.data.length; ++i) {
                                 response.data[i]['alumnos'] = (response.data[i]['alumnos'] == 'true' ? 'Si' : 'No');
                                 response.data[i]['vigente'] = (response.data[i]['vigente'] == 'true' ? 'Si' : 'No');
                             }
-
                             callback({
                                 draw:response.draw,
                                 data:response.data,

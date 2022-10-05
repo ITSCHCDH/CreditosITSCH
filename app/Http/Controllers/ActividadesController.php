@@ -37,7 +37,7 @@ class ActividadesController extends Controller
     public function cargarActividadesAjax(Request $request)
     {
         try {
-            $mostrar_no_vigentes = $request->input('vigente');
+            $chkVigencia = $request->input('vigente');  
 
             $selectColumns = [
                 'a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente',
@@ -59,7 +59,14 @@ class ActividadesController extends Controller
 
             DataTableHelper::applyOnly($actividades, $dtAttr, [DataTableHelper::WHERE, DataTableHelper::ORDER_BY]);
 
-            $actividades->where('a.vigente','<>', $mostrar_no_vigentes)->where('fecCierre','>=',$fecHoy);
+            if($chkVigencia=='false')
+            {                
+                $actividades->where('a.vigente','<>', $chkVigencia)->where('fecCierre','>=',$fecHoy);
+            }
+            else
+            {                
+                $actividades->where('a.vigente','<>', $chkVigencia)->where('fecCierre','<',$fecHoy);
+            }           
 
             DataTableHelper::applyOnly($actividades, $dtAttr, [DataTableHelper::PAGINATE]);
 
@@ -68,6 +75,8 @@ class ActividadesController extends Controller
             $paginatorResponse = DataTableHelper::paginatorResponse($actividades, $dtAttr);
 
             return response()->json($paginatorResponse, HttpCode::SUCCESS);
+
+
         } catch (Exception $e) {
             return response()->json($e->getMessage(), HttpCode::NOT_ACCEPTABLE);
         }
