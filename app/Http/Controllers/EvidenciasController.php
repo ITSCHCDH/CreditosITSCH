@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Alert;
+use Exception;
 
 class EvidenciasController extends Controller
 {
@@ -30,18 +31,21 @@ class EvidenciasController extends Controller
         $ruta = $request->has('ruta');
         if(Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA')){
             $actividades = Actividad::select('nombre','id')->orderBy('nombre')->get();
-           
-            return view('admin.evidencias.index')
-            ->with('actividades',$actividades)
-            ->with('ruta',$ruta);
         }else{
-            $actividades = DB::table('users as u')->join('actividad_evidencia as ae',function($join){
-                $join->on('ae.user_id','=','u.id');
-            })->join('actividad as a','a.id','=','ae.actividad_id')->where('u.id','=',Auth::guard('web')->User()->id)->orwhere('a.id_user','=',Auth::User()->id)->select('a.nombre','a.id')->orderBy('nombre')->get();            
-            return view('admin.evidencias.index')
+            $actividades = DB::table('users as u')
+                ->join('actividad_evidencia as ae',function($join){
+                    $join->on('ae.user_id','=','u.id');
+                })
+                ->join('actividad as a','a.id','=','ae.actividad_id')
+                ->where('u.id','=',Auth::guard('web')->User()->id)
+                ->orwhere('a.id_user','=',Auth::User()->id)
+                ->select('a.nombre','a.id')
+                ->orderBy('nombre')
+                ->get();
+        }
+        return view('admin.evidencias.index')
             ->with('actividades',$actividades)
             ->with('ruta',$ruta);
-        }
     }
 
     /**
@@ -89,7 +93,7 @@ class EvidenciasController extends Controller
         }
         $actividad = Actividad::find($request->actividad_id);
         if($request->has('archivos')){
-            // Creamos un arrelglo con las extemsiones validas
+            // Creamos un arreglo con las extensiones validas
             $allowedfileExtension=['pdf','jpg','png','jpeg'];
             for ($i = 0; $i < count($request->archivos); $i++) {
                $file = $request->archivos[$i];
@@ -104,73 +108,123 @@ class EvidenciasController extends Controller
             }
         }
         $id_actividad_evidencia = DB::table('actividad_evidencia')->where([
-            ['actividad_id','=',$request->actividad_id],
-            ['user_id','=',$request->responsables],
-        ])->select('id')->get();
+            ['actividad_id', '=', $request->actividad_id],
+            ['user_id', '=', $request->responsables],
+        ])->select('id')->first()->id;
+
+        $actividad_evidencia = Actividad_Evidencia::find($id_actividad_evidencia);
+
+        if (is_null($actividad_evidencia)) {
+            Alert::error('Error','Actividad no encontrada.');
+            return back();
+        }
+
         //Manipulacion de imagenes
         if($request->has('archivos'))//Validamos si existe una imagen
         {
             //Generamos la ruta donde se guardaran las imagenes de los articulos
-            $path=storage_path().'/app/public/evidencias/'.$actividad->nombre.'/';
-            $path_to_verify = 'public/evidencias/'.$actividad->nombre;
-            if(!Storage::has($path_to_verify)){
-                Storage::makeDirectory($path_to_verify);
-            }
-            for ($i = 0; $i < count($request->archivos) ; $i++) {
-                //En el metodo file ponemos el nombre del campo file que pusimos en la vista, que sera el que tenga los datos de la imagen
-                $file=$request->archivos[$i];
-                //Para evitar nombres repetidos en las imagenes, creamos un nombre antes de guardar
-                $name='credITSCH_'.time().'_'.$i.'.'.strtolower($file->getClientOriginalExtension());
-                //Guardamos la imagen en la carpeta creada en la ruta que marcamos anteriormente
-                $file->move($path,$name);
+            $path = storage_path() . '/app/public/evidencias/' . $actividad->nombre . '/';
+            $storage_path = 'public/evidencias/' . $actividad->nombre;
+            $uploaded_files = [];
 
-                $evidencia=new Evidencia(); //Obtiene todos los datos de la evidencia de la vista create
-                $evidencia->id_asig_actividades=$id_actividad_evidencia[0]->id;
-                $evidencia->nom_imagen=$name;//Obtiene el nombre de la imagen para guardarlo en la bd
-                $evidencia->save();//Guarda la evidencia en su tabla
-                
+            DB::beginTransaction();
+            try {
+                if (!Storage::has($storage_path)) {
+                    Storage::makeDirectory($storage_path);
+                }
+                for ($i = 0; $i < count($request->archivos); $i++) {
+                    //En el metodo file ponemos el nombre del campo file que pusimos en la vista, que sera el que tenga los datos de la imagen
+                    $file = $request->archivos[$i];
+                    //Para evitar nombres repetidos en las imagenes, creamos un nombre antes de guardar
+                    $name = 'credITSCH_' . time() . '_' . $i . '.' . strtolower($file->getClientOriginalExtension());
+                    //Guardamos la imagen en la carpeta creada en la ruta que marcamos anteriormente
+                    $file->move($path, $name);
+                    array_push($uploaded_files, $name);
+
+                    $evidencia = new Evidencia(); //Obtiene todos los datos de la evidencia de la vista create
+                    $evidencia->id_asig_actividades = $actividad_evidencia->id;
+                    $evidencia->nom_imagen = $name; //Obtiene el nombre de la imagen para guardarlo en la bd
+                    $evidencia->nom_original = $file->getClientOriginalName();
+                    $evidencia->save(); //Guarda la evidencia en su tabla
+                }
+                $actividad_evidencia->save();
+            } catch (Exception $e) {
+                DB::rollBack();
+                $this->rollbackFiles($storage_path, $uploaded_files);
+                Alert::error('Error', $e->getMessage());
+                return back();
             }
-            $actividad_evidencia = Actividad_Evidencia::find($id_actividad_evidencia[0]->id);
-            $actividad_evidencia->save();
+            DB::commit();
         }
         Alert::success('Correcto','La evidencia fue guardada correctamente');
         return redirect()->route('participantes.index');
     }
 
+    private function rollbackFiles($path, $files) {
+        for ($i = 0; $i < count($files); ++$i) {
+            $filepath = $path . '/' . $files[$i];
+            if (Storage::exists($filepath)) {
+                Storage::delete($filepath);
+            }
+        }
+    }
+
     public function peticionAjax(Request $request){
         //Consultamos todos los responsables asignados a una activdad
+        $responsables = null;
         if(Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA')){
-            $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->select('u.id','u.name')->orderBy('u.name')->get();
-            //Retornamos los responsables en un json
-            return response()->json($responsables);
+            $responsables = DB::table('actividad_evidencia as ae')
+                ->join('users as u','u.id','ae.user_id')
+                ->where('ae.actividad_id','=',$request->get('id'))
+                ->select('u.id','u.name')
+                ->orderBy('u.name')
+                ->get();
         }else{
             $actividad = Actividad::find($request->get('id'));
             if($actividad->id_user==Auth::User()->id){
-                $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->select('u.id','u.name')->orderBy('u.name')->get();
+                $responsables = DB::table('actividad_evidencia as ae')
+                    ->join('users as u','u.id','ae.user_id')
+                    ->where('ae.actividad_id','=',$request->get('id'))
+                    ->select('u.id','u.name')
+                    ->orderBy('u.name')
+                    ->get();
             }else{
                 $responsables = User::where('id','=',Auth::User()->id)->select('id','name')->get();
             }
-            
-            //Retornamos los responsables en un json
-            return response()->json($responsables);   
         }
-        
-    }  
+        return response()->json($responsables);
+    }
 
     public function peticionGaleria(Request $request){
         if($request->has('responsable_id') && $request->has('actividad_id')){
             if($request->get('responsable_id')=='nulo'){
-                $evidencias = DB::table('evidencia as e')->join('actividad_evidencia as ae',function($join) use($request){
-                    $join->on('ae.id','=','e.id_asig_actividades');
-                    $join->where('ae.actividad_id','=',$request->get('actividad_id'));
-                })->join('users as u','u.id','=','ae.user_id')->join('actividad as a','a.id','=','ae.actividad_id')->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')->select('e.nom_imagen','e.created_at','u.name as responsable_nombre','a.nombre as actividad_nombre','e.id as evidencia_id','alu.nombre as alumno_nombre','ae.validado','u.id as user_id')->get();
+                $evidencias = DB::table('evidencia as e')
+                    ->join('actividad_evidencia as ae',function($join) use($request){
+                        $join->on('ae.id','=','e.id_asig_actividades');
+                        $join->where('ae.actividad_id','=',$request->get('actividad_id'));
+                    })
+                    ->join('users as u','u.id','=','ae.user_id')
+                    ->join('actividad as a','a.id','=','ae.actividad_id')
+                    ->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')
+                    ->select('e.nom_imagen',DB::raw('DATE_FORMAT(e.created_at, "%d-%m-%Y") as fecha_creacion'),'u.name as responsable_nombre',
+                        'a.nombre as actividad_nombre','e.id as evidencia_id','alu.nombre as alumno_nombre'
+                        ,'ae.validado','u.id as user_id', 'e.nom_original')
+                    ->get();
                 return response()->json($evidencias);
             }
-            $evidencias = DB::table('users')->join('actividad_evidencia as ae',function($join) use($request){
-                $join->where('ae.user_id','=',$request->get('responsable_id'));
-                $join->where('ae.actividad_id','=',$request->get('actividad_id'));
-                $join->where('users.id','=',$request->get('responsable_id'));
-            })->join('actividad as a','a.id','=','ae.actividad_id')->join('evidencia as e','e.id_asig_actividades','=','ae.id')->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')->select('users.name as responsable_nombre','a.nombre as actividad_nombre','e.nom_imagen','e.created_at','e.id as evidencia_id','alu.nombre as alumno_nombre','ae.validado','users.id as user_id')->get();
+            $evidencias = DB::table('users')
+                ->join('actividad_evidencia as ae',function($join) use($request){
+                    $join->where('ae.user_id','=',$request->get('responsable_id'));
+                    $join->where('ae.actividad_id','=',$request->get('actividad_id'));
+                    $join->where('users.id','=',$request->get('responsable_id'));
+                })
+                ->join('actividad as a','a.id','=','ae.actividad_id')
+                ->join('evidencia as e','e.id_asig_actividades','=','ae.id')
+                ->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')
+                ->select('users.name as responsable_nombre','a.nombre as actividad_nombre','e.nom_imagen',
+                    DB::raw('DATE_FORMAT(e.created_at, "%d-%m-%Y") as fecha_creacion'),'e.id as evidencia_id','alu.nombre as alumno_nombre',
+                    'ae.validado','users.id as user_id', 'e.nom_original')
+                ->get();
             return response()->json($evidencias);
         }
         return response()->json(0);

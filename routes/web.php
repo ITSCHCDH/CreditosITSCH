@@ -16,6 +16,7 @@
 use App\Http\Controllers\ActividadesController;
 use App\Http\Controllers\AlumnosController;
 use App\Http\Controllers\CreditosController;
+use App\Http\Controllers\EvidenciasController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -65,16 +66,16 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     /****Rutas para el controlador de alumnos*****/
-    //Route::resource('alumnos','AlumnosController'); 
-    Route::get('alumnos/cargar_alumnos_ajax', [AlumnosController::class, 'cargarAlumnosAjax'])->name('admin.alumnos.cargar.ajax');  
-    Route::get('/alumnos/index',[AlumnosController::class,'index'])->name('alumnos.index'); 
-    Route::get('/alumnos/{id}/edit',[AlumnosController::class,'edit'])->name('alumnos.edit'); 
+    //Route::resource('alumnos','AlumnosController');
+    Route::get('alumnos/cargar_alumnos_ajax', [AlumnosController::class, 'cargarAlumnosAjax'])->name('admin.alumnos.cargar.ajax');
+    Route::get('/alumnos/index',[AlumnosController::class,'index'])->name('alumnos.index');
+    Route::get('/alumnos/{id}/edit',[AlumnosController::class,'edit'])->name('alumnos.edit');
     Route::post('/alumnos/{id}/update',[AlumnosController::class,'update'])->name('alumnos.update');
     Route::post('/alumnos/create',[AlumnosController::class,'create'])->name('alumnos.create');
-    Route::get('/alumnos/{id}/destroy',[AlumnosController::class,'destroy'])->name('alumnos.destroy');   
-   
+    Route::get('/alumnos/{id}/destroy',[AlumnosController::class,'destroy'])->name('alumnos.destroy');
 
-    
+
+
 
 
     /****Rutas para el controlador de creditos*****/
@@ -97,7 +98,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('actividades/store',[ActividadesController::class,'store'])->name('actividades.store');
     Route::get('actividades/{id}/edit',[ActividadesController::class,'edit'])->name('actividades.edit');
     Route::get('actividades/{id}/destroy',[ActividadesController::class,'destroy'])->name('actividades.destroy');
-   
+
 
     /****Rutas para el controlador de usuarios *****/
     Route::get('usuarios/{id}/asignar_roles','UsersController@asignarRoles')->name('usuarios.asignar_roles');
@@ -129,9 +130,9 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     ]);
 
     //Ruta y metodo para las peticiones al servidor mediante Ajax
-    Route::get('evidencias/galeria','EvidenciasController@peticionGaleria')->name('evidencias.galeria');
-    Route::get('evidencias/peticion','EvidenciasController@peticionAjax')->name('evidencias.peticion');
-    Route::get('evidencias/eliminar','EvidenciasController@peticionEliminar')->name('evidencias.eliminar');
+    Route::get('evidencias/galeria', [EvidenciasController::class, 'peticionGaleria'])->name('evidencias.galeria');
+    Route::get('evidencias/peticion',[EvidenciasController::class, 'peticionAjax'])->name('evidencias.peticion');
+    Route::get('evidencias/eliminar',[EvidenciasController::class, 'peticionEliminar'])->name('evidencias.eliminar');
     /****Rutas para el controlador de evidencias*****/
     Route::resource('evidencias','EvidenciasController');
 
@@ -209,8 +210,8 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::get('actividades/evidencia','AlumnosRutasController@evidencia')->name('alumnos.evidencia');
     Route::get('actividades/eliminar_evidencia','AlumnosRutasController@eliminarEvidencia')->name('alumnos.eliminar_evidencia');
     Route::get('constancias/imprimir','AlumnosRutasController@imprimir')->name('alumnos.constancias_imprimir');
-    Route::get('/alumnos/{id}/perfil',[AlumnosController::class,'perfil'])->name('alumnos.perfil'); 
-    Route::post('/alumnos/{id}/edit/perfil',[AlumnosController::class,'editPerfil'])->name('alumnos.edit.perfil'); 
+    Route::get('/alumnos/{id}/perfil',[AlumnosController::class,'perfil'])->name('alumnos.perfil');
+    Route::post('/alumnos/{id}/edit/perfil',[AlumnosController::class,'editPerfil'])->name('alumnos.edit.perfil');
 });
 //Route::get('alumnos/login','AlumnosLoginController@showLoginForm')->name('alumnos.login');
 Route::post('alumnos/login','AlumnosLoginController@login')->name('alumnos.login');

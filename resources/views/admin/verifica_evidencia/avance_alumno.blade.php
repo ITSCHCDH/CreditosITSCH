@@ -250,20 +250,6 @@
 			var busquedaTimeout = null;
 			var posicionActual = -1;
 
-			function ucwords(text) {
-				let token_list = text.split(' ');
-				let result = '';
-				for (let i = 0; i < token_list.length; ++i) {
-					if (i > 0) {
-						result += ' ';
-					}
-					let token = String(token_list[i]);
-					let word = token.charAt(0).toUpperCase() + token.slice(1).toLowerCase();
-					result += word;
-				}
-				return result;
-			}
-
 			function limpiarListaResultados(){
 				let listaItems = document.getElementsByClassName("autocomplete-items");
 				for(var x = 0; x < listaItems.length; x++){

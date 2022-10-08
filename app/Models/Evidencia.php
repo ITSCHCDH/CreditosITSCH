@@ -9,7 +9,7 @@ class Evidencia extends Model
     //Nombre de la tabla
     protected $table="evidencia";
     //Datos visibles para los objetos json
-    protected $fillable=['status','nom_imagen','valida','id_asig_actividades'];
+    protected $fillable=['status','nom_imagen','valida','id_asig_actividades', 'nom_original'];
 
     //Relacion con la tablas de evidencia(uno) a participante(muchos)
     public function participantes()

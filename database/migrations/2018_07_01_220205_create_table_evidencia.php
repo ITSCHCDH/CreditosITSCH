@@ -18,7 +18,7 @@ class CreateTableEvidencia extends Migration
             $table->string('nom_imagen');
             $table->integer('id_asig_actividades')->unsigned();
             $table->string('alumno_no_control',20)->nullable();
-            $table->string('slug')->nullable();
+            $table->string('nom_original', 128)->nullable();
             $table->foreign('alumno_no_control')->references('no_control')->on('alumnos');
             $table->foreign('id_asig_actividades')->references('id')->on('actividad_evidencia')->ondelete('cascade');
             $table->timestamps();
