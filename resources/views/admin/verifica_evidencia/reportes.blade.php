@@ -22,7 +22,15 @@
 							echo "<option value = 1>Todos</option>";
 							$anio_actual = (int)explode("-",Carbon\Carbon::now())[0];
 							for($anio = 2013; $anio <= $anio_actual; ++$anio){
-								echo "<option value = $anio>$anio</option>";
+								if($anio==$generacion)
+								{
+									echo "<option value = $anio selected='selected'>$anio</option>";
+								}
+								else 
+								{
+									echo "<option value = $anio>$anio</option>";
+								}
+								
 							}
 						@endphp
 					</select>
@@ -47,18 +55,28 @@
 					</select>
 				</div>
 			</div>
+			<div class="col-sm-2">
+				<div class="input-group mb-3">
+					<div class="input-group-prepend">
+						<span class="input-group-text bg-info">Status</span>
+					</div> 			   
+					<select class="form-control" name="status" id="status">											
+						<option value="todos" @if($status=='todos') selected='selected' @endif>Cualquier status</option>											
+						<option value="liberado" @if($status=='liberado') selected='selected' @endif>Liberados</option>							
+						<option value="pendiente" @if($status=='pendiente') selected='selected' @endif>Pendientes</option>										
+					</select>
+				</div>
+			</div>
 			<div class="col-sm-3">					
 				<div class="input-group mb-3">
 					<div class="input-group-prepend">
-						<span class="input-group-text bg-info">Busqueda</span>
+						<span class="input-group-text bg-info">Control</span>
 					</div>					
 					<input type="text" name="busqueda" id="Control" class="form-control" placeholder="Nombre - No Control" value="{{ $busqueda }}">
 				</div>
-			</div>
-			<div class="col-sm-3">
-				
-				<button type="submit" class="btn btn-secondary"><span class="glyphicon glyphicon-filter"></span> Filtrar</button>
-				
+			</div>			
+			<div class="col-sm-1">				
+				<button type="submit" class="btn btn-secondary"><span class="glyphicon glyphicon-filter"></span> Filtrar</button>				
 			</div>
 		</div>	
 		<hr>
@@ -72,7 +90,8 @@
 					<div class="row">				
 						<hr>
 						<h5><strong>Alumno:</strong>  {{ $suma_creditos[$alumno]->nombre }}</h5>
-						<p><strong>Numero de control:</strong> {{ $suma_creditos[$alumno]->no_control }}</p>					
+						<p><strong>Numero de control:</strong> {{ $suma_creditos[$alumno]->no_control }}</p>
+						<p><strong>Status:</strong> {{ $suma_creditos[$alumno]->status }}</p>					
 						<p><strong>Completado</strong></p>
 						<div>							
 							<div style="width: {{ ($suma_creditos[$alumno]->credito_suma*100)/500 }}%; background-color:#27ce1e;"><p style="color: white">{{ ($suma_creditos[$alumno]->credito_suma*100)/500 }}%</p></div>
@@ -166,11 +185,11 @@
 
 				      <!-- Modal body -->
 				      <div class="modal-body">
-				        <strong>Alumno no encontrado!.</strong>
+				        <strong>Alumno(s) no encontrado(s)!.</strong>
 				        <br>
 				        Nota:
 				        <br>
-				        Te sugerimos modificar los criterios de busqueda.
+				        Tus criterios de busqueda no generarón ningun resultado, te sugerimos modificarlos.
 				      </div>
 
 				      <!-- Modal footer -->

@@ -296,7 +296,7 @@ class VerificaEvidenciaController extends Controller
     	$creditos_count = Credito::all();
     	$creditos = count($creditos_count);
         $carreras = Area::where('tipo','=','carrera')->get();
-        $busqueda = $request->get('busqueda');
+        $busqueda = $request->get('busqueda'); 
         if (Auth::User()->hasAnyPermission(['VIP','VIP_REPORTES','VIP_SOLO_LECTURA'])) {
             $carrera = null;
             if($request->has('generacion')){
@@ -304,37 +304,66 @@ class VerificaEvidenciaController extends Controller
                 $generacion = substr($request->generacion,2,4);
                 $carrera = $request->get('carrera');
                 //Consulta para traer los creditos y su avance indibidual de cada uno
-                $reportes_data = DB::select('select alumnos.nombre, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control order by alumnos.nombre asc, alumnos.no_control asc, creditos.nombre asc');
-                //Cosulta para traer la suma total de todos creditos
-                $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control group by alumnos.no_control order by alumnos.nombre asc, alumnos.no_control asc');
-            }else{
+                if($request->status=="todos")
+                {                    
+                    $reportes_data = DB::select('select alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control order by alumnos.nombre asc, alumnos.no_control asc, creditos.nombre asc');
+                    //dd($reportes_data);     
+                    //Cosulta para traer la suma total de todos creditos
+                    $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control group by alumnos.no_control order by alumnos.nombre asc, alumnos.no_control asc');              
+                }
+                else
+                {
+                    $reportes_data = DB::select('select alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control WHERE alumnos.status = "'.$request->status.'" order by alumnos.nombre asc, alumnos.no_control asc, creditos.nombre asc');
+                    //dd($reportes_data); 
+                    //Cosulta para traer la suma total de todos creditos
+                    $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control WHERE alumnos.status = "'.$request->status.'" group by alumnos.no_control order by alumnos.nombre asc, alumnos.no_control asc'); 
+                }               
+                
+            }
+            else
+            {
                 $reportes_data = null;
                 $suma_creditos = null;
             }
-        }else{
+        }
+        else
+        {
             $carrera = null;
             if($request->has('generacion')){
                 //Substraemos los dos ultimos digitos del año de generacion
                 $generacion = substr($request->generacion,2,4);
                 $carrera = $request->get('carrera');
                 //Consulta para traer los creditos y su avance indibidual de cada uno
-                $reportes_data = DB::select('select alumnos.nombre, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control order by alumnos.nombre asc, alumnos.no_control asc, creditos.nombre asc');
-                //Cosulta para traer la suma total de todos creditos
-                $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control group by alumnos.no_control order by alumnos.nombre asc, alumnos.no_control asc');
-            }else{
+                if($request->status=="todos")
+                {
+                    $reportes_data = DB::select('select alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control order by alumnos.nombre asc, alumnos.no_control asc, creditos.nombre asc');                    
+                    //Cosulta para traer la suma total de todos creditos
+                    $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre, alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control group by alumnos.no_control order by alumnos.nombre asc, alumnos.no_control asc');
+                }
+                else
+                {
+                    $reportes_data = DB::select('select alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control WHERE alumnos.status = "'.$request->status.'" order by alumnos.nombre asc, alumnos.no_control asc, creditos.nombre asc');
+                    //Cosulta para traer la suma total de todos creditos
+                    $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre, alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control WHERE alumnos.status = "'.$request->status.'" group by alumnos.no_control order by alumnos.nombre asc, alumnos.no_control asc');
+                }  
+                
+            }
+            else
+            {
                 $reportes_data = null;
                 $suma_creditos = null;
             }
             $carreras = Area::where('id','=',Auth::User()->area)->get();
-        }
+        } 
         return view('admin.verifica_evidencia.reportes')
         ->with('reportes_data',$reportes_data)
         ->with('creditos',$creditos)
         ->with('suma_creditos',$suma_creditos)
         ->with('carreras',$carreras)
         ->with('carrera_seleccionada',$carrera)
-        ->with('busqueda', $busqueda);
-
+        ->with('busqueda', $busqueda)
+        ->with('status',$request->status)
+        ->with('generacion',$request->generacion);
     }
 
     public function verEvidencia($id){
