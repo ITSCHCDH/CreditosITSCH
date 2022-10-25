@@ -17,6 +17,7 @@ use App\Http\Controllers\ActividadesController;
 use App\Http\Controllers\AlumnosController;
 use App\Http\Controllers\CreditosController;
 use App\Http\Controllers\EvidenciasController;
+use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -59,6 +60,13 @@ Route::get('/admin/actividades/{id}/responsables/asignar','ResponsablesControlle
 
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+//Ruta para recuperación de passwords
+Route::get('perfil/password_mail',[PerfilController::class,'passwordMail'])->name('perfil.password_mail');
+Route::post('perfil/password_reset_link',[PerfilController::class,'passwordResetLink'])->name('perfil.password_reset_link');
+Route::get('perfil/password_reset/view/{token}',[PerfilController::class,'passwordResetView'])->name('perfil.password_reset.view');
+Route::post('perfil/password_reset',[PerfilController::class,'passwordReset'])->name('perfil.password_reset');
+
 
 
 
@@ -197,8 +205,8 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 
     //Rutas de mi perfil
     Route::get('perfil','PerfilController@index')->name('perfil.index');
-    Route::get('perfil/password_reset','PerfilController@passwordResetView')->name('perfil.password_reset_view');
-    Route::post('perfil/password_update','PerfilController@passwordUpdate')->name('perfil.password_update');
+    Route::get('perfil/password_reset','PerfilController@passwordResetViewMiPerfil')->name('perfil.password_reset_view');
+    Route::post('perfil/password_update','PerfilController@passwordUpdate')->name('perfil.password_update');   
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){

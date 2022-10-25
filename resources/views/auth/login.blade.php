@@ -23,6 +23,7 @@
         />
     </head>
     <body>
+        @include('sweetalert::alert')
         <section class="vh-100" style="background-color: #000000;">
             <div class="container py-5 h-100">
                 <div class="row d-flex justify-content-center align-items-center h-100">
@@ -76,7 +77,7 @@
                                                 <button class="btn btn-dark btn-lg btn-block" type="submit">Login</button>
                                             </div>
                         
-                                            <a class="small text-muted" href="{{ route('password.request') }}" id="olvidaste">¿Olvidaste tu contraseña?</a>
+                                            <a class="small text-muted" href="{{ route('perfil.password_mail') }}" id="olvidaste">¿Olvidaste tu contraseña?</a>
                                     
                                         </form>
                 

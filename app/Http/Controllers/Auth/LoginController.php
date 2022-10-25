@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use App\User;
+use Alert;
 
 class LoginController extends Controller
 {
@@ -82,6 +83,7 @@ class LoginController extends Controller
             ->withInput($request->only($this->username(), 'remember'))
             ->withErrors(['active' => 'Tu usuario actualmente se encuentra inactivo.']);
         }
+        Alert::error("Error","El usuario o la contraseña son incorrectos");
         return $this->sendFailedLoginResponse($request);
     }
 
