@@ -81,6 +81,9 @@
                             <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">Administración</a>
                             <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS','VER_AREAS','VER_ALUMNOS']))
+                                    <a class="dropdown-item" href="{{ route('alumnos.bajas.view') }}">Baja de alumnos</a>
+                                @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS']))
                                     <a class="dropdown-item" href="{{ route('usuarios.index') }}">Usuarios</a>
                                 @endif

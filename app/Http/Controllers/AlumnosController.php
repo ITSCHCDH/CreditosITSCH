@@ -14,6 +14,8 @@ use App\Http\Controllers\Utilities\HttpCode;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 
+use function PHPUnit\Framework\isEmpty;
+
 class AlumnosController extends Controller
 {
     public function __construct(){
@@ -251,5 +253,46 @@ class AlumnosController extends Controller
         }      
         Alert::success('Correcto','Su perfil fue modificado con exito');
         return redirect()->route('alumnos.perfil',$id);
+    }
+
+    public function bajas()
+    {
+        $alumno=[];
+        return view('admin.alumnos.bajas')
+        ->with('alumno',$alumno);
+    }
+
+    public function buscar(Request $request)
+    {
+        $selectColumns = ['alu.nombre','alu.no_control','alu.status','alu.id as alumno_id','a.nombre as carrera'];      
+
+        $alumno = DB::table('alumnos as alu')
+            ->join('areas as a','a.id','=','alu.carrera')
+            ->select($selectColumns)
+            ->where('alu.no_control',$request->control)->get();  
+
+        if($alumno->isEmpty())
+        {
+            Alert::error('Error','Alumno no encontrado');
+            return view('admin.alumnos.bajas')
+            ->with('alumno',$alumno);
+        }
+        else
+        {
+            return view('admin.alumnos.bajas')
+            ->with('alumno',$alumno);
+        }       
+    }
+
+    public function editStatus(Request $request)
+    {
+        $alumno=Alumno::where('no_control',$request->cont)->get();
+        $alumno[0]->status=$request->status;        
+        $alumno[0]->save();
+
+        Alert::success('Correcto','El status del alumno se modifico con exito');
+            return view('admin.alumnos.bajas')
+            ->with('alumno',$alumno);
+
     }
 }

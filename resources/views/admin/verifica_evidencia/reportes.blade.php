@@ -63,7 +63,8 @@
 					<select class="form-control" name="status" id="status">											
 						<option value="todos" @if($status=='todos') selected='selected' @endif>Cualquier status</option>											
 						<option value="liberado" @if($status=='liberado') selected='selected' @endif>Liberados</option>							
-						<option value="pendiente" @if($status=='pendiente') selected='selected' @endif>Pendientes</option>										
+						<option value="pendiente" @if($status=='pendiente') selected='selected' @endif>Pendientes</option>	
+						<option value="baja" @if($status=='baja') selected='selected' @endif>Baja</option>									
 					</select>
 				</div>
 			</div>
