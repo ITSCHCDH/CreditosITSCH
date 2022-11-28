@@ -21,6 +21,7 @@ class AddTableAlumnos extends Migration
             $table->integer('carrera')->unsigned();
             $table->string('status',35);
             $table->string('foto',30);
+            $table->string('email',35);
             $table->foreign('carrera')->references('id')->on('areas');
             $table->timestamps();
         });

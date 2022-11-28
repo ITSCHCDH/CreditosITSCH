@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Mail\mail_res_pass;
+use App\Models\Alumno;
 use Carbon\Carbon;
 use App\User;
 use Alert;
@@ -32,10 +33,29 @@ class PerfilController extends Controller
     public function passwordResetLink(Request $request)
 	{	
     	$email=User::where('email', $request->email)->first(); 
-		if(is_null($email))
-		{
-			Alert::error("Error","Este password no esta registrado, te sugerimos verificarlo");
-			return view('auth.passwords.email');
+		if(is_null($email))		{  
+			$emaila=Alumno::where('email', $request->email)->first(); 
+			if(is_null($emaila))
+			{
+				Alert::error("Error","Este usuario no esta registrado, te sugerimos verificarlo");
+				return view('auth.passwords.email');
+			}
+			else
+			{ 
+				//Generación de token y almacenado en la tabla password_resets
+				$token = Str::random(64);
+				DB::table('password_resets')->insert([
+					'email' => $request->email,
+					'token' => $token,
+					'created_at' => Carbon::now()
+				]);
+		
+				//Envío de email al usuario
+				Mail::to( $request->email)->send(new mail_res_pass($token));
+				//Retorno
+				Alert::success('Correcto','Te hemos enviado un email a '.$request->email.' con un enlace para realizar el cambio de contraseña. Recuerda que pueden pasar algunos minutos para que el correo llegue a tu bandeja de entrada');
+				return redirect('login');
+			}
 		}
 		else
 		{
@@ -46,7 +66,7 @@ class PerfilController extends Controller
 				'token' => $token,
 				'created_at' => Carbon::now()
 			]);
-	
+
 			//Envío de email al usuario
 			Mail::to( $request->email)->send(new mail_res_pass($token));
 			//Retorno
@@ -95,8 +115,8 @@ class PerfilController extends Controller
 			}
 			else
 			{
-				$mail=DB::table('password_resets')->where('token',$request->token)->select('email')->first(); 
-				$user=User::where('email',$mail->email)->first();
+				$mail=DB::table('password_resets')->where('token',$request->token)->select('email')->first();
+				$user=$this->getUser($mail->email);				
 				$user->password=bcrypt($request->newPass);
 				$user->save();
 				Alert::success("Correcto","Contraseña reseteada correctamente");
@@ -104,6 +124,17 @@ class PerfilController extends Controller
 			}
 		}
 		
+	}
+
+	//Función que obtiene el usuario que desea cambiar su password
+	private function getUser($email)
+	{
+		$user= User::where('email',$email)->first();
+		if (is_null($user))
+		{
+			$user= Alumno::where('email',$email)->first();
+		}
+		return $user;
 	}
 
     public function passwordUpdate(PasswordResetRequest $request){

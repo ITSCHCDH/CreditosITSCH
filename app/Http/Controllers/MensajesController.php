@@ -19,6 +19,7 @@ class MensajesController extends Controller
 		return view('admin.mensajes.bandeja')
 		->with('mensajes',$mensajes);	
     }
+
     public function crear(){
     	$users = User::where([
     		['active','=','true'],
@@ -27,6 +28,7 @@ class MensajesController extends Controller
     	return view('admin.mensajes.crear')
     	->with('users',$users);
     }
+	
     public function ver(Request $request){
     	$mensaje = Mensaje::where('mensajes.id','=',$request->mensaje_id)->join('users','users.id','=','mensajes.creador_id')->get();
         $ruta = $request->has('ruta');

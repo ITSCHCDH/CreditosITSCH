@@ -47,7 +47,7 @@ class LoginController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
-    {
+    {  
         $this->validateLogin($request);
         $user = User::where('email','=',$request->email)->get();
         $active = false;

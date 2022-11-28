@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+    'host' => env('MAIL_HOST', 'smtp.office365.com'),
 
     /*
     |--------------------------------------------------------------------------
@@ -42,7 +42,7 @@ return [
     |
     */
 
-    'port' => env('MAIL_PORT', 2525),
+    'port' => env('MAIL_PORT', 587),
 
     /*
     |--------------------------------------------------------------------------
@@ -56,8 +56,8 @@ return [
     */
 
     'from' => [
-        'address' => 'MAIL_FROM_ADDRESS', 
-        'name' => 'MAIL_FROM_NAME'],
+        'address' => env('MAIL_USERNAME'), 
+        'name' => 'CREDITSCH'],
 
     /*
     |--------------------------------------------------------------------------

@@ -106,9 +106,9 @@
                     event.preventDefault();
                     var tipo_val = $(this).val();                   
                     if(tipo_val==0){                                        
-                        $("#user").text("No de Control");    
+                        $("#user").text("email@cdhidalgo.tecnm.mx");    
                         $('#frm_login').attr('action', "{{ route('alumnos.login') }}");  
-                        $('#email').attr('name','no_control'); 
+                        $('#email').attr('name','email'); 
                         $('#email').attr('type','text');                  
                     }else{                       
                         $("#user").text("Email address"); 

@@ -47,11 +47,12 @@ class AlumnosLoginController extends Controller
      * @return Response
      */
     public function authenticate(Request $request)
-    {
+    { 
         $credentials = $request->only('no_control', 'password');
 
         if (Auth::attempt($credentials)) {
-            // Authentication passed...
+            // Authentication passed...  
+            
             return redirect()->intended($redirectTo);
         }
     }
@@ -62,8 +63,8 @@ class AlumnosLoginController extends Controller
      * @return string
      */
     public function username()
-    {
-        return 'no_control';
+    {  
+        return 'email'; 
     }
 
     /**
