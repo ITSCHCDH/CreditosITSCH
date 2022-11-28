@@ -1,0 +1,49 @@
+1.-Ejecutar el siguiente comando -> composer update
+2.- Generar tu clave -> php artisan key:generate
+3.- Ejecutar el comando -> php artisan storage:link
+4.- Ejecutar la migraciones con el siguiente comando-> php artisan migrate --seed
+En caso de ya haber ejecutado la migraciones pero sin el parametro --seed (crea los permisos, roles, creditos, admin* y areas)
+ejecutar el siguiente comando -> php artisan db:seed
+5.- Opcional en caso de querer generar alumnos de prueba ejecutar el siguiente comando php artisan db:seed --class=GenerarAlumnos
+6.-Listo ejecutar -> php artisan serve
+
+*usuario: admin@itsch.com
+contrase�a: Jaguares
+
+Usuario de prueba para alumnos
+user: No_control
+Pass: sistemas
+
+IMPORTANTE:
+1.-asignar los jefes de los creditos  e indicar que areas podran crear actividades de este credito
+(en el modulos creditos -> modificar [icono amarillo])
+2.-crear todas las constancias
+
+
+//Configuración para envio de correos
+Se debe de configurar el archivo .env con los siguientes datos
+MAIL_DRIVER=smtp
+MAIL_HOST=smtp.office365.com
+MAIL_PORT=587
+MAIL_USERNAME=creditos@cdhidalgo.tecnm.mx
+MAIL_PASSWORD="password_del_correo"
+MAIL_ENCRYPTION=tls
+
+Verificar que el archivo /Config/mail, contenga lo siguiente
+'driver' => env('MAIL_DRIVER', 'smtp'),
+'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+'port' => env('MAIL_PORT', 2525),
+'from' => [
+        'address' => 'MAIL_FROM_ADDRESS', 
+        'name' => 'MAIL_FROM_NAME'],
+'encryption' => env('MAIL_ENCRYPTION'),
+'username' => env('MAIL_USERNAME'),
+'password' => env('MAIL_PASSWORD'),
+'sendmail' => '/usr/sbin/sendmail -bs',
+'markdown' => [
+        'theme' => 'default',
+
+        'paths' => [
+            resource_path('views/vendor/mail'),
+        ],
+    ],
