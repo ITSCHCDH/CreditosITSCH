@@ -7,15 +7,15 @@
 @endsection
 
 @section('ruta')
-    <a href="{{route('creditos.index')}}"> Creditos </a>
+    <a href="{{route('creditos.index')}}"> Créditos </a>
     /
     <label class="label label-success"> Altas</label>
 @endsection
 
 @section('contenido')
 
-    <form action="{{ route('creditos.store') }}" method="get">  
-        
+    <form action="{{ route('creditos.store') }}" method="post">  
+        @csrf
         <div class="form-outline">
             <input type="text" name="nombre" id="nombre"class="form-control" required />
             <label class="form-label" for="nombre">Nombre del crédito</label>
@@ -33,7 +33,7 @@
         <div class="form-group">
             <label for="credito_jefe">Jefe</label>
             <select class="form-control" required name="credito_jefe">
-                <option value="">Jefe del credito</option>
+                <option value="">Jefe del crédito</option>
                 @foreach($usuarios as $usuario)
                     <option value="{{ $usuario->id }}">{{ $usuario->name }}</option>
                 @endforeach

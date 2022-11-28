@@ -94,19 +94,19 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 
     Route::get('/creditos/index',[CreditosController::class,'index'])->name('creditos.index');
     Route::get('/creditos/create',[CreditosController::class,'create'])->name('creditos.create');
-    Route::get('/creditos/store',[CreditosController::class,'store'])->name('creditos.store');
+    Route::post('/creditos/store',[CreditosController::class,'store'])->name('creditos.store');
     Route::get('/creditos/{id}/edit',[CreditosController::class,'edit'])->name('creditos.edit');
-    Route::get('/creditos/{id}/update',[CreditosController::class,'update'])->name('creditos.update');
+    Route::post('/creditos/{id}/update',[CreditosController::class,'update'])->name('creditos.update');
     Route::get('/creditos/{id}/destroy',[CreditosController::class,'destroy'])->name('creditos.destroy');
 
 
 
     /****Rutas para el controlador de actividades*****/
     Route::get('actividades/cargar_actividades', [ActividadesController::class, 'cargarActividadesAjax'])->name('actividades.cargar.ajax');
-    Route::get('actividades/update/{id}',[ActividadesController::class, 'update'])->name('actividades.update');
+    Route::post('actividades/update/{id}',[ActividadesController::class, 'update'])->name('actividades.update');
     Route::get('actividades/index',[ActividadesController::class,'index'])->name('actividades.index');
     Route::get('actividades/create',[ActividadesController::class,'create'])->name('actividades.create');
-    Route::get('actividades/store',[ActividadesController::class,'store'])->name('actividades.store');
+    Route::post('actividades/store',[ActividadesController::class,'store'])->name('actividades.store');
     Route::get('actividades/{id}/edit',[ActividadesController::class,'edit'])->name('actividades.edit');
     Route::get('actividades/{id}/destroy',[ActividadesController::class,'destroy'])->name('actividades.destroy');
 

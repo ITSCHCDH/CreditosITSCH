@@ -14,8 +14,8 @@
 
 @section('contenido')
 
-    <form action="{{ route('creditos.update', $credito->id) }}" method="get">
-        
+    <form action="{{ route('creditos.update', $credito->id) }}" method="post">
+        @csrf
         <div class="form-outline">
             <input type="text" name="nombre" id="nombre"class="form-control" value="{{ $credito->nombre }}" required />
             <label class="form-label" for="nombre">Nombre del crédito</label>

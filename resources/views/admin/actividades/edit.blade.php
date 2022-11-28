@@ -13,8 +13,8 @@
     <div class="row">
         <div class="col-sm-3"></div>
         <div class="col-sm-6">
-            <form action="{{ route('actividades.update', $actividad->id) }}" method="get">
-    
+            <form action="{{ route('actividades.update', $actividad->id) }}" method="post">
+                @csrf
                 <div class="form-group">
                     <label for="nombre">Nombre de la actividad</label>
                     <input type="text" name="nombre" id="nombre" value="{{ $actividad->nombre }}" class="form-control" placeholder="Nombre de la actividad" required>            

@@ -203,8 +203,8 @@ class ActividadesController extends Controller
                 }
             }
             if(!$tiene_permitido){
-                return redirect()->back()
-                ->with("error","No puedes crear actividades de este crédito");
+                Alert::error('Error','No puedes crear actividades de este crédito');
+                return redirect()->back();                
             }
         }
         if($actividad_con_mismo_nombre->count()>0){
@@ -220,7 +220,7 @@ class ActividadesController extends Controller
         $act->save(); //Guarda el articulo en su tabla
 
         //Llamado a mensajes con la libreria Sweet Alert
-        Alert::success('Correcto', 'La actividad '.$act->nombre.' se registro de forma correcta');
+        Alert::success('Correcto', 'La actividad '.$act->nombre.' se registro correctamente');
         return redirect()->route('actividades.index');
 
     }
