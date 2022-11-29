@@ -1,0 +1,44 @@
+Modificaciones a las base de datos:
+    ->Los campos status y valida fueron cambiados as la tabla actividad_evidencia status => validado, valida => validador_id,
+    motivo: debido a que se puede subir multiple evidencias puede llegar haber errores tales como
+        ->Que las evidencias puedan tener multiples validadores
+        ->Se puede dar el caso en que las evidencias esten validas parcialmente
+
+avances:
+    ->El modulo de usuarios esta casi terminado
+    ->Ya se cuenta con el panel para roles
+    ->constancia maquetada
+    ->creacion del modulo de admistracion para las constancias
+    ->creacion de ruta para los alumnos
+Mejoras:
+    ->Ahora los usuarios marcados como no activos no se puden logear, se manda un mensaje con el error
+    ->Ya se puede agregar multiples evidencias
+    ->Ya no importa si el usuario agregar los participantes o las evidencias primero
+    ->Se puden agregar multiple permisos al mismo tiempo y si estan repetidos ya no los agregar
+    ->Las evidencias se guardan en el directorio storage/public/{nombre de la actividad} para un mejor control
+    ->Se creo un yield en molde para agregar links as css para no hacer la pagina tan pesada
+    ->Se le agrego estilos al boton de subir evidencia
+    ->Se le anexa el numero de control al buscar alumnos
+    ->Gran parte del codigo se encuentra comentado
+    ->Las rutas han sido agregadas
+    ->El index de participantes cuando agregas evidencia se auto selecciona la actividad y el responsable
+    ->Ya se muestran los mensajes ajax
+    ->Se implemento el uso de cookies para que al refrescar una pagina hecha por ajax no se perdieran los datos
+    ->Cuando se elimina una evidencia tambien se elimina de manera fisica
+    ->Ya se pueden crear actividad para alumnos responsables
+    ->Los alumnos ya se pueden logear con su numero de control y su contraseña
+    ->desde el modulo de agregar participantes ya puedes ver cuantas y cualeas evidencias han sido agregadas.
+Correcion de errores y bugs:
+    ->Que se perdieran responsables a la hora de buscar y seleccionarlos
+    ->Error que causaba una exception si la actividad no existia
+    ->Mejora de al agregar responsables y agregarlos, ahora si el responsable no puede ser eliminado manda un mensaje señalando el porque
+    no se pude eliminar
+    ->Ya no se puden agregar actividad con el mismo nombre
+    ->Al editar el nombre de una actividad, si tiene ya evidencia agregada se mueven las evidencia al nuevo directorio con el mismo nombre
+    
+notas:
+    ->No estoy seguro si el siguiente comando para hacer un link de la carpeta storage(almacenamiento) al directorio public,
+    sea necesario ejecutarlo por si acaso ejecutar el comando "php artisan storage:link" si las comillas
+    ->IMPORTANE ELIMINAR LA BASE DE DATO Y VOLVERLA CREAR
+    ->ejecutar el siguiente comando composer remove niklasravnsborg/laravel-pdf
+    ->Un archivo de texto con el nombre de permisos.txt fue agregado a la carpeta public/permisos/ en el cual vienen todos los permisos

@@ -1,0 +1,55 @@
+.resetear{
+	clear: both;
+}
+
+.texto{
+	display: inline-block;
+	height: 25px;
+}
+.informe_alumno{
+	padding: 10px;
+}
+.alumno_nombre{
+	width: 350px;
+	float: left;
+}
+.porcentaje{
+	width: 220px;
+	height: 25px;
+	background: white;
+	border: 1px solid black;	
+}
+.porcentaje div{
+	height: 100%;
+	background: #3fd33f;
+}
+li .porcentaje div{
+	background: #55ed55;
+
+}
+.porcentaje p{
+	text-align: center;
+}
+.boton-desplegar{
+	width: 80px;
+	height: 25px;
+	margin-left: 15px;
+	padding: 0px !important;
+}
+.alumno-avance{
+	height: 25px;	
+	padding: 0px 10px 0px 10px !important;
+}
+.lista{
+	list-style:none;
+}
+.credito{
+	height: 25px;
+	width: 310px;
+}
+.credito p{
+	font-weight: bold;
+}
+.margen{
+	margin-bottom: 150px;
+}
