@@ -25,7 +25,7 @@ class CreditosController extends Controller
     public function index()
     {
         //Aqui mandamos llamar la vista de la pagina de inicio de alumnos
-        $credito = Credito::leftjoin('users as u','u.id','=','creditos.credito_jefe')->select('creditos.nombre','creditos.vigente','creditos.id','u.name as jefe_nombre')->paginate(5);
+        $credito = Credito::leftjoin('users as u','u.id','=','creditos.credito_jefe')->select('creditos.nombre','creditos.vigente','creditos.id','u.name as jefe_nombre')->get();
 
         $faltan_jefes = Credito::whereNull('credito_jefe')->get()->count() > 0;
         

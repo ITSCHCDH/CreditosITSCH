@@ -7,23 +7,23 @@
 @endsection
 
 @section('contenido')
-<div>
-    @if ($faltan_jefes)
-        <div class="alert-info" role="alert" style="padding:1rem;">
-            <p style="font-size:large; text-align: center !important;">
-                Se encuentran créditos sin jefe asignado, lo cual no permitirá la impresión de constancias
-            </p>
-        </div>
-    @endif
-    <br>
-    @if (Auth::User()->can('VIP') || Auth::User()->can('CREAR_CREDITOS'))
-        <div class="pull-right">
-            <a title="Agregar crédito" href="{{route('creditos.create')}}" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus" style='font-size:14px'></i>
-            </a>           
-        </div>
-    @endif
-    <br>
+    <div>
+        @if ($faltan_jefes)
+            <div class="alert-info" role="alert" style="padding:1rem;">
+                <p style="font-size:large; text-align: center !important;">
+                    Se encuentran créditos sin jefe asignado, lo cual no permitirá la impresión de constancias
+                </p>
+            </div>
+        @endif
+        <br>
+        @if (Auth::User()->can('VIP') || Auth::User()->can('CREAR_CREDITOS'))
+            <div class="pull-right">
+                <a title="Agregar crédito" href="{{route('creditos.create')}}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus" style='font-size:14px'></i>
+                </a>           
+            </div>
+        @endif
+        <br>
         <div class="table-responsive">
             <br>
             <table class="table">
@@ -68,34 +68,30 @@
                 @endforeach
                 </tbody>                
             </table>
-        </div>                
-    <div style="text-align:center;"> 
-        {!! $credito->render() !!}
-    </div> 
-    
+        </div>     
 
-    <!-- Modal -->
-    <div class="modal fade" id="myModalMsg" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Eliminar crédito</h5>
-            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+        <!-- Modal -->
+        <div class="modal fade" id="myModalMsg" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Eliminar crédito</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estas seguro que deseas eliminar el crédito?
+                    <input type="hidden" id="e_id" name="id"  readonly style="border: none">
+                    <input type="text" id="e_name" readonly onFocus="this.blur()" style="border: none">
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                <a type="button" class="btn btn-primary" id="eliminar">Eliminar</a>            
+                </div>
             </div>
-            <div class="modal-body">
-                ¿Estas seguro que deseas eliminar el crédito?
-                <input type="hidden" id="e_id" name="id"  readonly style="border: none">
-                <input type="text" id="e_name" readonly onFocus="this.blur()" style="border: none">
             </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
-            <a type="button" class="btn btn-primary" id="eliminar">Eliminar</a>            
-            </div>
-        </div>
-        </div>
-    </div>   
-</div>  
-<div style="padding: 200px;"></div>
+        </div>   
+    </div>  
+
     @section('js')
         <script>
              //Script para pasar el id del alumno a eliminar para que se use en el modal

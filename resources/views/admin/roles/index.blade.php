@@ -59,7 +59,6 @@
 		 </table>
 	</div>
 	
-	<div style="margin-bottom: 200px;"></div>
 	@section('js')
 		<script>
 			 //Codigo para adornar las tablas con datatables

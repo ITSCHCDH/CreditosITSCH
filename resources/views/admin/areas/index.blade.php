@@ -73,7 +73,6 @@
 		</div>
 	</div>
 
-	<div style="padding: 200px;"></div>
 
 	@section('js')
 		<script type="text/javascript">

@@ -53,9 +53,8 @@
 			@endforeach
 			</tbody>
 		</table>
-	</div>	
-	 
-	<div style="margin-bottom: 200px;"></div>
+	</div>		 
+	
 	@section('js')
 		<script>
 			 //Codigo para adornar las tablas con datatables
