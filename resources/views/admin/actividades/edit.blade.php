@@ -15,63 +15,66 @@
         <div class="col-sm-6">
             <form action="{{ route('actividades.update', $actividad->id) }}" method="post">
                 @csrf
-                <div class="form-group">
-                    <label for="nombre">Nombre de la actividad</label>
-                    <input type="text" name="nombre" id="nombre" value="{{ $actividad->nombre }}" class="form-control" placeholder="Nombre de la actividad" required>            
+                <div class="form-outline mb-4">
+                    <input value="{{ $actividad->nombre }}" type="text" id="nombre" class="form-control form-control-lg"  name="nombre" required/>
+                    <label class="form-label" for="nombre" id="actividad">Nombre de la actividad</label>
                 </div>
-        
-                <div class="form-group">
-                    <label for="avance">Porcentaje de liberación</label>
-                    <input type="text" name="por_cred_actividad" id="nombre" value="{{ $actividad->por_cred_actividad }}" class="form-control" placeholder="Porcentage del credito que se liberara con esta actividad, ej 20" required>             
+                
+                <div class="form-outline mb-4">
+                    <input value="{{ $actividad->por_cred_actividad }}" type="number" min="0" max="100" id="por_cred_actividad" class="form-control form-control-lg"  name="por_cred_actividad" required/>
+                    <label class="form-label" for="por_cred_actividad" id="lPorcentage">Porcentaje de liberación Ej. 20</label>
                 </div>
-        
-                <div class="form-group">
-                    <label for="id_actividad">Credito al que pertenece la actividad</label>
-                    <select name="id_actividad" id="id_actividad" class="form-control select-category" required>
+
+                <div class="mb-4">    
+                    <Label class="form-label" >Credito al que pertenece la actividad</Label>                                            
+                    <select id="select-category" name="id_actividad" class="form-control form-control-lg" required>                                                    
                         <option value="">Selecciona un tipo de credito</option>
                         @foreach($creditos as $cred)
                             @if($cred->id==$actividad->id_actividad)
                                 <option value="{{ $cred->id }}" selected>{{ $cred->nombre }}</option>
                             @else
                                 <option value="{{ $cred->id }}">{{ $cred->nombre }}</option>
-                            @endif                    
-                        @endforeach              
-                    </select>            
-                </div>
-                @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','CREAR_ACTIVIDAD_ALUMNOS']))
-                    <div class="form-group">            
-                        <label for="alumnos">Alumnos Responsables</label>            
-                        <select class="form-control form-control-sm" id="alumnos" required name="alumnos">	
-                            <option value="">¿Actividad dedicada para alumnos responsables?, Si no estas seguro selecciona NO</option>
+                            @endif 
+                        @endforeach
+                    </select>                                                
+                </div> 
+
+                @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD_ALUMNOS','VIP_ACTIVIDAD']))
+                    <div class="mb-4">    
+                        <Label class="form-label" >Alumnos Responsables</Label>                                            
+                        <select id="alumnos" name="alumnos" class="form-control form-control-lg" required>                                                    
                             @if($actividad->alumnos=="true")
                                 <option value="true" selected>SI</option>  
                                 <option value="false">NO</option>                      
                             @else
                                 <option value="true">SI</option>  
                                 <option value="false" selected>NO</option>
-                            @endif           
-                        </select>
-                    </div>
-                @endif
-                <div class="form-group">
-                    <div class="form-group">            
-                        <label for="vigente">Vigente</label>            
-                        <select class="form-control form-control-sm" id="vigente" required name="vigente">	
-                            <option value="">LA actividad aún esta vigente?</option>
-                            @if ($actividad->vigente=="true")
-                                <option value="false">NO</option>
-                                <option value="true" selected>SI</option>   
-                            @else
-                                <option value="false" selected>NO</option>
-                                <option value="true" >SI</option>   
-                            @endif                               
-                        </select>
-                    </div>           
+                            @endif     
+                        </select>                                                
+                    </div>                   
+                @endif        
+              
+                <div class="mb-4">    
+                    <Label class="form-label" >Vigente</Label>                                            
+                    <select id="alumnos" name="alumnos" class="form-control form-control-lg" required>                                                    
+                        @if ($actividad->vigente=="true")
+                            <option value="false">NO</option>
+                            <option value="true" selected>SI</option>   
+                        @else
+                            <option value="false" selected>NO</option>
+                            <option value="true" >SI</option>   
+                        @endif      
+                    </select>                                                
+                </div>    
+             
+                <div class="form-outline mb-4">                   
+                    <input value="{{ $actividad->fecCierre }}" type="date" class="form-control form-control-lg" name="fecCierre" id="fecCierre" required>
+                    <label class="form-label">Fecha de cierre</label>
                 </div>
-                <div class="form-group">
-                    <label for="fecCierre"></label>
-                    <input type="date" class="form-control" name="fecCierre" id="fecCierre" required title="Fecha de cierre de la actividad" value="{{ $actividad->fecCierre }}">
-                </div>
+            
+                <hr>
+
+               
                 <div class="form-group">
                     <input type="submit" value="Guardar" class="btn btn-primary">            
                 </div>
