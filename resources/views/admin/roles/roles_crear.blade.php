@@ -11,10 +11,11 @@
 @section('contenido')
 	<form action="{{ route('roles.roles_guardar') }}" method="post">	
 		@csrf
-		<div class="form-group">
-			<label for="name">Nombre</label>
-			<input type="text" name="name" id="name" placeholder="Nombre del rol" required class="form-control">		
+		<div class="form-outline">
+			<input type="text" id="name" name="name" class="form-control form-control-lg" required />
+			<label class="form-label" for="password">Nombre</label>
 		</div>
+		<br>
 		<button type="submit" class="btn btn-primary">Agregar</button>		
 	</form>
 @endsection

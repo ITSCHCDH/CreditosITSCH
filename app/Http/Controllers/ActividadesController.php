@@ -20,7 +20,7 @@ class ActividadesController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:VIP_SOLO_LECTURA|VIP|VER_ACTIVIDAD|VIP_ACTIVIDAD')->only(['index','show']);
+        $this->middleware('permission:VIP_SOLO_LECTURA|VIP|VER_ACTIVIDAD|VIP_ACTIVIDAD')->only(['index','show','cargarActividadesAjax']);
         $this->middleware('permission:VIP|VIP_ACTIVIDAD|CREAR_ACTIVIDAD')->only(['create','store']);
         $this->middleware('permission:VIP|VIP_ACTIVIDAD|MODIFICAR_ACTIVIDAD')->only(['edit','update']);
     }
@@ -137,7 +137,7 @@ class ActividadesController extends Controller
                             '" class="btn btn-warning btn-sm ms-1" title="Editar actividad"><i class="fas fa-pencil-alt" ' .
                             'style="font-size:14px"></i></a>';
                     } else if ($actividad->id_user==Auth::User()->id) {
-                        $actividad->acciones .= '<a href="' . route('actividades.edit',[$act->id]) .
+                        $actividad->acciones .= '<a href="' . route('actividades.edit',[$actividad->id]) .
                             '" class="btn btn-warning btn-sm ms-1" title="Editar actividad"><i class="fas fa-pencil-alt" ' .
                             'style="font-size:14px"></i></a>';
                     }
@@ -148,7 +148,7 @@ class ActividadesController extends Controller
                         $actividad->acciones .= '<button data-mdb-toggle="modal"  data-mdb-target="#modEliminar" ' .
                             'onclick="eliminar(' . $actividad->id . ')" class="btn btn-danger btn-sm ms-1" title="Eliminar actividad">' .
                             '<i class="far fa-trash-alt" style="font-size:14px"></i></button>';
-                    } else if ($act->id_user==Auth::User()->id) {
+                    } else if ($actividad->id_user==Auth::User()->id) {
                         $actividad->acciones .= '<button data-mdb-toggle="modal"  data-mdb-target="#modEliminar" ' .
                             'onclick="eliminar(' . $actividad->id . ')" class="btn btn-danger btn-sm ms-1" title="Eliminar actividad">' .
                             '<i class="far fa-trash-alt" style="font-size:14px"></i></button>';

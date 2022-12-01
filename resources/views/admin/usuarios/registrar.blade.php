@@ -66,6 +66,8 @@
 			</div>
 		@endif
 
+		<br>
+
 		<div class="form-outline">
 			<input type="password" id="password" name="password" class="form-control form-control-lg" required />
 			<label class="form-label" for="password">Password</label>
