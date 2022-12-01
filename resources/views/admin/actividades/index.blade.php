@@ -63,9 +63,7 @@
             </div>
         </div>
         </div>
-    </div>
-
-    <div style="margin-bottom: 200px;"></div>
+    </div>  
 
     @section('js')
         <script>
