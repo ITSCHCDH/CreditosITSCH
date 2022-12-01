@@ -37,7 +37,7 @@ class ActividadesController extends Controller
     public function cargarActividadesAjax(Request $request)
     {
         try {
-            $chkVigencia = $request->input('vigente');  
+            $chkVigencia = $request->input('vigente');
 
             $selectColumns = [
                 'a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente',
@@ -50,23 +50,25 @@ class ActividadesController extends Controller
             $fecHoy = Carbon::now();
 
             $actividades = DB::table('actividad as a')
-                ->leftjoin('users as u',$this->indexActFiltroJoinVIP())
+                ->leftjoin('users as u','u.id', '=','a.id_user')
                 ->leftjoin('actividad_evidencia as act_evi', 'act_evi.actividad_id', '=', 'a.id')
                 ->leftjoin('participantes as par','par.id_evidencia','=','act_evi.id')
                 ->leftjoin('creditos as c','c.id','=','a.id_actividad')
                 ->select($selectColumns)
                 ->groupBy('a.id');
 
+            $this->applicarActividadFiltro($actividades);
+
             DataTableHelper::applyOnly($actividades, $dtAttr, [DataTableHelper::WHERE, DataTableHelper::ORDER_BY]);
 
             if($chkVigencia=='false')
-            {                
+            {
                 $actividades->where('a.vigente','<>', $chkVigencia)->where('fecCierre','>=',$fecHoy);
             }
             else
-            {                
+            {
                 $actividades->where('a.vigente','<>', $chkVigencia)->where('fecCierre','<',$fecHoy);
-            }           
+            }
 
             DataTableHelper::applyOnly($actividades, $dtAttr, [DataTableHelper::PAGINATE]);
 
@@ -82,17 +84,10 @@ class ActividadesController extends Controller
         }
     }
 
-    private function indexActFiltroJoinVIP()
+    private function applicarActividadFiltro(&$actividad_query)
     {
-        if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])) {
-            return function($join){
-                $join->on('u.id','=','a.id_user');
-            };
-        } else {
-            return function($join) {
-                $join->on('u.id','=','a.id_user');
-                $join->where('u.id','=',Auth::User()->id);
-            };
+        if (!Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])) {
+            $actividad_query->where('u.id', '=', Auth::User()->id);
         }
     }
 
@@ -187,7 +182,7 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    { 
+    {
         $act=new Actividad($request->all()); //Obtiene todos los datos de la vista para guardarlos en la BD
         $act->id_user = Auth::User()->id;
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act->nombre)->get();
@@ -204,7 +199,7 @@ class ActividadesController extends Controller
             }
             if(!$tiene_permitido){
                 Alert::error('Error','No puedes crear actividades de este crédito');
-                return redirect()->back();                
+                return redirect()->back();
             }
         }
         if($actividad_con_mismo_nombre->count()>0){
@@ -328,7 +323,7 @@ class ActividadesController extends Controller
 
     }
 
-  
+
 
     /**
      * Remove the specified resource from storage.
