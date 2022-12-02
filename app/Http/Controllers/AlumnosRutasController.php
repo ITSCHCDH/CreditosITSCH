@@ -286,7 +286,7 @@ class AlumnosRutasController extends Controller
     	    $actividad_evidencia = Actividad_Evidencia::find($id_actividad_evidencia[0]->id);
     	    $actividad_evidencia->save();
     	}
-    	Alert::success('Error','La evidencia fue guardada correctamente');
+    	Alert::success('Correcto','La evidencia fue guardada correctamente');
     	return redirect()->route('alumnos.actividades');
     }
 

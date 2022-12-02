@@ -327,7 +327,7 @@ class VerificaEvidenciaController extends Controller
             }
         }
         else
-        {
+        { 
             $carrera = null;
             if($request->has('generacion')){
                 //Substraemos los dos ultimos digitos del año de generacion
@@ -353,7 +353,7 @@ class VerificaEvidenciaController extends Controller
                 $reportes_data = null;
                 $suma_creditos = null;
             }
-            $carreras = Area::where('id','=',Auth::User()->area)->get();
+            //$carreras = Area::where('id','=',Auth::User()->area)->get(); 
         } 
         return view('admin.verifica_evidencia.reportes')
         ->with('reportes_data',$reportes_data)
