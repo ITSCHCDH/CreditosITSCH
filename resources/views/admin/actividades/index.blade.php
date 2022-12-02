@@ -59,7 +59,7 @@
             <div class="modal-body">Estas seguro(a) de eliminar está actividad</div>
             <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
-            <a id="btnEliminar" type="button" class="btn btn-primary">Eliminar</a>
+            <a id="btnEliminar"  type="button" class="btn btn-primary">Eliminar</a>
             </div>
         </div>
         </div>
@@ -68,8 +68,8 @@
     @section('js')
         <script>
             function eliminar(act)
-            {
-                r="actividades/"+act+"/destroy";
+            {   
+                r="{{ url('/admin/actividades') }}"+"/"+act+"/destroy"; 
                 $('#btnEliminar').attr('href',r);
             }
 

@@ -98,20 +98,20 @@ class ActividadesController extends Controller
 
             if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA'])) {
                 if ($actividad->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD'])) {
-                    $actividad->acciones .= '<a href="#" class="btn btn-info btn-sm ms-1" ' .
+                    $actividad->acciones .= '<a href="#" class="btn btn-info btn-sm ms-1 mb-1" ' .
                         'onclick="redireccionar(' . $actividad->id . ');" title="Agregar participantes (Alumnos) a la actividad">' .
-                        '<i class="fas fa-users" style="font-size:14px"></i></a>';
+                        '<i class="fas fa-users" style="font-size:12px"></i></a>';
                 }
 
                 if (Auth::User()->hasAnyPermission(['VIP','VER_RESPONSABLES','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])) {
                     if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])) {
                         $actividad->acciones .= '<a href="' . route('responsables',$actividad->id) . '" ' .
-                            'class="btn btn-primary btn-sm ms-1">' .
-                            '<i class="fas fa-user-plus" style="font-size:14px" title="Ver/Asignar responsables"></i></a>';
+                            'class="btn btn-primary btn-sm ms-1 mb-1">' .
+                            '<i class="fas fa-user-plus" style="font-size:12px" title="Ver/Asignar responsables"></i></a>';
                     } else if ($actividad->id_user == Auth::User()->id) {
                         $actividad->acciones .= '<a href="' . route('responsables',$actividad->id) . '" ' .
-                            'class="btn btn-primary btn-sm ms-1">' .
-                            '<i class="fas fa-user-plus" style="font-size:14px" title="Ver/Asignar responsables"></i></a>';
+                            'class="btn btn-primary btn-sm ms-1 mb-1">' .
+                            '<i class="fas fa-user-plus" style="font-size:12px" title="Ver/Asignar responsables"></i></a>';
                     }
                 }
 
@@ -122,18 +122,18 @@ class ActividadesController extends Controller
                             'busqueda=' . $actividad->actividad_nombre,
                             'actividades_link=true'
                         ]) .
-                        '" class="btn btn-success btn-sm ms-1" title="Verificar evidencias de esta actividad">' .
+                        '" class="btn btn-success btn-sm ms-1 mb-1" title="Verificar evidencias de esta actividad">' .
                         '<i class="far fa-edit" style="font-size:14px"></i></a>';
                 }
 
                 if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ACTIVIDAD','VIP_ACTIVIDAD'])) {
                     if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
                         $actividad->acciones .= '<a href="' . route('actividades.edit',[$actividad->id]) .
-                            '" class="btn btn-warning btn-sm ms-1" title="Editar actividad"><i class="fas fa-pencil-alt" ' .
+                            '" class="btn btn-warning btn-sm ms-1 mb-1" title="Editar actividad"><i class="fas fa-pencil-alt" ' .
                             'style="font-size:14px"></i></a>';
                     } else if ($actividad->id_user==Auth::User()->id) {
                         $actividad->acciones .= '<a href="' . route('actividades.edit',[$actividad->id]) .
-                            '" class="btn btn-warning btn-sm ms-1" title="Editar actividad"><i class="fas fa-pencil-alt" ' .
+                            '" class="btn btn-warning btn-sm ms-1 mb-1" title="Editar actividad"><i class="fas fa-pencil-alt" ' .
                             'style="font-size:14px"></i></a>';
                     }
                 }
@@ -141,11 +141,11 @@ class ActividadesController extends Controller
                 if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ACTIVIDAD','VIP_ACTIVIDAD'])) {
                     if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
                         $actividad->acciones .= '<button data-mdb-toggle="modal"  data-mdb-target="#modEliminar" ' .
-                            'onclick="eliminar(' . $actividad->id . ')" class="btn btn-danger btn-sm ms-1" title="Eliminar actividad">' .
+                            'onclick="eliminar(' . $actividad->id . ')" class="btn btn-danger btn-sm ms-1 mb-1" title="Eliminar actividad">' .
                             '<i class="far fa-trash-alt" style="font-size:14px"></i></button>';
                     } else if ($actividad->id_user==Auth::User()->id) {
                         $actividad->acciones .= '<button data-mdb-toggle="modal"  data-mdb-target="#modEliminar" ' .
-                            'onclick="eliminar(' . $actividad->id . ')" class="btn btn-danger btn-sm ms-1" title="Eliminar actividad">' .
+                            'onclick="eliminar(' . $actividad->id . ')" class="btn btn-danger btn-sm ms-1 mb-1" title="Eliminar actividad">' .
                             '<i class="far fa-trash-alt" style="font-size:14px"></i></button>';
                     }
                 }
@@ -332,7 +332,7 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
+    { 
         $act=Actividad::find($id);
         if($act==null){
             Alert::error('Error','La actividad no existe');

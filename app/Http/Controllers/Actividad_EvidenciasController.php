@@ -44,7 +44,7 @@ class Actividad_EvidenciasController extends Controller
 				}
 				if(count($actividad_evidencia->evidencias)==0 && $participantes->count()==0 && $actividad_evidencia->validado=="false"){
 					Actividad_Evidencia::destroy($id);
-					Alert::error('Error','El responsable fue retirado de la actividad con exito');					
+					Alert::success('Correcto','El responsable fue retirado de la actividad con exito');					
 					return redirect()->back();					
 				}
 				

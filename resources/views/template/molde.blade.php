@@ -52,32 +52,21 @@
             <!-- Grid row-->
             <div class="row">
                 <!-- Grid column -->
-                <div class="col-md-12 py-5">
+                <div class="col-md-12 py-3">
                 <div class="list-unstyled list-inline text-center">
 
                     <!-- Facebook -->
-                    <a class="fb-ic">
+                    <a class="fb-ic" href="https://www.facebook.com/profile.php?id=100057428089409" target="_blank">
                         <i class="fab fa-facebook-f fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
-                    </a>
-                    <!-- Twitter -->
-                    <a class="tw-ic">
-                    <i class="fab fa-twitter fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
-                    </a>
-                    <!-- Google +-->
-                    <a class="gplus-ic">
-                    <i class="fab fa-google-plus-g fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
-                    </a>
+                    </a>  
+                    &nbsp;&nbsp;                 
                     <!--Linkedin -->
-                    <a class="li-ic">
-                    <i class="fab fa-linkedin-in fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
-                    </a>
-                    <!--Instagram-->
-                    <a class="ins-ic">
-                    <i class="fab fa-instagram fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
-                    </a>
-                    <!--Pinterest-->
-                    <a class="pin-ic">
-                    <i class="fab fa-pinterest fa-lg white-text fa-2x"> </i>
+                    <a class="li-ic" href="https://www.linkedin.com/in/oscar-delgado-camacho-68bab2114/">
+                        <i class="fab fa-linkedin-in fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
+                    </a>       
+                    &nbsp;&nbsp;
+                    <a href="https://kioselsar.com" target="_blank" >
+                        <i class="fas fa-globe"></i>
                     </a>
                 </div>
                 </div>
@@ -91,7 +80,7 @@
 
             <!-- Copyright -->
             <div class="text-center py-3" style="background-color: rgba(0, 0, 0, 0.2);">© 2022 Copyright:
-            <a href="https://github.com/kioselsa"> Kioselsar.com</a>
+                <a href="https://github.com/kioselsa" target="_blank"> Kioselsar</a> & <a href="https://github.com/Madophs" target="_blank">Madophs</a> ,Contact: <a href="https://kioselsar.com" target="_blank">kioselsar.com</a>
             </div>
             <!-- Copyright -->
 
