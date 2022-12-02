@@ -3,7 +3,7 @@
 @section('title','Evidencias')
 
 @section('links')
-    <link rel="stylesheet" type="text/css" href="{{ asset('plugins/fileupload/css/demo.css')}}">
+   
     <link rel="stylesheet" type="text/css" href="{{ asset('plugins/fileupload/css/component.css')}}">
     <script>(function(e,t,n){var r=e.querySelectorAll("html")[0];r.className=r.className.replace(/(^|\s)no-js(\s|$)/,"$1js$2")})(document,window,0);</script>
 @endsection
@@ -16,18 +16,25 @@
 @section('contenido')
     <form action="{{ route('evidencias.store') }}" method="post" enctype="multipart/form-data">
         @csrf
-        <label for="actividad_id">Actividad a la que pertenece la evidencia</label>
-        <input type="hidden" name="actividad_id" id="" value="{{ $actividad->id }}">
-        <input type="text" name="id_asig_activi" id="id_asig_activi" value="{{ $actividad->nombre }}" class="form-control" required readonly>
+        
+        <div class="form-outline mb-4">
+            <input type="text" name="id_asig_activi" id="id_asig_activi" value="{{ $actividad->nombre }}" class="form-control form-control-lg" required readonly>
+            <label class="form-label" for="id_asig_activi">Actividad a la que pertenece la evidencia</label>
+        </div>        
+        <input type="hidden" name="actividad_id"  value="{{ $actividad->id }}">
+       
 
-        <label for="responsables">Responsable de la actividad</label>
+        <div class="form-outline mb-4">
+            <input type="text" name="resp" id="resp" value="{{ $responsable->name }}" class="form-control form-control-lg" readonly required>
+            <label class="form-label" for="responsables">Responsable de la actividad</label>
+        </div>        
         <input type="hidden" name="responsables" id="responsables" value="{{ $responsable->id }}"> 
-        <input type="text" name="resp" id="resp" value="{{ $responsable->name }}" class="form-control" readonly required>
+        
     
-        <div class="form-group">
-            <label for="valida">Nombre del quien valida la evidencia</label>        
+        <div class="mb-4">
+            <label class="form-label" for="valida">Nombre del quien valida la evidencia</label>        
             @if ($validador!=null)
-                <select id='valida' name='valida' class="form-control select-category" required disabled>
+                <select id='valida' name='valida' class="form-control form-control-lg" required disabled>
                     <option value="{{ $validador->id }}" selected>{{ $validador->name }}</option>
                 </select>
             @endif

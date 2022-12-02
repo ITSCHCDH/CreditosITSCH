@@ -111,7 +111,7 @@
        </tbody>
     </table>
 </div>
-<div style="margin-bottom: 200px;"></div>
+
 
 <!-- The Modal -->
 <div class="modal" id="modEliminar">

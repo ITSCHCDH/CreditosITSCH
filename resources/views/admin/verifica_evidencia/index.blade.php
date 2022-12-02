@@ -120,8 +120,7 @@
 			<input type="submit" value="Guardar" class="btn btn-primary">			
 		@endif		
 	</form>	
-	<div style="margin-bottom: 200px;"></div>
-	{{ $evidencias_data->appends(['busqueda' => $busqueda,'validadas' => $validadas])->links() }}
+	
 	@section('js')
 		<script>
 			$('#checkbox5').click(function(){

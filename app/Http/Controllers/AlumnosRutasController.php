@@ -49,7 +49,7 @@ class AlumnosRutasController extends Controller
         ->where(function($query){
             $query->where('p.evidencia_validada','=','na')->orwhere('p.evidencia_validada','=','si');
         })->where('ae.validado','=','true')
-        ->select('alu.no_control','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
+        ->select('alu.no_control','alu.foto as foto','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
 
         $liberado = $this->verificarProgreso();
 

@@ -242,7 +242,7 @@
 			@endphp
 		@endif
 	</div>
-	<div style="margin-bottom: 300px;"></div>
+	
 	@section('js')
 		<script type="text/javascript">
 			var alumnoNombreInput = document.getElementById("alumno_nombre");
