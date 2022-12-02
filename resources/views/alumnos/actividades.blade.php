@@ -43,16 +43,10 @@
 							</td>
 							<td>
 								@if ($actividad->alumnos == "true")
-									@if ($actividad->validado == "false" || $falta_evidencia)
-										<div class="toltip">
-											<a href="{{ route('alumnos.subir_evidencia',['id_responsable' => $actividad->user_id,'id_actividad' => $actividad->actividad_id]) }}" class="btn btn-primary"><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span></a>
-											<span class="toltiptext">Subir evidencias</span>
-										</div>
-									@endif
-									<div class="toltip">
-										<a href="{{ route('alumnos.evidencia',['actividad_id' => $actividad->actividad_id,'user_id' => $actividad->user_id]) }}" class="btn btn-warning"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
-										<span class="toltiptext">Ver evidencias subidas</span>
-									</div>
+									@if ($actividad->validado == "false" || $falta_evidencia)										
+										<a href="{{ route('alumnos.subir_evidencia',['id_responsable' => $actividad->user_id,'id_actividad' => $actividad->actividad_id]) }}" class="btn btn-primary" title="Subir evidencias"><i class="fas fa-cloud-upload-alt"></i></a>																					
+									@endif									
+										<a href="{{ route('alumnos.evidencia',['actividad_id' => $actividad->actividad_id,'user_id' => $actividad->user_id]) }}" class="btn btn-warning" title="Ver evidencias subidas"><i class="far fa-eye"></i></a>																			
 								@else
 									NINGUNA
 								@endif
