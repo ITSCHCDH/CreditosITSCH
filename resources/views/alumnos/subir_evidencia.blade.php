@@ -14,7 +14,7 @@
 
 @section('contenido')
 
-    <form action="" method="post" enctype="multipart/form-data">
+    <form action="{{ route('alumnos.guardar_evidencia') }}" method="post" enctype="multipart/form-data">
         @csrf        
         <input type="hidden" name="no_control" value="{{ Auth::User()->no_control }}">
         <div class="form-outline mb-4">
