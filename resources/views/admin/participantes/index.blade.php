@@ -111,7 +111,7 @@
        </tbody>
     </table>
 </div>
-<div style="margin-bottom: 200px;"></div>
+
 
 <!-- The Modal -->
 <div class="modal" id="modEliminar">
@@ -277,10 +277,10 @@
                                     var responsable_id = response['responsable_id'];
                                     var no_control = response['participantes_data'][x]['no_control'];
                                     var tiene_evidencia = response['participantes_data'][x]['tiene_evidencia'];
-                                    var advertencia = "<div class='toltip'><div class='btn btn-warning'><span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span></div><span class='toltiptext'>No ha subido evidencia</text></div>";
-                                    var validar_evidencia_advertencia = "<div class='toltip'><div class='btn btn-warning'><span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span></div><span class='toltiptext'>Falta validar la evidencia</text></div>";
+                                    var advertencia = "<div class='btn btn-warning' title='No ha subido evidencia'><i class='fas fa-exclamation-triangle'></i></div>";
+                                    var validar_evidencia_advertencia = "<div class='btn btn-warning' title='Falta validar la evidencia'><i class='fas fa-exclamation-triangle'></i></div>";
                                     var ver_evidencia_link = "{{ route('participantes.ver_evidencia') }}"+"?id="+id+"&actividad_id="+actividad_id+"&responsable_id="+responsable_id;
-                                    var ver_evidencia = "<div class='toltip'><a href='"+ver_evidencia_link+"' class='btn btn-primary'><span class='glyphicon glyphicon glyphicon-camera' aria-hidden='true'></span></a><span class='toltiptext'>Ver evidencia</text></div>";
+                                    var ver_evidencia = "<a href='"+ver_evidencia_link+"' class='btn btn-primary' title='Ver evidencia'><i class='fas fa-camera'></i></a>";
                                     if(response['validado'] == "false"){
                                         if(tiene_permisos || ("{{ Auth::User()->can('ELIMINAR_PARTICIPANTES') }}" == "1" || response['user_id'] == "{{ Auth::User()->id}}") || (response['validador_id'] == "{{ Auth::User()->id }}")){
                                             if(alumnos_responsables){

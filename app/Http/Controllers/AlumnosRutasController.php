@@ -49,7 +49,7 @@ class AlumnosRutasController extends Controller
         ->where(function($query){
             $query->where('p.evidencia_validada','=','na')->orwhere('p.evidencia_validada','=','si');
         })->where('ae.validado','=','true')
-        ->select('alu.no_control','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
+        ->select('alu.no_control','alu.foto as foto','alu.id as alumno_id','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
 
         $liberado = $this->verificarProgreso();
 
@@ -189,16 +189,21 @@ class AlumnosRutasController extends Controller
         return $creditos_liberados >= 5;
     }
 
-    public function actividades(){
+    public function actividades(){         
+		$alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+
     	$actividades = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join){
     		$join->on('ae.id','=','p.id_evidencia');
     		$join->where('p.no_control','=',Auth::User()->no_control);
     	})->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','a.id_actividad','=','c.id')->select('a.nombre as actividad_nombre','a.id as actividad_id','a.por_cred_actividad as actividad_porcentaje','a.alumnos','ae.validado','ae.user_id','c.nombre as credito_nombre','p.momento_agregado','p.evidencia_validada')->orderBy('actividad_nombre','ASC')->get();
     	return view('alumnos.actividades')
-    	->with('actividades',$actividades);
+    	->with('actividades',$actividades)
+        ->with('alumno_data',$alumno_data);
     }
 
     public function subirEvidencia(Request $request){
+        $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+
         $actividad_evidencia = DB::table('actividad_evidencia')->where([
             ['user_id','=',$request->id_responsable],
             ['actividad_id','=',$request->id_actividad]
@@ -224,7 +229,8 @@ class AlumnosRutasController extends Controller
     	return view('alumnos.subir_evidencia')
     	->with('responsable',$responsable)
     	->with('actividad',$actividad)
-    	->with('validador',$validador);
+    	->with('validador',$validador)
+        ->with('alumno_data',$alumno_data);
     }
 
     public function guardarEvidencia(Request $request){
@@ -280,11 +286,13 @@ class AlumnosRutasController extends Controller
     	    $actividad_evidencia = Actividad_Evidencia::find($id_actividad_evidencia[0]->id);
     	    $actividad_evidencia->save();
     	}
-    	Alert::success('Error','La evidencia fue guardada correctamente');
+    	Alert::success('Correcto','La evidencia fue guardada correctamente');
     	return redirect()->route('alumnos.actividades');
     }
 
     public function evidencia(Request $request){
+        $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+
         if(!$request->has('user_id') && !$request->has('actividad_id')){
             return redirect()->route('alumnos.home_avance');
         }
@@ -319,7 +327,8 @@ class AlumnosRutasController extends Controller
     	->with('evidencias',$evidencias)
     	->with('actividad',$actividad)
         ->with('validado',$validado)
-        ->with('participante_data',$participante_data[0]);
+        ->with('participante_data',$participante_data[0])
+        ->with('alumno_data',$alumno_data);
     }
 
     public function eliminarEvidencia(Request $request){

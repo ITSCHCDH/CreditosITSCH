@@ -2,8 +2,7 @@
 
 @section('title','Evidencias')
 
-@section('links')
-    <link rel="stylesheet" type="text/css" href="{{ asset('plugins/fileupload/css/demo.css')}}">
+@section('links')    
     <link rel="stylesheet" type="text/css" href="{{ asset('plugins/fileupload/css/component.css')}}">
     <script>(function(e,t,n){var r=e.querySelectorAll("html")[0];r.className=r.className.replace(/(^|\s)no-js(\s|$)/,"$1js$2")})(document,window,0);</script>
 @endsection
@@ -15,25 +14,23 @@
 
 @section('contenido')
 
-    {!! Form::open(['route'=>'alumnos.guardar_evidencia','method'=>'POST','files'=>true]) !!}
-
-        {!! Form::hidden('no_control',Auth::User()->no_control) !!}
-        <div class="form-group">
-            {!! Form::label('actividad_id','Actividad a la que pertenece la evidencia') !!}
-            {!! Form::hidden('actividad_id',$actividad->id) !!}
-            {!! Form::text('id_asig_activi',$actividad->nombre,['class' => 'form-control','required','readonly']) !!}
+    <form action="{{ route('alumnos.guardar_evidencia') }}" method="post" enctype="multipart/form-data">
+        @csrf        
+        <input type="hidden" name="no_control" value="{{ Auth::User()->no_control }}">
+        <div class="form-outline mb-4">
+            <input type="text" name="id_asig_activi" id="id_asig_activi" class="form-control form-control-lg" required readonly value="{{ $actividad->nombre }}">
+            <label for="id_asig_activi" class="form-label">Actividad a la que pertenece la evidencia</label>                             
         </div>
-
-        <div class="form-group">
-            {!! Form::label('responsables','Responsable de la actividad') !!}
-            {!! Form::hidden('responsables',$responsable->id) !!}
-            {!! Form::text('resp',$responsable->name,['class' => 'form-control', 'required','readonly']) !!}
-
+            <input type="hidden" name="actividad_id" value="{{ $actividad->id }}">
+        <div class="form-outline mb-4">
+            <input type="text" name="resp" id="resp" class="form-control form-control-lg" value="{{ $responsable->name }}" required readonly>
+            <label for="resp" class="form-label">Responsable de la actividad</label>
         </div>
+        <input type="hidden" name="responsables" id="responsables" value="{{ $responsable->id }}">       
 
-        <div class="form-group">
-            {!! Form::label('valida','Nombre del quien valida la evidencia') !!}
-            <select id='valida' name='valida' class="form-control select-category" required disabled>
+        <div class="mb-4">
+            <label for="valida">Nombre del quien valida la evidencia</label>           
+            <select id='valida' name='valida' class="form-control form-control-lg" required disabled>
                 @if ($validador!=null)
                     <option value="{{ $validador->id }}">{{ $validador->name }}</option>
                 @else
@@ -48,11 +45,9 @@
             </div>
         </div>
         <div class="form-group">
-            {!! Form::submit('Guardar',['class'=>'btn btn-primary']) !!}
+            <button type="submit" class="btn btn-primary">Guardar</button>            
         </div>
-
-    {!! Form::close() !!}
-    <div style="margin-bottom: 50px;"></div>
+    </form>         
     @section('js')
         <script src="{{ asset('plugins/fileupload/js/custom-file-input.js') }}"></script>
     @endsection

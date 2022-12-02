@@ -86,8 +86,7 @@
     </div>
   </div>
 
-  <div class="resetear" style="padding: 30px;"></div>
-
+  
   @section('js')
     <script src="{{ asset('js/pdf_viewer/pdf.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{ asset('js/pdf_viewer/pdf.worker.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
