@@ -66,7 +66,7 @@
         <div class="col-sm-3">            
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                  <span class="input-group-text bg-info">Alumno</span>
+                  <span class="input-group-text bg-info">Alumno</span> 
                 </div>                   
                 <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
             </div>
@@ -183,7 +183,7 @@
                         cache:false,
                         data:{id:current_id},
                         dataType: 'json',
-                        success:function(response){                            
+                        success:function(response){                   
                             //Vaciamos la tabla de los participantes
                             $('#mitabla tbody').empty();
                             //Vaciamos el combobox de los responsables
@@ -232,8 +232,8 @@
                                 sesion = false;
                             }
                             $('#responsables_id').trigger('change');
-                        },error:function(){
-                            console.log('Error :(');
+                        },error:function(e){
+                            console.log('Error:',e);
                         }
                     });
                 }else{

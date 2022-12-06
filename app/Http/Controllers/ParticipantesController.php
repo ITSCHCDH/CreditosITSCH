@@ -266,27 +266,27 @@ class ParticipantesController extends Controller
     }
 
     public function peticionAjaxResponsables(Request $request){
-        if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA'])) {
+        if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA'])) {  
             //Consultamos todos los responsables asignadoas a una actividad
             $evidencias = DB::table('actividad_evidencia as ae')->join('evidencia as e',function($join) use($request){
                 $join->on('e.id_asig_actividades','=','ae.id');
                 $join->where('ae.actividad_id','=',$request->get('id'));
             })->get();
             $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->select('u.id','u.name')->orderBy('u.name')->get();
-            $actividad = Actividad::find($request->get('id'));
+            $actividad = Actividad::find($request->get('id')); 
             //Retornamos los responsables en un json
             return response()->json(array('responsables' => $responsables,'actividad' => $actividad,'no_evidencias' => $evidencias->count()));   
-        }else{
-            $actividad = Actividad::find($request->get('id'));
+        }else{ 
+            $actividad = Actividad::find($request->get('id'));  
 
             if($actividad->id_user==Auth::User()->id){
                 //Consultamos todos los responsables asignadoas a una actividad
                 $evidencias = DB::table('actividad_evidencia as ae')->join('evidencia as e',function($join) use($request){
                     $join->on('e.id_asig_actividades','=','ae.id');
                     $join->where('ae.actividad_id','=',$request->get('id'));
-                })->get();
+                })->get();               
                 $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->select('u.id','u.name')->orderBy('u.name')->get();
-                //Retornamos los responsables en un json
+                //Retornamos los responsables en un json                
                 return response()->json(array('responsables' => $responsables,'actividad' => $actividad,'no_evidencias' => $evidencias->count())); 
             }else{
                 //Consultamos todos los responsables asignadoas a una actividad
@@ -294,9 +294,9 @@ class ParticipantesController extends Controller
                     $join->on('e.id_asig_actividades','=','ae.id');
                     $join->where('ae.actividad_id','=',$request->get('id'));
                     $join->where('ae.user_id','=',Auth::User()->id);
-                })->get();
-                $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->where('ae.user_id','=',Auth::User()->id)->select('u.id','u.name')->orderBy('u.name')->get();
-                //Retornamos los responsables en un json
+                })->get(); 
+                $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->where('ae.user_id','=',Auth::User()->id)->select('u.id','u.name')->orderBy('u.name')->get();                           
+                //Retornamos los responsables en un json               
                 return response()->json(array('responsables' => $responsables,'actividad' => $actividad,'no_evidencias' => $evidencias->count()));
             }  
         }

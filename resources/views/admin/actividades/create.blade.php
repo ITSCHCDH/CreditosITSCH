@@ -53,11 +53,11 @@
                     <label class="form-label">Fecha de cierre</label>
                 </div>
             
-                <hr>
-            
-                <div class="form-group">        
-                    <input type="submit" value="Registrar actividad" class="btn btn-primary">
-                </div>
+                <hr>           
+                    
+                <input type="submit" value="Registrar actividad" class="btn btn-primary">
+            </form>
+               
         </div>
         <div class="col-sm-3"></div>
     </div>

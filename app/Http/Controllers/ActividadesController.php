@@ -161,15 +161,15 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
+    { 
         if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
             $creditos = Credito::where('vigente','=','true')->orderBy('nombre','asc')->get();
 
-        }else{
+        }else{ 
             $creditos = Credito::leftjoin('creditos_areas as ca','ca.credito_id','=','creditos.id')->where([
                 ['ca.credito_area','=',Auth::User()->area],
                 ['creditos.vigente','=','true']
-            ])->groupBy('creditos.id')->orderBy('creditos.nombre','asc')->pluck('creditos.nombre','creditos.id');
+            ])->groupBy('creditos.id')->orderBy('creditos.nombre','asc')->get();
         }
 
        return view('admin.actividades.create')->with('creditos',$creditos);
@@ -182,8 +182,9 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        $act=new Actividad($request->all()); //Obtiene todos los datos de la vista para guardarlos en la BD
+    { 
+        $act=new Actividad($request->all()); //Obtiene todos los datos de la vista para guardarlos en la BD 
+        
         $act->id_user = Auth::User()->id;
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act->nombre)->get();
         if(!Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])){
