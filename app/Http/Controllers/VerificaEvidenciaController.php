@@ -55,7 +55,7 @@ class VerificaEvidenciaController extends Controller
             })
             ->where('ae.validado','=',$validadas)
             ->select('e.nom_imagen','e.id','ae.validado','u.name','a.nombre','a.por_cred_actividad','c.nombre as nombre_credito','c.id as id_credito','ae.id as actividad_evidencia_id','validador.name as validador_nombre','validador.id as validador_id','c.vigente')
-            ->groupBy('ae.id')->paginate(5);
+            ->groupBy('ae.id')->get();
         }else{
             $evidencias_data = DB::table('evidencia as e')
             ->join('actividad_evidencia as ae','e.id_asig_actividades','=','ae.id')
@@ -75,7 +75,7 @@ class VerificaEvidenciaController extends Controller
                 ['ae.validado','=',$validadas]
             ])
             ->select('e.nom_imagen','e.id','ae.validado','u.name','a.nombre','a.por_cred_actividad','c.nombre as nombre_credito','c.id as id_credito','ae.id as actividad_evidencia_id','validador.name as validador_nombre','validador.id as validador_id','c.vigente')
-            ->groupBy('ae.id')->paginate(5);
+            ->groupBy('ae.id')->get();
         }
         return view('admin.verifica_evidencia.index')
         ->with('evidencias_data',$evidencias_data)
