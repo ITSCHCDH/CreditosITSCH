@@ -27,90 +27,48 @@ class ParticipantesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {   
+    {
         $actividades_link = 'false';
         if($request->has('actividades_link') && $request->actividades_link == 'true'){
             $actividades_link = 'true';
         }
         if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VIP_SOLO_LECTURA','VIP_ACTIVIDAD']))
-        {        
+        {
             //Consultamos todas las actividades disponibles
-            $actividades = Actividad::select('id','nombre')->orderBy('nombre','ASC')->get();          
+            $actividades = Actividad::select('id','nombre')->orderBy('nombre','ASC')->get();
         }
         else if(Auth::User()->hasAnyPermission(['CREAR_ACTIVIDAD','VER_ACTIVIDAD']))
-        {  
-            //Consultamos todas las actividades disponibles           
-            $actividades = DB::table('users as u')->join('actividad_evidencia as ae', function($join){
-                $join->on('ae.user_id','=','u.id');
-            })->join('actividad as a','a.id','=','ae.actividad_id')->where('u.id','=',Auth::User()->id)->orwhere('a.id_user','=',Auth::User()->id)->select('a.id','a.nombre')->orderBy('nombre','ASC')->get();
+        {
+            //Consultamos todas las actividades disponibles
+            $actividades = DB::table('users as u')
+                ->join('actividad_evidencia as ae', function($join){
+                    $join->on('ae.user_id','=','u.id');
+                })
+                ->join('actividad as a','a.id','=','ae.actividad_id')
+                ->where('u.id','=',Auth::User()->id)
+                ->orWhere('a.id_user','=',Auth::User()->id)
+                ->select('a.id','a.nombre')
+                ->orderBy('nombre','ASC')
+                ->groupBy('a.id')
+                ->get();
         }
         else
-        {           
-            //Consultamos todas las actividades disponibles            
-            $actividades = DB::table('users as u')->join('actividad_evidencia as ae', function($join){
-                $join->on('ae.user_id','=','u.id');
-                $join->where('u.id','=',Auth::User()->id);
-            })->join('actividad as a','a.id','=','ae.actividad_id')->select('a.id','a.nombre')->orderBy('nombre','ASC')->get();
-          
-        } 
+        {
+            //Consultamos todas las actividades disponibles
+            $actividades = DB::table('users as u')
+                ->join('actividad_evidencia as ae', function($join){
+                    $join->on('ae.user_id','=','u.id');
+                    $join->where('u.id','=',Auth::User()->id);
+                })
+                ->join('actividad as a','a.id','=','ae.actividad_id')
+                ->select('a.id','a.nombre')
+                ->orderBy('nombre','ASC')
+                ->get();
+        }
         //Retorna la vista de Agregar participantes
         return view('admin.participantes.index')
         ->with('actividades',$actividades)
         ->with('actividades_link',$actividades_link);
-    }
-
-    /** 
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Request $request)
-    {
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
     }
 
     public function eliminarEvidenciasAlumno($no_control, $actividad_evidencia_id, $actividad_nombre){
@@ -226,7 +184,7 @@ class ParticipantesController extends Controller
         }else{
             return response()->json(array("mensaje" => "No puedes eliminar participantes de esta actividad","mensaje_tipo" => "advertencia"));
         }
-        
+
     }
     public function peticionAjax(Request $request){
         /*
@@ -298,12 +256,12 @@ class ParticipantesController extends Controller
                 $responsables = DB::table('actividad_evidencia as ae')->join('users as u','u.id','ae.user_id')->where('ae.actividad_id','=',$request->get('id'))->where('ae.user_id','=',Auth::User()->id)->select('u.id','u.name')->orderBy('u.name')->get();                           
                 //Retornamos los responsables en un json               
                 return response()->json(array('responsables' => $responsables,'actividad' => $actividad,'no_evidencias' => $evidencias->count()));
-            }  
+            }
         }
     }
 
     public function ajaxGuardar(Request $request){
-        
+
         $actividad = Actividad::find($request->get('id_actividad'));
         // Validamos que la actividad exista
         if($actividad == null){
@@ -314,7 +272,7 @@ class ParticipantesController extends Controller
         if($actividad->vigente == 'false'){
             return response()->json(array('mensaje' => 'La actividad ya no se encuentra vigente, no puede ser modificada','mensaje_tipo' => 'error'));
         }
-        
+
         $evidencias = DB::table('actividad_evidencia as ae')->where([
             ['ae.user_id','=',$request->get('id_responsable')],
             ['ae.actividad_id','=',$request->get('id_actividad')]
@@ -333,7 +291,7 @@ class ParticipantesController extends Controller
         }
         // Validamos que el número de contro exista
         $existe_no_control = DB::table('alumnos')->select('no_control')->where('no_control','=',$request->get('no_control'))->get();
-        
+
         if($existe_no_control->count()==0){
             return response()->json(array('mensaje' => 'El numero de control no exite','mensaje_tipo' => 'error' ));
         }
@@ -429,7 +387,7 @@ class ParticipantesController extends Controller
             }
         }
     }
-        
+
     public function liberar($no_control){
         $avance = Avance::where('no_control','=',$no_control)->get();
         $creditos = 0;
@@ -446,7 +404,7 @@ class ParticipantesController extends Controller
             $alumno->save();
         }
     }
-    
+
     public function participantesBusqueda(Request $request){
         if($request->peticion == 0){
             $lista_alumnos = Alumno::select('nombre','no_control')->where('nombre','like',"%$request->nombre%")->orderBy('nombre')->get();
