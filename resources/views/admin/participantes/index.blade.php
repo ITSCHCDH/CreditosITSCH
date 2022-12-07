@@ -512,13 +512,15 @@
                 busqueda(entrada);
             });
         }
-        function getActividadCookie(){
+        function cargarDatos(){
             var temp_actividad_cookie = Cookies.get('participantes_actividad');
             if(temp_actividad_cookie!=null){
                 if($("#actividades_id option[value='"+temp_actividad_cookie+"']").length!=0){
                     $('#actividades_id').val(temp_actividad_cookie);
                     $('#actividades_id').trigger('change');
                 }
+            } else {
+                $('#actividades_id').trigger('change');
             }
         }
         function evidenciaTotal(){
@@ -544,7 +546,7 @@
         $(document).ready(function(){
             addEventListeners();
             comboActividades();
-            getActividadCookie();
+            cargarDatos();
             comboResponsables();
             agregaParticipante();
             var tiene_permisos = "{{ Auth::User()->hasAnyPermission(['VIP','AGREGAR_PARTICIPANTES']) }}"=="1"?true: false;
