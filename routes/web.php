@@ -15,6 +15,7 @@
 
 use App\Http\Controllers\ActividadesController;
 use App\Http\Controllers\AlumnosController;
+use App\Http\Controllers\AlumnosRutasController;
 use App\Http\Controllers\CreditosController;
 use App\Http\Controllers\EvidenciasController;
 use App\Http\Controllers\PerfilController;
@@ -209,7 +210,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     //Rutas de mi perfil
     Route::get('perfil','PerfilController@index')->name('perfil.index');
     Route::get('perfil/password_reset','PerfilController@passwordResetViewMiPerfil')->name('perfil.password_reset_view');
-    Route::post('perfil/password_update','PerfilController@passwordUpdate')->name('perfil.password_update');   
+    Route::post('perfil/password_update','PerfilController@passwordUpdate')->name('perfil.password_update');
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
@@ -218,8 +219,9 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::get('actividades','AlumnosRutasController@actividades')->name('alumnos.actividades');
     Route::get('actividades/subir_evidencia','AlumnosRutasController@subirEvidencia')->name('alumnos.subir_evidencia');
     Route::post('actividades/guardar_evidencia','AlumnosRutasController@guardarEvidencia')->name('alumnos.guardar_evidencia');
-    Route::get('actividades/evidencia','AlumnosRutasController@evidencia')->name('alumnos.evidencia');
-    Route::get('actividades/eliminar_evidencia','AlumnosRutasController@eliminarEvidencia')->name('alumnos.eliminar_evidencia');
+    Route::get('actividades/evidencia', [AlumnosRutasController::class, 'evidencia'])->name('alumnos.evidencia');
+    Route::get('actividades/peticion_evidencia', [AlumnosRutasController::class, 'peticionEvidencia'])->name('alumnos.peticion_evidencia');
+    Route::get('actividades/eliminar_evidencia', [AlumnosRutasController::class, 'peticionEliminar'])->name('alumnos.eliminar_evidencia');
     Route::get('constancias/imprimir','AlumnosRutasController@imprimir')->name('alumnos.constancias_imprimir');
     Route::get('/alumnos/{id}/perfil',[AlumnosController::class,'perfil'])->name('alumnos.perfil');
     Route::post('/alumnos/{id}/edit/perfil',[AlumnosController::class,'editPerfil'])->name('alumnos.edit.perfil');

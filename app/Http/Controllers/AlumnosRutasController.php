@@ -16,25 +16,26 @@ use App\Models\ConstanciaComplemento;
 use App\Models\Folio;
 use App\Models\Participante;
 use App\Models\Avance;
-use DB;
 use PDF;
 use Alert;
+use App\Http\Controllers\Utilities\HttpCode;
+use Illuminate\Support\Facades\DB;
 
 class AlumnosRutasController extends Controller
 {
 
     public function avance(){
-		$alumno_data=null;
-	    $avance = true;
+    $alumno_data=null;
+      $avance = true;
         $liberado = false;
-	    //Traemos todos los creditos existentes
-	    $creditos = Credito::select('nombre')->orderBy('nombre')->get();
+      //Traemos todos los creditos existentes
+      $creditos = Credito::select('nombre')->orderBy('nombre')->get();
 
         //Consulta para obterner el avance del alumno
-		$alumno_data = DB::table('alumnos as alu')->join('participantes as p', function($join){
-			$join->on('p.no_control','=','alu.no_control');
-			$join->where('alu.no_control','=',Auth::User()->no_control);
-		})->join('actividad_evidencia as ae',function($join){
+    $alumno_data = DB::table('alumnos as alu')->join('participantes as p', function($join){
+      $join->on('p.no_control','=','alu.no_control');
+      $join->where('alu.no_control','=',Auth::User()->no_control);
+    })->join('actividad_evidencia as ae',function($join){
             $join->on('ae.id','=','p.id_evidencia');
             $join->where('ae.validado','=','true');
         })->join('evidencia as e',function($join){
@@ -42,33 +43,36 @@ class AlumnosRutasController extends Controller
         })->join('actividad as a','a.id','=','ae.actividad_id')
         ->join('creditos as c','c.id','=','a.id_actividad')
         ->join('avance as av',function($join){
-			$join->on('av.id_credito','=','c.id');
-			$join->where('av.no_control','=',Auth::User()->no_control);
+      $join->on('av.id_credito','=','c.id');
+      $join->where('av.no_control','=',Auth::User()->no_control);
         })
         ->join('areas','areas.id','=','alu.carrera')
         ->where(function($query){
             $query->where('p.evidencia_validada','=','na')->orwhere('p.evidencia_validada','=','si');
-        })->where('ae.validado','=','true')
-        ->select('alu.no_control','alu.foto as foto','alu.id as alumno_id','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
+        })
+        ->where('ae.validado','=','true')
+        ->select('alu.no_control','alu.foto as foto','alu.id as alumno_id','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')
+        ->orderBy('a.created_at', 'DESC')
+        ->groupBy('nombre_actividad')->get();
 
         $liberado = $this->verificarProgreso();
 
         //Validamos que el alumnos tenga algun avance
-		if($alumno_data->count()==0){
+    if($alumno_data->count()==0){
             //SI no tiene avance solo retornamos los datos del alumno los datos del alumno
             $avance = false;
             $alumno_data = DB::table('alumnos')->join('areas', function($join){
                 $join->on('areas.id','=','alumnos.carrera');
             })->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.id as alumno_id','alumnos.nombre as nombre_alumno','areas.nombre as carrera','alumnos.no_control','alumnos.foto')->get();
         }
-        
-    	return view('alumnos.avance')
-    	->with('alumno_data',$alumno_data)
-    	->with('creditos',$creditos)
-    	->with('avance',$avance)
+
+      return view('alumnos.avance')
+      ->with('alumno_data',$alumno_data)
+      ->with('creditos',$creditos)
+      ->with('avance',$avance)
         ->with('liberado',$liberado);
     }
-    
+
     public function imprimir(){
         $existe_alumno = Alumno::where('no_control','=',Auth::User()->no_control)->get()->count()>0? true: false;
         if(!$existe_alumno){
@@ -156,7 +160,7 @@ class AlumnosRutasController extends Controller
         ->select('act.nombre as act_nombre', 'act.por_cred_actividad as porcentaje',
             'act.id_actividad as act_cred_id')
         ->get();
-        
+
         $creditos_cant = (int)Credito::max('id');
         $cred_porcen = array_fill(0, $creditos_cant + 1, 0);
 
@@ -171,7 +175,7 @@ class AlumnosRutasController extends Controller
                 $avance->por_credito = $cred_porcen[$avance->id_credito];
                 $avance->save();
             }
-            
+
             if ($avance->por_credito >= 100)
                 ++$creditos_liberados;
         }
@@ -189,15 +193,21 @@ class AlumnosRutasController extends Controller
         return $creditos_liberados >= 5;
     }
 
-    public function actividades(){         
-		$alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+    public function actividades(){
+    $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
 
-    	$actividades = DB::table('participantes as p')->join('actividad_evidencia as ae', function($join){
-    		$join->on('ae.id','=','p.id_evidencia');
-    		$join->where('p.no_control','=',Auth::User()->no_control);
-    	})->join('actividad as a','a.id','=','ae.actividad_id')->join('creditos as c','a.id_actividad','=','c.id')->select('a.nombre as actividad_nombre','a.id as actividad_id','a.por_cred_actividad as actividad_porcentaje','a.alumnos','ae.validado','ae.user_id','c.nombre as credito_nombre','p.momento_agregado','p.evidencia_validada')->orderBy('actividad_nombre','ASC')->get();
-    	return view('alumnos.actividades')
-    	->with('actividades',$actividades)
+    $actividades = DB::table('participantes as p')
+        ->join('actividad_evidencia as ae', function($join){
+            $join->on('ae.id','=','p.id_evidencia');
+            $join->where('p.no_control','=',Auth::User()->no_control);
+        })
+        ->join('actividad as a','a.id','=','ae.actividad_id')
+        ->join('creditos as c','a.id_actividad','=','c.id')
+        ->select('a.nombre as actividad_nombre','a.id as actividad_id','a.por_cred_actividad as actividad_porcentaje','a.alumnos','ae.validado','ae.user_id','c.nombre as credito_nombre','p.momento_agregado','p.evidencia_validada')
+        ->orderBy('a.created_at','DESC')
+        ->get();
+      return view('alumnos.actividades')
+        ->with('actividades',$actividades)
         ->with('alumno_data',$alumno_data);
     }
 
@@ -220,74 +230,94 @@ class AlumnosRutasController extends Controller
                 return redirect()->route('alumnos.actividades');
             }
         }
-    	$validador = User::find($actividad_evidencia[0]->validador_id);
+      $validador = User::find($actividad_evidencia[0]->validador_id);
         $responsable = User::find($request->id_responsable);
-    	if($actividad->count() == null || $responsable == null){
-    	    Alert::error('Error','No actividad o responsable seleccinado');
-    	    return redirect()->route('participantes.index');
-    	}
-    	return view('alumnos.subir_evidencia')
-    	->with('responsable',$responsable)
-    	->with('actividad',$actividad)
-    	->with('validador',$validador)
+      if($actividad->count() == null || $responsable == null){
+          Alert::error('Error','No actividad o responsable seleccinado');
+          return redirect()->route('participantes.index');
+      }
+      return view('alumnos.subir_evidencia')
+      ->with('responsable',$responsable)
+      ->with('actividad',$actividad)
+      ->with('validador',$validador)
         ->with('alumno_data',$alumno_data);
     }
 
     public function guardarEvidencia(Request $request){
-    	//dd(Storage::deleteDirectory('public/evidencias'));
-    	if(!Storage::has('public/evidencias')){
-    	    Storage::makeDirectory('public/evidencias');
-    	}
-    	$actividad = Actividad::where('id','=',$request->actividad_id)->get();
-    	if($request->has('archivos')){
-    	    // Creamos un arreglo con las extensiones validas
-    	    $allowedfileExtension=['pdf','jpg','png','jpeg'];
-    	    for ($i = 0; $i < count($request->archivos); $i++) {
-    	       $file = $request->archivos[$i];
-    	       // Obtenemos la exetensión original del archivo
-    	       $extension = strtolower($file->getClientOriginalExtension());
-    	       // Función para saber si la extensión se encuentra dentro de las extensiones permitidas
-    	       $check=in_array($extension,$allowedfileExtension);
-    	       if(!$check){
-    	           Alert::error('Error','La extensión '.$extension.' no es valida.');
-    	           return back()->withInput();
-    	       }
-    	    }
-    	}
-    	
-    	$id_actividad_evidencia = DB::table('actividad_evidencia')->where([
-    	    ['actividad_id','=',$request->actividad_id],
-    	    ['user_id','=',$request->responsables],
-    	])->select('id')->get();
-    	//Manipulacion de imagenes
-    	if($request->has('archivos'))//Validamos si existe una imagen
-    	{
-    	    //Generamos la ruta donde se guardaran las imagenes de los articulos
-    	    $path=storage_path().'/app/public/evidencias/'.$actividad[0]->nombre.'/';
-    	    $path_to_verify = 'public/evidencias/'.$actividad[0]->nombre;
-    	    if(!Storage::has($path_to_verify)){
-    	        Storage::makeDirectory($path_to_verify);
-    	    }
-    	    for ($i = 0; $i < count($request->archivos) ; $i++) {
-    	        //En el metodo file ponemos el nombre del campo file que pusimos en la vista, que sera el que tenga los datos de la imagen
-    	        $file=$request->archivos[$i];
-    	        //Para evitar nombres repetidos en las imagenes, creamos un nombre antes de guardar
-    	        $name='credITSCH_'.time().'_'.$i.'.'.strtolower($file->getClientOriginalExtension());
-    	        //Guardamos la imagen en la carpeta creada en la ruta que marcamos anteriormente
-    	        $file->move($path,$name);
+      //dd(Storage::deleteDirectory('public/evidencias'));
+      if(!Storage::has('public/evidencias')){
+          Storage::makeDirectory('public/evidencias');
+      }
 
-    	        $evidencia=new Evidencia(); //Obtiene todos los datos de la evidencia de la vista create
-    	        $evidencia->id_asig_actividades=$id_actividad_evidencia[0]->id;
-    	        $evidencia->nom_imagen=$name;//Obtiene el nombre de la imagen para guardarlo en la bd
-    	        $evidencia->alumno_no_control = $request->no_control;
-    	        $evidencia->save();//Guarda la evidencia en su tabla
-    	        
-    	    }
-    	    $actividad_evidencia = Actividad_Evidencia::find($id_actividad_evidencia[0]->id);
-    	    $actividad_evidencia->save();
-    	}
-    	Alert::success('Correcto','La evidencia fue guardada correctamente');
-    	return redirect()->route('alumnos.actividades');
+      $actividad = Actividad::find($request->actividad_id);
+      if (!isset($actividad) && $actividad->vigente == 'false') {
+        Alert::error('Error','La actividad ya no acepta modificaciones');
+        return redirect()->route('alumnos.actividades');
+      }
+
+      if($request->has('archivos')){
+          // Creamos un arreglo con las extensiones validas
+          $allowedfileExtension=['pdf','jpg','png','jpeg'];
+          for ($i = 0; $i < count($request->archivos); $i++) {
+             $file = $request->archivos[$i];
+             // Obtenemos la exetensión original del archivo
+             $extension = strtolower($file->getClientOriginalExtension());
+             // Función para saber si la extensión se encuentra dentro de las extensiones permitidas
+             $check=in_array($extension,$allowedfileExtension);
+             if(!$check){
+                 Alert::error('Error','La extensión '.$extension.' no es valida.');
+                 return back()->withInput();
+             }
+          }
+      }
+
+      $actividad_evidencia = DB::table('actividad_evidencia')->where([
+          ['actividad_id','=',$request->actividad_id],
+          ['user_id','=',$request->responsables],
+      ])->select('id', 'validado')->first();
+
+      if ($actividad_evidencia->validado == 'true') {
+          $participante = DB::table('participantes as p')
+              ->join('actividad_evidencia as ae', 'ae.id', '=', 'p.id_evidencia')
+              ->where('p.no_control', '=', Auth::User()->no_control)
+              ->where('ae.actividad_id', '=', $actividad->id)
+              ->first();
+
+          if ($participante->momento_agregado == 'anteriormente' || $participante->evidencia_validada == 'si') {
+            Alert::error('Error','La actividad se encuentra validada, motivo por el cual no acepta modificaciones');
+            return redirect()->route('alumnos.actividades');
+          }
+      }
+
+      //Manipulacion de imagenes
+      if($request->has('archivos'))//Validamos si existe una imagen
+      {
+          //Generamos la ruta donde se guardaran las imagenes de los articulos
+          $path=storage_path().'/app/public/evidencias/'.$actividad->nombre.'/';
+          $path_to_verify = 'public/evidencias/'.$actividad->nombre;
+          if(!Storage::has($path_to_verify)){
+              Storage::makeDirectory($path_to_verify);
+          }
+          for ($i = 0; $i < count($request->archivos) ; $i++) {
+              //En el metodo file ponemos el nombre del campo file que pusimos en la vista, que sera el que tenga los datos de la imagen
+              $file=$request->archivos[$i];
+              //Para evitar nombres repetidos en las imagenes, creamos un nombre antes de guardar
+              $name='credITSCH_'.time().'_'.$i.'.'.strtolower($file->getClientOriginalExtension());
+              //Guardamos la imagen en la carpeta creada en la ruta que marcamos anteriormente
+              $file->move($path,$name);
+
+              $evidencia=new Evidencia(); //Obtiene todos los datos de la evidencia de la vista create
+              $evidencia->id_asig_actividades=$actividad_evidencia->id;
+              $evidencia->nom_imagen=$name;//Obtiene el nombre de la imagen para guardarlo en la bd
+              $evidencia->alumno_no_control = $request->no_control;
+              $evidencia->save();//Guarda la evidencia en su tabla
+
+          }
+          $actividad_evidencia = Actividad_Evidencia::find($actividad_evidencia->id);
+          $actividad_evidencia->save();
+      }
+      Alert::success('Correcto','La evidencia fue guardada correctamente');
+      return redirect()->route('alumnos.actividades');
     }
 
     public function evidencia(Request $request){
@@ -299,19 +329,20 @@ class AlumnosRutasController extends Controller
         if(User::find($request->user_id) == null || Actividad::find($request->actividad_id) == null){
             return redirect()->route('alumnos.home_avance');
         }
-    	$evidencias = DB::table('actividad_evidencia as ae')->join('evidencia as e', function($join) use($request){
-    		$join->on('e.id_asig_actividades','=','ae.id');
-    		$join->where('ae.user_id','=',$request->user_id);
-    		$join->where('ae.actividad_id','=',$request->actividad_id);
-    		$join->where('e.alumno_no_control','=',Auth::User()->no_control);
-    	})->join('actividad as a','a.id','=','ae.actividad_id')->join('users as u','u.id','=','ae.user_id')->select('a.nombre as actividad_nombre','a.id as actividad_id','e.nom_imagen as evidencia_nombre','ae.user_id','e.created_at as fecha','e.id as evidencia_id','u.name as usuario_nombre')->get();
-    	$actividad = Actividad::find($request->actividad_id);
-    	$actividad_evidencia = DB::table('actividad_evidencia as ae')->join('participantes as p','p.id_evidencia','=','ae.id')->where([
-    		['p.no_control','=',Auth::User()->no_control],
-    		['ae.user_id','=',$request->user_id],
-    		['ae.actividad_id','=',$request->actividad_id]
-    	])->select('ae.id')->get();
-    	if($actividad_evidencia->count()==0)$actividad=null;
+      $evidencias = DB::table('actividad_evidencia as ae')->join('evidencia as e', function($join) use($request){
+        $join->on('e.id_asig_actividades','=','ae.id');
+        $join->where('ae.user_id','=',$request->user_id);
+        $join->where('ae.actividad_id','=',$request->actividad_id);
+        $join->where('e.alumno_no_control','=',Auth::User()->no_control);
+      })->join('actividad as a','a.id','=','ae.actividad_id')->join('users as u','u.id','=','ae.user_id')->select('a.nombre as actividad_nombre','a.id as actividad_id','e.nom_imagen as evidencia_nombre','ae.user_id','e.created_at as fecha','e.id as evidencia_id','u.name as usuario_nombre')->get();
+      $actividad = Actividad::find($request->actividad_id);
+      $responsable = User::find($request->user_id);
+      $actividad_evidencia = DB::table('actividad_evidencia as ae')->join('participantes as p','p.id_evidencia','=','ae.id')->where([
+        ['p.no_control','=',Auth::User()->no_control],
+        ['ae.user_id','=',$request->user_id],
+        ['ae.actividad_id','=',$request->actividad_id]
+      ])->select('ae.id')->get();
+      if($actividad_evidencia->count()==0)$actividad=null;
         $validado = Actividad_Evidencia::where([
             ['user_id','=',$request->user_id],
             ['actividad_id','=',$request->actividad_id]
@@ -323,37 +354,90 @@ class AlumnosRutasController extends Controller
         if($participante_data->count() == 0){
             return redirect()->route('alumnos.actividades');
         }
-    	return view('alumnos.evidencia')
-    	->with('evidencias',$evidencias)
-    	->with('actividad',$actividad)
+      return view('alumnos.evidencia')
+        ->with('evidencias',$evidencias)
+        ->with('responsable',$responsable)
+        ->with('actividad',$actividad)
         ->with('validado',$validado)
         ->with('participante_data',$participante_data[0])
         ->with('alumno_data',$alumno_data);
     }
 
-    public function eliminarEvidencia(Request $request){
-    	if($request->has('actividad') && $request->has('archivo') && $request->has('archivo_nombre')){
-            $validado = DB::table('evidencia as e')->join('actividad_evidencia as ae', function($join) use($request){
-                $join->on('ae.id','=','e.id_asig_actividades');
-                $join->where('e.id','=',$request->get('archivo'));
-            })->select('ae.validado','ae.id')->get();
-            if($validado->count()==0){
-                return response()->json(array('mensaje' => 'Error al eliminar la evidencia', 'tipo' => 'error'));
-            }else{
-                if($validado[0]->validado == "true"){
-                    $participante_data = Participante::where([
-                        ['id_evidencia','=',$validado[0]->id],
-                        ['no_control','=',Auth::User()->no_control]
-                    ])->get()[0];
-                    if($participante_data->momento_agregado == "posteriormente" && $participante_data->evidencia_validada == "si"){
-                        return response()->json(array('mensaje' => 'La evidencia ya ha sido validada', 'tipo' => 'error'));
-                    }
-                }
-            }
-    	    Evidencia::destroy($request->get('archivo'));
-    	    Storage::delete('public/evidencias/'.$request->get('actividad').'/'.$request->get('archivo_nombre'));
-    	    return response()->json(array('mensaje' => 'Evidencia eliminada con exito','tipo' => 'exito'));
-    	}
-    	return response()->json(array('mensaje' => 'Error al eliminar la evidencia', 'tipo' => 'error'));
+    public function peticionEvidencia(Request $request) {
+        if (!$request->has('responsable_id') || !$request->has('actividad_id')) {
+            return response()->json('Datos invalidos.', HttpCode::BAD_REQUEST);
+        }
+
+        $evidencias = DB::table('actividad_evidencia as ae')
+            ->join('evidencia as e', function($join) use($request){
+                $join->on('e.id_asig_actividades','=','ae.id');
+                $join->where('ae.user_id','=',$request->responsable_id);
+                $join->where('ae.actividad_id','=',$request->actividad_id);
+                $join->where('e.alumno_no_control','=',Auth::User()->no_control);
+            })
+            ->join('actividad as a','a.id','=','ae.actividad_id')
+            ->join('participantes as p','p.id_evidencia','=','ae.id')
+            ->select('e.nom_imagen',DB::raw('DATE_FORMAT(e.created_at, "%d-%m-%Y") as fecha_creacion'),
+                'a.nombre as actividad_nombre','e.id as evidencia_id', 'p.evidencia_validada as participante_evidencia_validada',
+                'ae.validado', 'e.nom_original', 'a.id as actividad_id', 'a.vigente', 'p.momento_agregado')
+            ->get();
+
+        return response()->json($evidencias);
     }
+
+    public function peticionEliminar(Request $request) {
+        if($request->has('actividad') && $request->has('archivo')){
+            $evidencia_data = DB::table('evidencia as e')
+                ->join('actividad_evidencia as ae', 'ae.id', '=', 'e.id_asig_actividades')
+                ->join('actividad as a', 'a.id', '=', 'ae.actividad_id')
+                ->where('e.id', '=', $request->get('archivo'))
+                ->where('e.alumno_no_control', '=', Auth::User()->no_control)
+                ->where('a.id', '=', $request->get('actividad'))
+                ->select('a.nombre as actividad_nombre', 'e.nom_imagen as archivo_nombre', 'ae.validado',
+                    'ae.user_id as responsable', 'ae.id as act_evidencia_id', 'a.id_user as owner_id', 'e.id as archivo', 'a.vigente')
+                ->get();
+
+            if ($evidencia_data->count() != 1) {
+                return response()->json('No se encontraron registros', HttpCode::BAD_REQUEST);
+            }
+
+            $evidencia_data = $evidencia_data[0];
+            $validado = (bool)json_decode($evidencia_data->validado);
+            $actividad_vigente = (bool)json_decode($evidencia_data->vigente);
+
+            try {
+                if (!$validado && $actividad_vigente) {
+                    $this->eliminarEvidencia($evidencia_data->actividad_nombre, $evidencia_data->archivo, $evidencia_data->archivo_nombre);
+                    return response()->json('Evidencia eliminada con exito', HttpCode::OK);
+                } else if($validado && $actividad_vigente) {
+                    $participante_data = Participante::where(
+                        [
+                            ['id_evidencia','=',$evidencia_data->act_evidencia_id],
+                            ['no_control','=',Auth::User()->no_control]
+                        ])
+                        ->first();
+
+                    if($participante_data->momento_agregado == 'posteriormente'
+                        && $participante_data->evidencia_validada == 'no')
+                    {
+                        $this->eliminarEvidencia($evidencia_data->actividad_nombre, $evidencia_data->archivo, $evidencia_data->archivo_nombre);
+                        return response()->json('Evidencia eliminada con exito', HttpCode::OK);
+                    } else {
+                        return response()->json('La evidencia ya se encuentra validada. No esta permitida esta acción.', HttpCode::NOT_ACCEPTABLE);
+                    }
+                } else {
+                    return response()->json('La actividad ya no acepta modificaciones.', HttpCode::UNAUTHORIZED);
+                }
+            } catch (\Exception $e) {
+                return response()->json('Se proceso con el siguiente error: '.$e->getMessage(), HttpCode::BAD_REQUEST);
+            }
+        }
+        return response()->json('Error al eliminar la evidencia', HttpCode::BAD_REQUEST);
+    }
+
+    private function eliminarEvidencia($actividad, $archivo_id, $archivo) {
+        Evidencia::destroy($archivo_id);
+        Storage::delete('public/evidencias/'.$actividad.'/'.$archivo);
+    }
+
 }

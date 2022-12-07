@@ -72,16 +72,15 @@
         </div>
         <div class="modal-body text-center">
           <div>
-            <button id="prev">Anterior</button>
-            <button id="next">Siguiente</button>
+            <button id="prev" class="btn btn-outline-primary">Anterior</button>
+            <button id="next" class="btn btn-outline-primary">Siguiente</button>
             &nbsp; &nbsp;
             <span>Página: <span id="page_num"></span> / <span id="page_count"></span></span>
           </div>
           <canvas id="pdf-canvas"></canvas>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-primary" data-mdb-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
@@ -127,11 +126,11 @@
                                         archivo_url,
                                         isPDF,
                                         actividad,
-                                        evidencia_id)
+                                        evidencia_id,
+                                        puede_eliminar)
       {
         let card = createElement('div', ['card']);
         let card_wrapper = createElement('div', ['col-md-3', 'col-sm-4', 'col-xxl-2', 'mt-2']);
-        let delete_button = crearLinkEliminar(actividad, evidencia_id, archivo_nombre);
         let img = createIMGElement(imagen_url, ['card-img-top', 'galeria-elemento', (isPDF ? 'is-PDF' : 'is-image')], archivo_nombre);
         img.addEventListener('click', displayDocument);
 
@@ -143,13 +142,17 @@
 
         let card_body = createElement('div', ['card-body', 'p-1']);
         let detalles_lista = createElement('ul', ['list-group', 'list-group-flush']);
-        let actividad_elem = crearDetalleSublista('Archivo: ', nameWithoutExtension(archivo_nombre));
+        let archivo_elem = crearDetalleSublista('Archivo: ', nameWithoutExtension(archivo_nombre));
         let responsable_elem = crearDetalleSublista('Responsable: ', responsable);
         let alumno_elem = crearDetalleSublista('Alumno: ', alumno);
         let fecha_elem = crearDetalleSublista('Fecha: ', fecha);
-        appendChildren(detalles_lista, actividad_elem, responsable_elem, alumno_elem, fecha_elem);
+        appendChildren(detalles_lista, archivo_elem, responsable_elem, alumno_elem, fecha_elem);
 
-        card.appendChild(delete_button);
+        if (puede_eliminar) {
+          let delete_button = crearLinkEliminar(actividad, evidencia_id, archivo_nombre);
+          card.appendChild(delete_button);
+        }
+
         card.appendChild(img);
         card_body.appendChild(detalles_lista);
         card.appendChild(card_body);
@@ -266,21 +269,11 @@
         for(var x=0; x<response.length; x++){
           var archivo = response[x]['nom_imagen'].toString();
           var nombre_original = isNull(response[x]['nom_original']) ? archivo : response[x]['nom_original'];
-          var eliminar_evidencia = "";
           var admin = "{{ Auth::User()->can('VIP')}}" == "1" ? true : false;
           var admin_evidencia = "{{ Auth::User()->can('VIP_EVIDENCIA') }}" == "1" ? true : false;
           var permiso_eliminar = "{{ Auth::User()->can('ELIMINAR_EVIDENCIA') }}" == "1" ? true : false;
-          if(admin || admin_evidencia){
-            eliminar_evidencia = "<a href='#' data-actividad='"+response[x]['actividad_nombre']+"' data-archivo='"+response[x]['evidencia_id']+"' data-validado = '"+response[x]['validado']+"'data-archivo_nombre='"+archivo+"' class='eliminar-evidencia'>"
-              +"<img src='{{ asset('images/eliminar_icono.png') }}' class='eliminar' width='40' heigth='40'>"
-              +"</a>";
-          }else if(permiso_eliminar && response[x]['validado']=="false"){
-            if(response[x]['user_id']=="{{ Auth::User()->id }}"){
-              eliminar_evidencia = "<a href='#' data-actividad='"+response[x]['actividad_nombre']+"' data-archivo='"+response[x]['evidencia_id']+"' data-validado = '"+response[x]['validado']+"'data-archivo_nombre='"+archivo+"' class='eliminar-evidencia'>"
-                +"<img src='{{ asset('images/eliminar_icono.png') }}' class='eliminar' width='40' heigth='40'>"
-                +"</a>";
-            }
-          }
+          var puede_eliminar = admin || admin_evidencia;
+          puede_eliminar = (permiso_eliminar && response[x]['validado']=="false") || puede_eliminar;
           let actividad_id = response[x]['actividad_id'];
           let actividad_nombre = response[x]['actividad_nombre'];
           let evidencia_id = response[x]['evidencia_id'];
@@ -291,7 +284,7 @@
           let isPDF = getExtension(archivo) === 'pdf';
           let imagen_url = (isPDF ? pdf_icono : asset('storage/evidencias', actividad_nombre, archivo));
           let archivo_url = asset('storage/evidencias', actividad_nombre, archivo);
-          let elem = crearElementoParaGaleria(nombre_original, responsable, alumno_nombre, fecha, imagen_url, archivo_url, isPDF, actividad_id, evidencia_id);
+          let elem = crearElementoParaGaleria(nombre_original, responsable, alumno_nombre, fecha, imagen_url, archivo_url, isPDF, actividad_id, evidencia_id, puede_eliminar);
           $('#gallery-container').append(elem);
         }
       }
