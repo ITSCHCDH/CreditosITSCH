@@ -161,15 +161,20 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    { 
+    {
         if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])) {
             $creditos = Credito::where('vigente','=','true')->orderBy('nombre','asc')->get();
 
-        }else{ 
-            $creditos = Credito::leftjoin('creditos_areas as ca','ca.credito_id','=','creditos.id')->where([
-                ['ca.credito_area','=',Auth::User()->area],
-                ['creditos.vigente','=','true']
-            ])->groupBy('creditos.id')->orderBy('creditos.nombre','asc')->get();
+        }else{
+            $creditos = Credito::leftjoin('creditos_areas as ca','ca.credito_id','=','creditos.id')
+                ->where([
+                    ['ca.credito_area','=',Auth::User()->area],
+                    ['creditos.vigente','=','true']
+                ])
+                ->select('creditos.id', 'creditos.nombre')
+                ->groupBy('creditos.id')
+                ->orderBy('creditos.nombre','asc')
+                ->get();
         }
 
        return view('admin.actividades.create')->with('creditos',$creditos);
@@ -182,15 +187,15 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    { 
-        $act=new Actividad($request->all()); //Obtiene todos los datos de la vista para guardarlos en la BD 
-        
+    {
+        $act=new Actividad($request->all()); //Obtiene todos los datos de la vista para guardarlos en la BD
+
         $act->id_user = Auth::User()->id;
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act->nombre)->get();
         if(!Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])){
             $areas_del_credito = DB::table('creditos as c')->join('creditos_areas as ca', function($join) use($request){
                 $join->on('c.id','=','ca.credito_id');
-                $join->where('c.id','=',$request->id_actividad);
+                $join->where('c.id','=',$request->id_actividad); // id_actividad hace referencia a credito_id, lo sé mal diseño de la DB
             })->select('ca.credito_area as area_id')->get();
             $tiene_permitido = false;
             foreach ($areas_del_credito as $area) {
@@ -333,7 +338,7 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    { 
+    {
         $act=Actividad::find($id);
         if($act==null){
             Alert::error('Error','La actividad no existe');
