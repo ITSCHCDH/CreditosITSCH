@@ -8,19 +8,20 @@
 @endsection
 @section('contenido')
 
-	<form method="POST" action="{{ route('usuarios.update',$user->id) }}">		
-	    {{ csrf_field() }}
+	<form method="POST" action="{{ route('usuarios.update',$user->id) }}">
+			{{ csrf_field() }}
+			{{ method_field('PATCH') }}
 
 		<div class="form-outline">
 			<input type="text" id="nombre" name="name" class="form-control form-control-lg" value="{{ $user->name }}" autofocus required />
 			<label class="form-label" for="nombre">Nombre</label>
-		</div>	
+		</div>
 		<br>
 
 		<div class="form-outline">
 			<input type="email" id="email" name="email" class="form-control form-control-lg" value="{{ $user->email }}" required />
 			<label class="form-label" for="email">Dirección E-Mail</label>
-		</div>	   
+		</div>
 
 		<div class="form-group">
 	        <label for="area" class="control-label">Area</label>
@@ -37,7 +38,7 @@
 		            		@endif
 		            	@endforeach
 		            @endif
-	            </select>	          
+	            </select>
 	        </div>
 	    </div>
 
@@ -53,21 +54,21 @@
 	        			{{ "selected" }}
 	        			style="{{ 'background-color: blue; color: white;' }}"
 	        		@endif>NO</option>
-	        	</select>	        	
+	        	</select>
 	        </div>
-	    </div>		
+	    </div>
 
 		<div class="form-outline">
 			<input type="password" id="password" name="password" class="form-control form-control-lg" value="{{ $user->password }}" required />
 			<label class="form-label" for="password">Password</label>
-		</div>	
-		<br>	
-		
+		</div>
+		<br>
+
 		<div class="form-outline">
 			<input type="password" id="password_confirmation" name="password_confirmation" class="form-control form-control-lg" value="{{ $user->password }}" required />
 			<label class="form-label" for="password_confirmation">Confirmar Password</label>
 		</div>
-		<br>   
+		<br>
 
 	    <div class="form-group">
 	        <div class="col-md-offset-4">

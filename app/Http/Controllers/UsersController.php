@@ -33,7 +33,7 @@ class UsersController extends Controller
                 return view('admin.usuarios.index')
                 ->with('users',$users);
         }
-        
+
     }
     public function create(){
         if (Auth::User()->can('VIP')) {
@@ -51,7 +51,7 @@ class UsersController extends Controller
                 $valido = true;
                 for ($x=0; $x < count($temp_permisos_role); $x++) {
                     $tiene_permiso = false;
-                    for ($y=0; $y < count($permisos); $y++) { 
+                    for ($y=0; $y < count($permisos); $y++) {
                         if($temp_permisos_role[$x]->name == $permisos[$y]->name){
                             $tiene_permiso = true;
                             break;
@@ -83,24 +83,24 @@ class UsersController extends Controller
     public function store(UserRequest $request){
     	$user = new User($request->all());
         $correo_duplicado = User::where('email','=',$user->email)->get()->count() > 0;
-        if($correo_duplicado){           
-            
+        if($correo_duplicado){
+
             Alert::error('Error','El correo '.$user->email.' ya se encuentra en uso');
             return back()->withInput();
-           
+
         }
     	$user->password = bcrypt($request->password);
         $user->save();
         if($request->has('roles_id')){
             $user->syncRoles($request->roles_id);
         }
-        Alert::success('Correcto','El usuario '.$user->name.' has sido registrado exitosamente!');   	
-    	return redirect()->route('usuarios.index');        
+        Alert::success('Correcto','El usuario '.$user->name.' has sido registrado exitosamente!');
+    	return redirect()->route('usuarios.index');
     }
 
     public function edit($id){
         $user = User::find($id);
-        if($user==null){            
+        if($user==null){
             return redirect()->back()
             ->with("error","El usuario no existe");
         }
@@ -110,64 +110,64 @@ class UsersController extends Controller
             ->with('areas',$areas)
             ->with('user',$user);
         }else{
-            if($user->area!=Auth::User()->area){    
-                Alert::error('Error','No puedes editar usuarios que no te corresponden');            
-                return redirect()->back();                
+            if($user->area!=Auth::User()->area){
+                Alert::error('Error','No puedes editar usuarios que no te corresponden');
+                return redirect()->back();
             }
-            if($user->id==1){ 
-                Alert::error('Error','No le puedes hacer modificaciones al administrador');               
-                return redirect()->back();               
+            if($user->id==1){
+                Alert::error('Error','No le puedes hacer modificaciones al administrador');
+                return redirect()->back();
             }
             $areas = Area::where('id','=',Auth::User()->area)->orderBy('nombre','ASC')->get();
             return view('admin.usuarios.edit')
             ->with('areas',$areas)
             ->with('user',$user);
         }
-        
+
     }
 
     public function update(UserRequest $request, $id){
         $user = User::find($id);
-        if($user==null){ 
-            Alert::error('Error','El usuario no existe');           
-            return redirect()->back();           
-        }        
+        if($user==null){
+            Alert::error('Error','El usuario no existe');
+            return redirect()->back();
+        }
         $user->name = $request->name;
         $user->email = $request->email;
         $user->area = $request->area;
         $user->active = $request->active;
         $correo_duplicado = User::where('email','=',$request->email)->get()->count() > 1;
-        if($correo_duplicado){ 
-            Alert::error('Error','El correo '.$request->email.' ya se encuentra en uso por otro usuario');           
-            return back()->withInput();           
+        if($correo_duplicado){
+            Alert::error('Error','El correo '.$request->email.' ya se encuentra en uso por otro usuario');
+            return back()->withInput();
         }
         if($user->password!=$request->password) {
-            if($request->password==$request->password_confirmation) 
+            if($request->password==$request->password_confirmation)
             {
                 $user->password=bcrypt($request->password);
             }
             else
-            {       
-                Alert::error('Error','Error de credenciales, las contraseñas deben ser iguales para el usuario: '.$user->nombre);         
-                return redirect()->route('alumnos.index');               
+            {
+                Alert::error('Error','Error de credenciales, las contraseñas deben ser iguales para el usuario: '.$user->nombre);
+                return redirect()->route('alumnos.index');
             }
         }
         $user->save();
-        
+
         Alert::success('Correcto','El usuario '.$request->name.' se modifico correctamente');
-        return redirect()->route('usuarios.index');        
+        return redirect()->route('usuarios.index');
     }
 
 
     public function destroy($id){
-        if(Auth::User()->id==$id){  
-            Alert::error('Error','No te puedes autoeliminar');         
-            return redirect()->route('usuarios.index');            
+        if(Auth::User()->id==$id){
+            Alert::error('Error','No te puedes autoeliminar');
+            return redirect()->route('usuarios.index');
         }
         $user = User::find($id);
-        if($user==null){  
-            Alert::error('Error','El usuario no existe');        
-            return redirect()->route('usuarios.index');            
+        if($user==null){
+            Alert::error('Error','El usuario no existe');
+            return redirect()->route('usuarios.index');
         }
 
         if(Auth::User()->can('VIP')){
@@ -175,34 +175,34 @@ class UsersController extends Controller
             $responsable = DB::table('actividad_evidencia as ae')->where('ae.user_id','=',$id)->orwhere('ae.user_id','=',$id)->get()->count()>0?true:false;
             $roles = DB::table('model_has_roles')->where('model_id','=',$id)->get()->count()>0?true:false;
 
-            if($roles || $actividades || $responsable){                
+            if($roles || $actividades || $responsable){
                 return redirect()->route('usuarios.index')
                 ->with("error","El usuarios ".$user->name." no puede ser eliminado debido debido a claves foraneas");
             }
             $user->delete();
             return redirect()->back();
         }else{
-            if($user->area!=Auth::User()->area){   
-                Alert::error('Error','No puedes eliminar usuarios que no te corresponden');            
-                return redirect()->back();                
+            if($user->area!=Auth::User()->area){
+                Alert::error('Error','No puedes eliminar usuarios que no te corresponden');
+                return redirect()->back();
             }
-            if($user->id==1){    
-                Alert::error('Error','El administrador no puede ser modificado');            
-                return redirect()->back();               
+            if($user->id==1){
+                Alert::error('Error','El administrador no puede ser modificado');
+                return redirect()->back();
             }
             $actividades = DB::table('actividad as a')->where('a.id_user','=',$id)->get()->count()>0? true: false;
             $responsable = DB::table('actividad_evidencia as ae')->where('ae.user_id','=',$id)->orwhere('ae.user_id','=',$id)->get()->count()>0?true:false;
             $roles = DB::table('model_has_roles')->where('model_id','=',$id)->get()->count()>0?true:false;
 
-            if($roles || $actividades || $responsable){ 
-                Alert::error('Error','El usuarios '.$user->name.' no puede ser eliminado debido debido a claves foraneas');             
-                return redirect()->route('usuarios.index');               
+            if($roles || $actividades || $responsable){
+                Alert::error('Error','El usuarios '.$user->name.' no puede ser eliminado debido debido a claves foraneas');
+                return redirect()->route('usuarios.index');
             }
             $user->delete();
             Alert::success('Correcto','El usuario se elimino correctamente');
             return redirect()->back();
         }
-        
+
     }
 
     public function asignarRoles($id){
@@ -229,7 +229,7 @@ class UsersController extends Controller
                 $valido = true;
                 for ($x=0; $x < count($temp_permisos_role); $x++) {
                     $tiene_permiso = false;
-                    for ($y=0; $y < count($permisos); $y++) { 
+                    for ($y=0; $y < count($permisos); $y++) {
                         if($temp_permisos_role[$x]->name == $permisos[$y]->name){
                             $tiene_permiso = true;
                             break;
@@ -257,7 +257,7 @@ class UsersController extends Controller
             ->with('user',$user)
             ->with('area',$area);
         }
-        
+
     }
 
     public function guardarRoles(Request $request){
@@ -272,7 +272,7 @@ class UsersController extends Controller
                 $user->syncRoles([]);
             }
         }
-       
+
         return redirect()->route('usuarios.index')
         ->with("success","Roles asignados correctamente");
     }
