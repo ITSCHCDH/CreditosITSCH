@@ -277,12 +277,12 @@
                                         if(tiene_permisos || ("{{ Auth::User()->can('ELIMINAR_PARTICIPANTES') }}" == "1" || response['user_id'] == "{{ Auth::User()->id}}") || (response['validador_id'] == "{{ Auth::User()->id }}")){
                                             if(alumnos_responsables){
                                                 if(tiene_evidencia == null){
-                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+advertencia+"</td></tr>");
+                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></span>"+advertencia+"</td></tr>");
                                                 }else{
-                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+ver_evidencia+"</td></tr>");
+                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></span>"+ver_evidencia+"</td></tr>");
                                                 }
                                             }else{
-                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a></td></tr>");
+                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></span></td></tr>");
                                             }
                                         }else{
                                             $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td><td>Ninguna</td></tr>");
@@ -291,14 +291,14 @@
                                         if(tiene_permisos || response['validador_id'] == "{{ Auth::User()->id }}"){
                                             if(alumnos_responsables){
                                                 if(tiene_evidencia == null){
-                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+advertencia+"</td></tr>");
+                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></span>"+advertencia+"</td></tr>");
                                                 }else if(response['participantes_data'][x]['evidencia_validada'] == 'no' && response['participantes_data'][x]['momento_agregado'] == 'posteriormente'){
-                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+ver_evidencia+validar_evidencia_advertencia+"</td></tr>");
+                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></span>"+ver_evidencia+validar_evidencia_advertencia+"</td></tr>");
                                                 }else{
-                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+ver_evidencia+"</td></tr>");
+                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></span>"+ver_evidencia+"</td></tr>");
                                                 }
                                             }else{
-                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span href=\"#\" value='"+id+"' class='btn btn-danger claseEliminaParticipante' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a></td></tr>");
+                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span href=\"#\" value='"+id+"' class='btn btn-danger claseEliminaParticipante' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></span></td></tr>");
                                             }
                                         }else{
                                             $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td><td>Ninguna</td></tr>");
