@@ -26,7 +26,7 @@
 			<br>
 			<div class="form-outline">
 				<input type="text" id="notificacion" name="notificacion" class="form-control" required />
-				<label class="form-label" for="notificacion">Example label</label>
+				<label class="form-label" for="notificacion">Asunto</label>
 			</div>			
 			<br>
 
