@@ -17,13 +17,13 @@
 <div id="mensaje-actividad-alumnos"></div>
 
 @if (Auth::User()->hasAnyPermission(['VIP','CREAR_EVIDENCIA']))
-    <form action="{{ route('evidencias.create') }}" method="get">  
+    <form action="{{ route('evidencias.create') }}" method="get">
         <input type="hidden" name="id_actividad" value='-1' id='input_id_actividad'>
-        <input type="hidden" name="id_responsable" value='-1' id='input_id_responsable'>      
+        <input type="hidden" name="id_responsable" value='-1' id='input_id_responsable'>
         <button type="submit" class="btn btn-outline-success btn-sm" title="Agregar evidencia">
-            <i class="fas fa-file-import fa-lg"></i>       
-        </button>    
-    </form>  
+            <i class="fas fa-file-import fa-lg"></i>
+        </button>
+    </form>
 @endif
 
 
@@ -34,60 +34,60 @@
     @endif
     <p>Evidencias del responsable seleccionado: <strong id = "numero-evidencias-responsable">0</strong> <a href="{{ route('evidencias.index',['ruta' => 'participantes']) }}" id="evidencia-parcial">VER</a></p>
     <p id="parrafo-validado" style="display: none;">Validado: <strong id="validado">NO</strong></p>
-</div>  
+</div>
 <br><br><br><br><br><br>
 <div class="row">
     <div class="col-sm-3">
         <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
         al que estan asignados los participantes -->
-       
+
         <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text bg-info">Actividad</span>
-            </div>   
+            </div>
             <select name="actividades_id" id="actividades_id" required class="form-control">
                 @foreach ($actividades as $act)
                     <option value="{{ $act->id }}">{{ $act->nombre }}</option>
                 @endforeach
-            </select>  
-        </div> 
-    </div>  
+            </select>
+        </div>
+    </div>
     <div class="col-sm-3">
         <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
-        al que estan asignados los participantes -->        
+        al que estan asignados los participantes -->
         <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text bg-info">Responsable</span>
-            </div>   
-            <select name="responsables_id[]" id="responsables_id" class="form-control" required></select>   
+            </div>
+            <select name="responsables_id[]" id="responsables_id" class="form-control" required></select>
         </div>
-    </div>    
-    @if (Auth::User()->hasAnyPermission(['AGREGAR_PARTICIPANTES','VIP']))       
-        <div class="col-sm-3">            
+    </div>
+    @if (Auth::User()->hasAnyPermission(['AGREGAR_PARTICIPANTES','VIP']))
+        <div class="col-sm-3">
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                  <span class="input-group-text bg-info">Alumno</span> 
-                </div>                   
+                  <span class="input-group-text bg-info">Alumno</span>
+                </div>
                 <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
             </div>
         </div>
         <div class="col-sm-3">
-                <!-- Abrimos el formulario para guardar los participantes -->       
-            <form id="frm" method="POST" class="form-inline">                                    
-                <div class="input-group mb-3">  
+                <!-- Abrimos el formulario para guardar los participantes -->
+            <form id="frm" method="POST" class="form-inline">
+                <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text bg-info">N. Control</span>
-                    </div>                            
-                    <input type="hidden" value="{{ csrf_token() }}" id="token">    
+                    </div>
+                    <input type="hidden" value="{{ csrf_token() }}" id="token">
                     <input type="hidden" name="id_actividad" id="id_actividad_oculto" value="-1">
                     <input type="hidden" name="id_responsable" id="responsable_oculto" value='-1'>
-                    <input type="text" name="no_control" id="no_control" placeholder="No Control" class="form-control" list="list_no_control">                           
-                    <input type="submit" value="Agregar"  class="btn btn-outline-primary btn-sm" data-mdb-ripple-color="dark">                         
+                    <input type="text" name="no_control" id="no_control" placeholder="No Control" class="form-control" list="list_no_control">
+                    <input type="submit" value="Agregar"  class="btn btn-outline-primary btn-sm" data-mdb-ripple-color="dark">
                 </div>
-            </form>    
-        </div>                   
-    @endif     
-</div>  
+            </form>
+        </div>
+    @endif
+</div>
 
 <datalist id="list_no_control">
 </datalist>
@@ -99,7 +99,7 @@
     <br>
 <div class="table-responsive">
     <table class="table" id="mitabla">
-        <!-- instancia al archivo table, dentro de este mismo direcctorio -->
+       <input type="hidden" id="participante_id" name="participante_id">
        <thead>
             <th>ID</th>
             <th>Numero de Control</th>
@@ -112,32 +112,24 @@
     </table>
 </div>
 
-
-<!-- The Modal -->
-<div class="modal" id="modEliminar">
-    <div class="modal-dialog">
-        <div class="modal-content">
-    
-            <!-- Modal Header -->
-            <div class="modal-header">
-            <h4 class="modal-title">Eliminar participante</h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-    
-            <!-- Modal body -->
-            <div class="modal-body">
-                Estas seguro de eliminar este participante?
-            </div>
-    
-            <!-- Modal footer -->
-            <div class="modal-footer">
-                <a class="btn btn-danger btn-ok">Eliminar</a>
-                <button type="button" class="btn btn-success" data-dismiss="modal">Cancelar</button>
-            </div>
-    
-        </div>
+<!-- Modal -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Eliminar participante</h5>
+        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estas seguro de eliminar este participante?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-mdb-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="eliminar">Eliminar</button>
+      </div>
     </div>
   </div>
+</div>
 
 
 {{-- Sección JS --}}
@@ -183,7 +175,7 @@
                         cache:false,
                         data:{id:current_id},
                         dataType: 'json',
-                        success:function(response){                   
+                        success:function(response){
                             //Vaciamos la tabla de los participantes
                             $('#mitabla tbody').empty();
                             //Vaciamos el combobox de los responsables
@@ -191,7 +183,7 @@
                             if(response['responsables'].length==0){
                                 $('#responsables_id').append("<option value='' disabled>Sin responsables</option>");
                             }
-                            
+
                             //Agregamos los responsables al combobox
                             for(var x=0; x<response['responsables'].length; x++){
                                 var id = response['responsables'][x]['id'];
@@ -285,12 +277,12 @@
                                         if(tiene_permisos || ("{{ Auth::User()->can('ELIMINAR_PARTICIPANTES') }}" == "1" || response['user_id'] == "{{ Auth::User()->id}}") || (response['validador_id'] == "{{ Auth::User()->id }}")){
                                             if(alumnos_responsables){
                                                 if(tiene_evidencia == null){
-                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+advertencia+"</td></tr>");
+                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+advertencia+"</td></tr>");
                                                 }else{
-                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+ver_evidencia+"</td></tr>");
+                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+ver_evidencia+"</td></tr>");
                                                 }
                                             }else{
-                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}' title='Eliminar participante'><i class='far fa-trash-alt'></i></a></td></tr>");
+                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a></td></tr>");
                                             }
                                         }else{
                                             $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td><td>Ninguna</td></tr>");
@@ -299,14 +291,14 @@
                                         if(tiene_permisos || response['validador_id'] == "{{ Auth::User()->id }}"){
                                             if(alumnos_responsables){
                                                 if(tiene_evidencia == null){
-                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+advertencia+"</td></tr>");
+                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+advertencia+"</td></tr>");
                                                 }else if(response['participantes_data'][x]['evidencia_validada'] == 'no' && response['participantes_data'][x]['momento_agregado'] == 'posteriormente'){
-                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+ver_evidencia+validar_evidencia_advertencia+"</td></tr>");
+                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+ver_evidencia+validar_evidencia_advertencia+"</td></tr>");
                                                 }else{
-                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+ver_evidencia+"</td></tr>");
+                                                    $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span value='"+id+"' class='btn btn-danger' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a>"+ver_evidencia+"</td></tr>");
                                                 }
                                             }else{
-                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <a href='' value='"+id+"' class='btn btn-danger claseEliminaParticipante' data-token='{{ csrf_token() }}' title='Eliminar participante'><i class='far fa-trash-alt'></i></a></td></tr>");
+                                                $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td> <td> <span href=\"#\" value='"+id+"' class='btn btn-danger claseEliminaParticipante' onclick='mostrarModalEliminar(" +id+")' title='Eliminar participante'><i class='far fa-trash-alt'></i></a></td></tr>");
                                             }
                                         }else{
                                             $('#mitabla tbody').append("<tr><td>"+id+"</td> <td>"+no_control+"</td> <td>"+nombre+"</td> <td>"+carrera+"</td><td>Ninguna</td></tr>");
@@ -324,46 +316,38 @@
                     });
                 });
         }
-        
-        function eliminaParticipante(){
-            $(document).on('click','.claseEliminaParticipante',function(event){                           
-                //var confirmacion = confirm('¡Estas seguro de eliminar al participante?'); 
-                event.preventDefault(); 
-                $("#modEliminar").modal("show");  
-                $('#modEliminar').on('show.bs.modal', function(e) {
-                    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));                    
-                    confirmacion=true;
-                });            
-                
-                if(confirmacion){
-                    var token = $(this).data('token');
-                    var id = $(this).attr('value');
-                    $.ajax({                       
-                        type:'GET',
-                        url:'participantes/'+id+'/destroy',
-                        dataType:'json',
-                        data:{
-                            'id':id,
-                            '_METHOD':'DELETE',
-                            '_token':token
-                        },
-                        success:function(response){
-                            //Mensaje
-                            swal({
-                                title: "Se elimino correctamente!",
-                                text: "Puedes dar click para cerrar el mensaje!",
-                                icon: "success",
-                                button: "Cerrar!",
-                            });
-                            setTimeout(function(){
-                                window.location.replace("{{ route('participantes.index') }}");
-                            },2000);
-                        },error:function(e){
-                            console.log('Error al eliminar'+e);
-                        }
+
+        function mostrarModalEliminar(id){
+            $('#participante_id').val(id);
+            $('#modalEliminar').modal('show');
+        }
+
+        function eliminarParticipante(event){
+            var id = $('#participante_id').val();
+            var token = $('#token').val();
+            $.ajax({
+                type:'GET',
+                url:'participantes/'+id+'/destroy',
+                dataType:'json',
+                data:{
+                    'id':id,
+                    '_METHOD':'DELETE',
+                    '_token':token
+                },
+                success:function(response){
+                    //Mensaje
+                    swal({
+                        title: "Se elimino correctamente!",
+                        text: "Puedes dar click para cerrar el mensaje!",
+                        icon: "success",
+                        button: "Cerrar!",
                     });
-                    
-                }  
+                    setTimeout(function(){
+                        window.location.replace("{{ route('participantes.index') }}");
+                    },2000);
+                },error:function(e){
+                    console.log('Error al eliminar '+e);
+                }
             });
         }
 
@@ -385,7 +369,7 @@
                             id_actividad: id_actividad
                         },
                         dataType:'json',
-                        success:function(response){                           
+                        success:function(response){
                            //Mensaje
                            swal({
                                 title: "El participante se agrego correctamente!",
@@ -402,7 +386,7 @@
                     });
                 }
                 $('#no_control').val('');
-                $('#participante_nombre').val(''); 
+                $('#participante_nombre').val('');
             });
         }
 
@@ -452,7 +436,7 @@
                     }
                 });
                 divPadre = document.createElement("div");
-                
+
             });
 
             entrada.addEventListener("keydown", function(event){
@@ -552,12 +536,17 @@
                 Cookies.set('evidencia_responsable',responsable,{ expires: 1});
             });
         }
+
+        function addEventListeners(){
+            $('#eliminar').on('click', eliminarParticipante);
+        }
+
         $(document).ready(function(){
+            addEventListeners();
             comboActividades();
             getActividadCookie();
             comboResponsables();
             agregaParticipante();
-            eliminaParticipante();
             var tiene_permisos = "{{ Auth::User()->hasAnyPermission(['VIP','AGREGAR_PARTICIPANTES']) }}"=="1"?true: false;
             if(tiene_permisos){
                 autocompletar(document.getElementById("participante_nombre"));
