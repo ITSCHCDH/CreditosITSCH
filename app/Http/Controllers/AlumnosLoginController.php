@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Alert;
 
 class AlumnosLoginController extends Controller
 {
@@ -47,12 +48,12 @@ class AlumnosLoginController extends Controller
      * @return Response
      */
     public function authenticate(Request $request)
-    { 
+    {
         $credentials = $request->only('no_control', 'password');
 
         if (Auth::attempt($credentials)) {
-            // Authentication passed...  
-            
+            // Authentication passed...
+
             return redirect()->intended($redirectTo);
         }
     }
@@ -63,8 +64,8 @@ class AlumnosLoginController extends Controller
      * @return string
      */
     public function username()
-    {  
-        return 'email'; 
+    {
+        return 'email';
     }
 
     /**
@@ -90,5 +91,38 @@ class AlumnosLoginController extends Controller
     protected function guard()
     {
         return Auth::guard('alumno');
+    }
+
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function login(Request $request)
+    {
+        $this->validateLogin($request);
+
+        // If the class is using the ThrottlesLogins trait, we can automatically throttle
+        // the login attempts for this application. We'll key this by the username and
+        // the IP address of the client making these requests into this application.
+        if ($this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+
+            return $this->sendLockoutResponse($request);
+        }
+
+        if ($this->attemptLogin($request)) {
+            return $this->sendLoginResponse($request);
+        }
+
+        // If the login attempt was unsuccessful we will increment the number of attempts
+        // to login and redirect the user back to the login form. Of course, when this
+        // user surpasses their maximum number of attempts they will get locked out.
+
+        $this->incrementLoginAttempts($request);
+
+        Alert::error('Error','El usuario o la contraseña son incorrectos.');
+        return $this->sendFailedLoginResponse($request);
     }
 }

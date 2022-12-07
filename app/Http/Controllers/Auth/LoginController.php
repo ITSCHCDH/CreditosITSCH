@@ -47,7 +47,7 @@ class LoginController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
-    {  
+    {
         $this->validateLogin($request);
         $user = User::where('email','=',$request->email)->get();
         $active = false;
@@ -78,10 +78,11 @@ class LoginController extends Controller
 
         $this->incrementLoginAttempts($request);
         if($existe && !$active){
+            Alert::error('Error','Tu usuario actualmente se encuentra inactivo.');
             return redirect()
-            ->back()
-            ->withInput($request->only($this->username(), 'remember'))
-            ->withErrors(['active' => 'Tu usuario actualmente se encuentra inactivo.']);
+                ->back()
+                ->withInput($request->only($this->username(), 'remember'))
+                ->withErrors(['active' => 'Tu usuario actualmente se encuentra inactivo.']);
         }
         Alert::error("Error","El usuario o la contraseña son incorrectos");
         return $this->sendFailedLoginResponse($request);
