@@ -9,7 +9,7 @@ var pdfDoc = null,
       pageNum = 1,
       pageRendering = false,
       pageNumPending = null,
-      scale = 1.2,
+      scale = 1.7,
       canvas = document.getElementById('pdf-canvas'),
       ctx = canvas.getContext('2d');
 

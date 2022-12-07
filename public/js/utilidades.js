@@ -1,3 +1,13 @@
+function printError(response) {
+   console.error(response);
+   if (parseInt(response.status) < 500) {
+      let responseText = JSON.parse(response.responseText);
+      swal('Error', responseText, 'error');
+   } else {
+      swal(String(response.status), response.statusText, 'error');
+   }
+}
+
 function ucwords(text) {
    let token_list = text.split(' ');
    let result = '';
@@ -47,6 +57,12 @@ function appendChildren(element) {
    }
 }
 
+function addStylesToElement(element, styles) {
+   for (const property in styles) {
+      element.style[property] = styles[property];
+   }
+}
+
 function isNull(element) {
    return element === null;
 }
@@ -80,5 +96,5 @@ function asset() {
       if (i > 0) asset_url += '/';
       asset_url += arguments[i];
    }
-   return asset_url;
+   return encodeURI(asset_url);
 }

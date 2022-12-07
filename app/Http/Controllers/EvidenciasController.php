@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Alert;
+use App\Http\Controllers\Utilities\HttpCode;
 use Exception;
 
 class EvidenciasController extends Controller
@@ -208,7 +209,7 @@ class EvidenciasController extends Controller
                     ->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')
                     ->select('e.nom_imagen',DB::raw('DATE_FORMAT(e.created_at, "%d-%m-%Y") as fecha_creacion'),'u.name as responsable_nombre',
                         'a.nombre as actividad_nombre','e.id as evidencia_id','alu.nombre as alumno_nombre'
-                        ,'ae.validado','u.id as user_id', 'e.nom_original')
+                        ,'ae.validado','u.id as user_id', 'e.nom_original', 'a.id as actividad_id')
                     ->get();
                 return response()->json($evidencias);
             }
@@ -223,7 +224,7 @@ class EvidenciasController extends Controller
                 ->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')
                 ->select('users.name as responsable_nombre','a.nombre as actividad_nombre','e.nom_imagen',
                     DB::raw('DATE_FORMAT(e.created_at, "%d-%m-%Y") as fecha_creacion'),'e.id as evidencia_id','alu.nombre as alumno_nombre',
-                    'ae.validado','users.id as user_id', 'e.nom_original')
+                    'ae.validado','users.id as user_id', 'e.nom_original', 'a.id as actividad_id')
                 ->get();
             return response()->json($evidencias);
         }
@@ -231,30 +232,44 @@ class EvidenciasController extends Controller
     }
 
     public function peticionEliminar(Request $request){
-        if($request->has('actividad') && $request->has('archivo') && $request->has('archivo_nombre')){
-            if(Auth::User()->can('VIP') || Auth::User()->can('VIP_EVIDENCIA')){
-                Evidencia::destroy($request->get('archivo'));
-                Storage::delete('public/evidencias/'.$request->get('actividad').'/'.$request->get('archivo_nombre'));
-                return response()->json(array('mensaje' => 'Evidencia eliminada con exito','tipo' => 'exito'));
+        if($request->has('actividad') && $request->has('archivo')){
+            $evidencia_data = DB::table('evidencia as e')
+                ->join('actividad_evidencia as ae', 'ae.id', '=', 'e.id_asig_actividades')
+                ->join('actividad as a', 'a.id', '=', 'ae.actividad_id')
+                ->where('e.id', '=', $request->get('archivo'))
+                ->where('a.id', '=', $request->get('actividad'))
+                ->select('a.nombre as actividad_nombre', 'e.nom_imagen as archivo_nombre', 'ae.validado', 'ae.user_id as responsable', 'a.id_user as owner_id', 'e.id as archivo')
+                ->get();
+
+            if ($evidencia_data->count() != 1) {
+                return response()->json('No se encontraron registros', HttpCode::BAD_REQUEST);
             }
-            $evidencia_validada = DB::table('evidencia as e')->join('actividad_evidencia as ae',function($join) use($request){
-                $join->on('ae.id','=','e.id_asig_actividades');
-                $join->where('e.id','=',$request->get('archivo'));
-            })->select('ae.validado','ae.user_id')->get();
-            if($evidencia_validada->count()==0){
-                return response()->json(array('mensaje' => 'Error al eliminar la evidencia', 'tipo' => 'error'));
-            }else{
-                if($evidencia_validada[0]->validado=="true"){
-                    return response()->json(array('mensaje' => 'La evidencia ya se encuentra validada. No esta permitida esta acción.', 'tipo' => 'error'));
-                }else if(Auth::User()->id==$evidencia_validada[0]->user_id && Auth::User()->can('ELIMINAR_EVIDENCIA')){
-                    Evidencia::destroy($request->get('archivo'));
-                    Storage::delete('public/evidencias/'.$request->get('actividad').'/'.$request->get('archivo_nombre'));
-                    return response()->json(array('mensaje' => 'Evidencia eliminada con exito','tipo' => 'exito'));
-                }else{
-                    return response()->json(array('mensaje' => 'No cuentas con los permisos necesarios para realizar esta acción', 'tipo' => 'error'));
+
+            $evidencia_data = $evidencia_data[0];
+            $validado = (bool)json_decode($evidencia_data->validado);
+
+            try {
+                $puede_eliminar = Auth::User()->can('VIP') || Auth::User()->can('VIP_EVIDENCIA');
+                $puede_eliminar = (Auth::User()->id == $evidencia_data->owner_id) || $pude_eliminar;
+                $puede_eliminar = (!$validado && Auth::User()->id==$evidencia_data->responsable && Auth::User()->can('ELIMINAR_EVIDENCIA')) || $puede_eliminar;
+
+                if ($puede_eliminar) {
+                    $this->eliminarEvidencia($evidencia_data->actividad_nombre, $evidencia_data->archivo, $evidencia_data->archivo_nombre);
+                    return response()->json('Evidencia eliminada con exito', HttpCode::OK);
+                } else if($validado) {
+                    return response()->json('La evidencia ya se encuentra validada. No esta permitida esta acción.', HttpCode::NOT_ACCEPTABLE);
+                } else {
+                    return response()->json('No cuentas con los permisos necesarios para realizar esta acción', HttpCode::UNAUTHORIZED);
                 }
+            } catch (\Exception $e) {
+                return response()->json('Se proceso con el siguiente error: '.$e->getMessage(), HttpCode::BAD_REQUEST);
             }
         }
-        return response()->json(array('mensaje' => 'Error al eliminar la evidencia', 'tipo' => 'error'));
+        return response()->json('Error al eliminar la evidencia', HttpCode::BAD_REQUEST);
+    }
+
+    private function eliminarEvidencia($actividad, $archivo_id, $archivo) {
+        Evidencia::destroy($archivo_id);
+        Storage::delete('public/evidencias/'.$actividad.'/'.$archivo);
     }
 }

@@ -14,6 +14,7 @@
 
 @section('links')
   <link href="{{ asset('css/viewer.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ asset('css/creditos/app.css') }}" rel="stylesheet" type="text/css">
   <script type="text/javascript" src="{{ asset('plugins/jsCookie/js.cookie.js') }}"></script>
 @endsection
 
@@ -61,15 +62,15 @@
     <ul id="images-list"></ul>
   </div>
 
-  <!-- Modal -->
+  <!-- PDF Modal -->
   <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="pdfModalLabel">Lector PDF</h5>
           <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body text-center">
           <div>
             <button id="prev">Anterior</button>
             <button id="next">Siguiente</button>
@@ -86,7 +87,27 @@
     </div>
   </div>
 
-  
+<!-- Modal para eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <input type="hidden" name="actividad_id" id="actividad_id">
+  <input type="hidden" name="archivo_eliminar" id="archivo_eliminar">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Eliminar evidencia</h5>
+        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modal-eliminar-body">
+        ¿Estas seguro de eliminar esta evidencia?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-mdb-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="eliminar">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
   @section('js')
     <script src="{{ asset('js/pdf_viewer/pdf.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{ asset('js/pdf_viewer/pdf.worker.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -98,9 +119,19 @@
       var imagenes_contador = 0;
       const galeria_viewer = new Viewer(imagenes_lista);
 
-      function crearElementoParaGaleria(archivo_nombre, responsable, alumno, fecha, imagen_url, archivo_url, isPDF) {
+      function crearElementoParaGaleria(archivo_nombre,
+                                        responsable,
+                                        alumno,
+                                        fecha,
+                                        imagen_url,
+                                        archivo_url,
+                                        isPDF,
+                                        actividad,
+                                        evidencia_id)
+      {
         let card = createElement('div', ['card']);
         let card_wrapper = createElement('div', ['col-md-3', 'col-sm-4', 'col-xxl-2', 'mt-2']);
+        let delete_button = crearLinkEliminar(actividad, evidencia_id, archivo_nombre);
         let img = createIMGElement(imagen_url, ['card-img-top', 'galeria-elemento', (isPDF ? 'is-PDF' : 'is-image')], archivo_nombre);
         img.addEventListener('click', displayDocument);
 
@@ -118,6 +149,7 @@
         let fecha_elem = crearDetalleSublista('Fecha: ', fecha);
         appendChildren(detalles_lista, actividad_elem, responsable_elem, alumno_elem, fecha_elem);
 
+        card.appendChild(delete_button);
         card.appendChild(img);
         card_body.appendChild(detalles_lista);
         card.appendChild(card_body);
@@ -132,6 +164,18 @@
         } else {
           displayPdf(target.dataset.pdf);
         }
+      }
+
+      function crearLinkEliminar(actividad, evidencia_id, archivo) {
+        let styles = { 'position': 'absolute', 'right': '0px' }
+        let delete_icon = createIMGElement(asset('images/delete.png'), ['mds-icon', 'mds-animation-scale']);
+        addStylesToElement(delete_icon, styles);
+        delete_icon.dataset.actividad = actividad;
+        delete_icon.dataset.evidencia_id = evidencia_id;
+        delete_icon.dataset.archivo = archivo;
+        delete_icon.setAttribute('title', 'Eliminar');
+        delete_icon.addEventListener('click', initProcesoEliminar);
+        return delete_icon;
       }
 
       function agregarImagenesAViewer() {
@@ -237,7 +281,9 @@
                 +"</a>";
             }
           }
+          let actividad_id = response[x]['actividad_id'];
           let actividad_nombre = response[x]['actividad_nombre'];
+          let evidencia_id = response[x]['evidencia_id'];
           let responsable = ucwords(response[x]['responsable_nombre']);
           let alumno_nombre = response[x]['alumno_nombre'] === null ? 'NA' : ucwords(response[x]['alumno_nombre']);
           let fecha = response[x]['fecha_creacion'];
@@ -245,7 +291,8 @@
           let isPDF = getExtension(archivo) === 'pdf';
           let imagen_url = (isPDF ? pdf_icono : asset('storage/evidencias', actividad_nombre, archivo));
           let archivo_url = asset('storage/evidencias', actividad_nombre, archivo);
-          $('#gallery-container').append(crearElementoParaGaleria(nombre_original, responsable, alumno_nombre, fecha, imagen_url, archivo_url, isPDF));
+          let elem = crearElementoParaGaleria(nombre_original, responsable, alumno_nombre, fecha, imagen_url, archivo_url, isPDF, actividad_id, evidencia_id);
+          $('#gallery-container').append(elem);
         }
       }
 
@@ -281,15 +328,6 @@
         }
       }
 
-      function elhover(){
-        $(document).on('mouseover','.gallery' ,function(event){
-          $(this).find('img.eliminar').css('visibility','visible');
-        });
-        $(document).on('mouseout','.gallery' ,function(event){
-          $(this).find('img.eliminar').css('visibility','hidden');
-        });
-      }
-
       function cookiesEvidencia(){
         var actividad_id = Cookies.get('evidencia_actividad');
         if($("#actividades_id option[value='"+actividad_id+"']").length!=0 && actividad_id!=null){
@@ -298,47 +336,45 @@
         }
       }
 
+      function initProcesoEliminar(event) {
+        let dataset = event.target.dataset;
+        $('#actividad_id').val(dataset.actividad);
+        $('#archivo_eliminar').val(dataset.evidencia_id);
+        $('#modal-eliminar-body').html('¿Estas seguro de eliminar la evidencia "' + dataset.archivo + '"?');
+        $('#modalEliminar').modal('show');
+      }
+
       function eliminarEvidencia(){
-        $(document).on('click','.eliminar-evidencia',function(event){
-          event.preventDefault();
-          var confirmacion = confirm("¿Estas seguro que deseas eliminar esta evidencia?");
-          if(confirmacion){
-            var actividad = $(this).attr('data-actividad');
-            var archivo_id = $(this).attr('data-archivo');
-            var archivo_nombre = $(this).attr('data-archivo_nombre');
-            var validado_msj = $(this).attr('data-validado');
-            var validado = true;
-            if(validado_msj=="true"){
-              validado = confirm("La evidencia se encuentra actualmente validada,¿Seguro que deseas continuar?");
+          var actividad = $('#actividad_id').val();
+          var archivo_id = $('#archivo_eliminar').val();
+          $.ajax({
+            type: "get",
+            dataType: "json",
+            url: "{{ route('evidencias.eliminar') }}",
+            data:{
+              actividad: actividad,
+              archivo: archivo_id,
+            },
+            success: function(response){
+              swal('Exito', 'Evidencia eliminada', 'success');
+              $('#responsables_id').trigger('change');
+              $('#modalEliminar').modal('hide');
+            }, error: function(response){
+              printError(response);
+              $('#modalEliminar').modal('hide');
             }
-            if(validado){
-              $.ajax({
-                type: "get",
-                dataType: "json",
-                url: "{{ route('evidencias.eliminar') }}",
-                data:{
-                  actividad: actividad,
-                  archivo: archivo_id,
-                  archivo_nombre: archivo_nombre
-                },
-                success: function(response){
-                  mostrarMensaje(response['mensaje'],'mensaje-parte-superior',response['tipo']);
-                  $('#responsables_id').trigger('change');
-                }, error: function(){
-                  mostrarMensaje("Error al eliminar la evidencia",'mensaje-parte-superior','error');
-                }
-              });
-            }
-          }
-        });
+          });
+      }
+
+      function addEventListeners() {
+        $('#eliminar').on('click', eliminarEvidencia);
       }
 
       $(document).ready(function(event){
+        addEventListeners();
         comboResponsables();
         peticionGaleria();
-        elhover();
         cookiesEvidencia();
-        eliminarEvidencia();
       });
     </script>
   @endsection
