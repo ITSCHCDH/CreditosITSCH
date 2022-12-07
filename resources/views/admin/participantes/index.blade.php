@@ -26,8 +26,6 @@
     </form>
 @endif
 
-
-
 <div class="pull-right" style="text-align: right">
     @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA']))
         <p>Total de evidencias: <strong id = "numero-evidencias">0</strong> <a href="{{ route('evidencias.index',['ruta' => 'participantes']) }}" id="evidencia-total">VER</a></p>
@@ -517,11 +515,9 @@
             if(temp_actividad_cookie!=null){
                 if($("#actividades_id option[value='"+temp_actividad_cookie+"']").length!=0){
                     $('#actividades_id').val(temp_actividad_cookie);
-                    $('#actividades_id').trigger('change');
                 }
-            } else {
-                $('#actividades_id').trigger('change');
             }
+            $('#actividades_id').trigger('change');
         }
         function evidenciaTotal(){
             $(document).on('click','#evidencia-total', function(event){
