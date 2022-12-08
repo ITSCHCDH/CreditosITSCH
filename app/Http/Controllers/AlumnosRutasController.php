@@ -25,40 +25,45 @@ class AlumnosRutasController extends Controller
 {
 
     public function avance(){
-    $alumno_data=null;
-      $avance = true;
-        $liberado = false;
-      //Traemos todos los creditos existentes
-      $creditos = Credito::select('nombre')->orderBy('nombre')->get();
+        $alumno_data=null;
+        $avance = true;
+            $liberado = false;
+        //Traemos todos los creditos existentes
+        $creditos = Credito::select('nombre')->orderBy('nombre')->get();
 
-        //Consulta para obterner el avance del alumno
-    $alumno_data = DB::table('alumnos as alu')->join('participantes as p', function($join){
-      $join->on('p.no_control','=','alu.no_control');
-      $join->where('alu.no_control','=',Auth::User()->no_control);
-    })->join('actividad_evidencia as ae',function($join){
-            $join->on('ae.id','=','p.id_evidencia');
-            $join->where('ae.validado','=','true');
-        })->join('evidencia as e',function($join){
-            $join->on('e.id_asig_actividades','=','ae.id');
-        })->join('actividad as a','a.id','=','ae.actividad_id')
-        ->join('creditos as c','c.id','=','a.id_actividad')
-        ->join('avance as av',function($join){
-      $join->on('av.id_credito','=','c.id');
-      $join->where('av.no_control','=',Auth::User()->no_control);
-        })
-        ->join('areas','areas.id','=','alu.carrera')
-        ->where(function($query){
-            $query->where('p.evidencia_validada','=','na')->orwhere('p.evidencia_validada','=','si');
-        })
-        ->where('ae.validado','=','true')
-        ->select('alu.no_control','alu.foto as foto','alu.id as alumno_id','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')
-        ->orderBy('a.created_at', 'DESC')
-        ->groupBy('nombre_actividad')->get();
+            //Consulta para obterner el avance del alumno
+        $alumno_data = DB::table('alumnos as alu')
+            ->join('participantes as p',function($join){
+                $join->on('p.no_control','=','alu.no_control');
+                $join->where('alu.no_control','=',Auth::User()->no_control);
+            })
+            ->join('actividad_evidencia as ae',function($join){
+                $join->on('ae.id','=','p.id_evidencia');
+                $join->where('ae.validado','=','true');
+            })
+            ->join('evidencia as e',function($join){
+                $join->on('e.id_asig_actividades','=','ae.id');
+            })
+            ->join('actividad as a','a.id','=','ae.actividad_id')
+            ->join('creditos as c','c.id','=','a.id_actividad')
+            ->join('avance as av',function($join){
+                $join->on('av.id_credito','=','c.id');
+                $join->where('av.no_control','=',Auth::User()->no_control);
+            })
+            ->join('areas','areas.id','=','alu.carrera')
+            ->where(function($query){
+                $query->where('p.evidencia_validada','=','na')->orwhere('p.evidencia_validada','=','si');
+            })
+            ->where('ae.validado','=','true')
+            ->select('alu.no_control','alu.foto as foto','alu.id as alumno_id','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')
+            ->orderBy('nombre_credito')
+            ->groupBy('nombre_actividad')
+            ->get();
 
-        $liberado = $this->verificarProgreso();
+            $liberado = $this->verificarProgreso();
 
-        //Validamos que el alumnos tenga algun avance
-    if($alumno_data->count()==0){
+            //Validamos que el alumnos tenga algun avance
+        if($alumno_data->count()==0){
             //SI no tiene avance solo retornamos los datos del alumno los datos del alumno
             $avance = false;
             $alumno_data = DB::table('alumnos')->join('areas', function($join){
@@ -67,9 +72,9 @@ class AlumnosRutasController extends Controller
         }
 
       return view('alumnos.avance')
-      ->with('alumno_data',$alumno_data)
-      ->with('creditos',$creditos)
-      ->with('avance',$avance)
+        ->with('alumno_data',$alumno_data)
+        ->with('creditos',$creditos)
+        ->with('avance',$avance)
         ->with('liberado',$liberado);
     }
 
