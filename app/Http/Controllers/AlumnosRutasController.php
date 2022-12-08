@@ -227,20 +227,21 @@ class AlumnosRutasController extends Controller
                 ['no_control','=',Auth::User()->no_control]
                 ])->get()[0];
             if($actividad->alumnos == "true" && ($participante->momento_agregado == "anteriormente" || $participante->evidencia_validada == "si")){
+                Alert::error('Error','La actividad ya no acepta modificaciones, ya ha sido validada.');
                 return redirect()->route('alumnos.actividades');
             }
         }
-      $validador = User::find($actividad_evidencia[0]->validador_id);
-        $responsable = User::find($request->id_responsable);
-      if($actividad->count() == null || $responsable == null){
-          Alert::error('Error','No actividad o responsable seleccinado');
-          return redirect()->route('participantes.index');
-      }
-      return view('alumnos.subir_evidencia')
-      ->with('responsable',$responsable)
-      ->with('actividad',$actividad)
-      ->with('validador',$validador)
-        ->with('alumno_data',$alumno_data);
+        $validador = User::find($actividad_evidencia[0]->validador_id);
+            $responsable = User::find($request->id_responsable);
+        if($actividad->count() == null || $responsable == null){
+            Alert::error('Error','No actividad o responsable seleccionado');
+            return redirect()->route('participantes.index');
+        }
+        return view('alumnos.subir_evidencia')
+            ->with('responsable',$responsable)
+            ->with('actividad',$actividad)
+            ->with('validador',$validador)
+            ->with('alumno_data',$alumno_data);
     }
 
     public function guardarEvidencia(Request $request){
