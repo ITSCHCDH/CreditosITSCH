@@ -39,7 +39,7 @@
 							<a href="{{ route('usuarios.edit',$user->id) }}" class="btn btn-warning btn-sm" title="Modificar usuario"><i class="fas fa-user-edit"></i></i></a>							
 						@endif
 						@if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_USUARIOS']))							
-							<a title="Eliminar usuario" href="{{ route('admin.usuarios.destroy',$user->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><i class="fas fa-user-minus"></i></a>							
+							<a title="Eliminar usuario" href="{{ route('usuarios.destroy',$user->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><i class="fas fa-user-minus"></i></a>							
 						@endif
 						@if (Auth::User()->hasAnyPermission(['VIP','ASIGNAR_REMOVER_ROLES_USUARIOS']))
 							

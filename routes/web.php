@@ -19,6 +19,8 @@ use App\Http\Controllers\AlumnosRutasController;
 use App\Http\Controllers\CreditosController;
 use App\Http\Controllers\EvidenciasController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\UsersController;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -115,13 +117,13 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     /****Rutas para el controlador de usuarios *****/
     Route::get('usuarios/{id}/asignar_roles','UsersController@asignarRoles')->name('usuarios.asignar_roles');
     Route::post('usuarios/guardar_roles','UsersController@guardarRoles')->name('usuarios.guardar_roles');
-    Route::resource('usuarios','UsersController');
-
-    //La siguiente nos crea las rutas para el controlador de actividades(Bajas)
-    Route::get('usuarios/{id}/destroy',[
-        'uses'=>'UsersController@destroy',
-        'as'=> 'admin.usuarios.destroy'
-    ]);
+    Route::get('usuarios/index', [UsersController::class, 'index'])->name('usuarios.index'); 
+    Route::get('usuarios/create', [UsersController::class, 'create'])->name('usuarios.create'); 
+    Route::get('usuarios/edit/{id}', [UsersController::class, 'edit'])->name('usuarios.edit'); 
+    Route::post('usuarios/update/{id}', [UsersController::class, 'update'])->name('usuarios.update'); 
+    Route::get('usuarios/destroy/{id}', [UsersController::class, 'destroy'])->name('usuarios.destroy'); 
+    Route::post('usuarios/store', [UsersController::class, 'store'])->name('usuarios.store'); 
+    
 
     //Ruta y metodo para la peticion al servidor mediante Ajax, el cual tendra como funcion consultar los participantes asignado a una evidencia
     Route::get('participantes/busqueda','ParticipantesController@participantesBusqueda')->name('participantes.busqueda');
