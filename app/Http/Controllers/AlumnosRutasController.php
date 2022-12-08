@@ -369,14 +369,13 @@ class AlumnosRutasController extends Controller
         }
 
         $evidencias = DB::table('actividad_evidencia as ae')
-            ->join('evidencia as e', function($join) use($request){
-                $join->on('e.id_asig_actividades','=','ae.id');
-                $join->where('ae.user_id','=',$request->responsable_id);
-                $join->where('ae.actividad_id','=',$request->actividad_id);
-                $join->where('e.alumno_no_control','=',Auth::User()->no_control);
-            })
+            ->join('evidencia as e', 'e.id_asig_actividades', '=', 'ae.id')
             ->join('actividad as a','a.id','=','ae.actividad_id')
             ->join('participantes as p','p.id_evidencia','=','ae.id')
+            ->where('ae.user_id','=',$request->responsable_id)
+            ->where('ae.actividad_id','=',$request->actividad_id)
+            ->where('e.alumno_no_control','=',Auth::User()->no_control)
+            ->where('p.no_control','=',Auth::User()->no_control)
             ->select('e.nom_imagen',DB::raw('DATE_FORMAT(e.created_at, "%d-%m-%Y") as fecha_creacion'),
                 'a.nombre as actividad_nombre','e.id as evidencia_id', 'p.evidencia_validada as participante_evidencia_validada',
                 'ae.validado', 'e.nom_original', 'a.id as actividad_id', 'a.vigente', 'p.momento_agregado')
