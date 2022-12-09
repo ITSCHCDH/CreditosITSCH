@@ -102,7 +102,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 
     /****Rutas para el controlador de actividades*****/
     Route::get('actividades/cargar_actividades', [ActividadesController::class, 'cargarActividadesAjax'])->name('actividades.cargar.ajax');
-    Route::post('actividades/update/{id}',[ActividadesController::class, 'update'])->name('actividades.update');
+    Route::post('actividades/update/{id}',[ActividadesController::class,'update'])->name('actividades.update');
     Route::get('actividades/index',[ActividadesController::class,'index'])->name('actividades.index');
     Route::get('actividades/create',[ActividadesController::class,'create'])->name('actividades.create');
     Route::post('actividades/store',[ActividadesController::class,'store'])->name('actividades.store');

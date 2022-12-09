@@ -263,23 +263,30 @@ class ActividadesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-
+    { 
         $act_anterior=Actividad::find($id);
         $act_nueva=Actividad::find($id);
         $act_nueva->fill($request->all());
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act_nueva->nombre)->get();
         if($actividad_con_mismo_nombre->count()>0){
             if($actividad_con_mismo_nombre[0]->id!=$id){
-                return back()->withInput()
-                ->with("error","El nombre ".$act_nueva->nombre." ya ha sido tomado, ingrese uno diferente");
+                Alert::error('Error','El nombre ".$act_nueva->nombre." ya ha sido tomado, ingrese uno diferente');
+                return back()->withInput();                
             }
         }
         if($act_nueva->por_cred_actividad>100){
             Alert::error('Error','El porcentaje de liberación no debe exceder el 100% del credito');
             return back()->withInput();
         }
-        if($act_anterior->id_actividad != $act_nueva->id_actividad || $act_anterior->por_cred_actividad != $act_nueva->por_cred_actividad){
+        // Se evalua de izquierda a derecha
+        // Primero: se ha cambiado de credio la actividad se evalua primero
+        // Segundo: se ha cambiado el porcentaje de liberacion
+        // Tercero: evaluar si la actividad era de alumnos responsables y estos ya tienen evidencia, no deberia dejar modificar.
+        // TODO: cambiar id_actividad a credito_id
+        if($act_anterior->id_actividad != $act_nueva->id_actividad
+            || $act_anterior->por_cred_actividad != $act_nueva->por_cred_actividad
+            || $act_anterior->alumnos != $act_nueva->alumnos)
+        {
             $tiene_foraneas = DB::table('actividad as a')->join('actividad_evidencia as ae', function($join) use($id){
                 $join->on('ae.actividad_id','=','a.id');
                 //$join->where('a.id','=',$id);
@@ -288,12 +295,13 @@ class ActividadesController extends Controller
                     ['ae.validado','=','true']
                 ]);
             })->get()->count()>0? true: false;
+           
             if($tiene_foraneas){
-                Alert::error('Error','La actividad ya tiene evidencias validadas');
+                Alert::error('Error','La actividad ya tiene evidencias validadas. Para modificarla primero tendrías que eliminar los participantes y sus evidencias');
                 return redirect()->back();
-
             }
         }
+       
         $act_nueva->save();
         //En caso de la actividad ya cuente con evidencias y a esta se le cambie el nombre
         //el directorio de la misma tambien debe ser cambiado

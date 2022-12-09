@@ -56,7 +56,7 @@
               
                 <div class="mb-4">    
                     <Label class="form-label" >Vigente</Label>                                            
-                    <select id="alumnos" name="alumnos" class="form-control form-control-lg" required>                                                    
+                    <select id="vigente" name="vigente" class="form-control form-control-lg" required>                                                    
                         @if ($actividad->vigente=="true")
                             <option value="false">NO</option>
                             <option value="true" selected>SI</option>   

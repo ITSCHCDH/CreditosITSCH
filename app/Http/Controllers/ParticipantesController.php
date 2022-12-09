@@ -497,8 +497,8 @@ class ParticipantesController extends Controller
         ->join('actividad as act','act.id','=','ae.actividad_id')
         ->join('creditos as c','c.id','=','act.id_actividad')
         ->where([
-            ['ae.id','=',$participante[0]->id_evidencia],
-            ['p.no_control','=',$participante[0]->no_control]
+            ['ae.id','=',$participante->id_evidencia],
+            ['p.no_control','=',$participante->no_control]
         ])
         ->select('ae.id as ae_id','p.no_control','act.nombre','c.vigente as credito_vigente','act.vigente as actividad_vigente','act.alumnos as alumnos_responsables','act.id_user as administrador_id','act.id as actividad_id','act.por_cred_actividad','ae.validado as actividad_validada','c.id as credito_id')->get();
         if($actividad_data->count() == 0) return back();
@@ -515,24 +515,24 @@ class ParticipantesController extends Controller
             Alert::error('Error','Esta actividad no es para alumnos responsables');
             return redirect()->route('participantes.index');
         }
-        if($participante[0]->evidencia_validada == "si"){
+        if($participante->evidencia_validada == "si"){
             Alert::error('Error','Ya se ha validado la evidencia para este participante');
             return redirect()->route('participantes.index');
         }
-        if($actividad_data->actividad_validada == "true" && $participante[0]->momento_agregado == "anteriormente"){
+        if($actividad_data->actividad_validada == "true" && $participante->momento_agregado == "anteriormente"){
             Alert::error('Error','Ya se ha validado la evidencia para este participante');
             return redirect()->route('participantes.index');
         }
         if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VERIFICAR_EVIDENCIA']) || $actividad_data->administrador_id == Auth::User()->id){
             $tiene_avance = Avance::where([
-                ['no_control','=',$participante[0]->no_control],
+                ['no_control','=',$participante->no_control],
                 ['id_credito','=',$actividad_data->credito_id]
             ])->get();
             $tiene_evidencias = DB::table('actividad_evidencia as ae')
             ->join('evidencia as evi','evi.id_asig_actividades','=','ae.id')
             ->where([
-                ['ae.id','=',$participante[0]->id_evidencia],
-                ['evi.alumno_no_control','=',$participante[0]->no_control]
+                ['ae.id','=',$participante->id_evidencia],
+                ['evi.alumno_no_control','=',$participante->no_control]
             ])->get()->count() == 0 ? false : true;
             if(!$tiene_evidencias){
                 Alert::error('Error','El participante no cuenta con evidencias');
@@ -540,7 +540,7 @@ class ParticipantesController extends Controller
             }
             if($tiene_avance->count() == 0){
                 $avance = new Avance();
-                $avance->no_control = $participante[0]->no_control;
+                $avance->no_control = $participante->no_control;
                 $avance->por_credito = (int)$actividad_data->por_cred_actividad;
                 $avance->id_credito=$actividad_data->actividad_id;
                 $avance->save();
@@ -549,9 +549,9 @@ class ParticipantesController extends Controller
                 $avance->por_credito += (int)$actividad_data->por_cred_actividad;
                 $avance->save();
             }
-            $participante[0]->evidencia_validada = "si";
-            $participante[0]->save();
-            $this->liberar($participante[0]->no_control);
+            $participante->evidencia_validada = "si";
+            $participante->save();
+            $this->liberar($participante->no_control);
             Alert::success('Correcto','Evidencia validada con exito');
             return redirect()->route('participantes.index');
         }

@@ -182,12 +182,12 @@
 					<tr>
 							<td></td>
 							<td></td>
-							<td><strong>Total de creditos</strong></td>
+							<td><h5>Total de creditos</h5></td>
 					</tr>
 					<tr>
 						<td></td>
 						<td></td>
-						<td>{{ $temp_suma.' creditos' }}</td>
+						<td><h5>{{ $temp_suma.' creditos' }}</h5></td>
 					</tr>
 				@endif
 			</tbody>
