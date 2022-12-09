@@ -20,8 +20,8 @@
     <form action="{{ route('evidencias.create') }}" method="get">
         <input type="hidden" name="id_actividad" value='-1' id='input_id_actividad'>
         <input type="hidden" name="id_responsable" value='-1' id='input_id_responsable'>
-        <button type="submit" class="btn btn-outline-success btn-sm" title="Agregar evidencia">
-            <i class="fas fa-file-import fa-lg"></i>
+        <button type="submit" class="btn btn-outline-primary waves-effect" title="Agregar evidencia" style="border:none">
+            <i class="fas fa-cloud-upload-alt fa-5x"></i>
         </button>
     </form>
 @endif

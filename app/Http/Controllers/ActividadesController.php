@@ -222,7 +222,7 @@ class ActividadesController extends Controller
 
         //Llamado a mensajes con la libreria Sweet Alert
         Alert::success('Correcto', 'La actividad '.$act->nombre.' se registro correctamente');
-        return redirect()->route('actividades.index');
+        return redirect()->route('responsables',$act->id); 
 
     }
 

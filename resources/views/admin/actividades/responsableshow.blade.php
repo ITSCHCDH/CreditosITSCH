@@ -4,16 +4,17 @@
 
 @section('ruta')
     <a href="{{route('actividades.index')}}">Actividades</a>
-    /
-    <label class="label label-success">Responsables</label>
+    / <label class="label label-success">{{ $actividad->nombre }}</label>
+    / <label class="label label-success">Responsables</label>
 @endsection
 
 @section('contenido')
+    
     @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
         @if ($actividad!=null)
             @if($actividad->vigente=="true")                
                 <a href="{{route('responsables.index',$actividad->id)}}" title="Agregar responsables">
-                    <i class="fas fa-users fa-3x amber-text"></i>
+                    <i class="fas fa-user-plus fa-3x amber-text"></i>
                 </a>                               
             @endif
         @endif
@@ -21,11 +22,12 @@
         @if ($actividad!=null)
             @if ($actividad->id_user==Auth::User()->id && $actividad->vigente=="true")
                 <a href="{{route('responsables.index',$actividad->id)}}" title="Agregar responsables">
-                    <i class="fas fa-users fa-3x amber-text"></i>
+                    <i class="fas fa-user-plus fa-3x amber-text"></i>
                 </a>                
             @endif
         @endif
     @endif
+    <br>    
     <div class="table-responsive">
         <br>
         <table class="table" id="tabResponsables">
