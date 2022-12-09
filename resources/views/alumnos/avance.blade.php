@@ -193,8 +193,8 @@
 			</tbody>
 		</table>
 	</div>
+	<hr>
 	@if($liberado)
 		<a href="{{ route('alumnos.constancias_imprimir') }}" class="btn btn-primary">Imprimir constancia</a>
-	@endif
-	<div style="margin-bottom: 300px;"></div>
+	@endif	
 @endsection
