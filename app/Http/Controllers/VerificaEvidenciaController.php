@@ -12,6 +12,7 @@ use App\Models\Participante;
 use App\Models\Actividad_Evidencia;
 use App\Models\Actividad;
 use App\Models\Area;
+use Alert;
 
 class VerificaEvidenciaController extends Controller
 {
@@ -200,12 +201,12 @@ class VerificaEvidenciaController extends Controller
             //Verificamos que el numero de control exista
     		$alumno = DB::table('alumnos')->where('no_control','=',$request->get('no_control'))->get();
     		if($alumno->count() == 0){
-    			Flash::error('El numero de control no exite');
+    			Alert::error('Error','El numero de control no exite');
     			return redirect()->route('verifica_evidencia.avance_alumno');
 
     		}else{
                 if(!Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO']) && $alumno[0]->carrera!=Auth::User()->area){
-                    Flash::error('No puedes consultar avances de alumnos de otras carreras');
+                    Alert::error('Error','No puedes consultar avances de alumnos de otras carreras');
                     return redirect()->route('verifica_evidencia.avance_alumno');
                 }
             }

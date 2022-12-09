@@ -88,10 +88,6 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('/alumnos/buscar',[AlumnosController::class,'buscar'])->name('alumnos.buscar');
     Route::get('/alumnos/editarStatus',[AlumnosController::class,'editStatus'])->name('alumnos.editarStatus');
 
-
-
-
-
     /****Rutas para el controlador de creditos*****/
     //Route::resource('creditos','CreditosController');
 

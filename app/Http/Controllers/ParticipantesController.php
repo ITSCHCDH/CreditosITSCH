@@ -13,6 +13,7 @@ use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Alert;
 
 class ParticipantesController extends Controller
 {
@@ -483,9 +484,10 @@ class ParticipantesController extends Controller
     	}
     	return response()->json(array('mensaje' => 'Error al eliminar la evidencia', 'tipo' => 'error'));
     }
-    public function validarEvidencia(Request $request){
-        $participante = Participante::find($request->get('participante_id'));
+    public function validarEvidencia(Request $request){ 
+        $participante = Participante::find($request->get('participante_id'));        
         if($participante == null){
+            Alert::error('Error','Participante no encontrado');
             return back();
         }
         $actividad_data = DB::table('participantes as p')
@@ -495,50 +497,50 @@ class ParticipantesController extends Controller
         ->join('actividad as act','act.id','=','ae.actividad_id')
         ->join('creditos as c','c.id','=','act.id_actividad')
         ->where([
-            ['ae.id','=',$participante->id_evidencia],
-            ['p.no_control','=',$participante->no_control]
+            ['ae.id','=',$participante[0]->id_evidencia],
+            ['p.no_control','=',$participante[0]->no_control]
         ])
         ->select('ae.id as ae_id','p.no_control','act.nombre','c.vigente as credito_vigente','act.vigente as actividad_vigente','act.alumnos as alumnos_responsables','act.id_user as administrador_id','act.id as actividad_id','act.por_cred_actividad','ae.validado as actividad_validada','c.id as credito_id')->get();
         if($actividad_data->count() == 0) return back();
         $actividad_data = $actividad_data[0];
         if($actividad_data->actividad_validada == "false"){
-            Flash::error('Error: hasta que la actividad haya sido validada se puede validar la evidencia de los participantes de forma individual');
+            Alert::error('Error',' Hasta que la actividad haya sido validada se puede validar la evidencia de los participantes de forma individual');
             return redirect()->route('participantes.index');
         }
         if($actividad_data->actividad_vigente == "false" || $actividad_data->credito_vigente == "false"){
-            Flash::error('La actividad no vigente, ya no puede ser modificada');
+            Alert::error('Error','La actividad no vigente, ya no puede ser modificada');
             return redirect()->route('participantes.index');
         }
         if($actividad_data->alumnos_responsables == "false"){
-            Flash::error('Error: esta actividad no es para alumnos responsables');
+            Alert::error('Error','Esta actividad no es para alumnos responsables');
             return redirect()->route('participantes.index');
         }
-        if($participante->evidencia_validada == "si"){
-            Flash::error('Error: ya se ha validado la evidencia para este participante');
+        if($participante[0]->evidencia_validada == "si"){
+            Alert::error('Error','Ya se ha validado la evidencia para este participante');
             return redirect()->route('participantes.index');
         }
-        if($actividad_data->actividad_validada == "true" && $participante->momento_agregado == "anteriormente"){
-            Flash::error('Error: ya se ha validado la evidencia para este participante');
+        if($actividad_data->actividad_validada == "true" && $participante[0]->momento_agregado == "anteriormente"){
+            Alert::error('Error','Ya se ha validado la evidencia para este participante');
             return redirect()->route('participantes.index');
         }
         if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VERIFICAR_EVIDENCIA']) || $actividad_data->administrador_id == Auth::User()->id){
             $tiene_avance = Avance::where([
-                ['no_control','=',$participante->no_control],
+                ['no_control','=',$participante[0]->no_control],
                 ['id_credito','=',$actividad_data->credito_id]
             ])->get();
             $tiene_evidencias = DB::table('actividad_evidencia as ae')
             ->join('evidencia as evi','evi.id_asig_actividades','=','ae.id')
             ->where([
-                ['ae.id','=',$participante->id_evidencia],
-                ['evi.alumno_no_control','=',$participante->no_control]
+                ['ae.id','=',$participante[0]->id_evidencia],
+                ['evi.alumno_no_control','=',$participante[0]->no_control]
             ])->get()->count() == 0 ? false : true;
             if(!$tiene_evidencias){
-                Flash::error('Error: el participante no cuenta con evidencias');
+                Alert::error('Error','El participante no cuenta con evidencias');
                 return redirect()->route('participantes.index');
             }
             if($tiene_avance->count() == 0){
                 $avance = new Avance();
-                $avance->no_control = $participante->no_control;
+                $avance->no_control = $participante[0]->no_control;
                 $avance->por_credito = (int)$actividad_data->por_cred_actividad;
                 $avance->id_credito=$actividad_data->actividad_id;
                 $avance->save();
@@ -547,13 +549,13 @@ class ParticipantesController extends Controller
                 $avance->por_credito += (int)$actividad_data->por_cred_actividad;
                 $avance->save();
             }
-            $participante->evidencia_validada = "si";
-            $participante->save();
-            $this->liberar($participante->no_control);
-            Flash::success('Evidencia validada con exito');
+            $participante[0]->evidencia_validada = "si";
+            $participante[0]->save();
+            $this->liberar($participante[0]->no_control);
+            Alert::success('Correcto','Evidencia validada con exito');
             return redirect()->route('participantes.index');
         }
-        Flash::error('No tienes autorización para validar esta evidencia');
+        Alert::error('Error','No tienes autorización para validar esta evidencia');
         return redirect()->route('participantes.index');
     }
 }

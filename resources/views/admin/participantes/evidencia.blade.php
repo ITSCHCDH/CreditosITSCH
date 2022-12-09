@@ -40,7 +40,7 @@
 				@if ($validado[0]->validado == "true" && ($participante_data->momento_agregado == "posteriormente" && $participante_data->evidencia_validada == "no"))
 					<form action="{{ route('participantes.validar_evidencia') }}" method="post">
 						@csrf
-						<input type="hidden" name="participante_id[]" value="$participante->id">
+						<input type="hidden" name="participante_id[]" value="{{ $participante->id }}">
 						<button type="submit" class="btn btn-primary">Validar evidencia</button>
 					</form>					
 				@endif

@@ -103,7 +103,7 @@ class EvidenciasController extends Controller
                // Funcion para saber si la extension se encuentra dentro de las extensiones permitidas
                $check=in_array($extension,$allowedfileExtension);
                if(!$check){
-                   Alert::error('Error','La extensión '.$extension.' no es valida.');
+                   Alert::error('Error','La extensión '.$extension.' no es valida. Solo se admiten archivos: pdf, jpg, png, jpeg');
                    return back()->withInput();
                }
             }
