@@ -35,8 +35,7 @@
             <thead>
                 <th>Actividad</th>
                 <th>No Alumnos</th>
-                <th>Porcentaje crédito</th>
-                <th>Administrador</th>
+                <th>Administrador</th>              
                 <th>Crédito</th>
                 <th>Creado</th>               
                 <th>Cierre</th>
@@ -141,8 +140,7 @@
                     columns: [
                         {data: 'actividad_nombre'},
                         {data: 'no_alumnos', orderable: true, searchable: false},
-                        {data: 'por_cred_actividad', orderable: true, searchable: false},
-                        {data: 'administrador', orderable: true, searchable: true},
+                        {data: 'administrador', orderable: true, searchable: true},                       
                         {data: 'credito_nombre'},
                         {data: 'fecha_creacion'},                        
                         {data: 'fecCierre', orderable: false, searchable: false},

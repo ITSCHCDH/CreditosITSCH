@@ -100,8 +100,8 @@
         ¿Estas seguro de eliminar esta evidencia?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-mdb-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary" id="eliminar">Eliminar</button>
+        <button type="button" class="btn btn-primary" data-mdb-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="eliminar">Eliminar</button>
       </div>
     </div>
   </div>

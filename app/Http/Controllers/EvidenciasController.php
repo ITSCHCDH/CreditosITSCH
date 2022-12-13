@@ -250,7 +250,7 @@ class EvidenciasController extends Controller
 
             try {
                 $puede_eliminar = Auth::User()->can('VIP') || Auth::User()->can('VIP_EVIDENCIA');
-                $puede_eliminar = (Auth::User()->id == $evidencia_data->owner_id) || $pude_eliminar;
+                $puede_eliminar = (Auth::User()->id == $evidencia_data->owner_id) || $puede_eliminar;
                 $puede_eliminar = (!$validado && Auth::User()->id==$evidencia_data->responsable && Auth::User()->can('ELIMINAR_EVIDENCIA')) || $puede_eliminar;
 
                 if ($puede_eliminar) {
