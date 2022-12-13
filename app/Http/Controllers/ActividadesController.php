@@ -68,6 +68,7 @@ class ActividadesController extends Controller
             else
             {
                 $actividades->where('a.vigente','<>', $chkVigencia)->where('fecCierre','<',$fecHoy);
+               
             }
 
             DataTableHelper::applyOnly($actividades, $dtAttr, [DataTableHelper::PAGINATE]);
@@ -84,8 +85,8 @@ class ActividadesController extends Controller
         }
     }
 
-    private function applicarActividadFiltro(&$actividad_query)
-    {
+    private function applicarActividadFiltro($actividad_query)
+    {   
         if (!Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])) {
             $actividad_query->where('u.id', '=', Auth::User()->id);
         }

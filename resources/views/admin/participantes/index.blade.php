@@ -4,11 +4,9 @@
 @section('links')
     <script type="text/javascript" src="{{ asset('plugins/jsCookie/js.cookie.js') }}"></script>
 @endsection
-@section('ruta')
-    @if ($actividades_link == 'true')
-        <a href="{{ route('actividades.index') }}">Actividades</a>
-        /
-    @endif
+@section('ruta')    
+    <a href="{{ route('actividades.index') }}">Actividades</a>
+    /   
     <label>Participantes</label>
 @endsection
 <!-- HTML index de los participantes -->
@@ -122,8 +120,8 @@
         ¿Estas seguro de eliminar este participante?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-mdb-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary" id="eliminar">Eliminar</button>
+        <button type="button" class="btn btn-primary" data-mdb-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="eliminar">Eliminar</button>
       </div>
     </div>
   </div>
@@ -335,16 +333,24 @@
                 success:function(response){
                     //Mensaje
                     swal({
-                        title: "Se elimino correctamente!",
-                        text: "Puedes dar click para cerrar el mensaje!",
-                        icon: "success",
+                        title: response.mensaje_tipo,
+                        text: response.mensaje,
+                        icon: response.icono,
                         button: "Cerrar!",
                     });
                     setTimeout(function(){
                         window.location.replace("{{ route('participantes.index') }}");
                     },2000);
                 },error:function(e){
-                    console.log('Error al eliminar '+e);
+                    swal({
+                        title: "Error",
+                        text: "Ocurrio un error al eliminar!",
+                        icon: "error",
+                        button: "Cerrar!",
+                    });
+                    setTimeout(function(){
+                        window.location.replace("{{ route('participantes.index') }}");
+                        },2000);
                 }
             });
         }
@@ -364,22 +370,30 @@
                         data:{
                             no_control: tk[i],
                             id_responsable: id_responsable,
-                            id_actividad: id_actividad
+                            id_actividad: id_actividad                           
                         },
                         dataType:'json',
                         success:function(response){
-                           //Mensaje
+                           //Mensaje                           
                            swal({
-                                title: "El participante se agrego correctamente!",
-                                text: "Puedes dar click para cerrar el mensaje!",
-                                icon: "success",
+                                title: response.mensaje_tipo,
+                                text: response.mensaje,
+                                icon: response.icono,
                                 button: "Cerrar!",
                             });
                             setTimeout(function(){
                                 window.location.replace("{{ route('participantes.index') }}");
                              },2000);
                         },error:function(){
-                            console.log('Error al guardar');
+                            swal({
+                                title: "Error",
+                                text: "Ocurrio un error al guardar!",
+                                icon: "error",
+                                button: "Cerrar!",
+                            });
+                            setTimeout(function(){
+                                window.location.replace("{{ route('participantes.index') }}");
+                             },2000);
                         }
                     });
                 }
