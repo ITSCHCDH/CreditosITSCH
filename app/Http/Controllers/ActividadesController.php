@@ -54,7 +54,7 @@ class ActividadesController extends Controller
                 ->leftjoin('actividad_evidencia as act_evi', 'act_evi.actividad_id', '=', 'a.id')
                 ->leftjoin('participantes as par','par.id_evidencia','=','act_evi.id')
                 ->leftjoin('creditos as c','c.id','=','a.id_actividad')
-                ->select($selectColumns)
+                ->select($selectColumns)                
                 ->groupBy('a.id');
 
             $this->applicarActividadFiltro($actividades);

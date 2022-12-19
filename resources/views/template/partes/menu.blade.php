@@ -15,31 +15,15 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 @if (Auth::guard('alumno')->check())
                     <li class="nav-item active">
-                        <a class="nav-link" aria-current="page" href="{{ route('alumnos.home_avance')}}">Inicio</a>
+                        <a class="nav-link" aria-current="page" href="{{ route('alumnos.home_avance')}}" title="Inicio"><i class="fas fa-home"></i></a>
                     </li>
                 @else
                     <li class="nav-item active">
-                        <a class="nav-link" aria-current="page" href="{{ url('/home') }}">Inicio</a>
+                        <a class="nav-link" aria-current="page" href="{{ url('/home') }}" title="Inicio"><i class="fas fa-home"></i></a>
                     </li>
-                @endif
+                @endif            
 
-                @if (!Auth::guard('alumno')->check())
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('mensajes.index') }}">Mensajes</a>
-                    </li>
-                @endif
-
-                @if (Auth::guard('web')->check())       
-                    @if (Auth::User()->hasAnyPermission(['VIP','VER_ALUMNOS','VIP_SOLO_LECTURA']))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{route('alumnos.index')}}" rel="nofollow">Alumnos</a>
-                        </li>
-                    @endif 
-                    @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VER_CREDITOS'))                 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{route('creditos.index')}}" rel="nofollow">Creditos</a>
-                        </li>   
-                    @endif
+                @if (Auth::guard('web')->check())                                        
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ACTIVIDAD','VIP_ACTIVIDAD','VER_PARTICIPANTES','VIP_EVIDENCIA','VER_EVIDENCIA']))             
                         <!-- Dropdown -->
                         <li class="nav-item dropdown">
@@ -55,6 +39,9 @@
                                 @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_EVIDENCIA') || Auth::User()->can('VER_EVIDENCIA') || Auth::User()->can('VIP_SOLO_LECTURA'))
                                     <a class="dropdown-item" href="{{route('evidencias.index')}}">Evidencia</a>
                                 @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA']))
+                                    <a class="dropdown-item" href="{{ route('verifica_evidencia.index') }}">Verificar evidencia</a>
+                                @endif
                             </div>
                         </li> 
                     @endif  
@@ -66,10 +53,7 @@
                             <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
                                     <a class="dropdown-item" href="{{ route('verifica_evidencia.avance_alumno') }}">Avance</a>
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA']))
-                                    <a class="dropdown-item" href="{{ route('verifica_evidencia.index') }}">Verificar evidencia</a>
-                                @endif
+                                @endif                               
                                 @if (Auth::User()->hasAnyPermission(['VER_REPORTES_CARRERA','VIP_REPORTES','VIP_SOLO_LECTURA','VIP']))
                                     <a class="dropdown-item" href="{{ route('verifica_evidencia.reportes') }}">Reporte</a>
                                 @endif
@@ -101,7 +85,13 @@
                                 @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
                                     <a class="dropdown-item" href="{{ route('ImportExcel.altaAlumnos') }}">Insertar alumnos desde excel</a>   
-                                @endif                            
+                                @endif  
+                                @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VER_CREDITOS'))                                 
+                                    <a class="dropdown-item" href="{{route('creditos.index')}}">Creditos</a>                                    
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','VER_ALUMNOS','VIP_SOLO_LECTURA']))                                   
+                                    <a class="dropdown-item" href="{{route('alumnos.index')}}">Alumnos</a>                                   
+                                @endif                                                          
                             </div>
                         </li>
                 @endif        

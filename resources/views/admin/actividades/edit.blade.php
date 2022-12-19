@@ -65,7 +65,7 @@
                             <option value="true" >SI</option>   
                         @endif      
                     </select>                                                
-                </div>    
+                </div>
              
                 <div class="form-outline mb-4">                   
                     <input value="{{ $actividad->fecCierre }}" type="date" class="form-control form-control-lg" name="fecCierre" id="fecCierre" required>
@@ -84,5 +84,31 @@
         </div>
         <div class="col-sm-3"></div>
     </div>    
+
+    @section('js')
+        <script>
+            $('#vigente').change(
+                function(){                  
+                    swal({
+                        title: "Warning",
+                        text: "Recuerda que al cambiar la vigencia es necesario que verifiques la fecha de cierre",
+                        icon: "warning",
+                        button: "Cerrar",
+                    });                                  
+            	}
+            );
+
+            $('#fecCierre').change(
+                function(){                  
+                    swal({
+                        title: "Warning",
+                        text: "Recuerda que al cambiar la fecha de cierre es necesario verificar si la actividad sigue siendo vigente",
+                        icon: "warning",
+                        button: "Cerrar",
+                    });                                  
+            	}
+            );
+        </script>
+    @endsection
 
 @endsection
