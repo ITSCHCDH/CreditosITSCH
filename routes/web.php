@@ -20,6 +20,7 @@ use App\Http\Controllers\CreditosController;
 use App\Http\Controllers\EvidenciasController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\JefesController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -209,6 +210,11 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('perfil','PerfilController@index')->name('perfil.index');
     Route::get('perfil/password_reset','PerfilController@passwordResetViewMiPerfil')->name('perfil.password_reset_view');
     Route::post('perfil/password_update','PerfilController@passwordUpdate')->name('perfil.password_update');
+
+    //Rutas STA
+
+    //Rutas de jefes de carrera
+    Route::get('/sta/jefes',[JefesController::class,'index'])->name('jefes.index');
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){

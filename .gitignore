@@ -63,3 +63,5 @@ composer.lock
 /storage/
 
 /bootstrap/cache
+
+/config/database.php

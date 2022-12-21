@@ -94,6 +94,24 @@
                                 @endif                                                          
                             </div>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">STA</a>
+                            <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
+                                    <a class="dropdown-item" href="{{ route('jefes.index') }}">Jefes de carrera</a>
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
+                                    <a class="dropdown-item" href="">Profesores</a>
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
+                                    <a class="dropdown-item" href="">Tutores</a>
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
+                                    <a class="dropdown-item" href="">Departamento tutorias</a>
+                                @endif
+                            </div>
+                        </li>
                 @endif        
             </ul>   
             <ul class="navbar-nav ml-auto mr-4">
