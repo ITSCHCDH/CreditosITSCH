@@ -20,6 +20,8 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"/>
         <!-- MDB -->
         <link rel="stylesheet" href="{{ asset('css/mdb.min.css') }}" />
+        {{-- Estilos sta --}}
+        <link rel="stylesheet" href="{{ asset('css/sta/estilos.css') }}" />
 
         @yield('links')
     </head>
