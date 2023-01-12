@@ -97,7 +97,15 @@
     color: green;
   }
 
-  .txtNaranja{
-    
+  .txtNaranja{    
     color: orange;
   }
+
+  .renMorado{
+    background-color:purple; 
+    color:white; 
+    text-align:center;
+  }
+
+  
+ 

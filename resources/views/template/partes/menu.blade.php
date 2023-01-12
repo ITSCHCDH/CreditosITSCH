@@ -99,7 +99,7 @@
                             aria-haspopup="true" aria-expanded="false">STA</a>
                             <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
-                                    <a class="dropdown-item" href="{{ route('jefes.index') }}">Jefes de carrera</a>
+                                    <a class="dropdown-item" href="{{ route('analisis.index') }}">Jefes de carrera</a>
                                 @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
                                     <a class="dropdown-item" href="">Profesores</a>

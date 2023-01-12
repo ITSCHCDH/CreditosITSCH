@@ -3,11 +3,11 @@
 @section('title','Alumnos')
 
 @section('ruta')
-    <label class="label label-success"> <a href="#">STA</a> / Jefes de carrera</label> 
+    <label class="label label-success"> <a href="#">STA</a> / Analisis alumnos</label> 
 @endsection
 
 @section('contenido')
-    <form action="{{ route('jefes.generacion') }}" method="post">
+    <form action="{{ route('analisis.generacion') }}" method="post">
         @csrf
         <div class="row">       
             <div class="col-sm-3" >
@@ -38,8 +38,7 @@
             </div>           
             <div class="col-sm-3">
                 <br>
-                <button type="submit" class="btn btn-success" title="Buscar" ><i class="fas fa-search"></i></button>
-                <a id="btnAnalisis" class="btn btn-secondary" title="Analisis grupal" onclick="asignaRuta()"><i class="fas fa-chart-pie"></i></a>
+                <button type="submit" class="btn btn-success" title="Buscar" ><i class="fas fa-search"></i></button>                
             </div> 
             <div class="col-sm-3">         
             </div>      
@@ -53,6 +52,7 @@
             <th>Nombre</th>
             <th>Último semestre</th>
             <th>Status</th>
+            <th>Semaforos</th>
             <th>Acciones</th>
         </thead>
         <tbody>
@@ -64,7 +64,20 @@
                         <td>{{ $gru->aPaterno }} {{ $gru->aMaterno }} {{ $gru->nombre }}</td>
                         <td>{{ $gru->semestre }}</td>
                         <td>{{ $gru->status }}</td>
-                        <td><a href="{{ route('jefes.diagnostico',$gru->control) }}" class="btn btn-primary"><i class="fas fa-search-plus"></i></a></td>
+                        <td>  
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <div class="{{ $gru->semaforoAcad }}" data-mdb-toggle="tooltip" title="Académico"></div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Medico"></div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Psicologico"></div>
+                                </div>
+                            </div>                            
+                        </td>
+                        <td><a href="{{ route('analisis.alumno',$gru->control) }}" class="btn btn-primary"><i class="fas fa-search-plus"></i></a></td>
                     </tr>                
                 @endforeach
             @endif
@@ -74,29 +87,6 @@
 
 @section('js')
     <script>
-        function asignaRuta()
-        {
-            gen=$('#generacion option:selected').val();
-            car=$('#carrera option:selected').val();
-
-            if(gen=='' || car=='')
-            {
-                swal({
-                        title: "Warning",
-                        text: "Debes seleccionar una generación y una carrera",
-                        icon: "warning",
-                        button: "Cerrar",
-                    });
-            }
-            else
-            {
-                r="{{url('/sta/jefes')}}/analisis/"+gen+"/"+car;               
-                $('#btnAnalisis').attr('action', r);
-            }
-            
-           
-        }
-
         //Codigo para adornar las tablas con datatables
         $(document).ready(function() {
 	        $('#tabGrupos').DataTable({ 	           

@@ -3,7 +3,7 @@
 @section('title','Alumnos')
 
 @section('ruta')
-    <label class="label label-success"> <a href="#">STA</a> / <a href="{{ route('jefes.index') }}">Jefes de carrera</a>/Diagnostico</label> 
+    <label class="label label-success"> <a href="#">STA</a> / <a href="{{ route('analisis.index') }}">Jefes de carrera</a>/Diagnostico</label> 
 @endsection
 
 @section('contenido')
@@ -40,23 +40,23 @@
             <tbody>
                 <tr>
                     <td>                        
-                        @if ($especiales > 0 || $nivelaciones >= 10 || $repeticiones >= 3) <!-- rojo -->
+                        @if ($especiales > 0 || $nivelaciones >= 10 || $repeticiones > 2) <!-- rojo -->
                             <div  class="CirculoRojo" data-mdb-toggle="tooltip" 
                             title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
                             ></div>
                         @else
-                            @if ($repeticiones <= 2 && ($nivelaciones >= 6 && $nivelaciones <= 9)) <!-- naranja -->
+                            @if ($repeticiones <= 2 && ($nivelaciones >= 3 && $nivelaciones <10)) <!-- naranja -->
                                 <div class="CirculoNaranja" data-mdb-toggle="tooltip" 
                                 title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
                                 ></div>
                             @else
 
-                                @if ($nivelaciones >= 3 && $nivelaciones <= 5)<!-- amarillo -->
+                                @if ($nivelaciones > 1 && $nivelaciones <=5)<!-- amarillo -->
                                     <div class="CirculoAmarillo" data-mdb-toggle="tooltip" 
                                     title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
                                     ></div>
                                 @else
-                                    @if ($nivelaciones <= 2)<!-- verde --> 
+                                    @if ($nivelaciones <= 1)<!-- verde --> 
                                         <div class="CirculoVerde" data-mdb-toggle="tooltip" 
                                         title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
                                         ></div>
@@ -85,7 +85,6 @@
                                     <div class="CirculoRojo" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
                                 @endif									
                             @else
-
                                 @if ($psicologico[0]->status_psico == 0) <!-- verde --> 
                                     <div class="CirculoVerde" data-mdb-toggle="tooltip" title="{{$msm_psicologico[0]->mensaje}}"></div>
                                 @endif
@@ -97,11 +96,8 @@
                                 @endif							
                                 @if ($psicologico[0]->status_psico == 3) <!-- rojo -->
                                     <div class="CirculoRojo" data-mdb-toggle="tooltip" title="{{$msm_psicologico[0]->mensaje}}"></div>
-                                @endif
-                                
+                                @endif                                
                             @endif
-
-
                         @else
                             <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Sin Evaluar"></div>
                         @endif
@@ -264,7 +260,7 @@
     <tbody>				
         @foreach ($cardex as $res)
             @if ($semestreTem != $res->cdx_SemXPrime)
-                <tr style="background-color:purple; color:white; text-align:center;">
+                <tr class="renMorado">
                     <td colspan = "5" style="font-size: 20px; ">Semestre&nbsp;&nbsp;{{$res->cdx_SemXPrime}}</td>
                 </tr>				
                 <tr style="font-size: 15px; ">

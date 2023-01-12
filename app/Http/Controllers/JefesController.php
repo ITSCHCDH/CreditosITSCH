@@ -17,14 +17,14 @@ class JefesController extends Controller
         $carreras = DB::connection('contEsc')->table('carreras')->get();
         $grupo="";
         $generacion="";
-        $carrera="";
+        $carrera="";      
         $generaciones = DB::connection('contEsc')->table('alumnos')			
 			->select("alumnos.Alu_AnioIngreso")
 			->orderBy('Alu_AnioIngreso', 'asc')
 			->distinct()
 			->get();
 
-        return view('sta/jefes/index')
+        return view('sta/analisis_alumnos/index')
         ->with('grupo',$grupo)
         ->with('carreras',$carreras)
         ->with('generaciones',$generaciones)
@@ -34,12 +34,16 @@ class JefesController extends Controller
 
     public function generacion(Request $request)
     { 
-        $grupo = DB::connection('contEsc')->table('alumnos')       
+        $grupo = DB::connection('contEsc')->table('alumnos')         
         ->select("alu_NumControl AS control","alu_ApePaterno AS aPaterno","alu_ApeMaterno AS aMaterno","alu_Nombre AS nombre","alu_SemestreAct AS semestre",'alu_StatusAct AS status')
         ->orderBy('alumnos.alu_ApePaterno', 'asc')       
         ->where('alumnos.car_Clave','=',$request->carrera)
         ->where('alumnos.Alu_AnioIngreso','=',$request->generacion)
-        ->get();        
+        ->get();   
+
+        foreach ($grupo as $row) {
+            $row->semaforoAcad = self::calSemaforo($row->control);            
+        }
 
         $carreras = DB::connection('contEsc')->table('carreras')->get();
 
@@ -48,8 +52,9 @@ class JefesController extends Controller
 			->orderBy('Alu_AnioIngreso', 'asc')
 			->distinct()
 			->get();
+
                
-        return view('sta.jefes.index')
+        return view('sta.analisis_alumnos.index')
         ->with('grupo',$grupo)
         ->with('carreras',$carreras)
         ->with('generaciones',$generaciones)
@@ -57,12 +62,12 @@ class JefesController extends Controller
         ->with('carrera',$request->carrera);
     }
 
-    public function diagnostico($id)
+    public function diagnostico($nc)
     {		
         $buscarAlumno = DB::connection('contEsc')->table('alumnos')
         ->join('carreras','carreras.car_Clave', '=','alumnos.car_Clave')
         ->select("alumnos.alu_NumControl",'alumnos.alu_StatusAct',"alumnos.alu_Nombre","alumnos.alu_ApePaterno","alumnos.alu_ApeMaterno","alumnos.alu_SemestreAct","carreras.car_Nombre","alumnos.alu_Sexo")
-        ->where("alu_NumControl","=",$id)
+        ->where("alu_NumControl","=",$nc)
         ->get();
 
         if($buscarAlumno[0]->alu_Sexo == "F"){
@@ -75,7 +80,7 @@ class JefesController extends Controller
         ->join('listassemestre','listassemestre.alu_NumControl','=','alumnos.alu_NumControl')
         ->join('grupossemestre','grupossemestre.gse_Clave','=','listassemestre.gse_Clave')
         ->select("grupossemestre.gse_Observaciones")
-        ->where("alumnos.alu_NumControl","=",$id)
+        ->where("alumnos.alu_NumControl","=",$nc)
         ->DISTINCT()
         ->get();
 
@@ -90,7 +95,7 @@ class JefesController extends Controller
         ->join('grupossemestre','listassemestre.gse_Clave','=','grupossemestre.gse_Clave')
         ->join('reticula','reticula.ret_Clave','=','grupossemestre.ret_Clave')
         ->select ('reticula.ret_NomCompleto','listassemestrecom.lsc_Calificacion','reticula.ret_NumUnidades','listassemestrecom.lsc_NumUnidad','listassemestrecom.lsc_Corte','listassemestrecom.lse_clave')
-        ->where('listassemestre.alu_NumControl','=',$id)
+        ->where('listassemestre.alu_NumControl','=',$nc)
         ->DISTINCT()
         ->get();
 
@@ -99,7 +104,7 @@ class JefesController extends Controller
         ->join('grupossemestre','listassemestre.gse_Clave','=','grupossemestre.gse_Clave')
         ->join('reticula','reticula.ret_Clave','=','grupossemestre.ret_Clave')
         ->select ('listassemestrecom.lsc_NumUnidad')
-        ->where('listassemestre.alu_NumControl','=',$id)
+        ->where('listassemestre.alu_NumControl','=',$nc)
         ->DISTINCT()
         ->get();
 
@@ -115,14 +120,14 @@ class JefesController extends Controller
         $GetCardex = DB::connection('contEsc')->table('cardex')
         ->join('reticula','cardex.ret_Clave','=','reticula.ret_Clave')
         ->select ('cardex.cdx_AnioXPrime','reticula.ret_NomCompleto','cardex.cdx_Calif','cardex.cdx_SemXPrime','cardex.cdx_UltOpcAcred')
-        ->where('cardex.alu_NumControl','=',$id)
+        ->where('cardex.alu_NumControl','=',$nc)
         ->orderBy('cardex.cdx_SemXPrime', 'asc')
         ->get();
 
 
         $semaforoMedico = DB::table('psicoclin.alumnos')
         ->select('alumnos.status_medico')
-        ->where('no_control','=',$id)
+        ->where('no_control','=',$nc)
         ->get();
 
         $MSMMedico = null;
@@ -136,7 +141,7 @@ class JefesController extends Controller
             ->join('psicoclin.alumnos','alumnos.id','=','status.alumno_id')
             ->select ('status.mensaje')
             ->where('status.tipo','=','medico')
-            ->where('alumnos.no_control','=',$id)
+            ->where('alumnos.no_control','=',$nc)
             ->get();
             if(sizeof($MSMMedico) == 0){
                 $tam_msm_medico = 0;
@@ -146,7 +151,7 @@ class JefesController extends Controller
 
         $semaforoPsicologico = DB::table('psicoclin.alumnos')
         ->select('alumnos.status_psico')
-        ->where('no_control','=',$id)
+        ->where('no_control','=',$nc)
         ->get();
 
         $MSMPsicologico = null;
@@ -160,7 +165,7 @@ class JefesController extends Controller
             ->join('psicoclin.alumnos','alumnos.id','=','status.alumno_id')
             ->select ('status.mensaje')
             ->where('status.tipo','=','psico')
-            ->where('alumnos.no_control','=',$id)
+            ->where('alumnos.no_control','=',$nc)
             ->get();
             if(sizeof($MSMPsicologico) == 0){
                 $tam_msm_psicologico = 0;
@@ -170,34 +175,34 @@ class JefesController extends Controller
 
         $nivelacionesOrdinario = DB::connection('contEsc')->table("cardex")
         ->select('cardex.*')
-        ->where('alu_NumControl', '=', $id)
+        ->where('alu_NumControl', '=', $nc)
         ->where('cdx_UltOpcAcred', '>=', '2')
         ->where('cdx_UltOpcAcred', '<', '3')
         ->count();
 
         $nivelacionesRepe = DB::connection('contEsc')->table("cardex")
         ->select('cardex.*')
-        ->where('alu_NumControl', '=', $id)
+        ->where('alu_NumControl', '=', $nc)
         ->where('cdx_UltOpcAcred', '>=', '4')
         ->where('cdx_UltOpcAcred', '<', '5')
         ->count();
 
         $nivelacionesEspecial = DB::connection('contEsc')->table("cardex")
         ->select('cardex.*')
-        ->where('alu_NumControl', '=', $id)
+        ->where('alu_NumControl', '=', $nc)
         ->where('cdx_UltOpcAcred', '>=', '6')
         ->count();
 
         $repeticiones = DB::connection('contEsc')->table("cardex")
         ->select('cardex.*')
-        ->where('alu_NumControl', '=', $id)
+        ->where('alu_NumControl', '=', $nc)
         ->where('cdx_UltOpcAcred', '>=', '3')
         ->where('cdx_UltOpcAcred', '<', '4')
         ->count();
 
         $especiales = DB::connection('contEsc')->table("cardex")
         ->select('cardex.*')
-        ->where('alu_NumControl', '=', $id)
+        ->where('alu_NumControl', '=', $nc)
         ->where('cdx_UltOpcAcred', '>=', '5')
         ->where('cdx_UltOpcAcred', '<', '6')
         ->count();
@@ -208,13 +213,13 @@ class JefesController extends Controller
         $Comentarios = DB::table('stav2.motivosreprobacion')
         ->join('stav2.alumnos','alumnos.id','=','motivosreprobacion.id_alu')
         ->select('motivosreprobacion.materia','motivosreprobacion.num_tema','motivosreprobacion.comentario','motivosreprobacion.lse_clave')
-        ->where('alumnos.no_cont','=',$id)
+        ->where('alumnos.no_cont','=',$nc)
         ->get();
         if(sizeof($Comentarios) == 0){
             $tamComentarios = 0;
         }
 
-        return view('sta.jefes.diagnostico')        
+        return view('sta.analisis_alumnos.diagnostico')        
         -> with ('alumnos',$buscarAlumno)
         -> with ('grupos',$GetGrupos)
         -> with ('tablacalificaciones',$GetTablaCalificaciones)
@@ -238,8 +243,52 @@ class JefesController extends Controller
         -> with('tamcomentarios',$tamComentarios);				      
     }
 
-    public function analisis($gen, $car)
-    {
-        dd('Si llega');
+    public function calSemaforo($nc) {
+        $nivelacionesOrdinario = DB::connection('contEsc')->table("cardex")
+        ->select('cardex.*')
+        ->where('alu_NumControl', '=', $nc)
+        ->where('cdx_UltOpcAcred', '>=', '2')
+        ->where('cdx_UltOpcAcred', '<', '3')
+        ->count();
+
+        $nivelacionesRepe = DB::connection('contEsc')->table("cardex")
+        ->select('cardex.*')
+        ->where('alu_NumControl', '=', $nc)
+        ->where('cdx_UltOpcAcred', '>=', '4')
+        ->where('cdx_UltOpcAcred', '<', '5')
+        ->count();
+
+        $nivelacionesEspecial = DB::connection('contEsc')->table("cardex")
+        ->select('cardex.*')
+        ->where('alu_NumControl', '=', $nc)
+        ->where('cdx_UltOpcAcred', '>=', '6')
+        ->count();
+
+        $repeticiones = DB::connection('contEsc')->table("cardex")
+        ->select('cardex.*')
+        ->where('alu_NumControl', '=', $nc)
+        ->where('cdx_UltOpcAcred', '>=', '3')
+        ->where('cdx_UltOpcAcred', '<', '4')
+        ->count();
+
+        $especiales = DB::connection('contEsc')->table("cardex")
+        ->select('cardex.*')
+        ->where('alu_NumControl', '=', $nc)
+        ->where('cdx_UltOpcAcred', '>=', '5')
+        ->where('cdx_UltOpcAcred', '<', '6')
+        ->count();
+
+        $nivelaciones = $nivelacionesOrdinario + $nivelacionesRepe + $nivelacionesEspecial;
+
+        if ($especiales > 0 || $nivelaciones >= 10 || $repeticiones > 2)
+            return "CirculoRojo";
+        elseif ($repeticiones <= 2 && ($nivelaciones >= 3 && $nivelaciones <10))
+            return "CirculoNaranja";
+        elseif ($nivelaciones > 1 && $nivelaciones <=5)
+            return "CirculoAmarillo";
+        elseif ($nivelaciones <= 1)
+            return "CirculoVerde";
+        else
+            return "CirculoNegro";
     }
 }
