@@ -20,7 +20,8 @@ use App\Http\Controllers\CreditosController;
 use App\Http\Controllers\EvidenciasController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\UsersController;
-use App\Http\Controllers\JefesController;
+use App\Http\Controllers\JefesController; 
+use App\Http\Controllers\AlumnosStaController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -231,10 +232,15 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::get('constancias/imprimir','AlumnosRutasController@imprimir')->name('alumnos.constancias_imprimir');
     Route::get('/alumnos/{id}/perfil',[AlumnosController::class,'perfil'])->name('alumnos.perfil');
     Route::post('/alumnos/{id}/edit/perfil',[AlumnosController::class,'editPerfil'])->name('alumnos.edit.perfil');
+
+    //Rutas STA alumnos
+    Route::get('alumnos/Ficha',[AlumnosStaController::class,'ficha'])->name('alumnos.sta.ficha');
 });
 //Route::get('alumnos/login','AlumnosLoginController@showLoginForm')->name('alumnos.login');
 Route::post('alumnos/login','AlumnosLoginController@login')->name('alumnos.login');
 Route::post('alumnos/logout','AlumnosLoginController@logout')->name('alumnos.logout');
+
+
 
 Auth::routes();
 

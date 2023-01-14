@@ -65,7 +65,7 @@ class AlumnosRutasController extends Controller
             //Validamos que el alumnos tenga algun avance
         if($alumno_data->count()==0){
             //SI no tiene avance solo retornamos los datos del alumno los datos del alumno
-            $avance = false;
+            $avance = false; 
             $alumno_data = DB::table('alumnos')->join('areas', function($join){
                 $join->on('areas.id','=','alumnos.carrera');
             })->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.id as alumno_id','alumnos.nombre as nombre_alumno','areas.nombre as carrera','alumnos.no_control','alumnos.foto')->get();
@@ -199,21 +199,21 @@ class AlumnosRutasController extends Controller
     }
 
     public function actividades(){
-    $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+        $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
 
-    $actividades = DB::table('participantes as p')
-        ->join('actividad_evidencia as ae', function($join){
-            $join->on('ae.id','=','p.id_evidencia');
-            $join->where('p.no_control','=',Auth::User()->no_control);
-        })
-        ->join('actividad as a','a.id','=','ae.actividad_id')
-        ->join('creditos as c','a.id_actividad','=','c.id')
-        ->select('a.nombre as actividad_nombre','a.id as actividad_id','a.por_cred_actividad as actividad_porcentaje','a.alumnos','ae.validado','ae.user_id','c.nombre as credito_nombre','p.momento_agregado','p.evidencia_validada')
-        ->orderBy('a.created_at','DESC')
-        ->get();
-      return view('alumnos.actividades')
-        ->with('actividades',$actividades)
-        ->with('alumno_data',$alumno_data);
+        $actividades = DB::table('participantes as p')
+            ->join('actividad_evidencia as ae', function($join){
+                $join->on('ae.id','=','p.id_evidencia');
+                $join->where('p.no_control','=',Auth::User()->no_control);
+            })
+            ->join('actividad as a','a.id','=','ae.actividad_id')
+            ->join('creditos as c','a.id_actividad','=','c.id')
+            ->select('a.nombre as actividad_nombre','a.id as actividad_id','a.por_cred_actividad as actividad_porcentaje','a.alumnos','ae.validado','ae.user_id','c.nombre as credito_nombre','p.momento_agregado','p.evidencia_validada')
+            ->orderBy('a.created_at','DESC')
+            ->get();
+        return view('alumnos.actividades')
+            ->with('actividades',$actividades)
+            ->with('alumno_data',$alumno_data);
     }
 
     public function subirEvidencia(Request $request){

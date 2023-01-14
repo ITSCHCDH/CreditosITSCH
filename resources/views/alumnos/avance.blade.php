@@ -3,7 +3,7 @@
 @section('title','Avance alumnos')
 
 @section('ruta')
-    <label class="label label-success">Avance alumno</label>
+    <label class="label label-success"><a href="{{ route('alumnos.home_avance')}}">Créditos</a>/Avance alumno</label> 
 @endsection
 
 @section('contenido')

@@ -16,13 +16,15 @@
                 @if (Auth::guard('alumno')->check())
                     <li class="nav-item active">
                         <a class="nav-link" aria-current="page" href="{{ route('alumnos.home_avance')}}" title="Inicio"><i class="fas fa-home"></i></a>
+                    </li>                   
+                    <li class="nav-item active">
+                        <a class="nav-link" aria-current="page" href="{{ route('alumnos.sta.ficha',1) }}" title="Créditos">Ficha</a>
                     </li>
                 @else
                     <li class="nav-item active">
                         <a class="nav-link" aria-current="page" href="{{ url('/home') }}" title="Inicio"><i class="fas fa-home"></i></a>
                     </li>
-                @endif            
-
+                @endif  
                 @if (Auth::guard('web')->check())                                        
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ACTIVIDAD','VIP_ACTIVIDAD','VER_PARTICIPANTES','VIP_EVIDENCIA','VER_EVIDENCIA']))             
                         <!-- Dropdown -->
