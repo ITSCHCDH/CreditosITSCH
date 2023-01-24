@@ -234,7 +234,13 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::post('/alumnos/{id}/edit/perfil',[AlumnosController::class,'editPerfil'])->name('alumnos.edit.perfil');
 
     //Rutas STA alumnos
-    Route::get('alumnos/Ficha',[AlumnosStaController::class,'ficha'])->name('alumnos.sta.ficha');
+    Route::get('alumnos/ficha',[AlumnosStaController::class,'ficha'])->name('alumnos.sta.ficha');    
+    Route::get('alumnos/ficha/guardar/{nc}',[AlumnosStaController::class,'guardarDatFam'])->name('alumnos.sta.ficha.guargar');
+    Route::get('alumnos/editDatSalud/{nc}',[AlumnosStaController::class,'editDatSalud'])->name('alumnos.sta.editDatSalud');
+    Route::get('alumnos/updtDatSalud/{nc}',[AlumnosStaController::class,'updtDatSalud'])->name('alumnos.sta.updtDatSalud');
+    Route::get('alumnos/dfamiliares/guardar/{nc}',[AlumnosStaController::class,'updtDatFam'])->name('alumnos.sta.dfamiliares.guargar');
+    Route::get('alumnos/dsociales/guardar/{nc}',[AlumnosStaController::class,'updtDatSoc'])->name('alumnos.sta.dsociales.guargar');
+    
 });
 //Route::get('alumnos/login','AlumnosLoginController@showLoginForm')->name('alumnos.login');
 Route::post('alumnos/login','AlumnosLoginController@login')->name('alumnos.login');

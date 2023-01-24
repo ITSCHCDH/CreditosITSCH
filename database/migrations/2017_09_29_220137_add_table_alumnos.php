@@ -21,8 +21,23 @@ class AddTableAlumnos extends Migration
             $table->integer('carrera')->unsigned();
             $table->string('status',35);
             $table->string('foto',30);
-            $table->string('email',35);
-            $table->foreign('carrera')->references('id')->on('areas');
+            $table->string('email',35);           
+            $table->integer('ficha')->nullable();
+            $table->string('nombre_i', 30)->nullable();
+            $table->string('a_pat', 30)->nullable();
+            $table->string('a_mat', 30)->nullable();          
+            $table->integer('creditos')->nullable();//Revisar si se puede usar                    
+            $table->date('fec_nac')->nullable();
+            $table->string('lug_pro', 70)->nullable();
+            $table->char('curp', 18)->nullable()->unique('alumnos_curp_unique');
+            $table->enum('sexo', ['f', 'm'])->nullable();
+            $table->string('est_civ', 30)->nullable();
+            $table->string('tel', 13)->nullable();
+            $table->string('tel_emer', 13)->nullable();
+            $table->string('beca', 100)->nullable();
+            $table->string('grupo', 10)->nullable();           
+            $table->string('nom_ficha', 100)->nullable();
+            $table->integer('generacion')->nullable();
             $table->timestamps();
         });
     }
