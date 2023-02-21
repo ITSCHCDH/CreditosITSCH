@@ -11,6 +11,8 @@ use App\Models\Familiar;
 use App\Models\Personales;
 use App\Models\Padres;
 use App\Models\Social;
+use Doctrine\DBAL\Schema\View;
+use PDF;
 
 use Illuminate\Http\Request;
 
@@ -310,9 +312,76 @@ class AlumnosStaController extends Controller
         return view('alumnos.sta.dsocial', compact('alu1', 'alu', 'soc','alumno_data'));
    }
 
-   public function updtDatSoc($nc)
+   public function updtDatSoc(Request $request, $nc)
    {
-        dd($nc);
+        $alu = Alumno::where('no_control',$nc)->first();
+        $soc = Social::where('id_alu', $alu->id)->first();
+        $soc->rel_comp = $request->rel_comp;
+        $soc->comp_por = $request->rel_comp_t;
+        $soc->rel_amig = $request->rel_ami;
+        $soc->amig_por = $request->rel_ami_t;
+        if ($request->alu_par == 'No') {
+            $soc->pareja = $request->alu_par;
+        } else {
+            $soc->pareja = $request->rel_alu_par;
+        }
+        $soc->rel_prof = $request->rel_pro;
+        $soc->prof_por = $request->rel_pro_t;
+        $soc->rel_auto_ac = $request->rel_aut_aca;
+        $soc->auto_ac_por = $request->rel_aut_aca_t;
+        $soc->tiempo_lib = $request->alu_tlibre;
+        $soc->recreativa = $request->alu_act_rec;
+        $soc->planes_in = $request->alu_pl_inme;
+        $soc->metas_vida = $request->alu_metas;
+        $soc->yo_soy = $request->alu_soy;
+        $soc->caracter = $request->alu_caracter;
+        $soc->me_gusta = $request->alu_gusto;
+        $soc->aspiraciones = $request->alu_aspira;
+        $soc->miedo = $request->alu_miedo;
+        $soc->save();
+
+        $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
+        $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+        return view('alumnos.sta.autorizar', compact('alu1', 'alu','alumno_data'));
    }
+
+   public function autorizar($nc)
+   {        
+        return redirect()->route('alumnos.sta.pdf', $nc);
+   }
+
+   public function pdf($nc)
+    {
+        $alu = Alumno::where('no_control',$nc)->first();
+        $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
+        $car = DB::connection('contEsc')->table('carreras')->where('car_Clave', $alu1->car_Clave)->first();
+        $alu2 = DB::connection('contEsc')->table('alumcom')->where('alu_NumControl', $alu1->alu_NumControl)->first();
+
+        $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
+
+        $dPad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Padre')->first();
+        $dMad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Madre')->first();
+        $direccion = Direccion::where('id_alu', $alu->id)->first();
+        $direccionP = Direccion::where('id_fam', $dPad->id)->first();
+        $direccionM = Direccion::where('id_fam', $dMad->id)->first();
+
+        $familiares = Familiar::where('id_alu', $alu->id)->get();
+
+        $person = Personales::where('id_alu', $alu->id)->first();
+        $fam = Datos_familiares::where('id_alu', $alu->id)->first();
+        $soc = Social::where('id_alu', $alu->id)->first();
+        /*$imal = $alu->nom_foto;
+        $foto = base_path('public' . $imal);
+        $ty = pathinfo($foto, PATHINFO_EXTENSION);
+        $da = file_get_contents($foto);
+        $fo = 'data:image/' . $ty . ";base64," . base64_encode($da);
+        $path = base_path('public/storage/fotop/itsch.jpg');
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        $im = 'data:image/' . $type . ";base64," . base64_encode($data);*/
+        $pdf = PDF::setOptions(['defaultFont' => 'sans-serif'])->loadView('alumnos.sta.pdf', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));       
+        return $pdf->stream($alu->no_cont . ".pdf");
+        //return View('alumnos.sta.pdf', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));
+    }
    
 }

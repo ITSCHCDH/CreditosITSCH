@@ -26,6 +26,7 @@ use App\Http\Controllers\AlumnosStaController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+
 Route::post('/getmsg','ExcelController@camMsg')->name('getmsg')->middleware('auth');
 
 Route::get('/fileUploadPost','ExcelController@fileUploadPost')->name('session_variable')->middleware('auth');
@@ -240,6 +241,8 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::get('alumnos/updtDatSalud/{nc}',[AlumnosStaController::class,'updtDatSalud'])->name('alumnos.sta.updtDatSalud');
     Route::get('alumnos/dfamiliares/guardar/{nc}',[AlumnosStaController::class,'updtDatFam'])->name('alumnos.sta.dfamiliares.guargar');
     Route::get('alumnos/dsociales/guardar/{nc}',[AlumnosStaController::class,'updtDatSoc'])->name('alumnos.sta.dsociales.guargar');
+    Route::get('alumnos/autorizar/guardar/{nc}',[AlumnosStaController::class,'autorizar'])->name('alumnos.sta.autorizar.guargar');
+    Route::get('alumnos/pdf/{nc}', [AlumnosStaController::class,'pdf'])->name('alumnos.sta.pdf');
     
 });
 //Route::get('alumnos/login','AlumnosLoginController@showLoginForm')->name('alumnos.login');
