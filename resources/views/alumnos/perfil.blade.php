@@ -33,6 +33,7 @@
                             <br>
                             Carrera: {{ $alumno_data[0]->carrera }}
                         </p>
+                        <h5>Editar fotografía</h5>
                         <input type="file" name="foto" id="foto">
                         <hr>
                         <div class="input-group mb-3">

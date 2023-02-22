@@ -370,18 +370,9 @@ class AlumnosStaController extends Controller
         $person = Personales::where('id_alu', $alu->id)->first();
         $fam = Datos_familiares::where('id_alu', $alu->id)->first();
         $soc = Social::where('id_alu', $alu->id)->first();
-        /*$imal = $alu->nom_foto;
-        $foto = base_path('public' . $imal);
-        $ty = pathinfo($foto, PATHINFO_EXTENSION);
-        $da = file_get_contents($foto);
-        $fo = 'data:image/' . $ty . ";base64," . base64_encode($da);
-        $path = base_path('public/storage/fotop/itsch.jpg');
-        $type = pathinfo($path, PATHINFO_EXTENSION);
-        $data = file_get_contents($path);
-        $im = 'data:image/' . $type . ";base64," . base64_encode($data);*/
+       
         $pdf = PDF::setOptions(['defaultFont' => 'sans-serif'])->loadView('alumnos.sta.pdf', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));       
-        return $pdf->stream($alu->no_cont . ".pdf");
-        //return View('alumnos.sta.pdf', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));
+        return $pdf->stream($alu->no_cont . ".pdf");        
     }
    
 }
