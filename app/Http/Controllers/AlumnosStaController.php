@@ -11,7 +11,6 @@ use App\Models\Familiar;
 use App\Models\Personales;
 use App\Models\Padres;
 use App\Models\Social;
-use Doctrine\DBAL\Schema\View;
 use PDF;
 
 use Illuminate\Http\Request;

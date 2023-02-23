@@ -218,7 +218,8 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     //Rutas de jefes de carrera
     Route::get('/sta/analisis',[JefesController::class,'index'])->name('analisis.index');
     Route::post('/sta/analisis/generación',[JefesController::class,'generacion'])->name('analisis.generacion');
-    Route::get('/sta/analisis/alumno/{nc}',[JefesController::class,'diagnostico'])->name('analisis.alumno');   
+    Route::get('/sta/analisis/alumno/{nc}',[JefesController::class,'diagnostico'])->name('analisis.alumno'); 
+    Route::get('/sta/analisis/ficha/{nc}',[JefesController::class,'ficha'])->name('analisis.ficha');   
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){

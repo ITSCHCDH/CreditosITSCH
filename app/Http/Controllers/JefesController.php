@@ -4,6 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Exception;
+use App\Models\Historial_clinico;
+use App\Models\Datos_familiares;
+use App\Models\ALumno;
+use App\Models\Direccion;
+use App\Models\Familiar;
+use App\Models\Personales;
+use App\Models\Padres;
+use App\Models\Social;
+use Alert;
 
 class JefesController extends Controller
 {
@@ -290,5 +300,44 @@ class JefesController extends Controller
             return "CirculoVerde";
         else
             return "CirculoNegro";
+    }
+
+    public function ficha($nc)
+    {
+        try {
+            $alu = Alumno::where('no_control',$nc)->first();
+            $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
+            $car = DB::connection('contEsc')->table('carreras')->where('car_Clave', $alu1->car_Clave)->first();
+            $alu2 = DB::connection('contEsc')->table('alumcom')->where('alu_NumControl', $alu1->alu_NumControl)->first();
+    
+            $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
+    
+            $dPad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Padre')->first();
+            $dMad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Madre')->first();
+            if($dPad!=null && $dMad!=Null)
+            {
+                $direccion = Direccion::where('id_alu', $alu->id)->first();
+                $direccionP = Direccion::where('id_fam', $dPad->id)->first();
+                $direccionM = Direccion::where('id_fam', $dMad->id)->first();
+        
+                $familiares = Familiar::where('id_alu', $alu->id)->get();
+        
+                $person = Personales::where('id_alu', $alu->id)->first();
+                $fam = Datos_familiares::where('id_alu', $alu->id)->first();
+                $soc = Social::where('id_alu', $alu->id)->first();
+            
+                return view('sta.analisis_alumnos.ficha', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));
+            }    
+            else
+            {
+                Alert::error('Error', 'Este alumno no ha llenado su ficha académica');
+                return redirect()->route('analisis.index');
+            }                         
+        
+        } catch (Exception $e) {
+            Alert::error('Error', 'A ocurrido un error: ',$e);
+            return redirect()->route('analisis.index');
+        }
+       
     }
 }

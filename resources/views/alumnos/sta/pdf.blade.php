@@ -213,7 +213,7 @@
         </table>
         <h5>Datos del padre</h5>
         <hr class="etHr">
-        <table class="table table-user-information">
+        <table>
             <tbody class="txtSmall">
                 <tr>
                     <td><b>Nombre del padre:</b></td>
