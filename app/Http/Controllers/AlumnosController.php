@@ -72,7 +72,7 @@ class AlumnosController extends Controller
     }
 
     public function create()
-    {
+    { 
         $carreras = Area::where('tipo','=','carrera')->orderBy('nombre','ASC')->get();
         return view('admin.alumnos.create')
         ->with('carreras',$carreras);

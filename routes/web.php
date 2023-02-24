@@ -85,7 +85,8 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('/alumnos/index',[AlumnosController::class,'index'])->name('alumnos.index');
     Route::get('/alumnos/{id}/edit',[AlumnosController::class,'edit'])->name('alumnos.edit');
     Route::post('/alumnos/{id}/update',[AlumnosController::class,'update'])->name('alumnos.update');
-    Route::post('/alumnos/create',[AlumnosController::class,'create'])->name('alumnos.create');
+    Route::post('/alumnos/store',[AlumnosController::class,'store'])->name('alumnos.store');
+    Route::get('/alumnos/create',[AlumnosController::class,'create'])->name('alumnos.create');
     Route::get('/alumnos/{id}/destroy',[AlumnosController::class,'destroy'])->name('alumnos.destroy');
     Route::get('/alumnos/Bajas/view',[AlumnosController::class,'bajas'])->name('alumnos.bajas.view');
     Route::get('/alumnos/buscar',[AlumnosController::class,'buscar'])->name('alumnos.buscar');
