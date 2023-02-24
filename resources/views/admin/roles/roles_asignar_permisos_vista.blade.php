@@ -12,7 +12,7 @@
 
 @section('contenido')
 		@if ($role!=null)
-			<label style="float: left;">Rol: {{ "$role->name" }}</label>
+			<h4>Rol: {{ "$role->name" }}</h4>			
 			<br>
 			<div class="resetear" style="padding: 5px;"></div>
 			<input type="hidden" name="role_id" value="{{ $role->id }}" id="role_id">
@@ -57,6 +57,7 @@
 		   	@endif
 		   </tbody>
 		</table>
+		<hr>
 		<a href="#" id="permisos-submit" class="btn btn-primary">Agregar</a>
 		<div style="margin-bottom: 50px;"></div>
 		@section('js')
@@ -106,8 +107,8 @@
 							},
 							success: function(response){
 								location.href = "{{ route('roles.index') }}";
-							},error: function(){
-								console.log('Error a agregar permisos');
+							},error: function(e){
+								console.log('Error a agregar permisos',e);
 							}
 						});
 					});					

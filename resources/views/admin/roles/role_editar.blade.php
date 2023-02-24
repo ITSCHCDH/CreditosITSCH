@@ -6,13 +6,14 @@
     <label class="label label-success"> Editar Roles</label>
 @endsection
 
-@section('contenido')
-	{!! Form::open(['route' => ['roles.role_actualizar',$role->id], 'method' => 'put'])!!}
+@section('contenido')	
+	<form action="{{ route('roles.role_actualizar',$role->id) }}" method="post">
+		@csrf
 		<div class="form-group">
-			{!! Form::label('name','Nombre') !!}
-			{!! Form::text('name',$role->name,['placeholder' => 'Nombre del rol','required','class'=>'form-control']) !!}
+			<label for="name">Nombre</label>
+			<input type="text" name="name" id="name" class="form-control" required placeholder="Nombre del rol" value="{{ $role->name }}">			
 		</div>
-		
-		{!! Form::submit('Guardar',['class' => 'btn btn-info']) !!}
-	{!! Form::close() !!}
+		<hr>
+		<input type="submit" value="Guardar" class="btn btn-info">		
+	</form>
 @endsection

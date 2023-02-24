@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\User;
+use Alert;
 
 class RolesPermisosController extends Controller
 {
@@ -75,19 +76,19 @@ class RolesPermisosController extends Controller
 
     public function eliminarRole($id){
         $role = Role::find($id);
-        if($role==null){
-            Flash::error('El rol no existe');
+        if($role==null){           
+            Alert::error('Error','El rol no existe');
             return redirect()->route('roles.index');
         }
         Role::destroy($id);
-        Flash::success('Role eliminado correctamente');
+        Alert::success('Correcto','Role eliminado correctamente');
         return redirect()->back();
     }
 
     public function usuarios($id){
         $role = Role::find($id);
         if($role==null){
-            Flash::error('El rol no existe');
+            Alert::error('Error','El rol no existe');
             return redirect()->route('roles.index');
         }
         $users = $role->users;
@@ -99,23 +100,23 @@ class RolesPermisosController extends Controller
     public function usuariosRevocarRol(Request $request, $id){
         $role = Role::find($id);
         if($role==null){
-            Flash::error('El rol no existe');
+            Alert::error('Error','El rol no existe');
             return redirect()->back();
         }
         if(!$request->has('user_id')){
             return redirect()->back();
         }
         if($request->get('user_id') == Auth::User()->id){
-            Flash::error('No puedes autoeliminarte');
+            Alert::error('Error','No puedes autoeliminarte');
             return redirect()->back();
         }
         $user = User::find($request->get('user_id'));
         if($user==null){
-            Flash::error('El usuario no existe');
+            Alert::error('Error','El usuario no existe');
             return redirect()->back();
         }
         $user->removeRole($role->name);
-        Flash::success('Roles removidos exitosamente');
+        Alert::success('Correcto','Roles removidos exitosamente');
         return redirect()->route('roles.usuarios',$role->id);
     }
 }

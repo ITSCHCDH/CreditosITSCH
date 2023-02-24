@@ -63,57 +63,61 @@
                         </li>
                     @endif                        
                         <!-- Dropdown -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">Administración</a>
-                            <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS','VER_AREAS','VER_ALUMNOS']))
-                                    <a class="dropdown-item" href="{{ route('alumnos.bajas.view') }}">Baja de alumnos</a>
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS']))
-                                    <a class="dropdown-item" href="{{ route('usuarios.index') }}">Usuarios</a>
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES']))
-                                    <a class="dropdown-item" href="{{ route('roles.index') }}">Roles</a>
-                                @endif
-                                @if(Auth::User()->hasAnyPermission('VIP','VER_AREAS','VIP_SOLO_LECTURA'))
-                                    <a class="dropdown-item" href="{{ route('areas.inicio') }}">Areas</a>
-                                @endif 
-                                @if (Auth::User()->hasAnyPermission('VIP','VIP_CONSTANCIAS','MODIFICAR_CONSTANCIAS_CARRERA'))
-                                    <a class="dropdown-item" href="{{ route('constancias.index') }}">Constancias</a>
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
-                                    <a class="dropdown-item" href="{{ route('ImportExcel.index') }}">Modificar password alumnos</a>
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
-                                    <a class="dropdown-item" href="{{ route('ImportExcel.altaAlumnos') }}">Insertar alumnos desde excel</a>   
-                                @endif  
-                                @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VER_CREDITOS'))                                 
-                                    <a class="dropdown-item" href="{{route('creditos.index')}}">Creditos</a>                                    
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VER_ALUMNOS','VIP_SOLO_LECTURA']))                                   
-                                    <a class="dropdown-item" href="{{route('alumnos.index')}}">Alumnos</a>                                   
-                                @endif                                                          
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">STA</a>
-                            <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
-                                    <a class="dropdown-item" href="{{ route('analisis.index') }}">Jefes de carrera</a>
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
-                                    <a class="dropdown-item" href="">Profesores</a>
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
-                                    <a class="dropdown-item" href="">Tutores</a>
-                                @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
-                                    <a class="dropdown-item" href="">Departamento tutorias</a>
-                                @endif
-                            </div>
-                        </li>
+                        @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS']))
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">Administración</a>
+                                <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS','VER_AREAS','VER_ALUMNOS']))
+                                        <a class="dropdown-item" href="{{ route('alumnos.bajas.view') }}">Baja de alumnos</a>
+                                    @endif
+                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS']))
+                                        <a class="dropdown-item" href="{{ route('usuarios.index') }}">Usuarios</a>
+                                    @endif
+                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES']))
+                                        <a class="dropdown-item" href="{{ route('roles.index') }}">Roles</a>
+                                    @endif
+                                    @if(Auth::User()->hasAnyPermission('VIP','VER_AREAS','VIP_SOLO_LECTURA'))
+                                        <a class="dropdown-item" href="{{ route('areas.inicio') }}">Areas</a>
+                                    @endif 
+                                    @if (Auth::User()->hasAnyPermission('VIP','VIP_CONSTANCIAS','MODIFICAR_CONSTANCIAS_CARRERA'))
+                                        <a class="dropdown-item" href="{{ route('constancias.index') }}">Constancias</a>
+                                    @endif
+                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
+                                        <a class="dropdown-item" href="{{ route('ImportExcel.index') }}">Modificar password alumnos</a>
+                                    @endif
+                                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
+                                        <a class="dropdown-item" href="{{ route('ImportExcel.altaAlumnos') }}">Insertar alumnos desde excel</a>   
+                                    @endif  
+                                    @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VER_CREDITOS'))                                 
+                                        <a class="dropdown-item" href="{{route('creditos.index')}}">Creditos</a>                                    
+                                    @endif
+                                    @if (Auth::User()->hasAnyPermission(['VIP','VER_ALUMNOS','VIP_SOLO_LECTURA']))                                   
+                                        <a class="dropdown-item" href="{{route('alumnos.index')}}">Alumnos</a>                                   
+                                    @endif                                                          
+                                </div>
+                            </li>
+                        @endif
+                        @if (Auth::User()->hasAnyPermission(['VIP_STA']))
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">STA</a>
+                                <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                                    @if (Auth::User()->hasAnyPermission(['VIP_STA']))
+                                        <a class="dropdown-item" href="{{ route('analisis.index') }}">Jefes de carrera</a>
+                                    @endif
+                                    @if (Auth::User()->hasAnyPermission(['VIP_STA']))
+                                        <a class="dropdown-item" href="{{ route('profesores.index') }}">Profesores</a>
+                                    @endif
+                                    @if (Auth::User()->hasAnyPermission(['VIP_STA']))
+                                        <a class="dropdown-item" href="">Tutores</a>
+                                    @endif
+                                    @if (Auth::User()->hasAnyPermission(['VIP_STA']))
+                                        <a class="dropdown-item" href="">Departamento tutorias</a>
+                                    @endif
+                                </div>
+                            </li>
+                        @endif
                 @endif        
             </ul>   
             <ul class="navbar-nav ml-auto mr-4">

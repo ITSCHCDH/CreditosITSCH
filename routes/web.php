@@ -21,6 +21,7 @@ use App\Http\Controllers\EvidenciasController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\JefesController; 
+use App\Http\Controllers\STAController;
 use App\Http\Controllers\AlumnosStaController;
 
 use Illuminate\Support\Facades\Auth;
@@ -187,7 +188,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('roles/{id}/ver_permisos','RolesPermisosController@roleVerPermisos')->name('roles.role_ver_permisos');
     Route::post('roles_permisos/role_asignar_permiso','RolesPermisosController@rolesAsignarPermiso')->name('roles.roles_asignar_permisos');
     Route::get('roles_permisos/{id}/editar','RolesPermisosController@editarRole')->name('roles.role_editar');
-    Route::put('roles_permisos/{id}/actualizar','RolesPermisosController@actualizarRole')->name('roles.role_actualizar');
+    Route::post('roles_permisos/{id}/actualizar','RolesPermisosController@actualizarRole')->name('roles.role_actualizar');
     Route::get('roles_permisos/{id}/eliminar','RolesPermisosController@eliminarRole')->name('roles.role_eliminar');
     Route::get('roles_permisos/{id}/usuarios','RolesPermisosController@usuarios')->name('roles.usuarios');
     Route::get('roles_permisos/{id}/usuarios/revocar_role','RolesPermisosController@usuariosRevocarRol')->name('roles.usuarios_revocar');
@@ -221,6 +222,10 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::post('/sta/analisis/generación',[JefesController::class,'generacion'])->name('analisis.generacion');
     Route::get('/sta/analisis/alumno/{nc}',[JefesController::class,'diagnostico'])->name('analisis.alumno'); 
     Route::get('/sta/analisis/ficha/{nc}',[JefesController::class,'ficha'])->name('analisis.ficha');   
+
+    //Rutas profesores
+    Route::get('/sta/profesores',[STAController::class,'indexProfesores'])->name('profesores.index'); 
+    Route::post('/sta/profesores/find',[STAController::class,'findProfesores'])->name('profesores.find');  
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){

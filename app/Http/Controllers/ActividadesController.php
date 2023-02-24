@@ -5,15 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Credito;
 use Illuminate\Http\Request;
 use App\Models\Actividad;
-use App\Models\Actividad_Evidencia;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Alert;
 use App\Http\Controllers\Utilities\DataTableAttr;
 use App\Http\Controllers\Utilities\DataTableHelper;
 use App\Http\Controllers\Utilities\HttpCode;
-use Exception;
+use App\Models\Actividad_Evidencia;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Exception;
+use Alert;
+
 use Carbon\Carbon;
 
 class ActividadesController extends Controller
