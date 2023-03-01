@@ -4,9 +4,6 @@ namespace App\Imports;
 
 use App\Alumno;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Illuminate\Support\Facades\Hash;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithChunkReading; //Para cargar la hoja de excel por partes a la memoria
 
 class AlumnosAgregar implements ToModel
 {
