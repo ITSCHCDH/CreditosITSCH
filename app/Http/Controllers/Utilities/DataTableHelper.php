@@ -104,6 +104,9 @@ class DataTableHelper {
 
     static private function getCanonicalColumn($selectColumns, $alias) {
         foreach ($selectColumns as $selCol) {
+            if ($selCol instanceof \Illuminate\Database\Query\Expression) {
+                $selCol = self::DBRaw2String($selCol);
+            }
             $pos = strpos($selCol, $alias);
             if ($pos !== false) {
                 // Caso 1: la columna tiene prefijo
@@ -124,5 +127,12 @@ class DataTableHelper {
             }
         }
         return null;
+    }
+
+    static private function DBRaw2String($rawStmt) : string {
+        $reflection = new \ReflectionClass($rawStmt);
+        $property = $reflection->getProperty('value');
+        $property->setAccessible(true);
+        return strval($property->getValue($rawStmt));
     }
 }
