@@ -17,8 +17,8 @@ class CreateMotivosreprobacionTable extends Migration
             $table->id();
             $table->string('no_control',15)->nullable(false);
             $table->string('materia',45)->nullable(false);
-            $table->char('grup_cla',10)->nullable(false)->unique();
-            $table->integer('lse_clave')->nullable(false)->unique();
+            $table->char('grup_cla',10)->nullable(false);
+            $table->integer('lse_clave')->nullable(false);
             $table->integer('num_tema')->nullable(false);
             $table->enum('motivos',['1','2','3','4'])->nullable(false);
             $table->string('comentario',500)->nullable();

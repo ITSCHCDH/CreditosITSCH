@@ -92,15 +92,11 @@ class STAController extends Controller
 
     public function saveComent(Request $request)
     {
-        $motivos = new Motivoreprobacion; 
-        $motivos->no_control = $request->alumno; 
-        $motivos->materia = $request->materia; 
-        $motivos->grup_cla = $request->gse_clave; 
-        $motivos->lse_clave = $request->lse_clave; 
-        $motivos->num_tema = $request->unidad; 
-        $motivos->motivos = $request->motivos; 
-        $motivos->comentarios = $request->comentarios; 
-        $motivos->save();
+        Motivoreprobacion::updateOrCreate(
+            ['no_control' => $request->alumno, 'grup_cla' => $request->gse_clave],
+            ['materia' =>  $request->materia, 'lse_clave' => $request->lse_clave,'num_tema'=> $request->unidad,'motivos'=>$request->motivos,'comentario'=>$request->comentario]
+        );
+       
         return response()->json("correcto");
     }
 }

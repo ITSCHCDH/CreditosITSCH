@@ -229,7 +229,7 @@
                         url:"{{ route('comentarios.save') }}",
                         data:{                           
                             motivos:mot,
-                            comentarios:com,           
+                            comentario:com,           
                             alumno:alu,
                             materia:m,
                             unidad:u,
@@ -237,10 +237,11 @@
                             gse_clave:gse_clave                                              
                         },
                         success: function(){                                                    
-                             console.log('Comentarios guardados con exito');                    
+                            swal('Exito', 'Los comentarios se guardaron de forma exitosa', 'success');                   
                         },
                         error: function(e){                        
-                            console.log('Error al guardar los comentarios',e);                        
+                            console.log('Error al guardar los comentarios',e); 
+                            swal('Error', 'Ocurrio un error, error #1001, consulta con el administrador del sistema', 'error');                        
                         }
                     });
             }
