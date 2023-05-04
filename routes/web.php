@@ -228,7 +228,8 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::post('/sta/units/find',[STAController::class,'findUnits'])->name('units.find');  
     Route::post('/sta/profesores/find',[STAController::class,'findProfesores'])->name('profesores.find');  
     Route::post('/sta/materias/find',[STAController::class,'findMaterias'])->name('materias.find'); 
-    Route::post('/sta/lista/calificaciones/find',[STAController::class,'findListaCali'])->name('listaCali.find');  
+    Route::post('/sta/lista/calificaciones/find',[STAController::class,'findListaCali'])->name('listaCali.find'); 
+    Route::post('/sta/comentarios/guardar',[STAController::class,'saveComent'])->name('comentarios.save');  
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){

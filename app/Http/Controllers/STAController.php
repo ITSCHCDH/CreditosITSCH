@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\ALumno;
+use App\Models\Motivoreprobacion;
 use Alert;
 
 class STAController extends Controller
@@ -85,8 +85,22 @@ class STAController extends Controller
         ->join('listassemestrecom','listassemestre.lse_Clave','=','listassemestrecom.lse_clave')
         ->where('listassemestre.gse_Clave',$request->materia)
         ->where('listassemestrecom.lsc_NumUnidad',$request->unidad) 
-        ->select('alumnos.alu_NumControl','alumnos.alu_Nombre','alumnos.alu_ApePaterno','alumnos.alu_ApeMaterno','listassemestrecom.lsc_Calificacion')  
+        ->select('listassemestre.gse_Clave','listassemestre.lse_Clave','alumnos.alu_NumControl','alumnos.alu_Nombre','alumnos.alu_ApePaterno','alumnos.alu_ApeMaterno','listassemestrecom.lsc_Calificacion')  
         ->get();   
         return response()->json($listaCali);
+    }
+
+    public function saveComent(Request $request)
+    {
+        $motivos = new Motivoreprobacion; 
+        $motivos->no_control = $request->alumno; 
+        $motivos->materia = $request->materia; 
+        $motivos->grup_cla = $request->gse_clave; 
+        $motivos->lse_clave = $request->lse_clave; 
+        $motivos->num_tema = $request->unidad; 
+        $motivos->motivos = $request->motivos; 
+        $motivos->comentarios = $request->comentarios; 
+        $motivos->save();
+        return response()->json("correcto");
     }
 }
