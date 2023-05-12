@@ -87,7 +87,10 @@ class STAController extends Controller
         ->where('listassemestrecom.lsc_NumUnidad',$request->unidad) 
         ->select('listassemestre.gse_Clave','listassemestre.lse_Clave','alumnos.alu_NumControl','alumnos.alu_Nombre','alumnos.alu_ApePaterno','alumnos.alu_ApeMaterno','listassemestrecom.lsc_Calificacion')  
         ->get();   
-        return response()->json($listaCali);
+
+        $coment=Motivoreprobacion::select('no_control','motivos','comentario')->where('grup_cla',$request->materia)->where('num_tema',$request->unidad)->get();
+
+        return response()->json( ['listaCali'=>$listaCali,'coment'=>$coment]);
     }
 
     public function saveComent(Request $request)

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Exception;
 use App\Models\Historial_clinico;
 use App\Models\Datos_familiares;
+use App\Models\Motivoreprobacion;
 use App\Models\ALumno;
 use App\Models\Direccion;
 use App\Models\Familiar;
@@ -220,11 +221,9 @@ class JefesController extends Controller
         $nivelaciones = $nivelacionesOrdinario + $nivelacionesRepe + $nivelacionesEspecial;
 
         $tamComentarios = 1;
-        $Comentarios = DB::table('stav2.motivosreprobacion')
-        ->join('stav2.alumnos','alumnos.id','=','motivosreprobacion.id_alu')
-        ->select('motivosreprobacion.materia','motivosreprobacion.num_tema','motivosreprobacion.comentario','motivosreprobacion.lse_clave')
-        ->where('alumnos.no_cont','=',$nc)
-        ->get();
+        $Comentarios = Motivoreprobacion::select('*')              
+        ->where('no_control','=',$nc)
+        ->get(); 
         if(sizeof($Comentarios) == 0){
             $tamComentarios = 0;
         }

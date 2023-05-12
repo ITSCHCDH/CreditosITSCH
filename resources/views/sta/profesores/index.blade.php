@@ -174,16 +174,32 @@
                         materia:materia,
                         unidad:unidad
                     },
-                    success: function(listaCali){ 
-                        $("#gse_clave").val(listaCali[0].gse_Clave);                                                            
+                    success: function(datos){  
+                        console.log(datos);                       
+                        $("#gse_clave").val(datos['listaCali'][0].gse_Clave);                                                            
                         $("#listaCali > tbody").empty();                       
-                        $.each(listaCali, function(i, item) {
+                        $.each(datos['listaCali'], function(i, item) {
                             if(item.lsc_Calificacion<70){
-                                $("#listaCali > tbody").append(`<tr><td>${i+1}</td> <td><input type="hidden" name="alu${i}" id="alu${i}" readonly value="${item.alu_NumControl}"><input type="hidden" name="lse_clave${i}" id="lse_clave${i}" readonly value="${item.lse_Clave}"> ${item.alu_NumControl}</td> <td>${item.alu_Nombre} ${item.alu_ApePaterno} ${item.alu_ApeMaterno}</td> <td style="color:red">${item.lsc_Calificacion}</td> <td> <select class="form-control" name="motivos${i}" id="motivos${i}" required> <option value="">Slecciona una opción</option> <option value="1">Responsabilidad alumno</option> <option value="2">Inasistencia</option> <option value="3">Complejidad materia</option> <option value="4">Otro</option> </select> </td> <td> <textarea required placeholder="Comentarios adicionales" name="comentarios${i}" id="comentarios${i}" rows="1" class="form-control"></textarea> </td> <td><a onclick="guardarComentarios(${i})" type="button" class="btn btn-secondary">Guardar</a></td></tr>`);
+                                $.each(datos['coment'],function(x,com){
+                                    van=0;
+                                    if(com.no_control==item.alu_NumControl){
+                                        //Repobado con comentarios
+                                        $("#listaCali > tbody").append(`<tr><td>${i+1}</td> <td><input type="hidden" name="alu${i}" id="alu${i}" readonly value="${item.alu_NumControl}"><input type="hidden" name="lse_clave${i}" id="lse_clave${i}" readonly value="${item.lse_Clave}"> ${item.alu_NumControl}</td> <td>${item.alu_Nombre} ${item.alu_ApePaterno} ${item.alu_ApeMaterno}</td> <td style="color:red">${item.lsc_Calificacion}</td> <td> <select class="form-control" name="motivos${i}" id="motivos${i}" required> <option value="">Selecciona una opción</option> <option value="1">Responsabilidad alumno</option> <option value="2">Inasistencia</option> <option value="3">Complejidad materia</option> <option value="4">Otro</option> </select> </td> <td> <textarea required placeholder="Comentarios adicionales" name="comentarios${i}" id="comentarios${i}" rows="1" class="form-control">${com.comentario}</textarea> </td> <td><a onclick="guardarComentarios(${i})" type="button" class="btn btn-secondary">Guardar</a></td></tr>`);                                        
+                                        $("#motivos"+i).val(com.motivos);//Seleccionamos la opcion de motivos seleccionada
+                                        van=1;
+                                        return false;  
+                                    }                                                
+                                });
+                                if(van==0){
+                                    //Reprobado sin comentarios
+                                    $("#listaCali > tbody").append(`<tr><td>${i+1}</td> <td><input type="hidden" name="alu${i}" id="alu${i}" readonly value="${item.alu_NumControl}"><input type="hidden" name="lse_clave${i}" id="lse_clave${i}" readonly value="${item.lse_Clave}"> ${item.alu_NumControl}</td> <td>${item.alu_Nombre} ${item.alu_ApePaterno} ${item.alu_ApeMaterno}</td> <td style="color:red">${item.lsc_Calificacion}</td> <td> <select class="form-control" name="motivos${i}" id="motivos${i}" required> <option value="">Slecciona una opción</option> <option value="1">Responsabilidad alumno</option> <option value="2">Inasistencia</option> <option value="3">Complejidad materia</option> <option value="4">Otro</option> </select> </td> <td> <textarea required placeholder="Comentarios adicionales" name="comentarios${i}" id="comentarios${i}" rows="1" class="form-control"></textarea> </td> <td><a onclick="guardarComentarios(${i})" type="button" class="btn btn-secondary">Guardar</a></td></tr>`);
+                                }
+                               
                             }
                             else{
+                                //Alunos aprobados
                                 $("#listaCali > tbody").append(`<tr><td>${i+1}</td> <td>${item.alu_NumControl}</td> <td>${item.alu_Nombre} ${item.alu_ApePaterno} ${item.alu_ApeMaterno}</td> <td>${item.lsc_Calificacion}</td> <td></td> <td></td> <td></td></tr>`);
-                            }                           
+                            }                                                                
                         });                        
                     },
                     error: function(e){                        
