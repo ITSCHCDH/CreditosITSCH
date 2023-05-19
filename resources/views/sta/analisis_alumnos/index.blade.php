@@ -11,11 +11,11 @@
         @csrf
         <div class="row">       
             <div class="col-sm-3" >
-                <h5>Selecciona una generación</h5>        
+                <h5>Selecciona una generación</h5>       
                 <select class="form-control " name="generacion" id="generacion" required>
                     <option selected value="">Selecciona una opción</option>
                     @foreach ($generaciones as $gen )
-                        @if($generacion==$gen->Alu_AnioIngreso)
+                        @if($generacion==$gen->Alu_AnioIngreso )
                             <option value="{{ $gen->Alu_AnioIngreso }}" selected>{{ $gen->Alu_AnioIngreso }}</option>
                         @else
                             <option value="{{ $gen->Alu_AnioIngreso }}">{{ $gen->Alu_AnioIngreso }}</option>

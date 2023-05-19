@@ -17,7 +17,7 @@ class STAController extends Controller
         $carreras = DB::connection('contEsc')->table('carreras')
         ->where('car_Status','VIGENTE')
         ->get();       
-        return view('sta.profesores.index',compact('carreras'));
+        return view('sta.profesores.index',compact('carreras')); 
     }
 
     public function findProfesores(Request $request)
@@ -47,7 +47,7 @@ class STAController extends Controller
         $materias=DB::connection('contEsc')->table('reticula')
         ->join('grupossemestre','reticula.ret_Clave','=','grupossemestre.ret_Clave')
         ->where('grupossemestre.cat_Clave',$request->profesor)
-        ->select('reticula.ret_NomCompleto','reticula.ret_NumUnidades','grupossemestre.gse_Clave','grupossemestre.gse_Anio','grupossemestre.gse_Observaciones')
+        ->select('reticula.ret_NomCompleto','reticula.ret_NumUnidades','grupossemestre.ret_Clave','grupossemestre.gse_Anio','grupossemestre.gse_Observaciones')
         ->get();
       
         return response()->json($materias);

@@ -41,7 +41,7 @@
                 <h6>Filtrar</h6>
             </div>
             <div class="row">
-                <a href="#" type="button" class="btn btn-success" id="findUnits" ><i class="fas fa-filter"></i></a>
+                <a href="#" type="button" class="btn btn-success" id="findUnits" title="filtrar datos" ><i class="fas fa-filter"></i></a>
             </div>
         </div>   
          <div class="col-sm-3">
@@ -100,7 +100,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
 			} );
-            //Filtros para generar consulta
+            //Codigo para obtener profesores de una carrera
             $(document).ready(function(){                             
                 $("#carrera").change(function(e){
                     e.preventDefault(); 
@@ -143,7 +143,7 @@
                         success: function(materias){                                                    
                             $('#materia').empty();                                                    
                             $.each(materias, function(i, item) {
-                                $('#materia').prepend(`<option value= ${item.gse_Clave}>${item.ret_NomCompleto}  ${item.gse_Observaciones}</option>`);
+                                $('#materia').prepend(`<option value= ${item.ret_Clave}>${item.ret_NomCompleto}  ${item.gse_Observaciones}</option>`);
                             });     
                             $('#materia').prepend(`<option value="" selected>Selecciona una materia</option>`);                        
                         },
@@ -163,9 +163,9 @@
             });
           
             function getCalificaciones(unidad){  
-                $("#unidad").text(unidad);
+                $("#unidad").text(unidad); 
                 txtFiltro();                              
-                materia=$('#materia').val();                          
+                materia=$('#materia').val();                        
                 $.ajax({
                     type: "post",
                     dataType: "json",
@@ -174,8 +174,7 @@
                         materia:materia,
                         unidad:unidad
                     },
-                    success: function(datos){  
-                        console.log(datos);                       
+                    success: function(datos){                                               
                         $("#gse_clave").val(datos['listaCali'][0].gse_Clave);                                                            
                         $("#listaCali > tbody").empty();                       
                         $.each(datos['listaCali'], function(i, item) {
@@ -193,8 +192,7 @@
                                 if(van==0){
                                     //Reprobado sin comentarios
                                     $("#listaCali > tbody").append(`<tr><td>${i+1}</td> <td><input type="hidden" name="alu${i}" id="alu${i}" readonly value="${item.alu_NumControl}"><input type="hidden" name="lse_clave${i}" id="lse_clave${i}" readonly value="${item.lse_Clave}"> ${item.alu_NumControl}</td> <td>${item.alu_Nombre} ${item.alu_ApePaterno} ${item.alu_ApeMaterno}</td> <td style="color:red">${item.lsc_Calificacion}</td> <td> <select class="form-control" name="motivos${i}" id="motivos${i}" required> <option value="">Slecciona una opción</option> <option value="1">Responsabilidad alumno</option> <option value="2">Inasistencia</option> <option value="3">Complejidad materia</option> <option value="4">Otro</option> </select> </td> <td> <textarea required placeholder="Comentarios adicionales" name="comentarios${i}" id="comentarios${i}" rows="1" class="form-control"></textarea> </td> <td><a onclick="guardarComentarios(${i})" type="button" class="btn btn-secondary">Guardar</a></td></tr>`);
-                                }
-                               
+                                }                               
                             }
                             else{
                                 //Alunos aprobados
@@ -221,7 +219,7 @@
                         materia:materia
                     },
                     success: function(unidades){                        
-                        botones = "";
+                        botones = "";                        
                         for(i=0;i<unidades.ret_NumUnidades;i++)
                             botones += `<div class="col-sm-2"><a type="button" class="btn btn-info" onclick="getCalificaciones(${i+1})">Unidad ${i+1}</a></div>`;
                         $("#unidades").html(botones);

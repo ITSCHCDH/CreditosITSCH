@@ -148,7 +148,7 @@
         <div>
             {{-- Dibuja la tabla con las calificaciones del semestre actual --}}
             <h2>{{$calificacionesvariable}}</h2>	
-            <table class="table">
+            <table class="table table-sm">
                 <thead>
                     <tr>
                         {{-- Dibuja en la tabla el numero maximo de unidades --}}
@@ -165,7 +165,7 @@
                     @foreach ( $materias as $calif )  
                         <tr> 
                             {{-- Agregamos el nombre de cada materia a la tabla --}}
-                            <td> {{   $calif[0]->ret_NomCompleto; }}</td>                                             
+                            <td> {{   $calif[0]->ret_NomCompleto; }} <P class="txtSmall">(PROFESOR: {{ $calif[0]->profesor; }})</P></td>                                             
                             @foreach ($calif as $c)
                                 @if (!$c->lsc_Corte)
                                     <!-- El profesor no ha capturado calificaciones -->
@@ -174,7 +174,28 @@
                                     {{-- Cambiar a color Rojo las calificaciones menores a 70 --}}   
                                     @if ($c->comentario!="")
                                         {{-- Se agrega el comentario a las materias reprobadas --}}
-                                        <td class="txtRojo"  data-mdb-toggle="tooltip" title="{{ $c->comentario }}"> {{   $c->lsc_Calificacion; }}  </td> 
+                                        @php
+                                            //Cambiamos el numero de motivo de reprobación por su texto correspondiente
+                                            $motivo="";
+                                            switch ($c->motivo) {
+                                                case 1:
+                                                    $motivo="Responsabilidad alumno";
+                                                    break;
+                                                case 2:
+                                                    $motivo="Inasistencia";
+                                                    break; 
+                                                case 3:
+                                                    $motivo="Complejidad materia";
+                                                    break;
+                                                case 4:
+                                                    $motivo="Otro";
+                                                    break;                                                 
+                                                default:
+                                                    $motivo="El profesor no agrego un motivo especifico";
+                                                    break;
+                                            }
+                                        @endphp
+                                        <td class="txtRojo"  data-mdb-toggle="tooltip" title="Motivo: {{ $motivo }}. Comentario: {{ $c->comentario }}"> {{   $c->lsc_Calificacion; }}  </td> 
                                     @else
                                         {{-- En caso de que el profesor no agregue comentario --}}
                                         <td class="txtRojo"  data-mdb-toggle="tooltip" title="El profesor no agrego comentarios"> {{   $c->lsc_Calificacion; }}  </td> 

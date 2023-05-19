@@ -15,6 +15,7 @@ use App\Models\Personales;
 use App\Models\Padres;
 use App\Models\Social;
 use Alert;
+use PhpParser\Node\Expr\AssignOp\Concat;
 
 class JefesController extends Controller
 {
@@ -25,7 +26,7 @@ class JefesController extends Controller
      */
     public function index()
     {
-        $carreras = DB::connection('contEsc')->table('carreras')->get();
+        $carreras = DB::connection('contEsc')->table('carreras')->where('car_Status','VIGENTE')->get();
         $grupo="";
         $generacion="";
         $carrera="";      
@@ -33,8 +34,9 @@ class JefesController extends Controller
 			->select("alumnos.Alu_AnioIngreso")
 			->orderBy('Alu_AnioIngreso', 'asc')
 			->distinct()
+            ->where('alumnos.Alu_AnioIngreso','!=',0)
 			->get();
-
+       
         return view('sta/analisis_alumnos/index')
         ->with('grupo',$grupo)
         ->with('carreras',$carreras)
@@ -105,7 +107,8 @@ class JefesController extends Controller
         ->join('listassemestrecom','listassemestrecom.lse_Clave','=','listassemestre.lse_Clave')        
         ->join('grupossemestre','listassemestre.gse_Clave','=','grupossemestre.gse_Clave')
         ->join('reticula','reticula.ret_Clave','=','grupossemestre.ret_Clave')
-        ->select ('reticula.ret_NomCompleto','listassemestrecom.lsc_Calificacion','reticula.ret_NumUnidades','listassemestrecom.lsc_NumUnidad','listassemestrecom.lsc_Corte','listassemestrecom.lse_clave')
+        ->join('catedraticos','catedraticos.cat_Clave','=','grupossemestre.cat_Clave')
+        ->select (DB::raw('CONCAT(catedraticos.cat_Nombre," ",catedraticos.cat_ApePat," ",catedraticos.cat_ApeMat) as profesor'),'reticula.ret_NomCompleto','listassemestrecom.lsc_Calificacion','reticula.ret_NumUnidades','listassemestrecom.lsc_NumUnidad','listassemestrecom.lsc_Corte','listassemestrecom.lse_clave')
         ->where('listassemestre.alu_NumControl','=',$nc)
         ->DISTINCT()
         ->get();
@@ -229,7 +232,7 @@ class JefesController extends Controller
         //Guardar las calificaciones en forma de arreglos
         $temp="";
         $con=0;
-        $materias=[]; 
+        $materias=[];         
        
         foreach($GetTablaCalificaciones as $calificaciones)
         {            
@@ -247,11 +250,10 @@ class JefesController extends Controller
                     $calificaciones->motivo = $comentario->motivos;
                 }
             }
-            $materias[$con][]=$calificaciones; 
-
-           // dd($materias);
-                                                
-        }      
+            $materias[$con][]=$calificaciones;                                                
+        }     
+        
+        
             
         return view('sta.analisis_alumnos.diagnostico')        
         -> with ('alumnos',$buscarAlumno)
