@@ -146,103 +146,53 @@
         </table>
         <br>
         <div>
+            {{-- Dibuja la tabla con las calificaciones del semestre actual --}}
             <h2>{{$calificacionesvariable}}</h2>	
             <table class="table">
-                <tbody>	
+                <thead>
                     <tr>
-                        <td>{{$unidadesvariable}}</td>
+                        {{-- Dibuja en la tabla el numero maximo de unidades --}}
+                        <th>{{$unidadesvariable}}</th>
                         @foreach ($unidades as $uni)
-                            <td>Unidad&nbsp;{{$uni->lsc_NumUnidad}}</td>
+                            <th>Unidad&nbsp;{{$uni->lsc_NumUnidad}}</th>
                         @endforeach                
-                    </tr>            
-                        @php
-                            $m = true;
-                        @endphp
-                        @foreach ($tablacalificaciones as $calif)                
-                            @if ($m == true)
-                                <tr>
-                                <td>{{$calif->ret_NomCompleto}}&nbsp; <b>-- {{$calif->lse_clave}}</b> </td>	
-                                @php
-                                    $m = false;
-                                @endphp	
-                            @endif
-                            @if ($calif -> lsc_NumUnidad == $calif->ret_NumUnidades)
-                                @if ($calif->lsc_Calificacion<=69)
-                                    @if ($calif->lsc_Corte)
-                                        <!-- Color Rojo -->
-                                        @if ($tamcomentarios == 0)
-                                            <td class="txtRojo" data-mdb-toggle="tooltip" title="El profesor no agrego comentario">{{$calif->lsc_Calificacion}}</td>			
-                                        @else
-                                        @foreach ($comentarios as $rescomentarios)
-                                                @if ($calif->lse_clave == $rescomentarios->lse_clave)
-                                                    @if ($calif -> lsc_NumUnidad == $rescomentarios -> num_tema)
-                                                        <td class="txtRojo" data-mdb-toggle="tooltip" title="{{$rescomentarios->comentario}}">{{$calif->lsc_Calificacion}}</td>				
-                                                    @else
-                                                        <td class="txtRojo" data-mdb-toggle="tooltip" title="El profesor no agrego comentario">{{$calif->lsc_Calificacion}}</td>			
-                                                    @endif
-                                                @endif
-                                            @endforeach
-                                        @endif
-                                    @else                                        
-                                        <td data-mdb-toggle="tooltip" title="El profesor no ha capturado la calificación">----</td>
-                                    @endif
+                    </tr>
+                </thead>
+                <tbody> 
+                    @php
+                        $temp="";                      
+                    @endphp                 
+                    @foreach ( $materias as $calif )  
+                        <tr> 
+                            {{-- Agregamos el nombre de cada materia a la tabla --}}
+                            <td> {{   $calif[0]->ret_NomCompleto; }}</td>                                             
+                            @foreach ($calif as $c)
+                                @if (!$c->lsc_Corte)
+                                    <!-- El profesor no ha capturado calificaciones -->
+                                    <td data-mdb-toggle="tooltip" title="El profesor no ha capturado la calificación">----</td>
+                                @elseif ($c->lsc_Calificacion<70)
+                                    {{-- Cambiar a color Rojo las calificaciones menores a 70 --}}   
+                                    @if ($c->comentario!="")
+                                        {{-- Se agrega el comentario a las materias reprobadas --}}
+                                        <td class="txtRojo"  data-mdb-toggle="tooltip" title="{{ $c->comentario }}"> {{   $c->lsc_Calificacion; }}  </td> 
+                                    @else
+                                        {{-- En caso de que el profesor no agregue comentario --}}
+                                        <td class="txtRojo"  data-mdb-toggle="tooltip" title="El profesor no agrego comentarios"> {{   $c->lsc_Calificacion; }}  </td> 
+                                    @endif                          
+                                @elseif ($c->lsc_Calificacion>=70 && $c->lsc_Calificacion<80)
+                                    {{-- Cambiar a color Naranja las calificaciones menores a 80 --}}                                
+                                    <td class="txtNaranja"> {{   $c->lsc_Calificacion; }}  </td> 
+                                @elseif ($c->lsc_Calificacion>=80 && $c->lsc_Calificacion<86)
+                                    {{-- Cambiar a color Amarillo las calificaciones menores a 86 --}}                                
+                                    <td class="txtNaranja"> {{   $c->lsc_Calificacion; }}  </td> 
                                 @else
-                                    @if ($calif->lsc_Calificacion>=86)
-                                        <!-- Color Verde -->
-                                        <td class="txtVerde">{{$calif->lsc_Calificacion}}</td>	
-                                    @else
-                                        @if ($calif->lsc_Calificacion>=80)
-                                            <!-- Color Amarillo -->
-                                            <td class="txtAmarillo">{{$calif->lsc_Calificacion}}</td>		
-                                        @else
-                                            <!-- Color Naranja -->
-                                            <td class="txtNaranja">{{$calif->lsc_Calificacion}}</td>			
-                                        @endif
-                                        
-                                    @endif
-                                @endif
-                                </tr>
-                                @php
-                                    $m = true;
-                                @endphp
-                            @else	
-                                @if ($calif->lsc_Calificacion<=69)
-                                    @if ($calif->lsc_Corte)
-                                        <!-- Color Rojo -->
-                                        @if ($tamcomentarios == 0)
-                                            <td class="txtRojo" data-mdb-toggle="tooltip" title="El profesor no agrego comentario">{{$calif->lsc_Calificacion}}</td>			
-                                        @else
-                                        @foreach ($comentarios as $rescomentarios)
-                                                @if ($calif->lse_clave == $rescomentarios->lse_clave)
-                                                    @if ($calif -> lsc_NumUnidad == $rescomentarios -> num_tema)
-                                                        <td class="txtRojo" data-mdb-toggle="tooltip" title="{{$rescomentarios->comentario}}">{{$calif->lsc_Calificacion}}</td>				
-                                                    @else
-                                                        <td class="txtRojo" data-mdb-toggle="tooltip" title="El profesor no agrego comentario">{{$calif->lsc_Calificacion}}</td>			
-                                                    @endif
-                                                @endif
-                                            @endforeach
-                                        @endif
-                                    @else
-                                        <!-- Color Blanco -->
-                                        <td data-mdb-toggle="tooltip" title="El profesor no ha capturado la calificación">----</td>
-                                    @endif
-                                @else
-                                    @if ($calif->lsc_Calificacion>=86)
-                                        <!-- Color Verde -->
-                                        <td class="txtVerde">{{$calif->lsc_Calificacion}}</td>	
-                                    @else
-                                        @if ($calif->lsc_Calificacion>=80)
-                                            <!-- Color Amarillo -->
-                                            <td class="txtAmarillo">{{$calif->lsc_Calificacion}}</td>		
-                                        @else
-                                            <!-- Color Naranja -->
-                                            <td class="txtNaranja">{{$calif->lsc_Calificacion}}</td>			
-                                        @endif                                
-                                    @endif
-                                @endif					
-                            @endif                    
-                        @endforeach
-                </tbody>	
+                                    {{-- Cambiar a color Verde las calificaciones mayores a 86 --}} 
+                                    <td class="txtVerde"> {{   $c->lsc_Calificacion; }}  </td> 
+                                @endif                               
+                            @endforeach  
+                        </tr>                                                                                                     
+                    @endforeach
+                </tbody>
             </table>
         </div>
     </div>
@@ -318,9 +268,7 @@
                 <tr id="FilaDatosCardex">
                     <td id="DatosCardex">@php $contador++; echo $contador; @endphp</td>	
                     <td id="DatosCardex">{{$res -> ret_NomCompleto}}</td>	
-                    <td id="DatosCardexCentrados">{{$res -> cdx_AnioXPrime}}</td>	
-                    
-                        
+                    <td id="DatosCardexCentrados">{{$res -> cdx_AnioXPrime}}</td>                      
                 @if ($res->cdx_Calif<=69)
                         <!-- Color Rojo -->
                         <td class="txtRojo" data-mdb-toggle="tooltip" title="No Acreditada ">{{$res->cdx_Calif}}</td>		
@@ -338,9 +286,7 @@
                         @endif
                         
                     @endif
-                @endif	
-                    
-                        
+                @endif               
                     @if ($res -> cdx_UltOpcAcred == 1)
                         <td class="txtVerde">Ordinario</td>		
                     @endif

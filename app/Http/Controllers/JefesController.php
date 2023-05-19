@@ -102,7 +102,7 @@ class JefesController extends Controller
         }
 
         $GetTablaCalificaciones = DB::connection('contEsc')->table('listassemestre')
-        ->join('listassemestrecom','listassemestrecom.lse_Clave','=','listassemestre.lse_Clave')
+        ->join('listassemestrecom','listassemestrecom.lse_Clave','=','listassemestre.lse_Clave')        
         ->join('grupossemestre','listassemestre.gse_Clave','=','grupossemestre.gse_Clave')
         ->join('reticula','reticula.ret_Clave','=','grupossemestre.ret_Clave')
         ->select ('reticula.ret_NomCompleto','listassemestrecom.lsc_Calificacion','reticula.ret_NumUnidades','listassemestrecom.lsc_NumUnidad','listassemestrecom.lsc_Corte','listassemestrecom.lse_clave')
@@ -117,14 +117,14 @@ class JefesController extends Controller
         ->select ('listassemestrecom.lsc_NumUnidad')
         ->where('listassemestre.alu_NumControl','=',$nc)
         ->DISTINCT()
-        ->get();
+        ->get(); 
 
         if(sizeof($GetMaxUnidad)>0){
             $variableCalificaciones = 'Calificaciones Parciales';
-            $unidadesvariable = 'Unidades';
+            $unidadesvariable = 'Materias';
         }else{
             $variableCalificaciones = 'Sin calificaciones parciales';
-            $unidadesvariable = 'Sin unidades vigentes';
+            $unidadesvariable = 'Sin materias asignadas';
         }
 
 
@@ -220,18 +220,42 @@ class JefesController extends Controller
 
         $nivelaciones = $nivelacionesOrdinario + $nivelacionesRepe + $nivelacionesEspecial;
 
-        $tamComentarios = 1;
-        $Comentarios = Motivoreprobacion::select('*')              
+       
+        $comentarios = Motivoreprobacion::select('*')              
         ->where('no_control','=',$nc)
         ->get(); 
-        if(sizeof($Comentarios) == 0){
-            $tamComentarios = 0;
-        }
 
+
+        //Guardar las calificaciones en forma de arreglos
+        $temp="";
+        $con=0;
+        $materias=[]; 
+       
+        foreach($GetTablaCalificaciones as $calificaciones)
+        {            
+            if($temp!=$calificaciones->lse_clave)
+            {
+                $temp=$calificaciones->lse_clave;
+                $con++;                               
+            }
+            //Agregamos los comentarios a cada calificación
+            $calificaciones->comentario = "";
+            $calificaciones->motivo = 0;
+            foreach($comentarios as $comentario){
+                if($calificaciones->lse_clave == $comentario->lse_clave && $calificaciones->lsc_NumUnidad == $comentario->num_tema){
+                    $calificaciones->comentario = $comentario->comentario;
+                    $calificaciones->motivo = $comentario->motivos;
+                }
+            }
+            $materias[$con][]=$calificaciones; 
+
+           // dd($materias);
+                                                
+        }      
+            
         return view('sta.analisis_alumnos.diagnostico')        
         -> with ('alumnos',$buscarAlumno)
-        -> with ('grupos',$GetGrupos)
-        -> with ('tablacalificaciones',$GetTablaCalificaciones)
+        -> with ('grupos',$GetGrupos)       
         -> with ('unidades',$GetMaxUnidad)
         -> with ('calificacionesvariable',$variableCalificaciones)
         -> with ('unidadesvariable',$unidadesvariable)
@@ -247,9 +271,8 @@ class JefesController extends Controller
         -> with('msm_medico',$MSMMedico)
         -> with('tam_msm_medico',$tam_msm_medico)
         -> with('msm_psicologico',$MSMPsicologico)
-        -> with('tam_msm_psicologico',$tam_msm_psicologico)
-        -> with('comentarios',$Comentarios)
-        -> with('tamcomentarios',$tamComentarios);				      
+        -> with('tam_msm_psicologico',$tam_msm_psicologico)        
+        -> with('materias',$materias);				      
     }
 
     public function calSemaforo($nc) {
