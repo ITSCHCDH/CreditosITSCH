@@ -27,7 +27,8 @@
                     
                 </select>               
             </div>
-        </div>      
+        </div> 
+        <input type="hidden" name="grupo" id="grupo" readonly>     
         <div class="col-sm-3" id="divMaterias" >
             <label for="materia"  id="labMaterias">Materias</label>
             <div class="input-group mb-3">               
@@ -140,10 +141,11 @@
                         data:{                           
                             profesor:profesor                                                 
                         },
-                        success: function(materias){                                                    
+                        success: function(materias){                                                                              
                             $('#materia').empty();                                                    
                             $.each(materias, function(i, item) {
-                                $('#materia').prepend(`<option value= ${item.ret_Clave}>${item.ret_NomCompleto}  ${item.gse_Observaciones}</option>`);
+                                valor = JSON.stringify(item); 
+                                $('#materia').prepend(`<option value= '${valor}'>${item.ret_NomCompleto}  ${item.gse_Observaciones}</option>`);
                             });     
                             $('#materia').prepend(`<option value="" selected>Selecciona una materia</option>`);                        
                         },
@@ -153,30 +155,34 @@
                     });
                     $('#divMaterias').show();                                   
                 }); 
+                //Función para obtener las unidades de una materia
                 $("#materia").change(function(){
-                    $('#divFiltrar').show();                                   
+                    txtFiltro(); 
+                    $('#divFiltrar').show();
                 });                               
             });
-
-            $("#materia").change(function(){
-                txtFiltro();   
-            });
           
+            //Funcion para obtener las calificaciones de una unidad
             function getCalificaciones(unidad){  
                 $("#unidad").text(unidad); 
                 txtFiltro();                              
-                materia=$('#materia').val();                        
+                strMateria=$('#materia').val();
+                jsnMateria=JSON.parse(strMateria); 
+                materia=jsnMateria.ret_Clave; 
+                grupo=$('#grupo').val();     
                 $.ajax({
                     type: "post",
                     dataType: "json",
                     url:"{{ route('listaCali.find') }}",
                     data:{                                                                  
                         materia:materia,
-                        unidad:unidad
+                        unidad:unidad,
+                        grupo:grupo
                     },
-                    success: function(datos){                                               
+                    success: function(datos){                                                                                            
                         $("#gse_clave").val(datos['listaCali'][0].gse_Clave);                                                            
-                        $("#listaCali > tbody").empty();                       
+                        $("#listaCali > tbody").empty();  
+                        van=0;                     
                         $.each(datos['listaCali'], function(i, item) {
                             if(item.lsc_Calificacion<70){
                                 $.each(datos['coment'],function(x,com){
@@ -210,7 +216,10 @@
             $("#findUnits").click(function(e){                      
                 e.preventDefault();               
                 profesor = $('#profesor').val();                 
-                materia=$('#materia').val();  
+                strMateria=$('#materia').val();
+                jsnMateria=JSON.parse(strMateria); 
+                materia=jsnMateria.ret_Clave; 
+                $('#grupo').val(jsnMateria.gse_Clave);
                 $.ajax({
                     type: "post",
                     dataType: "json",

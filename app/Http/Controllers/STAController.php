@@ -47,7 +47,7 @@ class STAController extends Controller
         $materias=DB::connection('contEsc')->table('reticula')
         ->join('grupossemestre','reticula.ret_Clave','=','grupossemestre.ret_Clave')
         ->where('grupossemestre.cat_Clave',$request->profesor)
-        ->select('reticula.ret_NomCompleto','reticula.ret_NumUnidades','grupossemestre.ret_Clave','grupossemestre.gse_Anio','grupossemestre.gse_Observaciones')
+        ->select('reticula.ret_NomCompleto','reticula.ret_NumUnidades','grupossemestre.ret_Clave','grupossemestre.gse_Anio','grupossemestre.gse_Observaciones','grupossemestre.gse_Clave')
         ->get();
       
         return response()->json($materias);
@@ -83,12 +83,19 @@ class STAController extends Controller
         $listaCali=DB::connection('contEsc')->table('listassemestre')
         ->join('alumnos','listassemestre.alu_NumControl','=','alumnos.alu_NumControl') 
         ->join('listassemestrecom','listassemestre.lse_Clave','=','listassemestrecom.lse_clave')
-        ->where('listassemestre.gse_Clave',$request->materia)
-        ->where('listassemestrecom.lsc_NumUnidad',$request->unidad) 
+        ->join('planesestudios','alumnos.pes_Clave','=','planesestudios.pes_Clave')
+        ->join('reticula','planesestudios.pes_Clave','=','reticula.pes_Clave')
+        ->where('reticula.ret_Clave',$request->materia)
+        ->where('listassemestrecom.lsc_NumUnidad',$request->unidad)
+        ->where('listassemestre.gse_Clave',$request->grupo) 
         ->select('listassemestre.gse_Clave','listassemestre.lse_Clave','alumnos.alu_NumControl','alumnos.alu_Nombre','alumnos.alu_ApePaterno','alumnos.alu_ApeMaterno','listassemestrecom.lsc_Calificacion')  
-        ->get();   
+        ->orderBy('alumnos.alu_Nombre','asc')
+        ->get();        
 
-        $coment=Motivoreprobacion::select('no_control','motivos','comentario')->where('grup_cla',$request->materia)->where('num_tema',$request->unidad)->get();
+        $coment=Motivoreprobacion::select('no_control','motivos','comentario')
+        ->where('grup_cla',$request->materia)
+        ->where('num_tema',$request->unidad)
+        ->get();
 
         return response()->json( ['listaCali'=>$listaCali,'coment'=>$coment]);
     }
@@ -100,6 +107,7 @@ class STAController extends Controller
             ['materia' =>  $request->materia, 'lse_clave' => $request->lse_clave,'motivos'=>$request->motivos,'comentario'=>$request->comentario]
         );
        
-        return response()->json("correcto");
+        return response()->json("correcto");       
+
     }
 }
