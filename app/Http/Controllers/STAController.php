@@ -110,4 +110,23 @@ class STAController extends Controller
         return response()->json("correcto");       
 
     }
+
+    //Funciones para el modulo del departamento de tutorias
+    public function indexTutorias()
+    {
+        //Obtener los profesores
+        $profesores = DB::connection('contEsc')->table('catedraticos')
+        ->where('cat_Status','VI')
+        ->orderBy('cat_Nombre','asc')
+        ->get();       
+
+        //Obtener las carreras
+        $carreras = DB::connection('contEsc')->table('carreras')
+        ->where('car_Status','VIGENTE')
+        ->orderBy('car_Nombre','asc')
+        ->get();
+
+        return view('sta.tutorias.index',compact('profesores','carreras')); 
+    }
+   
 }

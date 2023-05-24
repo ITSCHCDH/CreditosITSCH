@@ -23,6 +23,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\JefesController; 
 use App\Http\Controllers\STAController;
 use App\Http\Controllers\AlumnosStaController;
+use App\Http\Controllers\GruposController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -230,6 +231,14 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::post('/sta/materias/find',[STAController::class,'findMaterias'])->name('materias.find'); 
     Route::post('/sta/lista/calificaciones/find',[STAController::class,'findListaCali'])->name('listaCali.find'); 
     Route::post('/sta/comentarios/guardar',[STAController::class,'saveComent'])->name('comentarios.save');  
+
+    //Rutas departamento de tutorias
+    Route::get('/sta/tutorias',[STAController::class,'indexTutorias'])->name('tutorias.index');
+    Route::post('/sta/tutorias/get/grupos',[GruposController::class,'getGrupos'])->name('tutorias.getGrupos');
+    Route::post('/sta/tutorias/save/grupo',[GruposController::class,'saveGrupo'])->name('tutorias.saveGrupo');
+    Route::get('/sta/tutorias/grupos',[GruposController::class,'indexGrupos'])->name('tutorias.indexGrupos');
+   
+
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){

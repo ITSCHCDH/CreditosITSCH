@@ -113,7 +113,7 @@
                                         <a class="dropdown-item" href="">Tutores</a>
                                     @endif
                                     @if (Auth::User()->hasAnyPermission(['VIP_STA']))
-                                        <a class="dropdown-item" href="">Departamento tutorias</a>
+                                        <a class="dropdown-item" href="{{ route('tutorias.index') }}">Departamento tutorias</a>
                                     @endif
                                 </div>
                             </li>
