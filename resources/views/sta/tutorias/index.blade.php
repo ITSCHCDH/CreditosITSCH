@@ -11,7 +11,7 @@
         <div class="col-sm-4"></div>
         <div class="col-sm-4"></div>
         <div class="col-sm-4">           
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCrearGrupo" title="Agregar grupo"><i class="fas fa-users"></i></button>
+            <a href="{{ route('tutorias.indexGrupos') }}" type="button" class="btn btn-primary" title="Agregar grupo"><i class="fas fa-users"></i></a>
         </div>
     </div>
     <div class="row">

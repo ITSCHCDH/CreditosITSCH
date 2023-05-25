@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Grupo;
+use Illuminate\Support\Facades\DB;
 
 class GruposController extends Controller
 {
@@ -25,8 +26,17 @@ class GruposController extends Controller
     {
         //Obtenemos los grupos de la base de datos
         $grupos = Grupo::all();
-        //Retornamos los grupos en json 
-        return response()->json($grupos);
+
+        
+        //Agregamos el nombre de la carrera a cada grupo
+        foreach ($grupos as $grupo) {
+            $grupo->carrera = DB::connection('contEsc')->table('carreras')
+            ->where('car_Clave',$grupo->id_Carrera)
+            ->first()->car_Nombre;
+        }        
+
+        //Retornamos la vista de grupos con los grupos obtenidos
+        return view('sta.tutorias.grupos',compact('grupos'));
     }
 
     //Función para guardar los grupos con el modelo Grupo
