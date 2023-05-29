@@ -42,48 +42,8 @@
             </select>
         </div>
         <div class="col-sm-3"></div>
-    </div>  
-    
-    <!-- Modal -->
-    <div class="modal fade" id="modalCrearGrupo" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                    <div class="modal-header">
-                            <h5 class="modal-title">Agregar grupo</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                        </div>
-                <div class="modal-body">
-                    <div class="container-fluid">                                         
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">Nombre del grupo</span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Nombre" aria-label="Grupo" aria-describedby="basic-addon1" name="gpo_Nombre" id="gpo_Nombre" required>
-                        </div> 
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="selCarreras">Carrera</label>
-                            </div>
-                            <select class="form-control" id="selCarrerasMod" name="selCarrerasMod" required>
-                                <option selected>Seleccione una carrera</option>
-                                @foreach ($carreras as $carrera)
-                                    <option value="{{$carrera->car_Clave}}">{{$carrera->car_Nombre}}</option>
-                                @endforeach
-                            </select>
-                        </div>                         
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="saveGrupo()">Guardar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    
+    </div>     
+   
 @endsection
 
 @section('js')
@@ -138,11 +98,6 @@
                     swal('Error', 'El grupo esta duplicado', 'error');                       
                 }
             }); 
-        }
-
-        //Convierte a mayusculas
-        $("#gpo_Nombre").keyup(function(){
-            $(this).val($(this).val().toUpperCase());
-        });
+        }       
     </script>
 @endsection

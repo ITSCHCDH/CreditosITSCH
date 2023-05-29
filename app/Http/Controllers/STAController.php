@@ -38,7 +38,7 @@ class STAController extends Controller
         ->groupBy('ca.cat_Clave')
         ->get();
 
-        return response()->json($profesores);
+        return response()->json($profesores);       
     }
 
     public function findMaterias(Request $request)
