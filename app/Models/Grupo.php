@@ -12,6 +12,6 @@ class Grupo extends Model
     protected $table = 'grupos';
 
     //Campos que se pueden modificar
-    protected $fillable=['gpo_Nombre','id_Carrera','status'];
+    protected $fillable=['gpo_Nombre','id_Carrera','gpo_Status','gpo_Semestre'];
 
 }

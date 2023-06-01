@@ -7,18 +7,20 @@
 @endsection
 
 @section('contenido')
+
     <div class="row">
         <div class="col-sm-4"></div>
-        <div class="col-sm-4"></div>
-        <div class="col-sm-4">           
-            <a href="{{ route('tutorias.indexGrupos') }}" type="button" class="btn btn-primary" title="Agregar grupo"><i class="fas fa-users"></i></a>
+        <div class="col-sm-7"></div>
+        <div class="col-sm-1">           
+            <a href="{{ route('tutorias.getGruposAll') }}" type="button" class="btn btn-primary" title="Agregar grupo"><i class="fas fa-users"></i></a>
         </div>
     </div>
+    <hr>
     <div class="row">
         <div class="col-sm-3" id="divProfesores">
-            <h5>Selecciona una profesor</h5>
+            <h5>Selecciona un profesor</h5>
             <select name="selProfesores" id="selProfesores" class="form-control">
-                <option value="0">Seleccione una carrera</option>
+                <option value="0">Seleccione un profesor</option>
                 @foreach ($profesores as $profesores)
                     <option value="{{$profesores->cat_Clave}}">{{$profesores->cat_Nombre}} {{$profesores->cat_ApePat}} {{$profesores->cat_ApeMat}}</option>
                 @endforeach
@@ -41,7 +43,18 @@
                 <option value="0">Seleccione un grupo</option>
             </select>
         </div>
-        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <h5>Selecciona un semestre</h5>
+            <select name="selSemestres" id="selSemestres" class="form-control" required>
+                <option value="">Seleccione un semestre</option>
+                <option value="Feb-Jun">Febrero Junio</option>
+                <option value="Ago-Dic">Agosto Diciembre</option>
+            </select>
+        </div>
+        <div class="col-sm-1">
+            <br>
+            <button type="button" class="btn btn-primary" onclick="saveGrupoTut()" title="Agregar grupo"><i class="fas fa-plus"></i></button>
+        </div>
     </div>     
    
 @endsection
@@ -59,7 +72,7 @@
             $("#selCarreras").change(function(){
                 var car_Clave = $(this).val();
                 $.ajax({
-                    url: "{{route('tutorias.getGrupos')}}",
+                    url: "{{route('tutorias.getGruposCar')}}",
                     method: 'POST',
                     data: {
                         car_Clave:car_Clave
@@ -68,7 +81,7 @@
                         $('#selGrupos').empty(); 
                         $("#selGrupos").append("<option value='0' selected='selected'>Seleccione un grupo</option>");  
                         $.each(data, function(key, value){
-                            $('#selGrupos').append('<option value="'+value.id+'">'+value.gpo_Nombre+'</option>');
+                            $('#selGrupos').append('<option value="'+value.gpo_id+'">'+value.gpo_Nombre+'</option>');
                         });                                               
                     },                    
                     error: function(data){                        
@@ -78,11 +91,11 @@
             });
         }); 
         //Función para guardar los grupos
-        function saveGrupo(){
+        function saveGrupoTut(){
             var gpo_Nombre = $("#gpo_Nombre").val();
             var car_Clave = $("#selCarrerasMod").val(); 
             $.ajax({
-                url: "{{route('tutorias.saveGrupo')}}",
+                url: "{{route('tutorias.saveGrupoTut')}}",
                 method: 'POST',
                 data: {
                     gpo_Nombre:gpo_Nombre,

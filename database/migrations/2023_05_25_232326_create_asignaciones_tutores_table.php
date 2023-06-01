@@ -14,14 +14,17 @@ class CreateAsignacionesTutoresTable extends Migration
     public function up()
     {
         Schema::create('asignaciones_tutores', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('gtu_grupo',60)->nullable(false);
-            $table->string('tut_clave', 60)->nullable(false);
-            $table->bigInteger('gtu_tipo')->nullable();
-            $table->integer('gtu_semestre')->nullable();
-            $table->string('gtu_año', 4)->nullable();
-            $table->string('gtu_observaciones', 255)->nullable();            
+            $table->id();
+            $table->bigInteger('gpo_Id')->unsigned()->nullable();
+            $table->integer('tut_Clave')->nullable(false);
+            $table->string('gtu_Tipo',35)->nullable();
+            $table->string('gtu_Semestre',15)->nullable();
+            $table->string('gtu_Año', 4)->nullable();
+            $table->string('gtu_Observaciones', 255)->nullable();   
+            $table->foreign('gpo_Id')->references('id')->on('grupos')->ondelete('cascade');                          
             $table->timestamps();
+
+                    
         });
     }
     

@@ -10,8 +10,20 @@
     <form action="{{ route('tutorias.saveGrupo') }}" method="POST">
         @csrf
         <div class="row">        
-            <div class="col-sm-2"></div>
-            <div class="col-sm-4">
+            <div class="col-sm-1"></div>
+            <div class="col-sm-3">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Semestre</span>
+                    </div>
+                    <select name="gpo_Semestre" id="gpo_SemestreInp" class="form-control" required>
+                        <option value="">Selecciona un semestre</option>
+                        <option value="Feb-Jun">Febrero Junio</option>
+                        <option value="Ago-Dic">Agosto Diciembre</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-3">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="basic-addon1">Nombre del grupo</span>
@@ -32,17 +44,18 @@
                     </select>
                 </div>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-1">
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </div>      
         </div>
     </form>
     <div class="container">
-        <table class="table">
+        <table class="table" id="tabGrupos">
             <thead>
                 <th>Numero</th>
                 <th>Nombre</th>
                 <th>Carrera</th>
+                <th>Semestre</th>
                 <th>Status</th>
                 <th>Acciones</th>
             </thead>
@@ -51,8 +64,9 @@
                     <tr>
                         <td>{{$loop->iteration}}</td>
                         <td>{{$grupo->gpo_Nombre}}</td>
-                        <td>{{$grupo->carrera}}</td>
-                        <td>@if($grupo->status==0)Sin asignar @else Asignado @endif</td>
+                        <td>{{$grupo->gpo_Carrera}}</td>
+                        <td>{{$grupo->gpo_Semestre}}</td>
+                        <td>@if($grupo->gpo_Status==0)Sin asignar @else Asignado @endif</td>
                         <td>                            
                             <button type="button" class="btn btn-warning" onclick="modificarGrupo({{ $grupo }})" data-mdb-toggle="modal" data-mdb-target="#myModalUpdate">
                                 <i class="fas fa-edit"></i>
@@ -86,7 +100,7 @@
                                 <span class="input-group-text" >Nombre del grupo</span>
                             </div>
                             <input type="text" class="form-control" placeholder="Nombre" aria-label="Grupo" aria-describedby="basic-addon1" name="gpo_Nombre" id="gpo_NombreMod" required>                    
-                            <input type="hidden" id="status" name="status" readonly> 
+                            <input type="hidden" id="status" name="gpo_Status" readonly> 
                         </div>                   
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
@@ -98,7 +112,17 @@
                                     <option value="{{$carrera->car_Clave}}">{{$carrera->car_Nombre}}</option>
                                 @endforeach
                             </select>                       
-                        </div>                                     
+                        </div>  
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="selCarreras">Semestre</label>
+                            </div>
+                            <select class="form-control" id="selSemestreMod" name="gpo_Semestre" required>
+                                <option value="">Seleccione un semestre</option>
+                                <option value="Feb-Jun">Febrero Junio</option>
+                                <option value="Ago-Dic">Agosto Diciembre</option>
+                            </select>                       
+                        </div>                              
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Cancelar</button>
@@ -141,10 +165,11 @@
             $(this).val($(this).val().toUpperCase());
         });
 
-        function modificarGrupo(grupo){            
+        function modificarGrupo(grupo){          
             $("#gpo_NombreMod").val(grupo.gpo_Nombre);
             $("#selCarrerasMod").val(grupo.id_Carrera);
-            $("#status").val(grupo.status);
+            $("#status").val(grupo.gpo_Status);
+            $("#selSemestreMod").val(grupo.gpo_Semestre);
             $("#formUpdateGrupo").attr('action', "{{ URL::to('/admin/sta') }}/tutorias/grupos/"+grupo.id+"/update"); 
         }
 
@@ -152,6 +177,49 @@
             $("#mensaje").html("¿Estas seguro de eliminar el grupo "+grupo.gpo_Nombre+"?");
             $("#formDeleteGrupo").attr('action', "{{ URL::to('/admin/sta') }}/tutorias/grupos/"+grupo.id+"/delete"); 
         }
+
+        //Codigo para adornar las tablas con datatables
+			$(document).ready(function() {
+				$('#tabGrupos').DataTable({
+
+					dom: 'Bfrtip',
+
+					responsive: {
+						breakpoints: [
+						{name: 'bigdesktop', width: Infinity},
+						{name: 'meddesktop', width: 1366},
+						{name: 'smalldesktop', width: 1280},
+						{name: 'medium', width: 1188},
+						{name: 'tabletl', width: 1024},
+						{name: 'btwtabllandp', width: 848},
+						{name: 'tabletp', width: 768},
+						{name: 'mobilel', width: 600},
+						{name: 'mobilep', width: 320}
+						]
+					},
+
+					lengthMenu: [
+						[ 5, 10, 25, 50, -1 ],
+						[ '5 reg', '10 reg', '25 reg', '50 reg', 'Ver todo' ]
+					],
+
+					buttons: [
+						{extend: 'collection', text: 'Exportar',
+							buttons: [
+								{ extend: 'copyHtml5', text: 'Copiar' },
+								'excelHtml5',
+								'pdfHtml5',
+								{ extend: 'print', text: 'Imprimir' },
+							]},
+						{ extend: 'colvis', text: 'Columnas visibles' },
+						{ extend:'pageLength',text:'Ver registros'},
+					],
+					language: {
+						url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+					},
+				
+				});
+			});
 
        
     </script>

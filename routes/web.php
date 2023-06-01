@@ -234,11 +234,12 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 
     //Rutas departamento de tutorias
     Route::get('/sta/tutorias',[STAController::class,'indexTutorias'])->name('tutorias.index');
-    Route::post('/sta/tutorias/get/grupos',[GruposController::class,'getGrupos'])->name('tutorias.getGrupos');
+    Route::post('/sta/tutorias/get/grupos',[GruposController::class,'getGruposCar'])->name('tutorias.getGruposCar');
     Route::post('/sta/tutorias/save/grupo',[GruposController::class,'saveGrupo'])->name('tutorias.saveGrupo');
-    Route::get('/sta/tutorias/grupos',[GruposController::class,'indexGrupos'])->name('tutorias.indexGrupos');    
+    Route::get('/sta/tutorias/grupos',[GruposController::class,'getGruposAll'])->name('tutorias.getGruposAll');    
     Route::post('/sta/tutorias/grupos/{id}/update',[GruposController::class,'updateGrupo'])->name('tutorias.updateGrupo');
     Route::get('/sta/tutorias/grupos/{id}/delete',[GruposController::class,'deleteGrupo'])->name('tutorias.deleteGrupo');
+    Route::post('/sta/tutorias/saveGrupoTutorias',[GruposController::class,'saveGrupoTut'])->name('tutorias.saveGrupoTut');
    
 
 });
