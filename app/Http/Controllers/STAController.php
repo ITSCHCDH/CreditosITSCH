@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Motivoreprobacion;
+use App\Models\AsignacionTutores;
+use App\Models\Grupo;
 use Alert;
 
 class STAController extends Controller
@@ -126,7 +128,31 @@ class STAController extends Controller
         ->orderBy('car_Nombre','asc')
         ->get();
 
-        return view('sta.tutorias.index',compact('profesores','carreras')); 
+        //Unimos la tabla grupos con la de AsignacionTutores
+        $gruTutorias = Grupo::select('gpo_Nombre','at.*')
+        ->join('asignaciones_tutores as at','grupos.id','=','at.gpo_Id')
+        ->orderBy('gpo_Nombre','asc')
+        ->get(); 
+        
+        //Obtenemos el nombre de la carrera y lo agregamos al objeto $gruTutorias
+        foreach($gruTutorias as $gru)
+        {
+            $carrera = DB::connection('contEsc')->table('carreras')
+            ->where('car_Clave',$gru->car_Clave)
+            ->first();
+            $gru->car_Nombre=$carrera->car_Nombre;
+        }
+
+        //Obtenemos el nombre del profesor y lo agregamos al objeto $gruTutorias
+        foreach($gruTutorias as $gru)
+        {
+            $profesor = DB::connection('contEsc')->table('catedraticos')
+            ->where('cat_Clave',$gru->tut_Clave)
+            ->first();
+            $gru->cat_Nombre=$profesor->cat_Nombre ." ". $profesor->cat_ApePat ." ". $profesor->cat_ApeMat;
+        }
+
+        return view('sta.tutorias.index',compact('profesores','carreras','gruTutorias')); 
     }
    
 }

@@ -12,6 +12,6 @@ class AsignacionTutores extends Model
     protected $table="asignaciones_tutores";
 
     //Datos que se permitira modificar en el modelo
-    protected $fillable=['gtu_grupo','tut_clave','gtu_tipo','gtu_semestre','gtu_año','gtu_observaciones'];
+    protected $fillable=['gpo_Id','tut_Clave','gtu_Tipo','gtu_Semestre','gtu_Año','car_Clave'];
 
 }

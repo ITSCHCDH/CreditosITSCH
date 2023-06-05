@@ -240,6 +240,8 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::post('/sta/tutorias/grupos/{id}/update',[GruposController::class,'updateGrupo'])->name('tutorias.updateGrupo');
     Route::get('/sta/tutorias/grupos/{id}/delete',[GruposController::class,'deleteGrupo'])->name('tutorias.deleteGrupo');
     Route::post('/sta/tutorias/saveGrupoTutorias',[GruposController::class,'saveGrupoTut'])->name('tutorias.saveGrupoTut');
+    Route::get('/sta/tutorias/tutoriasDestroy/{id}/',[GruposController::class,'tutoriasDestroy'])->name('tutorias.destroy');
+    Route::get('/sta/tutorias/tutoriasEdit/{id}/',[GruposController::class,'tutoriasEdit'])->name('tutorias.tutoriasEdit'); 
    
 
 });

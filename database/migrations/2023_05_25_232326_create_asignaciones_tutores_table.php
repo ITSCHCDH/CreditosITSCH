@@ -19,8 +19,8 @@ class CreateAsignacionesTutoresTable extends Migration
             $table->integer('tut_Clave')->nullable(false);
             $table->string('gtu_Tipo',35)->nullable();
             $table->string('gtu_Semestre',15)->nullable();
-            $table->string('gtu_Año', 4)->nullable();
-            $table->string('gtu_Observaciones', 255)->nullable();   
+            $table->string('gtu_Año', 4)->nullable();  
+            $table->integer('car_Clave')->nullable(false);         
             $table->foreign('gpo_Id')->references('id')->on('grupos')->ondelete('cascade');                          
             $table->timestamps();
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Grupo;
 use Illuminate\Support\Facades\DB;
+use App\Models\AsignacionTutores;
 use Alert;
 
 class GruposController extends Controller
@@ -16,6 +17,7 @@ class GruposController extends Controller
     {
         //Obtenemos los grupos de la base de datos
         $grupos = Grupo::where('id_Carrera',$request->car_Clave)
+        ->where('gpo_Semestre',$request->gpo_Semestre)
         ->where('gpo_Status',0)
         ->get();
         //Retornamos los grupos en json
@@ -93,24 +95,53 @@ class GruposController extends Controller
 
     //Funcion para guardar los grupos de tutorias
     public function saveGrupoTut(Request $request)
-    { 
+    {    
+        //Obtetemos el año actual
+        $año = date("Y");   
         //Guarda el grupo si no existe en la tabla de grupos
-        $grupo=Grupo::updateOrCreate(
-            ['gpo_Nombre' => $request->gpo_Nombre],
-            ['gpo_Semestre' => $request->gpo_Semestre, 'id_Carrera' => $request->id_Carrera, 'gpo_Status' => 0]
-        );         
-        if ($grupo->wasRecentlyCreated) {
-            // El grupo no existía y se creó
-            Alert::success('Correcto',"El grupo se ha creado correctamente");
+        $grupo=AsignacionTutores::updateOrCreate(
+            ['gpo_Id'=> $request->gpo_Id , 'tut_Clave' => $request->tut_Clave],
+            ['gtu_Tipo'=>$request->gtu_Tipo,'gtu_Semestre'=>$request->gtu_Semestre,'car_Clave'=>$request->car_Clave,'gtu_Año'=>$año]
+        );    
+
+        if ($grupo->wasRecentlyCreated) {     
+            // Cambiamos el status del grupo a 1
+            $grupo = Grupo::find($request->gpo_Id);
+            $grupo->gpo_Status = 1;    
+            $grupo->save();   
+            Alert::success('Correcto',"El grupo se ha asignado correctamente");
             //Regresamos a la vista de grupos
-            return redirect()->route('tutorias.getGruposTutoria');                    
+            return redirect()->route('tutorias.index');                    
         } 
-        else {
-            // El usuario ya existía y se actualizó
-            Alert::success('Correcto',"El grupo se ha actualizado correctamente");
+        else {           
+            Alert::error('Error',"Ocurrio un error al asignar el grupo");
             //Regresamos a la vista de grupos
-            return redirect()->route('tutorias.getGruposTutoria');
+            return redirect()->route('tutorias.index');
         }        
     }
+
+    //Función para eliminar un grupo
+    public function tutoriasDestroy($id, Request $request)
+    {   
+        try {
+            //Obtenemos el grupo a eliminar
+            $grupoTut = AsignacionTutores::find($id);
+            //Eliminamos el grupo
+            $grupoTut->delete();
+            // Cambiamos el status del grupo a 0
+            $grupo = Grupo::find($request->gpo_Id); 
+            $grupo->gpo_Status = 0;    
+            $grupo->save(); 
+            Alert::success('Correcto',"El grupo se ha eliminado correctamente");
+            //Regresamos a la vista de grupos
+            return redirect()->route('tutorias.index');
+        } catch (\Throwable $th) {
+            Alert::error('Error',"Ocurrio un error al eliminar el grupo");
+            //Regresamos a la vista de grupos
+            return redirect()->route('tutorias.index');
+        }       
+    }
+
+    
    
 }
