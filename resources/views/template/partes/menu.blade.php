@@ -110,7 +110,7 @@
                                         <a class="dropdown-item" href="{{ route('profesores.index') }}">Profesores</a>
                                     @endif
                                     @if (Auth::User()->hasAnyPermission(['VIP_STA']))
-                                        <a class="dropdown-item" href="">Tutores</a>
+                                        <a class="dropdown-item" href="{{ route('tutores.index') }}">Tutores</a>
                                     @endif
                                     @if (Auth::User()->hasAnyPermission(['VIP_STA']))
                                         <a class="dropdown-item" href="{{ route('tutorias.index') }}">Departamento tutorias</a>

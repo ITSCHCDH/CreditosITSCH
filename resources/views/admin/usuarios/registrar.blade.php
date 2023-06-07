@@ -53,6 +53,18 @@
 	        </div>
 		</div>
 
+		<div class="form-group">
+	        <label for="active" class="control-label">Podra ser tutor?</label>
+
+	        <div>
+	        	<select id="tutor" type="select" class="form-control" name="tutor" required>
+	        		<option value="" disabled selected>Este usuario podra ser nombrado como tutor?</option>
+	        		<option value="1">SI</option>
+	        		<option value="0">NO</option>
+	        	</select>	        
+	        </div>
+		</div>
+
 		@if (Auth::User()->hasAnyPermission(['VIP','ASIGNAR_REMOVER_ROLES_USUARIOS']))
 			<div class="form-group">
 				<label for="area" class="control-label">Roles</label>

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Motivoreprobacion;
 use App\Models\AsignacionTutores;
 use App\Models\Grupo;
+use App\User;
 use Alert;
 
 class STAController extends Controller
@@ -45,7 +47,7 @@ class STAController extends Controller
 
     public function findMaterias(Request $request)
     {          
-        //Obtener los profesores de la carrera seleccionada
+        //Obtener las materias del profesor seleccionada
         $materias=DB::connection('contEsc')->table('reticula')
         ->join('grupossemestre','reticula.ret_Clave','=','grupossemestre.ret_Clave')
         ->where('grupossemestre.cat_Clave',$request->profesor)
@@ -117,11 +119,12 @@ class STAController extends Controller
     public function indexTutorias()
     {
         //Obtener los profesores
-        $profesores = DB::connection('contEsc')->table('catedraticos')
-        ->where('cat_Status','VI')
-        ->orderBy('cat_Nombre','asc')
-        ->get();       
-
+        $profesores = User::select('id',DB::raw('UPPER(name) as nombre'))
+        ->where('active','true')
+        ->where('tutor','1')
+        ->orderBy('name','asc')
+        ->get();   
+        
         //Obtener las carreras
         $carreras = DB::connection('contEsc')->table('carreras')
         ->where('car_Status','VIGENTE')
@@ -146,13 +149,20 @@ class STAController extends Controller
         //Obtenemos el nombre del profesor y lo agregamos al objeto $gruTutorias
         foreach($gruTutorias as $gru)
         {
-            $profesor = DB::connection('contEsc')->table('catedraticos')
-            ->where('cat_Clave',$gru->tut_Clave)
+            $profesor = User::where('id',$gru->tut_Clave)
             ->first();
-            $gru->cat_Nombre=$profesor->cat_Nombre ." ". $profesor->cat_ApePat ." ". $profesor->cat_ApeMat;
+            $gru->name=strtoupper($profesor->name); 
         }
 
         return view('sta.tutorias.index',compact('profesores','carreras','gruTutorias')); 
+    }
+
+    //Función para vista de tutores
+    public function indexTutores()
+    {        
+        $gruposTut=AsignacionTutores::where('tut_Clave',Auth::user()->name)->get();
+       
+        return view('sta.tutores.index',compact('gruposTut'));
     }
    
 }

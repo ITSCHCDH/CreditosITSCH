@@ -242,6 +242,9 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::post('/sta/tutorias/saveGrupoTutorias',[GruposController::class,'saveGrupoTut'])->name('tutorias.saveGrupoTut');
     Route::get('/sta/tutorias/tutoriasDestroy/{id}/',[GruposController::class,'tutoriasDestroy'])->name('tutorias.destroy');
     Route::get('/sta/tutorias/tutoriasEdit/{id}/',[GruposController::class,'tutoriasEdit'])->name('tutorias.tutoriasEdit'); 
+
+    //Rutas de tutores
+    Route::get('/sta/tutores',[STAController::class,'indexTutores'])->name('tutores.index');
    
 
 });

@@ -23,7 +23,7 @@
                 <select name="tut_Clave" id="selProfesores" class="form-control" required>
                     <option value="">Seleccione un profesor</option>
                     @foreach ($profesores as $profesor)
-                        <option value="{{$profesor->cat_Clave}}">{{$profesor->cat_Nombre}} {{$profesor->cat_ApePat}} {{$profesor->cat_ApeMat}}</option>
+                        <option value="{{$profesor->id}}">{{$profesor->nombre}}</option>
                     @endforeach
                 </select>
             </div> 
@@ -88,7 +88,7 @@
                    @foreach ($gruTutorias as $grupo)
                         <tr>
                             <td>{{$loop->iteration}}</td>
-                            <td>{{$grupo->cat_Nombre }}</td>                            
+                            <td>{{$grupo->name }}</td>                            
                             <td>{{$grupo->gpo_Nombre}}</td>
                             <td>{{$grupo->car_Nombre}}</td>
                             <td>{{$grupo->gtu_Semestre}} {{ $grupo->gtu_Año }}</td>

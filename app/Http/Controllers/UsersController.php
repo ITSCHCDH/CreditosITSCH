@@ -22,7 +22,7 @@ class UsersController extends Controller
     }
     public function index(){
         if (Auth::User()->can('VIP')) {
-                $users = DB::table('users as u')->join('areas as a','a.id','=','u.area')->select('a.nombre as area','u.name','u.active','u.id','u.email')->get();
+                $users = DB::table('users as u')->join('areas as a','a.id','=','u.area')->select('a.nombre as area','u.name','u.active','u.id','u.email','u.tutor')->get();
                 return view('admin.usuarios.index')
                 ->with('users',$users);
         }else{
@@ -84,12 +84,11 @@ class UsersController extends Controller
     	$user = new User($request->all());
         $correo_duplicado = User::where('email','=',$user->email)->get()->count() > 0;
         if($correo_duplicado){
-
             Alert::error('Error','El correo '.$user->email.' ya se encuentra en uso');
             return back()->withInput();
-
         }
     	$user->password = bcrypt($request->password);
+        $user->tutor=$request->tutor;
         $user->save();
         if($request->has('roles_id')){
             $user->syncRoles($request->roles_id);
@@ -136,6 +135,7 @@ class UsersController extends Controller
         $user->email = $request->email;
         $user->area = $request->area;
         $user->active = $request->active;
+        $user->tutor=$request->tutor;
         $correo_duplicado = User::where('email','=',$request->email)->get()->count() > 1;
         if($correo_duplicado){
             Alert::error('Error','El correo '.$request->email.' ya se encuentra en uso por otro usuario');
