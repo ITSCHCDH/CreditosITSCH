@@ -159,10 +159,84 @@ class STAController extends Controller
 
     //Función para vista de tutores
     public function indexTutores()
-    {        
-        $gruposTut=AsignacionTutores::where('tut_Clave',Auth::user()->name)->get();
-       
-        return view('sta.tutores.index',compact('gruposTut'));
+    {   
+        if( Auth::User()->can('VIP_STA'))        
+            $grupos=AsignacionTutores::all();        
+        else       
+            $grupos=AsignacionTutores::where('tut_Clave',Auth::user()->id)->get();        
+        //Agregamos el nombre del tutor al grupo
+        foreach($grupos as $gru)
+        {
+            $tutor = User::where('id',$gru->tut_Clave)
+            ->first();
+            $gru->name=strtoupper($tutor->name); 
+        }
+        //Agregamos el nombre del grupo al grupo de tutorias
+        foreach($grupos as $gru)
+        {
+            $grupo = Grupo::where('id',$gru->gpo_Id)
+            ->first();
+            $gru->gpo_Nombre=strtoupper($grupo->gpo_Nombre); 
+        }
+        //Agregamos el nombre de la carrera al grupo de tutorias
+        foreach($grupos as $gru)
+        {
+            $carrera = DB::connection('contEsc')->table('carreras')
+            ->where('car_Clave',$gru->car_Clave)
+            ->first();
+            $gru->car_Nombre=strtoupper($carrera->car_Nombre);
+        }
+        return view('sta.tutores.index',compact('grupos'));
+    }
+
+    //Funcion para mostrar los grupos de tutorias
+    public function showGrupo($id)
+    {
+        //Llamamos a la función para completar el grupo
+        $grupo = $this->completarGrupo($id); 
+
+        //Seleccionamos los alumnos que pertenecen al grupo
+        $alumnos = DB::connection('contEsc')->table('listassemestre')
+        ->join('alumnos','listassemestre.alu_NumControl','=','alumnos.alu_NumControl')        
+        ->join('planesestudios','alumnos.pes_Clave','=','planesestudios.pes_Clave')
+        ->join('reticula','planesestudios.pes_Clave','=','reticula.pes_Clave')
+        ->where('reticula.ret_Clave',698)        
+        ->where('listassemestre.gse_Clave',262) 
+        ->select('listassemestre.gse_Clave','listassemestre.lse_Clave','alumnos.alu_NumControl','alumnos.alu_Nombre','alumnos.alu_ApePaterno','alumnos.alu_ApeMaterno')  
+        ->orderBy('alumnos.alu_Nombre','asc')
+        ->get(); 
+             
+        return view('sta.tutores.showGrupo',compact('grupo','alumnos'));
+    }
+
+    //Función para completar un grupo con la información de nombre de tutor, carrera y grupo
+    public function completarGrupo($id)
+    {              
+        $grupo=AsignacionTutores::where('id',$id)->get();  
+         //Agregamos el nombre del tutor al grupo
+         foreach($grupo as $gru)
+         {
+             $tutor = User::where('id',$gru->tut_Clave)
+             ->first();
+             $gru->nomTutor=strtoupper($tutor->name); 
+         } 
+         //Agregamos el nombre del grupo al grupo de tutorias
+         foreach($grupo as $gru)
+         {
+             $grupoTem = Grupo::where('id',$gru->gpo_Id)
+             ->first();
+             $gru->gpo_Nombre=strtoupper($grupoTem->gpo_Nombre); 
+         }  
+         //Agregamos el nombre de la carrera al grupo de tutorias
+         foreach($grupo as $gru)
+         {
+             $carrera = DB::connection('contEsc')->table('carreras')
+             ->where('car_Clave',$gru->car_Clave)
+             ->first();
+             $gru->car_Nombre=strtoupper($carrera->car_Nombre);
+         }      
+         
+        return $grupo;
     }
    
 }

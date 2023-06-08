@@ -245,6 +245,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 
     //Rutas de tutores
     Route::get('/sta/tutores',[STAController::class,'indexTutores'])->name('tutores.index');
+    Route::get('/sta/tutores/show/grupo/{id}',[STAController::class,'showGrupo'])->name('tutores.showGrupo');
    
 
 });
