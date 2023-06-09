@@ -194,17 +194,14 @@ class STAController extends Controller
     {
         //Llamamos a la función para completar el grupo
         $grupo = $this->completarGrupo($id); 
-
-        //Seleccionamos los alumnos que pertenecen al grupo
-        $alumnos = DB::connection('contEsc')->table('listassemestre')
-        ->join('alumnos','listassemestre.alu_NumControl','=','alumnos.alu_NumControl')        
-        ->join('planesestudios','alumnos.pes_Clave','=','planesestudios.pes_Clave')
-        ->join('reticula','planesestudios.pes_Clave','=','reticula.pes_Clave')
-        ->where('reticula.ret_Clave',698)        
-        ->where('listassemestre.gse_Clave',262) 
-        ->select('listassemestre.gse_Clave','listassemestre.lse_Clave','alumnos.alu_NumControl','alumnos.alu_Nombre','alumnos.alu_ApePaterno','alumnos.alu_ApeMaterno')  
-        ->orderBy('alumnos.alu_Nombre','asc')
-        ->get(); 
+        //Obtenemos el año actual
+        $anio = date('Y');
+        //Seleccionamos todos los alumnos de los ultimos 7 años
+        $alumnos = DB::connection('contEsc')->table('alumnos')
+        ->where('alu_AnioIngreso','>=',$anio-7)
+        ->select('alu_NumControl','alu_Nombre','alu_ApePaterno','alu_ApeMaterno')
+        ->get();
+       
              
         return view('sta.tutores.showGrupo',compact('grupo','alumnos'));
     }
@@ -237,6 +234,13 @@ class STAController extends Controller
          }      
          
         return $grupo;
+    }
+
+    //Función para guardar los alumnos de un grupo
+    public function storeGrupo()
+    {
+        //retornamos un json con la respuesta de que se guardo el grupo correctamente
+        return response()->json("ok");
     }
    
 }
