@@ -55,7 +55,7 @@ class JefesController extends Controller
         ->get();   
 
         foreach ($grupo as $row) {
-            $row->semaforoAcad = self::calSemaforo($row->control);            
+            $row->semaforos = self::calSemaforos($row->control);            
         }
 
         $carreras = DB::connection('contEsc')->table('carreras')->get();
@@ -81,13 +81,16 @@ class JefesController extends Controller
         ->join('carreras','carreras.car_Clave', '=','alumnos.car_Clave')
         ->select("alumnos.alu_NumControl",'alumnos.alu_StatusAct',"alumnos.alu_Nombre","alumnos.alu_ApePaterno","alumnos.alu_ApeMaterno","alumnos.alu_SemestreAct","carreras.car_Nombre","alumnos.alu_Sexo")
         ->where("alu_NumControl","=",$nc)
-        ->get();
+        ->get(); 
 
         if($buscarAlumno[0]->alu_Sexo == "F"){
             $buscarAlumno[0]->alu_Sexo = "Femenino";
         }else{
             $buscarAlumno[0]->alu_Sexo = " Masculino";
         }
+
+        //Obtenemos el semaforo academico correspondiente para este alumno
+        $buscarAlumno[0]->semaforos = self::calSemaforos($buscarAlumno[0]->alu_NumControl); 
 
         $GetGrupos = DB::connection('contEsc')->table('alumnos')
         ->join('listassemestre','listassemestre.alu_NumControl','=','alumnos.alu_NumControl')
@@ -136,92 +139,7 @@ class JefesController extends Controller
         ->select ('cardex.cdx_AnioXPrime','reticula.ret_NomCompleto','cardex.cdx_Calif','cardex.cdx_SemXPrime','cardex.cdx_UltOpcAcred')
         ->where('cardex.alu_NumControl','=',$nc)
         ->orderBy('cardex.cdx_SemXPrime', 'asc')
-        ->get();
-
-
-        $semaforoMedico = DB::table('psicoclin.alumnos')
-        ->select('alumnos.status_medico')
-        ->where('no_control','=',$nc)
-        ->get();
-
-        $MSMMedico = null;
-        $TamSemMedico = 1;
-        $tam_msm_medico = 0;
-        if(sizeof($semaforoMedico) == 0){
-            $TamSemMedico = 0;
-        }else{
-            $tam_msm_medico = 1;
-            $MSMMedico = DB::table('psicoclin.status')
-            ->join('psicoclin.alumnos','alumnos.id','=','status.alumno_id')
-            ->select ('status.mensaje')
-            ->where('status.tipo','=','medico')
-            ->where('alumnos.no_control','=',$nc)
-            ->get();
-            if(sizeof($MSMMedico) == 0){
-                $tam_msm_medico = 0;
-            }
-
-        }
-
-        $semaforoPsicologico = DB::table('psicoclin.alumnos')
-        ->select('alumnos.status_psico')
-        ->where('no_control','=',$nc)
-        ->get();
-
-        $MSMPsicologico = null;
-        $tam_msm_psicologico = 0;
-        $TamSemPsicologico = 1;
-        if(sizeof($semaforoPsicologico) == 0){
-            $TamSemPsicologico = 0;
-        }else{
-            $tam_msm_psicologico = 1;
-            $MSMPsicologico = DB::table('psicoclin.status')
-            ->join('psicoclin.alumnos','alumnos.id','=','status.alumno_id')
-            ->select ('status.mensaje')
-            ->where('status.tipo','=','psico')
-            ->where('alumnos.no_control','=',$nc)
-            ->get();
-            if(sizeof($MSMPsicologico) == 0){
-                $tam_msm_psicologico = 0;
-            }
-        }
-
-
-        $nivelacionesOrdinario = DB::connection('contEsc')->table("cardex")
-        ->select('cardex.*')
-        ->where('alu_NumControl', '=', $nc)
-        ->where('cdx_UltOpcAcred', '>=', '2')
-        ->where('cdx_UltOpcAcred', '<', '3')
-        ->count();
-
-        $nivelacionesRepe = DB::connection('contEsc')->table("cardex")
-        ->select('cardex.*')
-        ->where('alu_NumControl', '=', $nc)
-        ->where('cdx_UltOpcAcred', '>=', '4')
-        ->where('cdx_UltOpcAcred', '<', '5')
-        ->count();
-
-        $nivelacionesEspecial = DB::connection('contEsc')->table("cardex")
-        ->select('cardex.*')
-        ->where('alu_NumControl', '=', $nc)
-        ->where('cdx_UltOpcAcred', '>=', '6')
-        ->count();
-
-        $repeticiones = DB::connection('contEsc')->table("cardex")
-        ->select('cardex.*')
-        ->where('alu_NumControl', '=', $nc)
-        ->where('cdx_UltOpcAcred', '>=', '3')
-        ->where('cdx_UltOpcAcred', '<', '4')
-        ->count();
-
-        $especiales = DB::connection('contEsc')->table("cardex")
-        ->select('cardex.*')
-        ->where('alu_NumControl', '=', $nc)
-        ->where('cdx_UltOpcAcred', '>=', '5')
-        ->where('cdx_UltOpcAcred', '<', '6')
-        ->count();
-
-        $nivelaciones = $nivelacionesOrdinario + $nivelacionesRepe + $nivelacionesEspecial;
+        ->get();      
 
        
         $comentarios = Motivoreprobacion::select('*')              
@@ -251,10 +169,7 @@ class JefesController extends Controller
                 }
             }
             $materias[$con][]=$calificaciones;                                                
-        }     
-        
-        
-            
+        }                
         return view('sta.analisis_alumnos.diagnostico')        
         -> with ('alumnos',$buscarAlumno)
         -> with ('grupos',$GetGrupos)       
@@ -262,68 +177,88 @@ class JefesController extends Controller
         -> with ('calificacionesvariable',$variableCalificaciones)
         -> with ('unidadesvariable',$unidadesvariable)
         -> with ('variablegrupo',$variablegrupo)
-        -> with ('cardex',$GetCardex)
-        -> with ('medico',$semaforoMedico)
-        -> with ('psicologico',$semaforoPsicologico)
-        -> with ('tamsemmedico',$TamSemMedico)
-        -> with ('tamsempsicologico',$TamSemPsicologico)
-        -> with('nivelaciones',$nivelaciones)
-        -> with('repeticiones',$repeticiones)
-        -> with('especiales',$especiales)
-        -> with('msm_medico',$MSMMedico)
-        -> with('tam_msm_medico',$tam_msm_medico)
-        -> with('msm_psicologico',$MSMPsicologico)
-        -> with('tam_msm_psicologico',$tam_msm_psicologico)        
+        -> with ('cardex',$GetCardex)       
         -> with('materias',$materias);				      
     }
 
-    public function calSemaforo($nc) {
-        $nivelacionesOrdinario = DB::connection('contEsc')->table("cardex")
-        ->select('cardex.*')
-        ->where('alu_NumControl', '=', $nc)
-        ->where('cdx_UltOpcAcred', '>=', '2')
-        ->where('cdx_UltOpcAcred', '<', '3')
-        ->count();
+    public function calSemaforos($nc) {
+        
+        $indicesAcad = DB::connection('contEsc')->table("cardex")
+        ->select(
+            'alumnos.alu_StatusAct',
+            DB::raw('SUM(cdx_UltOpcAcred = 2) AS nivelacionesOrdinario'),
+            DB::raw('SUM(cdx_UltOpcAcred = 3) AS repeticiones'),
+            DB::raw('SUM(cdx_UltOpcAcred = 4) AS nivelacionesRepe'),
+            DB::raw('SUM(cdx_UltOpcAcred = 5) AS especiales'),
+            DB::raw('SUM(cdx_UltOpcAcred = 6) AS nivelacionesEspecial')           
+        )
+        ->join('alumnos', 'alumnos.alu_NumControl', '=', 'cardex.alu_NumControl')
+        ->where('cardex.alu_NumControl', '=', $nc)
+        ->groupBy('alumnos.alu_StatusAct')
+        ->first();
+        //Declaramos un arreglo para guardar los semaforos
+        $semaforos = [];
 
-        $nivelacionesRepe = DB::connection('contEsc')->table("cardex")
-        ->select('cardex.*')
-        ->where('alu_NumControl', '=', $nc)
-        ->where('cdx_UltOpcAcred', '>=', '4')
-        ->where('cdx_UltOpcAcred', '<', '5')
-        ->count();
+        $nivelaciones = $indicesAcad->nivelacionesOrdinario + $indicesAcad->nivelacionesRepe + $indicesAcad->nivelacionesEspecial;
 
-        $nivelacionesEspecial = DB::connection('contEsc')->table("cardex")
-        ->select('cardex.*')
-        ->where('alu_NumControl', '=', $nc)
-        ->where('cdx_UltOpcAcred', '>=', '6')
-        ->count();
+        // Calculamos el semáforo académico
+        switch (true) {
+            case $indicesAcad->especiales > 0 || $nivelaciones >= 10 || $indicesAcad->repeticiones > 2 || $indicesAcad->alu_StatusAct == 'BD':
+                $semaforos['semaforoAcad'] = 'CirculoRojo';
+                break;
+            case ($indicesAcad->repeticiones <= 2 && ($nivelaciones >= 3 && $nivelaciones < 10)) || $indicesAcad->alu_StatusAct == 'BT':
+                $semaforos['semaforoAcad'] = 'CirculoNaranja';
+                break;
+            case $nivelaciones > 1 && $nivelaciones <= 5:
+                $semaforos['semaforoAcad'] = 'CirculoAmarillo';
+                break;
+            case $nivelaciones <= 1:
+                $semaforos['semaforoAcad'] = 'CirculoVerde';
+                break;
+            default:
+                $semaforos['semaforoAcad'] = 'CirculoNegro';
+        }
 
-        $repeticiones = DB::connection('contEsc')->table("cardex")
-        ->select('cardex.*')
-        ->where('alu_NumControl', '=', $nc)
-        ->where('cdx_UltOpcAcred', '>=', '3')
-        ->where('cdx_UltOpcAcred', '<', '4')
-        ->count();
+        $semPsico=2;
 
-        $especiales = DB::connection('contEsc')->table("cardex")
-        ->select('cardex.*')
-        ->where('alu_NumControl', '=', $nc)
-        ->where('cdx_UltOpcAcred', '>=', '5')
-        ->where('cdx_UltOpcAcred', '<', '6')
-        ->count();
+        // Calculamos el semáforo psicológico
+        switch ($semPsico) {
+            case 1:
+                $semaforos['semaforoPsico'] = 'CirculoVerde';
+                break;
+            case 2:
+                $semaforos['semaforoPsico'] = 'CirculoAmarillo';
+                break;
+            case 3:
+                $semaforos['semaforoPsico'] = 'CirculoNaranja';
+                break;
+            case 4:
+                $semaforos['semaforoPsico'] = 'CirculoRojo';
+                break;
+            default:
+                $semaforos['semaforoPsico'] = 'CirculoNegro';
+        }
 
-        $nivelaciones = $nivelacionesOrdinario + $nivelacionesRepe + $nivelacionesEspecial;
+        $semMedico=1;
+        // Calculamos el semáforo médico
+        switch ($semMedico) {
+            case 1:
+                $semaforos['semaforoMedico'] = 'CirculoVerde';
+                break;
+            case 2:
+                $semaforos['semaforoMedico'] = 'CirculoAmarillo';
+                break;
+            case 3:
+                $semaforos['semaforoMedico'] = 'CirculoNaranja';
+                break;
+            case 4:
+                $semaforos['semaforoMedico'] = 'CirculoRojo';
+                break;
+            default:
+                $semaforos['semaforoMedico'] = 'CirculoNegro';
+        }         
 
-        if ($especiales > 0 || $nivelaciones >= 10 || $repeticiones > 2)
-            return "CirculoRojo";
-        elseif ($repeticiones <= 2 && ($nivelaciones >= 3 && $nivelaciones <10))
-            return "CirculoNaranja";
-        elseif ($nivelaciones > 1 && $nivelaciones <=5)
-            return "CirculoAmarillo";
-        elseif ($nivelaciones <= 1)
-            return "CirculoVerde";
-        else
-            return "CirculoNegro";
+        return $semaforos;
     }
 
     public function ficha($nc)

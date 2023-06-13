@@ -13,10 +13,7 @@
         <div class="col-sm-3"></div>
         <div class="col-sm-2"></div>
     </div>
-    <hr>
-    <div class="alert alert-danger" role="alert">
-        Este grupo no se a guardado en el sistema, por lo tanto no se puede realizar ninguna accion.
-    </div>
+    <hr>   
     <div class="row">
         <div class="col-sm-7"></div>
         <div class="col-sm-4">
@@ -42,10 +39,51 @@
             <th>Número</th>
             <th>No. Control</th>
             <th>Nombre</th>
+            <th>Status</th>
+            <th>Semaforos</th>
             <th>Acciones</th>
         </thead>
         <tbody>
-           
+            @foreach($alumnosGrupo as $alumno)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $alumno->no_Control }}</td>
+                    <td>{{ $alumno->alu_Nombre }} {{ $alumno->alu_ApePaterno }} {{ $alumno->alu_ApeMaterno }}</td>
+                    <td>
+                        @switch($alumno->status)
+                            @case('BD')
+                                Baja definitiva
+                                @break
+                            @case('BT')
+                                Baja temporal
+                                @break
+                            @case('VI')
+                                Vigente
+                                @break                        
+                            @default
+                                Sin status                       
+                        @endswitch
+                    </td>
+                    <td>
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <div class="{{ $alumno->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="Académico"></div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="{{ $alumno->semaforos['semaforoMedico'] }}" data-mdb-toggle="tooltip" title="Medico"></div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="{{ $alumno->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div>
+                            </div>
+                        </div> 
+                    </td>
+                    <td>
+                        <a class="btn btn-danger" onclick="eliminar('{{ $alumno->no_Control }}')" title="Eliminar"><i class="fas fa-trash-alt"></i></a>                       
+                        <a href="{{ route('analisis.alumno',$alumno->no_Control) }}" class="btn btn-primary" title="Ver más"><i class="far fa-eye"></i></a>
+                        <a href="{{ route('analisis.ficha',$alumno->no_Control) }}" class="btn btn-secondary" title="Ver ficha"><i class="fas fa-file-invoice"></i></a>
+                    </td>
+                </tr>
+            @endforeach           
         </tbody>
     </table>
 @endsection
@@ -79,49 +117,69 @@
                 return false;
             }
             else
-            {
-                //Si no existe el alumno lo agregamos a la tabla            
-                var alumno = $('#alumno').val();
-                var nombre = $('#alumno option:selected').text();
-                var num = $('#tabGrupoTut tr').length;
-                var fila = '<tr id="fila'+num+'"><td>'+num+'</td><td>'+alumno+'</td><td>'+nombre+'</td><td><a href="" class="btn btn-danger" onclick="eliminar('+num+')"><i class="fas fa-trash-alt"></i></a></td></tr>';
-                $('#tabGrupoTut tbody').append(fila);
-                //Guardamos el registro en la base de datos
+            {              
+                var gpo_Nombre = "{{ $grupo[0]->gpo_Nombre }}"; 
+                var no_Control = $('#alumno').val();
+                //Guardamos el registro en la base de datos                
                 $.ajax({
                     url: "{{ route('tutores.storeGrupo') }}",
                     type: "POST",
                     data: {
                         _token: "{{ csrf_token() }}",
-                        gpo: {{ $grupo[0]->gpo_Id }},
-                        alu: alumnoCom
+                        gpo_Nombre: gpo_Nombre,
+                        no_Control: no_Control,                        
                     },
-                    success: function(response){
-                        if(response == 'ok')
-                        {
-                            swal('Exito','Alumno agregado al grupo de tutorias','success');
-                        }
-                        else
-                        {
-                            swal('Error','No se pudo agregar al alumno al grupo de tutorias','error');
-                        }
+                    success: function(response){                       
+                        swal('Exito','Alumno agregado al grupo de tutorias','success')
+                        .then((value) => {
+                            window.location.reload();
+                        });              
+                    },
+                    error: function(xhr, status, error){
+                        swal('Error','Algo salio mal, intentelo de nuevo','error');
                     }
                 });
+                //Limpiamos el select
+                $('#alumno option').prop('selected', false); 
                 return false;
             }           
-        }
-        
+        }        
     }
     //Eliminamos un alumno de la tabla de grupo de tutorias sin actualizar la pagina
-    function eliminar(num, event)
-    {
-        event.preventDefault();
-        $('#fila'+num).remove();
-        var num = 1;
-        $('#tabGrupoTut tbody tr').each(function(){
-            $(this).find('td').eq(0).text(num);
-            num++;
-        });
-        return false;
+    function eliminar(no_Control)
+    {           
+        swal({
+            title: "¿Estás seguro?",
+            text: "Una vez eliminado el alumno no podrá ser recuperado",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                // Si el usuario confirma la eliminación
+                $.ajax({
+                    url: "{{ route('tutores.deleteAlumno') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        no_Control: no_Control,
+                    },
+                    success: function(response) {                       
+                        swal('Exito', 'Alumno eliminado del grupo de tutorías', 'success')
+                        .then((value) => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        swal('Error', 'Algo salió mal, inténtelo de nuevo', 'error');
+                    }
+                });
+            } else {
+                // Si el usuario cancela la eliminación
+                swal("El alumno no fue eliminado");
+            }
+        });  
     }
     
     //Codigo para buscar en el select de alumno
@@ -130,7 +188,9 @@
             var searchText = $(this).val().toLowerCase();        
             if (searchText === '') {
                 $('#alumno option').prop('selected', false);
-            } else {
+            } 
+            else 
+            {
                 $('#alumno option').filter(function() {
                     var optionText = $(this).text().toLowerCase();
                     var regex = new RegExp(searchText, 'i');

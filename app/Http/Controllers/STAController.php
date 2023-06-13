@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Motivoreprobacion;
 use App\Models\AsignacionTutores;
 use App\Models\Grupo;
+use App\Models\GpoTutorias;
 use App\User;
-use Alert;
+
 
 class STAController extends Controller
 {
@@ -190,20 +191,38 @@ class STAController extends Controller
     }
 
     //Funcion para mostrar los grupos de tutorias
-    public function showGrupo($id)
+    public function showGrupo($id, $gpo_Nombre)
     {
         //Llamamos a la función para completar el grupo
         $grupo = $this->completarGrupo($id); 
         //Obtenemos el año actual
         $anio = date('Y');
-        //Seleccionamos todos los alumnos de los ultimos 7 años
+        //Seleccionamos todos los alumnos de los ultimos 7 años para llenar el select de alumnos
         $alumnos = DB::connection('contEsc')->table('alumnos')
         ->where('alu_AnioIngreso','>=',$anio-7)
         ->select('alu_NumControl','alu_Nombre','alu_ApePaterno','alu_ApeMaterno')
-        ->get();
+        ->get();       
        
+        //Obtenemos los alumnos del grupo
+        $alumnosGrupo=GpoTutorias::where('gpo_Nombre',$gpo_Nombre)->get(); 
+        //Agregamos el nombre del alumno al grupo
+        foreach($alumnosGrupo as $alumno)
+        {
+            $alumnoTem = DB::connection('contEsc')->table('alumnos')
+            ->where('alu_NumControl',$alumno->no_Control)
+            ->first();
+            $alumno->alu_Nombre=strtoupper($alumnoTem->alu_Nombre).' '.strtoupper($alumnoTem->alu_ApePaterno).' '.strtoupper($alumnoTem->alu_ApeMaterno);     
+            $alumno->status=$alumnoTem->alu_StatusAct;           
+        }
+
+         //Creamos una instancia de la clase JefesController
+         $jefe = new JefesController;
+
+         foreach ($alumnosGrupo as $row) {             
+             $row->semaforos = $jefe->calSemaforos($row->no_Control);            
+         }        
              
-        return view('sta.tutores.showGrupo',compact('grupo','alumnos'));
+        return view('sta.tutores.showGrupo',compact('grupo','alumnos','alumnosGrupo'));
     }
 
     //Función para completar un grupo con la información de nombre de tutor, carrera y grupo
@@ -237,10 +256,38 @@ class STAController extends Controller
     }
 
     //Función para guardar los alumnos de un grupo
-    public function storeGrupo()
+    public function storeGrupo(Request $request)
     {
-        //retornamos un json con la respuesta de que se guardo el grupo correctamente
-        return response()->json("ok");
+        try
+        {
+            //Guardamos el numero de contro y grupo en la tabla gpoTutorias            
+            GpoTutorias::updateOrCreate(
+                ['no_Control' => $request->no_Control],
+                ['gpo_Nombre' => $request->gpo_Nombre]
+            );
+            //Retornamos status 200 y el mensaje de que se guardo correctamente
+            return response()->json(['message' => 'Correcto'], 200);          
+        }
+        catch(\Exception $e)
+        {
+            return response()->json(['message' => 'No se pudo dar de alta el registro'], 500);
+        }
+    }
+
+    //Función para eliminar un alumno de un grupo
+    public function deleteAlumno(Request $request)
+    {
+        try
+        {
+            //Eliminamos el registro de la tabla gpoTutorias
+            GpoTutorias::where('no_Control',$request->no_Control)->delete();
+            //Retornamos status 200 y el mensaje de que se guardo correctamente
+            return response()->json(['message' => 'Correcto'], 200);          
+        }
+        catch(\Exception $e)
+        {
+            return response()->json(['message' => 'No se pudo eliminar el registro'], 500);
+        }
     }
    
 }

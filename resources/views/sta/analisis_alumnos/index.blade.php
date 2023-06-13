@@ -63,19 +63,33 @@
                         <td>{{ $gru->control }}</td>
                         <td>{{ $gru->aPaterno }} {{ $gru->aMaterno }} {{ $gru->nombre }}</td>
                         <td>{{ $gru->semestre }}</td>
-                        <td>{{ $gru->status }}</td>
-                        <td>  
+                        <td>
+                            @switch($gru->status)
+                            @case('BD')
+                                Baja definitiva
+                                @break
+                            @case('BT')
+                                Baja temporal
+                                @break
+                            @case('VI')
+                                Vigente
+                                @break                        
+                            @default
+                                Sin status                       
+                        @endswitch
+                        </td>
+                        <td>
                             <div class="row">
                                 <div class="col-sm-2">
-                                    <div class="{{ $gru->semaforoAcad }}" data-mdb-toggle="tooltip" title="Académico"></div>
+                                    <div class="{{ $gru->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="Académico"></div>
                                 </div>
                                 <div class="col-sm-2">
-                                    <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Medico"></div>
+                                    <div class="{{ $gru->semaforos['semaforoMedico'] }}" data-mdb-toggle="tooltip" title="Medico"></div>
                                 </div>
                                 <div class="col-sm-2">
-                                    <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Psicologico"></div>
+                                    <div class="{{ $gru->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div>
                                 </div>
-                            </div>                            
+                            </div>                           
                         </td>
                         <td>
                             <a href="{{ route('analisis.alumno',$gru->control) }}" class="btn btn-primary" title="Ver más"><i class="fas fa-search-plus"></i></a>

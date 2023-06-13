@@ -23,7 +23,7 @@
                     <td>{{$grupo->gpo_Nombre}}</td>
                     <td>{{$grupo->car_Nombre}}</td>
                     <td>
-                        <a href="{{route('tutores.showGrupo',$grupo->id)}}" class="btn btn-primary">Ver</a>
+                        <a href="{{route('tutores.showGrupo', [$grupo->id,$grupo->gpo_Nombre])}}" class="btn btn-primary">Ver</a>
                     </td>
                 </tr>
             @endforeach

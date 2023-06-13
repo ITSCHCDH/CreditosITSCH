@@ -3,7 +3,7 @@
 @section('title','Alumnos')
 
 @section('ruta')
-    <label class="label label-success"> <a href="#">STA</a> / <a href="{{ route('analisis.index') }}">Jefes de carrera</a>/Diagnostico</label> 
+    <label class="label label-success"> <a href="#">STA</a> /Diagnostico</label> 
 @endsection
 
 @section('contenido')
@@ -39,108 +39,9 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>                        
-                        @if ($especiales > 0 || $nivelaciones >= 10 || $repeticiones > 2) <!-- rojo -->
-                            <div  class="CirculoRojo" data-mdb-toggle="tooltip" 
-                            title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
-                            ></div>
-                        @else
-                            @if ($repeticiones <= 2 && ($nivelaciones >= 3 && $nivelaciones <10)) <!-- naranja -->
-                                <div class="CirculoNaranja" data-mdb-toggle="tooltip" 
-                                title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
-                                ></div>
-                            @else
-
-                                @if ($nivelaciones > 1 && $nivelaciones <=5)<!-- amarillo -->
-                                    <div class="CirculoAmarillo" data-mdb-toggle="tooltip" 
-                                    title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
-                                    ></div>
-                                @else
-                                    @if ($nivelaciones <= 1)<!-- verde --> 
-                                        <div class="CirculoVerde" data-mdb-toggle="tooltip" 
-                                        title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
-                                        ></div>
-                                    @else
-                                        <div class="CirculoNegro" data-mdb-toggle="tooltip" 
-                                        title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
-                                        ></div>
-                                    @endif
-                                @endif
-                            @endif
-                        @endif
-                    </td>
-                    <td>
-                        @if ($tamsempsicologico > 0)
-                            @if ($tam_msm_psicologico == 0)
-                                @if ($psicologico[0]->status_psico == 0) <!-- verde --> 
-                                    <div class="CirculoVerde" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif
-                                @if ($psicologico[0]->status_psico == 1) <!-- amarillo -->
-                                    <div class="CirculoAmarillo" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif
-                                @if ($psicologico[0]->status_psico == 2) <!-- naranja -->
-                                    <div class="CirculoNaranja" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif							
-                                @if ($psicologico[0]->status_psico == 3) <!-- rojo -->
-                                    <div class="CirculoRojo" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif									
-                            @else
-                                @if ($psicologico[0]->status_psico == 0) <!-- verde --> 
-                                    <div class="CirculoVerde" data-mdb-toggle="tooltip" title="{{$msm_psicologico[0]->mensaje}}"></div>
-                                @endif
-                                @if ($psicologico[0]->status_psico == 1) <!-- amarillo -->
-                                    <div class="CirculoAmarillo" data-mdb-toggle="tooltip" title="{{$msm_psicologico[0]->mensaje}}"></div>
-                                @endif
-                                @if ($psicologico[0]->status_psico == 2) <!-- naranja -->
-                                    <div class="CirculoNaranja" data-mdb-toggle="tooltip" title="{{$msm_psicologico[0]->mensaje}}"></div>
-                                @endif							
-                                @if ($psicologico[0]->status_psico == 3) <!-- rojo -->
-                                    <div class="CirculoRojo" data-mdb-toggle="tooltip" title="{{$msm_psicologico[0]->mensaje}}"></div>
-                                @endif                                
-                            @endif
-                        @else
-                            <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Sin Evaluar"></div>
-                        @endif
-                    
-                    </td>
-                    <td>
-                        @if ($tamsemmedico > 0)
-                            @if ($tam_msm_medico == 0)
-
-                                @if ($medico[0]->status_medico == 0) <!-- verde --> 
-                                    <div class="CirculoVerde" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif
-                                @if ($medico[0]->status_medico == 1) <!-- amarillo -->
-                                    <div class="CirculoAmarillo" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif
-                                @if ($medico[0]->status_medico == 2) <!-- naranja -->
-                                    <div class="CirculoNaranja" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif							
-                                @if ($medico[0]->status_medico == 3) <!-- rojo -->
-                                        <div class="CirculoRojo" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif								
-
-                            @else
-                                
-                                @if ($medico[0]->status_medico == 0) <!-- verde --> 
-                                    <div class="CirculoVerde" data-mdb-toggle="tooltip" title="{{$msm_medico[0]->mensaje}}"></div>
-                                @endif
-                                @if ($medico[0]->status_medico == 1) <!-- amarillo -->
-                                    <div class="CirculoAmarillo" data-mdb-toggle="tooltip" title="{{$msm_medico[0]->mensaje}}"></div>
-                                @endif
-                                @if ($medico[0]->status_medico == 2) <!-- naranja -->
-                                    <div class="CirculoNaranja" data-mdb-toggle="tooltip" title="{{$msm_medico[0]->mensaje}}"></div>
-                                @endif							
-                                @if ($medico[0]->status_medico == 3) <!-- rojo -->
-                                        <div class="CirculoRojo" data-mdb-toggle="tooltip" title="{{$msm_medico[0]->mensaje}}"></div>
-                                @endif
-
-                            @endif
-
-                        @else
-                            <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Sin Evaluar"></div>
-                        @endif
-                    </td>
+                    <td><div class="{{ $alumnos[0]->semaforoAcad }}" data-mdb-toggle="tooltip" title="Académico"></div></td>
+                    <td> <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Medico"></div></td>
+                    <td><div class="CirculoNegro" data-mdb-toggle="tooltip" title="Psicologico"></div></td>                      
                 </tr>
             </tbody>
         </table>

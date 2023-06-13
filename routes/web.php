@@ -245,8 +245,9 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 
     //Rutas de tutores
     Route::get('/sta/tutores',[STAController::class,'indexTutores'])->name('tutores.index');
-    Route::get('/sta/tutores/show/grupo/{id}',[STAController::class,'showGrupo'])->name('tutores.showGrupo');
-    Route::get('/sta/tutores/store/grupo',[STAController::class,'storeGrupo'])->name('tutores.storeGrupo');
+    Route::get('/sta/tutores/show/grupo/{id}/{nom}',[STAController::class,'showGrupo'])->name('tutores.showGrupo');
+    Route::post('/sta/tutores/store/grupo',[STAController::class,'storeGrupo'])->name('tutores.storeGrupo');
+    Route::post('/sta/tutores/delete/alumno',[STAController::class,'deleteAlumno'])->name('tutores.deleteAlumno');
    
 
 });
