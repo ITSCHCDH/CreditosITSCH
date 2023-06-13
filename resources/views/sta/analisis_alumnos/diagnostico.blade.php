@@ -39,9 +39,9 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><div class="{{ $alumnos[0]->semaforoAcad }}" data-mdb-toggle="tooltip" title="Académico"></div></td>
-                    <td> <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Medico"></div></td>
-                    <td><div class="CirculoNegro" data-mdb-toggle="tooltip" title="Psicologico"></div></td>                      
+                    <td><div class="{{ $alumnos[0]->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="Académico"></div></td>
+                    <td><div class="{{ $alumnos[0]->semaforos['semaforoMedico'] }}" data-mdb-toggle="tooltip" title="Medico"></div></td>
+                    <td><div class="{{ $alumnos[0]->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div></td>                      
                 </tr>
             </tbody>
         </table>
