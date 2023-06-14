@@ -13,17 +13,18 @@
             <img src="{{ asset('images/user.png') }}" class="card-img-top" alt="Datos del alumno"/>
             <div class="card-body">
                 <h5 class="card-title">Datos del alumno</h5>
-                <h6>Control&nbsp;:&nbsp;&nbsp;{{$alumnos[0]->alu_NumControl}}</h6>
-                <h6>Nombre&nbsp;:&nbsp;&nbsp;{{$alumnos[0]->alu_Nombre}} &nbsp;{{$alumnos[0]->alu_ApePaterno}} &nbsp;{{$alumnos[0]->alu_ApeMaterno}}</h6>
-                <h6>Último semestre&nbsp;:&nbsp;&nbsp;{{$alumnos[0]->alu_SemestreAct}}</h6>
+                <h6>Control&nbsp;:&nbsp;&nbsp;{{$alumnos->alu_NumControl}}</h6>
+                <input type="hidden" name="no_Control" id="no_Control" readonly value="{{$alumnos->alu_NumControl}}">
+                <h6>Nombre&nbsp;:&nbsp;&nbsp;{{$alumnos->alu_Nombre}} &nbsp;{{$alumnos->alu_ApePaterno}} &nbsp;{{$alumnos->alu_ApeMaterno}}</h6>
+                <h6>Último semestre&nbsp;:&nbsp;&nbsp;{{$alumnos->alu_SemestreAct}}</h6>
                 <div class="datospersonales">{{$variablegrupo}} 
                     @foreach($grupos as $al)
                         <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;{{$al->gse_Observaciones}}
                     @endforeach		
                 </div>
-                <h6>Carrera&nbsp;:&nbsp;&nbsp;{{$alumnos[0]->car_Nombre}}</h6>
-                <h6>Sexo&nbsp;:&nbsp;&nbsp;{{$alumnos[0]->alu_Sexo}}</h6>           
-                <h6>Status&nbsp;:&nbsp;&nbsp;{{ $alumnos[0]->alu_StatusAct }}</h6>           
+                <h6>Carrera&nbsp;:&nbsp;&nbsp;{{$alumnos->car_Nombre}}</h6>
+                <h6>Sexo&nbsp;:&nbsp;&nbsp;{{$alumnos->alu_Sexo}}</h6>           
+                <h6>Status&nbsp;:&nbsp;&nbsp;{{ $alumnos->alu_StatusAct }}</h6>           
             </div>
         </div>
     </div>
@@ -39,9 +40,9 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><div class="{{ $alumnos[0]->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="Académico"></div></td>
-                    <td><div class="{{ $alumnos[0]->semaforos['semaforoMedico'] }}" data-mdb-toggle="tooltip" title="Medico"></div></td>
-                    <td><div class="{{ $alumnos[0]->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div></td>                      
+                    <td><div class="{{ $alumnos->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="Académico"></div></td>
+                    <td><div class="{{ $alumnos->semaforos['semaforoMedico'] }}" data-mdb-toggle="tooltip" title="Medico"></div></td>
+                    <td><div class="{{ $alumnos->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div></td>                      
                 </tr>
             </tbody>
         </table>
@@ -117,6 +118,21 @@
                 </tbody>
             </table>
         </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-sm-4">
+        <h2>Observaciones</h2>
+    </div>
+    <div class="col-sm-6">
+        <textarea name="observaciones" id="observaciones" cols="30" rows="4" class="form-control">{{ $alumnos->observaciones }}</textarea>
+    </div>
+    <div class="col-sm-2">
+        <br>
+        <br>
+        <br>
+        <button class="btn btn-primary" onclick="guardarObservaciones()">Actualizar</button>
     </div>
 </div>
 
@@ -232,4 +248,33 @@
         @endforeach
     </tbody>
 </table>	
+@endsection
+
+@section('js')
+    <script>
+        function guardarObservaciones()
+        {
+            //Guardamos las observaciones en la tabla de alumnos
+            var observaciones = $('#observaciones').val(); 
+            var no_Control = $('#no_Control').val(); 
+            //Guardamos el registro en la base de datos                
+            $.ajax({
+                    url: "{{ route('tutores.storeAlumnoObs') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        observaciones: observaciones,
+                        no_Control: no_Control,                        
+                    },
+                    success: function(response){   
+                        console.log('No. de Control: ' + response.noControl);                    
+                        swal('Exito',response.mensaje,'success')                                    
+                    },
+                    error: function(e){
+                        console.log(e);
+                        swal('Error',e.mensaje,'error');                        
+                    }
+                });
+        }
+    </script>
 @endsection

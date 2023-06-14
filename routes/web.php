@@ -222,7 +222,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('/sta/analisis',[JefesController::class,'index'])->name('analisis.index');
     Route::post('/sta/analisis/generación',[JefesController::class,'generacion'])->name('analisis.generacion');
     Route::get('/sta/analisis/alumno/{nc}',[JefesController::class,'diagnostico'])->name('analisis.alumno'); 
-    Route::get('/sta/analisis/ficha/{nc}',[JefesController::class,'ficha'])->name('analisis.ficha');   
+    Route::get('/sta/analisis/ficha/{nc},/{usr}',[JefesController::class,'ficha'])->name('analisis.ficha');   
 
     //Rutas profesores
     Route::get('/sta/profesores',[STAController::class,'indexProfesores'])->name('profesores.index'); 
@@ -248,6 +248,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('/sta/tutores/show/grupo/{id}/{nom}',[STAController::class,'showGrupo'])->name('tutores.showGrupo');
     Route::post('/sta/tutores/store/grupo',[STAController::class,'storeGrupo'])->name('tutores.storeGrupo');
     Route::post('/sta/tutores/delete/alumno',[STAController::class,'deleteAlumno'])->name('tutores.deleteAlumno');
+    Route::post('/sta/tutores/store/alumno/observaciones',[JefesController::class,'storeAlumnoObs'])->name('tutores.storeAlumnoObs');
    
 
 });

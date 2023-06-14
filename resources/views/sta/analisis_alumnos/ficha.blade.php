@@ -179,19 +179,19 @@
                     <tbody>
                         <tr>
                             <td><b>Nombre del padre:</b></td>
-                            <td>{{ $dPad->nombre }}</td>
+                            <td>{{ $padres[0]->nombre }}</td>
                         </tr>
                         <tr>
                             <td><b>Teléfono:</b> </td>
-                            <td>{{ $dPad->tel }}</td>
+                            <td>{{ $padres[0]->tel }}</td>
                         </tr>
                         <tr>
                             <td><b>Edad:</b></td>
-                            <td>{{ $dPad->edad }}</td>
+                            <td>{{ $padres[0]->edad }}</td>
                         </tr>
                         <tr>
                             <td><b>Trabaja: </b></td>
-                            <td>{{ $dPad->ocupacion }}</td>
+                            <td>{{ $padres[0]->ocupacion }}</td>
                         </tr>
                         <tr>
                             <td><b>Domicilio:</b></td>
@@ -201,7 +201,7 @@
                         </tr>
                         <tr>
                             <td><b>Profesión:</b> </td>
-                            <td>{{ $dPad->profesion }}</td>
+                            <td>{{ $padres[0]->profesion }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -217,19 +217,19 @@
                     <tbody>
                         <tr>
                             <td><b>Nombre de la madre:</b></td>
-                            <td>{{ $dMad->nombre }}</td>
+                            <td>{{ $padres[1]->nombre }}</td>
                         </tr>
                         <tr>
                             <td><b>Teléfono:</b> </td>
-                            <td>{{ $dMad->tel }}</td>
+                            <td>{{ $padres[1]->tel }}</td>
                         </tr>
                         <tr>
                             <td><b>Edad:</b></td>
-                            <td>{{ $dMad->edad }}</td>
+                            <td>{{ $padres[1]->edad }}</td>
                         </tr>
                         <tr>
                             <td><b>Trabaja:</b> </td>
-                            <td>{{ $dMad->ocupacion }}</td>
+                            <td>{{ $padres[1]->ocupacion }}</td>
                         </tr>
                         <tr>
                             <td><b>Domicilio:</b></td>
@@ -239,7 +239,7 @@
                         </tr>
                         <tr>
                             <td><b>Profesión:</b> </td>
-                            <td>{{ $dMad->profesion }}</td>
+                            <td>{{ $padres[1]->profesion }}</td>
                         </tr>
                     </tbody>
                 </table>

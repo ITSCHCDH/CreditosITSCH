@@ -38,6 +38,7 @@ class AddTableAlumnos extends Migration
             $table->string('grupo', 10)->nullable();           
             $table->string('nom_ficha', 100)->nullable();
             $table->integer('generacion')->nullable();
+            $table->string('observaciones', 500)->nullable();
             $table->timestamps();
         });
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Exception;
 use App\Models\Historial_clinico;
@@ -15,7 +16,6 @@ use App\Models\Personales;
 use App\Models\Padres;
 use App\Models\Social;
 use Alert;
-use PhpParser\Node\Expr\AssignOp\Concat;
 
 class JefesController extends Controller
 {
@@ -53,7 +53,7 @@ class JefesController extends Controller
         ->where('alumnos.car_Clave','=',$request->carrera)
         ->where('alumnos.Alu_AnioIngreso','=',$request->generacion)
         ->get();   
-
+       
         foreach ($grupo as $row) {
             $row->semaforos = self::calSemaforos($row->control);            
         }
@@ -81,16 +81,21 @@ class JefesController extends Controller
         ->join('carreras','carreras.car_Clave', '=','alumnos.car_Clave')
         ->select("alumnos.alu_NumControl",'alumnos.alu_StatusAct',"alumnos.alu_Nombre","alumnos.alu_ApePaterno","alumnos.alu_ApeMaterno","alumnos.alu_SemestreAct","carreras.car_Nombre","alumnos.alu_Sexo")
         ->where("alu_NumControl","=",$nc)
-        ->get(); 
+        ->first(); 
+       
+        //Consultamos las observaciones de cada alumno y las agregamos a $buscarAlumno
+        $obs=DB::table('alumnos')->where('no_control',$nc)->select('observaciones')->first();
+        $buscarAlumno->observaciones =$obs->observaciones;  
 
-        if($buscarAlumno[0]->alu_Sexo == "F"){
-            $buscarAlumno[0]->alu_Sexo = "Femenino";
+
+        if($buscarAlumno->alu_Sexo == "F"){
+            $buscarAlumno->alu_Sexo = "Femenino";
         }else{
-            $buscarAlumno[0]->alu_Sexo = " Masculino";
+            $buscarAlumno->alu_Sexo = " Masculino";
         }
 
         //Obtenemos el semaforo academico correspondiente para este alumno
-        $buscarAlumno[0]->semaforos = self::calSemaforos($buscarAlumno[0]->alu_NumControl); 
+        $buscarAlumno->semaforos = self::calSemaforos($buscarAlumno->alu_NumControl); 
 
         $GetGrupos = DB::connection('contEsc')->table('alumnos')
         ->join('listassemestre','listassemestre.alu_NumControl','=','alumnos.alu_NumControl')
@@ -261,42 +266,68 @@ class JefesController extends Controller
         return $semaforos;
     }
 
-    public function ficha($nc)
-    {
+    public function ficha($nc, $usr)
+    { 
         try {
-            $alu = Alumno::where('no_control',$nc)->first();
+            $alu = Alumno::where('no_control',$nc)->first(); 
             $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
             $car = DB::connection('contEsc')->table('carreras')->where('car_Clave', $alu1->car_Clave)->first();
             $alu2 = DB::connection('contEsc')->table('alumcom')->where('alu_NumControl', $alu1->alu_NumControl)->first();
     
             $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
     
-            $dPad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Padre')->first();
-            $dMad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Madre')->first();
-            if($dPad!=null && $dMad!=Null)
-            {
-                $direccion = Direccion::where('id_alu', $alu->id)->first();
-                $direccionP = Direccion::where('id_fam', $dPad->id)->first();
-                $direccionM = Direccion::where('id_fam', $dMad->id)->first();
+            $padres = Padres::where('id_alu', $alu->id)
+            ->whereIn('parentesco', ['Padre', 'Madre'])
+            ->get(); 
+
+            if ($padres->count() == 2) { 
+                $direccion = Direccion::where('id_alu', $alu->id)->first();  
+                $direccionP = Direccion::where('id_fam', $padres[0]->id)->first();
+                $direccionM = Direccion::where('id_fam', $padres[1]->id)->first();  
         
-                $familiares = Familiar::where('id_alu', $alu->id)->get();
+                $familiares = Familiar::where('id_alu', $alu->id)->get(); 
         
-                $person = Personales::where('id_alu', $alu->id)->first();
-                $fam = Datos_familiares::where('id_alu', $alu->id)->first();
-                $soc = Social::where('id_alu', $alu->id)->first();
+                $person = Personales::where('id_alu', $alu->id)->first(); 
+                $fam = Datos_familiares::where('id_alu', $alu->id)->first(); 
+                $soc = Social::where('id_alu', $alu->id)->first(); 
             
-                return view('sta.analisis_alumnos.ficha', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));
+                return view('sta.analisis_alumnos.ficha', compact('familiares', 'alu1', 'alu2', 'car','padres', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));
             }    
             else
-            {
-                Alert::error('Error', 'Este alumno no ha llenado su ficha académica');
-                return redirect()->route('analisis.index');
+            { 
+                
+                if($usr==1)
+                {
+                    Alert::error('Error', 'Este alumno no ha llenado su ficha académica');
+                    return redirect()->route('analisis.index');
+                }
+                else
+                {
+                    Alert::error('Error', 'Este alumno no ha llenado su ficha académica');
+                    return back();
+                }
+                
             }                         
         
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Alert::error('Error', 'A ocurrido un error: ',$e);
-            return redirect()->route('analisis.index');
+            return back();
+        }      
+    }
+    //Funcion para guardar las observaciones del alumno
+    public function storeAlumnoObs(Request $request)
+    {
+        $noControl = $request->no_Control;
+        try {
+            $alumno = Alumno::where('no_control', $noControl)->firstOrFail();
+            $alumno->observaciones = $request->observaciones;
+            $alumno->save();
+            
+            return response()->json(['mensaje' => 'Observaciones guardadas correctamente', 'status' => 200, 'noControl' => $noControl]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['mensaje' => 'No se encontró el registro del alumno'.$noControl.', informalo al administrador de sistemas', 'status' => 404]);
+        } catch (\Exception $e) {
+            return response()->json(['mensaje' => 'Error al guardar las observaciones: '.$e->getMessage(), 'status' => 500]);
         }
-       
     }
 }

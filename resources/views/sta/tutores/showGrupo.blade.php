@@ -80,7 +80,7 @@
                     <td>
                         <a class="btn btn-danger" onclick="eliminar('{{ $alumno->no_Control }}')" title="Eliminar"><i class="fas fa-trash-alt"></i></a>                       
                         <a href="{{ route('analisis.alumno',$alumno->no_Control) }}" class="btn btn-primary" title="Ver más"><i class="far fa-eye"></i></a>
-                        <a href="{{ route('analisis.ficha',$alumno->no_Control) }}" class="btn btn-secondary" title="Ver ficha"><i class="fas fa-file-invoice"></i></a>
+                        <a href="{{ route('analisis.ficha',[$alumno->no_Control,2]) }}" class="btn btn-secondary" title="Ver ficha"><i class="fas fa-file-invoice"></i></a>
                     </td>
                 </tr>
             @endforeach           
