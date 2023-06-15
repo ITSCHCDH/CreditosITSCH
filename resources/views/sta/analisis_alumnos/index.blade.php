@@ -24,7 +24,7 @@
                 </select>             
             </div>
             <div class="col-sm-3" >
-                <h5>Selecciona una carrera</h5>         
+                <h5>Selecciona una carrera</h5>        
                 <select class="form-control " name="carrera" id="carrera" required>
                     <option selected value="">Selecciona una opción</option>
                     @foreach ($carreras as $car )

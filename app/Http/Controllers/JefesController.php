@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Exception;
 use App\Models\Historial_clinico;
 use App\Models\Datos_familiares;
 use App\Models\Motivoreprobacion;
+use Illuminate\Support\Facades\Auth;
 use App\Models\ALumno;
 use App\Models\Direccion;
 use App\Models\Familiar;
@@ -24,9 +24,23 @@ class JefesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+     public function __construct()
+     {
+         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_COR_CARRERA')->only(['index']);
+         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_TUTOR|STA_COR_CARRERA')->only(['generacion','diagnostico','calSemaforos','ficha','storeAlumnoObs']);            
+     }      
+
     public function index()
-    {
-        $carreras = DB::connection('contEsc')->table('carreras')->where('car_Status','VIGENTE')->get();
+    {       
+        //Verificamos si el usuario tiene permiso VIP_STA para darle acceso a todas las carreras si no, lo limitamos solo a su carrera
+        if(Auth::User()->hasAnyPermission(['VIP_STA','STA_DEP_TUTORIA'])){       
+            $carreras = DB::connection('contEsc')->table('carreras')->where('car_Status','VIGENTE')->get();
+        }
+        else{
+            $carreras = DB::connection('contEsc')->table('carreras')->where('car_Clave',auth()->user()->area)->get();
+        }           
+       
         $grupo="";
         $generacion="";
         $carrera="";      
@@ -58,8 +72,14 @@ class JefesController extends Controller
             $row->semaforos = self::calSemaforos($row->control);            
         }
 
-        $carreras = DB::connection('contEsc')->table('carreras')->get();
-
+        //Verificamos si el usuario tiene permiso VIP_STA para darle acceso a todas las carreras si no, lo limitamos solo a su carrera
+        if(Auth::User()->hasAnyPermission(['VIP_STA','STA_DEP_TUTORIA'])){       
+            $carreras = DB::connection('contEsc')->table('carreras')->where('car_Status','VIGENTE')->get();
+        }
+        else{
+            $carreras = DB::connection('contEsc')->table('carreras')->where('car_Clave',auth()->user()->area)->get();
+        }
+       
         $generaciones = DB::connection('contEsc')->table('alumnos')			
 			->select("alumnos.Alu_AnioIngreso")
 			->orderBy('Alu_AnioIngreso', 'asc')

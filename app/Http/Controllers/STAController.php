@@ -14,14 +14,24 @@ use App\User;
 
 class STAController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_PROFESOR')->only(['indexProfesores']);
+        //$this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_TUTOR|STA_COR_CARRERA')->only(['generacion','diagnostico','calSemaforos','ficha','storeAlumnoObs']);            
+    }  
+
     public function indexProfesores()
     {
-        $carreras = DB::connection('contEsc')->table('carreras')
-        ->where('car_Status','VIGENTE')
-        ->get();       
+        //Verificamos si el usuario tiene permiso para ver la vista de profesores
+        if(Auth::User()->hasAnyPermission(['VIP_STA','STA_DEP_TUTORIA'])){  
+            $carreras = DB::connection('contEsc')->table('carreras')
+            ->where('car_Status','VIGENTE')
+            ->get();             
+        }else if(Auth::User()->hasAnyPermission(['STA_PROFESOR'])){
+            $carreras = DB::connection('contEsc')->table('carreras')           
+            ->where('car_Clave',Auth::User()->area)
+            ->get(); 
+        }       
         return view('sta.profesores.index',compact('carreras')); 
     }
 
@@ -30,20 +40,89 @@ class STAController extends Controller
         $carrera=$request->carrera;
         //Llamado a función para obtener el departamento de adscripción
         $dpto=$this->obtDpto($carrera);
-        //Obtener los profesores de la carrera seleccionada
-        $profesores = DB::connection('contEsc')->table('carreras as c')
-        ->select('d.dep_Clave','ca.cat_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
-        ->join('planesestudios as p','c.car_Clave','=','p.car_Clave')
-        ->join('reticula as r','p.pes_Clave','=','r.pes_Clave')
-        ->join('departamentos as d','r.dep_Clave','=','d.dep_Clave') 
-        ->join('catedraticos as ca','ca.dep_Clave','=','d.dep_Clave')  
-        ->where('d.dep_Clave',$dpto->dep_Clave)
-        ->where('c.car_Status','VIGENTE')
-        ->where('ca.cat_Status','VI')
-        ->groupBy('ca.cat_Clave')
-        ->get();
+        //Verificamos que el usuario tenga permiso para ver todos los profesores
+        if(Auth::User()->hasAnyPermission(['VIP_STA','STA_DEP_TUTORIA'])){ 
+            $profesores = DB::connection('contEsc')->table('carreras as c')
+            ->select('d.dep_Clave','ca.cat_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
+            ->join('planesestudios as p','c.car_Clave','=','p.car_Clave')
+            ->join('reticula as r','p.pes_Clave','=','r.pes_Clave')
+            ->join('departamentos as d','r.dep_Clave','=','d.dep_Clave') 
+            ->join('catedraticos as ca','ca.dep_Clave','=','d.dep_Clave')  
+            ->where('d.dep_Clave',$dpto->dep_Clave)
+            ->where('c.car_Status','VIGENTE')
+            ->groupBy('ca.cat_Clave')
+            ->get();
+        }else if(Auth::User()->hasAnyPermission(['STA_PROFESOR'])){      
+            $profesores = DB::connection('contEsc')->table('carreras as c')
+            ->select('d.dep_Clave','ca.cat_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
+            ->join('planesestudios as p','c.car_Clave','=','p.car_Clave')
+            ->join('reticula as r','p.pes_Clave','=','r.pes_Clave')
+            ->join('departamentos as d','r.dep_Clave','=','d.dep_Clave') 
+            ->join('catedraticos as ca','ca.dep_Clave','=','d.dep_Clave')            
+            ->where('ca.cat_Clave',87)
+            ->groupBy('ca.cat_Clave')
+            ->get();
+        }       
 
         return response()->json($profesores);       
+    }
+
+    public function obtCatClave()
+    {
+        $catClave=0;
+        //Obtenemos el usuario que esta conectado           
+        $userName=Auth::User()->name;
+        //Convertimos el nombre del usuario a minusculas sin acentos
+        $userName=strtolower($userName);
+        $userName=$this->quitarCaracteres($userName);
+        //Obtenemos la lista de catedraticos para comparar con el nombre del usuario
+        $catedraticos = DB::connection('contEsc')->table('catedraticos as ca')
+        ->select('cat_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
+        ->get();
+        //Concatenamos los nombres y apellidos de los catedraticos
+        foreach($catedraticos as $catedratico){
+            $catNombre=$catedratico->cat_Nombre;
+            $catApePat=$catedratico->cat_ApePat;
+            $catApeMat=$catedratico->cat_ApeMat;
+            $catNombre=strtolower($catNombre);
+            $catApePat=strtolower($catApePat);
+            $catApeMat=strtolower($catApeMat);
+            $catNombre=$catNombre." ".$catApePat." ".$catApeMat;
+            //Llamamos a la funcion quitar caracteres especiales
+            $catNombre=$this->quitarCaracteres($catNombre);            
+            //Verificamos si el nombre del usuario esta en la lista de catedraticos
+            if($userName==$catNombre){
+                $catClave=$catedratico->cat_Clave;  
+                //Salimos del ciclo foreach
+                break;              
+            }
+        }
+        return $catClave;        
+    }
+
+    //Función para quitar caracteres especiales a una cadena
+    function quitarCaracteres($cadena){
+        $cadena=strtolower($cadena);
+        $cadena=str_replace("á","a",$cadena);
+        $cadena=str_replace("é","e",$cadena);
+        $cadena=str_replace("í","i",$cadena);
+        $cadena=str_replace("ó","o",$cadena);
+        $cadena=str_replace("ú","u",$cadena);
+        $cadena=str_replace("ñ","n",$cadena);
+        $cadena=str_replace("ü","u",$cadena);
+        $cadena=str_replace(" ","",$cadena);
+        $cadena=str_replace(".","",$cadena);
+        $cadena=str_replace(",","",$cadena);
+        $cadena=str_replace("-","",$cadena);
+        $cadena=str_replace("_","",$cadena);
+        $cadena=str_replace("´","",$cadena);
+        $cadena=str_replace("`","",$cadena);
+        $cadena=str_replace("¨","",$cadena);
+        $cadena=str_replace("¿","",$cadena);
+        $cadena=str_replace("?","",$cadena);
+        $cadena=str_replace("¡","",$cadena);
+        $cadena=str_replace("!","",$cadena);
+        return $cadena;
     }
 
     public function findMaterias(Request $request)

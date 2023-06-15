@@ -9,9 +9,10 @@
 @section('contenido')
     <div class="row">
         <div class="col-sm-4"></div>
-        <div class="col-sm-7"></div>
-        <div class="col-sm-1">           
+        <div class="col-sm-6"></div>
+        <div class="col-sm-2">           
             <a href="{{ route('tutorias.getGruposAll') }}" type="button" class="btn btn-primary" title="Agregar grupo"><i class="fas fa-users"></i></a>
+            <a href="{{ route('analisis.index') }}" class="btn btn-success" title="Analisar alumnos"><i class="fas fa-user-graduate"></i></a>
         </div>
     </div>
     <hr>

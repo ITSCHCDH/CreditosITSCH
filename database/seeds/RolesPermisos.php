@@ -98,6 +98,13 @@ class RolesPermisos extends Seeder
        	Permission::create(['name' => 'VIP']);
        	Permission::create(['name' => 'VIP_SOLO_LECTURA']);
 
+        //Permisos relacionados con STA
+        Permission::create(['name' => 'VIP_STA']);
+        Permission::create(['name' => 'STA_DEP_TUTORIA']);
+        Permission::create(['name' => 'STA_TUTOR']);
+        Permission::create(['name' => 'STA_COR_CARRERA']);
+        Permission::create(['name' => 'STA_PROFESOR']);
+
        	//Creacion de un administrador por defecto
        	DB::table('users')->insert([
           'id' => 1,
@@ -109,6 +116,8 @@ class RolesPermisos extends Seeder
        	]);
         $user = User::find(1);
         $user->givePermissionTo('VIP');
+
+        $user->givePermissionTo('VIP_STA');
 
         $role = Role::create(['name' => 'Responsable']);
         $role->givePermissionTo(['VER_EVIDENCIA','ELIMINAR_EVIDENCIA','AGREGAR_PARTICIPANTES','ELIMINAR_PARTICIPANTES','VER_PARTICIPANTES','CREAR_EVIDENCIA']);

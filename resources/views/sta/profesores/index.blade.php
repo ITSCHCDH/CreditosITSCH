@@ -115,7 +115,7 @@
                         data:{
                             carrera:carrera                      
                         },
-                        success: function(profesores){                           
+                        success: function(profesores){                                                      
                             $('#profesor').empty();                                                    
                             $.each(profesores, function(i, item) {                                
                                 $('#profesor').prepend(`<option value=${item.cat_Clave}>${item.cat_Nombre} ${item.cat_ApePat} ${item.cat_ApeMat}</option>`);
