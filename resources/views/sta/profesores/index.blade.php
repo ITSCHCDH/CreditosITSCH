@@ -179,7 +179,7 @@
                         unidad:unidad,
                         grupo:grupo
                     },
-                    success: function(datos){                                                                                            
+                    success: function(datos){                                                                                           
                         $("#gse_clave").val(datos['listaCali'][0].gse_Clave);                                                            
                         $("#listaCali > tbody").empty();  
                         van=0;                     
@@ -245,7 +245,9 @@
                 com=$('#comentarios'+r).val();
                 alu=$('#alu'+r).val();
                 lse_clave=$('#lse_clave'+r).val();
-                gse_clave=$('#gse_clave').val(); 
+                strMateria=$('#materia').val();
+                jsnMateria=JSON.parse(strMateria); 
+                gse_clave=jsnMateria.ret_Clave;               
                 $.ajax({
                         type: "post",
                         dataType: "json",

@@ -13,7 +13,14 @@
         <div class="col-sm-3"></div>
         <div class="col-sm-2"></div>
     </div>
-    <hr>   
+    <hr>  
+    <div class="row">
+        <div class="col-sm-7"></div>
+        <div class="col-sm-4">
+            <h5>Agregar alumnos al grupo</h5>  
+        </div>
+        <div class="col-sm-1"></div>
+    </div>   
     <div class="row">
         <div class="col-sm-7"></div>
         <div class="col-sm-4">
@@ -31,7 +38,7 @@
             </div>
         </div>
         <div class="col-sm-1">
-            <a onclick="agregar()" class="btn btn-primary"><i class="fas fa-plus"></i></a>
+            <a onclick="agregar()" class="btn btn-primary" title="Agregar alumno al grupo"><i class="fas fa-plus"></i></a>
         </div>
     </div>
     <table class="table" id="tabGrupoTut">
@@ -113,6 +120,7 @@
             });
             if(existe)
             {
+                $('#alumno option').prop('selected', false); 
                 swal('Error','El alumno ya se encuentra registrado en el grupo de tutorias','error');
                 return false;
             }

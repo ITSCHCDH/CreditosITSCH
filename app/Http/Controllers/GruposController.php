@@ -132,6 +132,8 @@ class GruposController extends Controller
             $grupo = Grupo::find($request->gpo_Id); 
             $grupo->gpo_Status = 0;    
             $grupo->save(); 
+            //Quitamos los alumnos asignados a este grupo de la tabla gpo_tutorias
+            DB::table('gpo_tutorias')->where('gpo_Nombre',$request->gpo_Nombre)->delete();            
             Alert::success('Correcto',"El grupo se ha eliminado correctamente");
             //Regresamos a la vista de grupos
             return redirect()->route('tutorias.index');

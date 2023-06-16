@@ -16,8 +16,9 @@ class STAController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_PROFESOR')->only(['indexProfesores']);
-        //$this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_TUTOR|STA_COR_CARRERA')->only(['generacion','diagnostico','calSemaforos','ficha','storeAlumnoObs']);            
+        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_PROFESOR')->only(['indexProfesores','findProfesores','findMaterias','findListaCali','saveComent']);
+        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA')->only(['indexTutorias']);       
+        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_TUTOR')->only(['indexTutores','showGrupo','storeGrupo','deleteAlumno']);
     }  
 
     public function indexProfesores()
@@ -52,18 +53,18 @@ class STAController extends Controller
             ->where('c.car_Status','VIGENTE')
             ->groupBy('ca.cat_Clave')
             ->get();
-        }else if(Auth::User()->hasAnyPermission(['STA_PROFESOR'])){      
+        }else if(Auth::User()->hasAnyPermission(['STA_PROFESOR'])){ 
+            $cat_Clave=$this->obtCatClave();     
             $profesores = DB::connection('contEsc')->table('carreras as c')
             ->select('d.dep_Clave','ca.cat_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
             ->join('planesestudios as p','c.car_Clave','=','p.car_Clave')
             ->join('reticula as r','p.pes_Clave','=','r.pes_Clave')
             ->join('departamentos as d','r.dep_Clave','=','d.dep_Clave') 
             ->join('catedraticos as ca','ca.dep_Clave','=','d.dep_Clave')            
-            ->where('ca.cat_Clave',87)
+            ->where('ca.cat_Clave', $cat_Clave)
             ->groupBy('ca.cat_Clave')
             ->get();
-        }       
-
+        }   
         return response()->json($profesores);       
     }
 
@@ -90,11 +91,13 @@ class STAController extends Controller
             $catNombre=$catNombre." ".$catApePat." ".$catApeMat;
             //Llamamos a la funcion quitar caracteres especiales
             $catNombre=$this->quitarCaracteres($catNombre);            
-            //Verificamos si el nombre del usuario esta en la lista de catedraticos
-            if($userName==$catNombre){
-                $catClave=$catedratico->cat_Clave;  
+            //Verificamos la similitud entre el nombre del usuario y el nombre del catedrático          
+            similar_text($userName, $catNombre, $similarity);
+            $threshold = 85; // Establece el umbral de similitud mínimo requerido
+            if ($similarity >= $threshold) {
+                $catClave = $catedratico->cat_Clave;
                 //Salimos del ciclo foreach
-                break;              
+                break;
             }
         }
         return $catClave;        
@@ -156,10 +159,8 @@ class STAController extends Controller
     {    
         $units=DB::connection('contEsc')->table('reticula')        
         ->where('ret_Clave', $request->materia)
-        ->first();
-        
-        return response()->json($units);
-            
+        ->first();        
+        return response()->json($units);            
     }
 
     public function findListaCali(Request $request)
@@ -174,13 +175,11 @@ class STAController extends Controller
         ->where('listassemestre.gse_Clave',$request->grupo) 
         ->select('listassemestre.gse_Clave','listassemestre.lse_Clave','alumnos.alu_NumControl','alumnos.alu_Nombre','alumnos.alu_ApePaterno','alumnos.alu_ApeMaterno','listassemestrecom.lsc_Calificacion')  
         ->orderBy('alumnos.alu_Nombre','asc')
-        ->get();        
-
+        ->get();   
         $coment=Motivoreprobacion::select('no_control','motivos','comentario')
         ->where('grup_cla',$request->materia)
         ->where('num_tema',$request->unidad)
         ->get();
-
         return response()->json( ['listaCali'=>$listaCali,'coment'=>$coment]);
     }
 
@@ -189,10 +188,8 @@ class STAController extends Controller
         Motivoreprobacion::updateOrCreate(
             ['no_control' => $request->alumno, 'grup_cla' => $request->gse_clave, 'num_tema'=>$request->unidad],
             ['materia' =>  $request->materia, 'lse_clave' => $request->lse_clave,'motivos'=>$request->motivos,'comentario'=>$request->comentario]
-        );
-       
-        return response()->json("correcto");       
-
+        );       
+        return response()->json("correcto");
     }
 
     //Funciones para el modulo del departamento de tutorias

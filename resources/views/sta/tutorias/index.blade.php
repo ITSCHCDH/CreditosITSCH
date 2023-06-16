@@ -119,6 +119,7 @@
                         <!-- Contenido del modal -->
                         <label id="mensaje"></label>
                         <input type="hidden" name="gpo_Id" id="idGrupo" readonly>
+                        <input type="hidden" name="gpo_Nombre" id="gpo_Nombre" readonly>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Cerrar</button>
@@ -172,11 +173,12 @@
         });          
         
         //Funcion para eliminar un grupo de tutorias
-        function eliminarGrupo(grupo){                      
+        function eliminarGrupo(grupo){                    
             $("#miModalLabel").text('Eliminar grupo de tutorias');
             $("#mensaje").text('¿Esta seguro de eliminar el grupo de tutorias '+grupo.gpo_Nombre+'?');
             $("#formEliminar").attr('action', "{{ URL::to('/admin/sta') }}/tutorias/tutoriasDestroy/"+grupo.id);
             $("#idGrupo").val(grupo.gpo_Id);
+            $("#gpo_Nombre").val(grupo.gpo_Nombre);
         }   
         
        

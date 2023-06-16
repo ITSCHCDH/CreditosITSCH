@@ -121,20 +121,31 @@
     </div>
 </div>
 <hr>
-<div class="row">
-    <div class="col-sm-4">
-        <h2>Observaciones</h2>
+@if (Auth::User()->hasAnyPermission(['VIP_STA','STA_TUTOR','STA_DEP_TUTORIA']))
+    <div class="row">
+        <div class="col-sm-4">
+            <h2>Observaciones</h2>
+        </div>
+        <div class="col-sm-6">
+            <textarea name="observaciones" id="observaciones" cols="30" rows="4" class="form-control">{{ $alumnos->observaciones }}</textarea>
+        </div>
+        <div class="col-sm-2">
+            <br>
+            <br>
+            <br>
+            <button class="btn btn-primary" onclick="guardarObservaciones()">Actualizar</button>
+        </div>
     </div>
-    <div class="col-sm-6">
-        <textarea name="observaciones" id="observaciones" cols="30" rows="4" class="form-control">{{ $alumnos->observaciones }}</textarea>
+@else
+    <div class="row">
+        <div class="col-sm-4">
+            <h2>Observaciones</h2>
+        </div>
+        <div class="col-sm-6">
+            <textarea name="observaciones" id="observaciones" cols="30" rows="4" class="form-control" readonly>{{ $alumnos->observaciones }}</textarea>
+        </div>       
     </div>
-    <div class="col-sm-2">
-        <br>
-        <br>
-        <br>
-        <button class="btn btn-primary" onclick="guardarObservaciones()">Actualizar</button>
-    </div>
-</div>
+@endif
 
 <hr>
 
