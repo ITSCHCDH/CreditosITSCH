@@ -7,6 +7,7 @@ use App\Models\Grupo;
 use Illuminate\Support\Facades\DB;
 use App\Models\AsignacionTutores;
 use Alert;
+use PDF;
 
 class GruposController extends Controller
 {
@@ -142,6 +143,46 @@ class GruposController extends Controller
             //Regresamos a la vista de grupos
             return redirect()->route('tutorias.index');
         }       
+    }
+
+    //Función para imprimir la asignacion del tutor en PDF
+    public function asigTutPDF($id)
+    {
+        //Obtenemos los datos de la asignacion del tutor
+        $data = DB::table('asignaciones_tutores')
+        ->join('users','asignaciones_tutores.tut_Clave','=','users.id') 
+        ->join('grupos','asignaciones_tutores.gpo_Id','=','grupos.id')       
+        ->select('asignaciones_tutores.*','users.name','grupos.gpo_Nombre')
+        ->where('asignaciones_tutores.id',$id)
+        ->first();         
+        //Obtenemos el nombre de la carrera y se lo asignamos a la variable
+        $data->car_Nombre = DB::connection('contEsc')->table('carreras')
+        ->where('car_Clave',$data->car_Clave)
+        ->first()->car_Nombre;  
+        //Abrimos el editor de PDF y le enviamos la vista que diseñamos para la impresión              
+        return PDF::loadView('sta.tutorias.asigTutPDF', compact('data'))
+        ->setPaper('letter', 'portrait')
+        ->stream('Asignación de tutorias.pdf');
+    }
+
+    //Función para imprimir la asignacion del tutor en PDF
+    public function libTutPDF($id)
+    {
+        //Obtenemos los datos de la asignacion del tutor
+        $data = DB::table('asignaciones_tutores')
+        ->join('users','asignaciones_tutores.tut_Clave','=','users.id') 
+        ->join('grupos','asignaciones_tutores.gpo_Id','=','grupos.id')       
+        ->select('asignaciones_tutores.*','users.name','grupos.gpo_Nombre')
+        ->where('asignaciones_tutores.id',$id)
+        ->first();         
+        //Obtenemos el nombre de la carrera y se lo asignamos a la variable
+        $data->car_Nombre = DB::connection('contEsc')->table('carreras')
+        ->where('car_Clave',$data->car_Clave)
+        ->first()->car_Nombre;  
+        //Abrimos el editor de PDF y le enviamos la vista que diseñamos para la impresión              
+        return PDF::loadView('sta.tutorias.libTutPDF', compact('data'))
+        ->setPaper('letter', 'portrait')
+        ->stream('Liberación de tutoria.pdf');
     }
 
     

@@ -95,7 +95,9 @@
                             <td>{{$grupo->gtu_Semestre}} {{ $grupo->gtu_Año }}</td>
                             <td>{{$grupo->gtu_Tipo}}</td>
                             <td>                               
-                                <a href="" data-mdb-toggle="modal" data-mdb-target="#modalEliminar" onclick="eliminarGrupo({{ $grupo }})" type="button" class="btn btn-danger" title="Eliminar"><i class="fas fa-trash-alt"></i></a>
+                                <a data-mdb-toggle="modal" data-mdb-target="#modalEliminar" onclick="eliminarGrupo({{ $grupo }})" type="button" class="btn btn-danger" title="Eliminar"><i class="fas fa-trash-alt"></i></a>
+                                <a href="{{ route('tutorias.asigTutPDF',$grupo->id) }}" class="btn btn-success" target="_blank"><i class="fas fa-file-contract" title="Imprimir asignación"></i></a>
+                                <a href="{{ route('tutorias.libTutPDF',$grupo->id) }}" class="btn btn-secondary" target="_blank"><i class="fas fa-file-contract" title="Imprimir liberación"></i></a>
                             </td>
                         </tr>
                     @endforeach
