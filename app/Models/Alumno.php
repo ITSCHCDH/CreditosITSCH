@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Alumno extends Model
+class Alumno extends Authenticatable
 {
+    use Notifiable;
    
     //Nombre de la tabla
     protected $table="alumnos";

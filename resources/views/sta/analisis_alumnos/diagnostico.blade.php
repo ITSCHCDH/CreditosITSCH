@@ -277,9 +277,8 @@
                         observaciones: observaciones,
                         no_Control: no_Control,                        
                     },
-                    success: function(response){   
-                        console.log('No. de Control: ' + response.noControl);                    
-                        swal('Exito',response.mensaje,'success')                                    
+                    success: function(response){                                          
+                        swal('Exito',response.mensaje,'success');                                    
                     },
                     error: function(e){
                         console.log(e);

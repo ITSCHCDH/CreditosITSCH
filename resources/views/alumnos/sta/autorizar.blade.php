@@ -36,8 +36,7 @@
                                 <hr>
                                 <div id="cr">
                                     <div class="panel-footer center">
-                                        <a href="{{ url()->previous() }}" type="button"
-                                            class="previous btn btn-default">Anterior</a>
+                                        <a href="{{  url()->previous() }}" type="button" class="previous btn btn-default">Anterior</a>
                                         <input type="submit" value="Aceptar y firmar" class="btn btn-primary">
                                     </div>
                                 </div>

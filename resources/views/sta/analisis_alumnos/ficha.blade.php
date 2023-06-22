@@ -21,28 +21,28 @@
             }else {
                 $enfermedades = "Sí, las siguientes: ";
                 if ($clinicos->diabetes == 'Diabetes') {
-                    $enfermedades = $enfermedades . 'Diabetes ';
+                    $enfermedades = $enfermedades . 'Diabetes, ';
                 }
                 if ($clinicos->hipertension == 'Hipertensión') {
-                    $enfermedades = $enfermedades . 'Hipertensión ';
+                    $enfermedades = $enfermedades . 'Hipertensión, ';
                 }
                 if ($clinicos->epilepsia == 'Epilepsia') {
-                    $enfermedades = $enfermedades . 'Epilepsia ';
+                    $enfermedades = $enfermedades . 'Epilepsia, ';
                 }
                 if ($clinicos->anorexia == 'Anorexia') {
-                    $enfermedades = $enfermedades . 'Anorexia ';
+                    $enfermedades = $enfermedades . 'Anorexia, ';
                 }
                 if ($clinicos->bulimia == 'Bulimia') {
-                    $enfermedades =  $enfermedades . 'Bulimia ';
+                    $enfermedades =  $enfermedades . 'Bulimia, ';
                 }
                 if ($clinicos->sexual == 'Enfermedad de Transmisión Sexual') {
                     $enfermedades = $enfermedades . 'Enfermedad de Transmisión Sexual ';
                 }
                 if ($clinicos->depresion == 'Depresión') {
-                    $enfermedades = $enfermedades . 'Depresión ';
+                    $enfermedades = $enfermedades . 'Depresión, ';
                 }
                 if ($clinicos->tristeza == 'Tristeza Profunda') {
-                    $enfermedades = $enfermedades . 'Tristeza Profunda ';
+                    $enfermedades = $enfermedades . 'Tristeza Profunda, ';
                 }
                 if ($clinicos->otra_enf != '') {
                     $enfermedades = $enfermedades . $clinicos->otra_enf;
@@ -53,16 +53,16 @@
             }else {
                 $discapacidades = "Sí, las siguientes: ";
                 if ($clinicos->vista == 'Vista') {
-                    $discapacidades = $discapacidades . 'Vista ';
+                    $discapacidades = $discapacidades . 'Vista, ';
                 }
                 if ($clinicos->oido == 'Oído') {
-                    $discapacidades = $discapacidades . 'Oído ';
+                    $discapacidades = $discapacidades . 'Oído, ';
                 }
                 if ($clinicos->lenguaje == 'Lenguaje') {
-                    $discapacidades = $discapacidades . 'Lenguaje ';
+                    $discapacidades = $discapacidades . 'Lenguaje, ';
                 }
                 if ($clinicos->motora == 'Motora') {
-                    $discapacidades = $discapacidades . 'Motora ';
+                    $discapacidades = $discapacidades . 'Motora, ';
                 }
                 if ($clinicos->otra_enf != '') {
                     $discapacidades =  $discapacidades . $clinicos->otra_enf;
@@ -94,17 +94,20 @@
          
         <hr style="height: 1px; border:none; background-color: orange;">     
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <b>Numero de Control:</b> {{ $alu1->alu_NumControl }}            
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <b>Nombre:</b> {{ $alu1->alu_Nombre }} {{ $alu1->alu_ApePaterno }} {{$alu1->alu_ApeMaterno }}
             </div>
             <div class="col-sm-4">
                 <b>Carrera:</b> {{$car->car_NombreCorto}}
             </div>
+            <div class="col-sm-2">
+                <a href="{{ route('analisis.sta.pdf',$alu1->alu_NumControl) }}" target="_blank" class="btn btn-primary" title="Imprimir ficha"><i class="fas fa-print"></i></a>
+            </div>
         </div>  
-        <br>
+        <hr style="height: 1px; border:none; background-color: orange;">
         <h5>Datos personales</h5>
         <hr>  
         <div class="row">

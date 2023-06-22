@@ -11,7 +11,7 @@ use App\Models\Familiar;
 use App\Models\Personales;
 use App\Models\Padres;
 use App\Models\Social;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use Illuminate\Http\Request;
 
@@ -312,7 +312,7 @@ class AlumnosStaController extends Controller
    }
 
    public function updtDatSoc(Request $request, $nc)
-   {
+   { 
         $alu = Alumno::where('no_control',$nc)->first();
         $soc = Social::where('id_alu', $alu->id)->first();
         $soc->rel_comp = $request->rel_comp;

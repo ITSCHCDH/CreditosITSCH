@@ -114,20 +114,10 @@
 												</div>
 												<div class="row">
 													<div class="col-sm-4">
-														<div class="form-group bs-float-label">
-															{{--<select id="sexo" name="sexo"
-																class="form-control float-input" required>
-																<option value="">Seleccione una Opcion</option>
-																<option value="M" @if($alu->sexo=='M') selected
-																	@endif>Hombre</option>
-																<option value="F" @if($alu->sexo=='F') selected @endif>Mujer
-																</option>
-															</select>--}}
+														<div class="form-group bs-float-label">															
 															<label id="sexo" name="sexo"> Sexo
 															</label><br>
-															<label for='sexo' class="float-label">{{
-																$sex }}</label>
-
+															<label for='sexo' class="float-label">{{$sex }}</label>
 														</div>
 													</div>
 													<div class="col-sm-4">
@@ -182,9 +172,7 @@
 											<div class="panel-body">
 												<div class="row">
 													<div class="col-sm-6">
-														<div class="form-group bs-float-label">
-															{{-- <input type="text" class="form-control float-input"
-																value="{{$carrera->nom_carr}}" required> --}}
+														<div class="form-group bs-float-label">															
 															<label>Carrera</label><br>
 															<label class="float-label"> {{$car->car_NombreCorto }}</label>
 
@@ -221,12 +209,6 @@
 															<label>Fecha de Nacimiento
 															</label><br>
 															<label class="float-label"> {{$alu2->alc_FechaNac }}</label>
-
-															{{-- <input id="nac" name="nac" type="date"
-																class="form-control float-input" value="{{ $alu->fec_nac }}"
-																required>
-															<label for="nac" class="float-label">Fecha de Nacimiento</label>
-															--}}
 														</div>
 													</div>
 													<div class="col-sm-6">
@@ -519,7 +501,7 @@
 											</div>
 										</div>
 									</div>
-									{{--dat padre--}}
+									{{--datos del padre--}}
 									<div class="panel panel-default">
 										<div class="panel-heading">
 											<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#datPad"
@@ -662,7 +644,7 @@
 										</div>
 									</div>
 								</div>
-								{{--dat madre--}}
+								{{--datos de la madre--}}
 								<div class="panel panel-default">
 									<div class="panel-heading">
 										<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#datMad"
@@ -795,14 +777,7 @@
 																		class="float-label">Colonia</label>
 																</div>
 															</div>
-														</div>
-														{{--
-														<input type="text" name="DomMa" id="DomMa"
-															class="form-control float-input"
-															placeholder="Domicilio de la Madre"
-															value="Mariano Escobedo #25" />
-														<label for="DomMa" class="float-label">Domicilio de la
-															Madre</label> --}}
+														</div>														
 													</div>
 												</div>
 											</div>
@@ -811,8 +786,7 @@
 								</div>
 								<div class="panel-footer center">
 									<hr>
-									<a data-toggle="tooltip" type="button" class="btn btn-danger"
-										href="">Cancelar</a>
+									<a data-toggle="tooltip" type="button" class="btn btn-danger">Cancelar</a>
 									<input type="submit" value="Siguiente" class="btn btn-info">
 								</div>
 						</div>
@@ -835,7 +809,7 @@
 		evento.preventDefault();
 		var peso = document.getElementById('peso').value;
 		if(peso.length == 0 ) {
-			alert('Rellena todos los campos');
+			swal('Rellena todos los campos');			
 			return;
 		}
 		this.submit();

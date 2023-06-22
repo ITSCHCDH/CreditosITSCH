@@ -91,6 +91,7 @@ class AlumnosController extends Controller
             Alert::error('Error','El No de control ya existe');
             return redirect()->back()->withInput();
         }
+        $alumno->email=$request->email;
         $alumno->save();
 
         Alert::success('Correcto', 'El alumno  '.$alumno->name.' se ha registrado de forma exitosa');
@@ -142,6 +143,7 @@ class AlumnosController extends Controller
 
             }
         }
+        $alumno->email=$request->email;
         $alumno->save();
 
         Alert::warning('Alerta','El alumno '. $alumno->nombre .' a sido editado de forma exitosa');
@@ -151,23 +153,23 @@ class AlumnosController extends Controller
 
 
     public function destroy($id)
-    {
+    {   
         //Codigo de bajas
         $alumno=Alumno::find($id);//Busca el registro
         if($alumno==null){
             Alert::error('Error','El alumno no existe');
-            return redirect('/home');
+            return redirect()->route('alumnos.index');;
         }
         $participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true:false;
         $evidencia = DB::table('evidencia')->where('alumno_no_control','=',$alumno->no_control)->get()->count()>0?true:false;
         $avance = DB::table('avance')->where('no_control','=',$alumno->no_control)->get()->count()>0?true:false;
         if($participante || $evidencia || $avance){
-            Alert::error('Error','El alumno '.$alumno->nombre.' no puede ser eliminado debido a claves foraneas');
+            Alert::error('Error','El alumno '.$alumno->nombre.' no puede ser eliminado por que esta registrado en algunas actividades');
             return redirect()->route('alumnos.index');
         }
         $alumno->delete();//Elimina el registro
         Alert::success('Correcto','El alumno '. $alumno->nombre .' a sido borrado de forma exitosa');//Envia mensaje
-        return redirect('admin/alumnos');//llama a la pagina de consultas
+        return redirect()->route('alumnos.index');//llama a la pagina de consultas
     }
 
     public function perfil($id)

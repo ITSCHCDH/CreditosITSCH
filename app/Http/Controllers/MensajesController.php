@@ -97,4 +97,16 @@ class MensajesController extends Controller
 		return view('admin.mensajes.vistos')
 		->with('mensajes',$mensajes);	
 	}
+
+	public function eliminarMensaje(Request $request)
+	{
+		//Marcamos el mensaje como visto
+		$receptor = Receptor::find($request->receptor_id);
+		$receptor->visto="true";
+		$receptor->fecha_visto=Carbon::now()->setTimezone('CDT');
+		$receptor->save();
+		//Regresamos a la pagina anterior
+		Alert::success('Correcto','El mensaje fue eliminado correctamente');
+		return redirect()->back();
+	}
 }

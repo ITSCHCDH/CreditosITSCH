@@ -36,6 +36,7 @@
                 <label for="nombre">Nombre de la actividad</label>                
                 <textarea class="form-control" style="text-align: left; font-size: large;" disabled id="textarea-mensaje">{{ $mensaje->mensaje }}</textarea>
             </div>
+            <hr>
             @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']) && $actividad_id != null)               
                 <a href="#" onclick="redireccionar({{$actividad_id}});" class="btn btn-success btn-sm"><i class='fas fa-person-booth' style='font-size:18px'></i> Participantes</a>               
             @endif

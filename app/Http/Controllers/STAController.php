@@ -51,7 +51,9 @@ class STAController extends Controller
             ->join('catedraticos as ca','ca.dep_Clave','=','d.dep_Clave')  
             ->where('d.dep_Clave',$dpto->dep_Clave)
             ->where('c.car_Status','VIGENTE')
+            ->where('ca.cat_Status','VI')
             ->groupBy('ca.cat_Clave')
+            ->orderBy('ca.cat_Nombre','desc')
             ->get();
         }else if(Auth::User()->hasAnyPermission(['STA_PROFESOR'])){ 
             $cat_Clave=$this->obtCatClave();     
@@ -135,6 +137,7 @@ class STAController extends Controller
         ->join('grupossemestre','reticula.ret_Clave','=','grupossemestre.ret_Clave')
         ->where('grupossemestre.cat_Clave',$request->profesor)
         ->select('reticula.ret_NomCompleto','reticula.ret_NumUnidades','grupossemestre.ret_Clave','grupossemestre.gse_Anio','grupossemestre.gse_Observaciones','grupossemestre.gse_Clave')
+        ->orderBy('reticula.ret_NomCompleto','asc')
         ->get();
       
         return response()->json($materias);

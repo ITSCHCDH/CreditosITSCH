@@ -326,8 +326,7 @@
 									</div>
 									<hr>
 									<div class="panel-footer center">
-										<a href="{{ url()->previous() }}" type="button"
-											class="previous btn btn-default">Anterior</a>
+										<a href="{{ url('alumnos/editDatSalud',$alu->no_control) }}" type="button" class="previous btn btn-default">Anterior</a>
 										<input type="submit" value="Siguiente" class="btn btn-info">
 									</div>
 								</div>
