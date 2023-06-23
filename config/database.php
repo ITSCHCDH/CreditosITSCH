@@ -54,6 +54,8 @@ return [
             'engine' => null,
         ],   
         
+        /* 
+        //Conexión a base de datos de prueba con mysql
         'contEsc' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
@@ -72,7 +74,20 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+        ],*/
+
+        //Conexión a base de datos de prueba con sqlserver
+        'contEsc' => [
+            'driver' => 'sqlsrv',
+            'host' => env('DB_SECOND_HOST', '172.16.0.10'),
+            'port' => env('DB_SECOND_PORT', '1433'),
+            'database' => env('DB_SECOND_DATABASE', 'forge'),
+            'username' => env('DB_SECOND_USERNAME', 'forge'),
+            'password' => env('DB_SECOND_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
         ],
+
         
         'pgsql' => [
             'driver' => 'pgsql',

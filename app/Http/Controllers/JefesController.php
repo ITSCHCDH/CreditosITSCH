@@ -44,12 +44,13 @@ class JefesController extends Controller
         $grupo="";
         $generacion="";
         $carrera="";      
-        $generaciones = DB::connection('contEsc')->table('alumnos')			
-			->select("alumnos.Alu_AnioIngreso")
-			->orderBy('Alu_AnioIngreso', 'asc')
-			->distinct()
-            ->where('alumnos.Alu_AnioIngreso','!=',0)
-			->get();
+        $generaciones = DB::connection('contEsc')->table('alumnos')
+        ->select("alumnos.Alu_AnioIngreso")
+        ->where('alumnos.Alu_AnioIngreso', '!=', 0)
+        ->whereNotNull('alumnos.Alu_AnioIngreso')
+        ->orderBy('Alu_AnioIngreso', 'asc')
+        ->distinct()
+        ->get();
        
         return view('sta/analisis_alumnos/index')
         ->with('grupo',$grupo)
@@ -80,11 +81,13 @@ class JefesController extends Controller
             $carreras = DB::connection('contEsc')->table('carreras')->where('car_Clave',auth()->user()->area)->get();
         }
        
-        $generaciones = DB::connection('contEsc')->table('alumnos')			
-			->select("alumnos.Alu_AnioIngreso")
-			->orderBy('Alu_AnioIngreso', 'asc')
-			->distinct()
-			->get();
+        $generaciones = DB::connection('contEsc')->table('alumnos')
+        ->select("alumnos.Alu_AnioIngreso")
+        ->where('alumnos.Alu_AnioIngreso', '!=', 0)
+        ->whereNotNull('alumnos.Alu_AnioIngreso')
+        ->orderBy('Alu_AnioIngreso', 'asc')
+        ->distinct()
+        ->get();
 
                
         return view('sta.analisis_alumnos.index')
@@ -136,7 +139,7 @@ class JefesController extends Controller
         ->join('grupossemestre','listassemestre.gse_Clave','=','grupossemestre.gse_Clave')
         ->join('reticula','reticula.ret_Clave','=','grupossemestre.ret_Clave')
         ->join('catedraticos','catedraticos.cat_Clave','=','grupossemestre.cat_Clave')
-        ->select (DB::raw('CONCAT(catedraticos.cat_Nombre," ",catedraticos.cat_ApePat," ",catedraticos.cat_ApeMat) as profesor'),'reticula.ret_NomCompleto','listassemestrecom.lsc_Calificacion','reticula.ret_NumUnidades','listassemestrecom.lsc_NumUnidad','listassemestrecom.lsc_Corte','listassemestrecom.lse_clave')
+        ->select (DB::raw("CONCAT(catedraticos.cat_Nombre,' ',catedraticos.cat_ApePat,' ',catedraticos.cat_ApeMat) as profesor"),'reticula.ret_NomCompleto','listassemestrecom.lsc_Calificacion','reticula.ret_NumUnidades','listassemestrecom.lsc_NumUnidad','listassemestrecom.lsc_Corte','listassemestrecom.lse_clave')
         ->where('listassemestre.alu_NumControl','=',$nc)
         ->DISTINCT()
         ->get();
@@ -211,11 +214,11 @@ class JefesController extends Controller
         $indicesAcad = DB::connection('contEsc')->table("cardex")
         ->select(
             'alumnos.alu_StatusAct',
-            DB::raw('SUM(cdx_UltOpcAcred = 2) AS nivelacionesOrdinario'),
-            DB::raw('SUM(cdx_UltOpcAcred = 3) AS repeticiones'),
-            DB::raw('SUM(cdx_UltOpcAcred = 4) AS nivelacionesRepe'),
-            DB::raw('SUM(cdx_UltOpcAcred = 5) AS especiales'),
-            DB::raw('SUM(cdx_UltOpcAcred = 6) AS nivelacionesEspecial')           
+            DB::raw('SUM(CASE WHEN cdx_UltOpcAcred = 2 THEN 1 ELSE 0 END) AS nivelacionesOrdinario'),
+            DB::raw('SUM(CASE WHEN cdx_UltOpcAcred = 3 THEN 1 ELSE 0 END) AS repeticiones'),
+            DB::raw('SUM(CASE WHEN cdx_UltOpcAcred = 4 THEN 1 ELSE 0 END) AS nivelacionesRepe'),
+            DB::raw('SUM(CASE WHEN cdx_UltOpcAcred = 5 THEN 1 ELSE 0 END) AS especiales'),
+            DB::raw('SUM(CASE WHEN cdx_UltOpcAcred = 6 THEN 1 ELSE 0 END) AS nivelacionesEspecial')
         )
         ->join('alumnos', 'alumnos.alu_NumControl', '=', 'cardex.alu_NumControl')
         ->where('cardex.alu_NumControl', '=', $nc)
