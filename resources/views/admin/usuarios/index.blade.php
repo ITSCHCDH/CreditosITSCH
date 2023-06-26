@@ -13,7 +13,7 @@
 	<div class="table-responsive">
 		<table class="table" id="tabUsuarios">
 			<thead>
-				<th>ID</th>
+				<th>Numero</th>
 				<th>Nombre</th>
 				<th>Area</th>
 				<th>Correo</th>
@@ -25,8 +25,8 @@
 			<tbody>
 			@foreach ($users as $user)
 				<tr>
-					<td>{{ $user->id }}</td>
-					<td>{{ $user->name }}</td>
+					<td>{{ $loop->iteration }}</td>
+					<td>{{ strtoupper($user->name)  }}</td>
 					<td style="overflow:hidden;">{{ $user->area }}</td>
 					<td>{{ $user->email }}</td>
 					@if ($user->active=='true')

@@ -22,14 +22,22 @@ class UsersController extends Controller
     }
     public function index(){
         if (Auth::User()->can('VIP')) {
-                $users = DB::table('users as u')->join('areas as a','a.id','=','u.area')->select('a.nombre as area','u.name','u.active','u.id','u.email','u.tutor')->get();
+                $users = DB::table('users as u')
+                ->join('areas as a','a.id','=','u.area')
+                ->select('a.nombre as area','u.name','u.active','u.id','u.email','u.tutor')
+                ->orderBy('u.name','ASC')
+                ->get();
                 return view('admin.usuarios.index')
                 ->with('users',$users);
         }else{
-                $users = DB::table('users as u')->join('areas as a','a.id','=','u.area')->where([
+                $users = DB::table('users as u')->join('areas as a','a.id','=','u.area')
+                ->where([
                     ['u.area','=',Auth::User()->area],
                     ['u.id','<>','1']
-                ])->select('a.nombre as area','u.name','u.active','u.id','u.email')->get();
+                ])
+                ->select('a.nombre as area','u.name','u.active','u.id','u.email')
+                ->orderBy('u.name','ASC')
+                ->get();
                 return view('admin.usuarios.index')
                 ->with('users',$users);
         }
