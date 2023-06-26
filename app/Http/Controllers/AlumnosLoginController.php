@@ -49,7 +49,7 @@ class AlumnosLoginController extends Controller
      */
     public function authenticate(Request $request)
     {
-        $credentials = $request->only('no_control', 'password');
+        $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
             // Authentication passed...
@@ -102,7 +102,7 @@ class AlumnosLoginController extends Controller
     public function login(Request $request)
     {
         $this->validateLogin($request);
-
+       
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
@@ -111,7 +111,7 @@ class AlumnosLoginController extends Controller
 
             return $this->sendLockoutResponse($request);
         }
-
+       
         if ($this->attemptLogin($request)) {
             return $this->sendLoginResponse($request);
         }

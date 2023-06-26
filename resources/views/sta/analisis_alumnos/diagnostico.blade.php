@@ -3,7 +3,7 @@
 @section('title','Alumnos')
 
 @section('ruta')
-    <label class="label label-success"> <a href="#">STA</a> / <a href="{{ route('analisis.index') }}">Jefes de carrera</a>/Diagnostico</label> 
+    <label class="label label-success"> <a href="#">STA</a> /Diagnostico</label> 
 @endsection
 
 @section('contenido')
@@ -13,17 +13,18 @@
             <img src="{{ asset('images/user.png') }}" class="card-img-top" alt="Datos del alumno"/>
             <div class="card-body">
                 <h5 class="card-title">Datos del alumno</h5>
-                <h6>Control&nbsp;:&nbsp;&nbsp;{{$alumnos[0]->alu_NumControl}}</h6>
-                <h6>Nombre&nbsp;:&nbsp;&nbsp;{{$alumnos[0]->alu_Nombre}} &nbsp;{{$alumnos[0]->alu_ApePaterno}} &nbsp;{{$alumnos[0]->alu_ApeMaterno}}</h6>
-                <h6>Último semestre&nbsp;:&nbsp;&nbsp;{{$alumnos[0]->alu_SemestreAct}}</h6>
+                <h6>Control&nbsp;:&nbsp;&nbsp;{{$alumnos->alu_NumControl}}</h6>
+                <input type="hidden" name="no_Control" id="no_Control" readonly value="{{$alumnos->alu_NumControl}}">
+                <h6>Nombre&nbsp;:&nbsp;&nbsp;{{$alumnos->alu_Nombre}} &nbsp;{{$alumnos->alu_ApePaterno}} &nbsp;{{$alumnos->alu_ApeMaterno}}</h6>
+                <h6>Último semestre&nbsp;:&nbsp;&nbsp;{{$alumnos->alu_SemestreAct}}</h6>
                 <div class="datospersonales">{{$variablegrupo}} 
                     @foreach($grupos as $al)
                         <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;{{$al->gse_Observaciones}}
                     @endforeach		
                 </div>
-                <h6>Carrera&nbsp;:&nbsp;&nbsp;{{$alumnos[0]->car_Nombre}}</h6>
-                <h6>Sexo&nbsp;:&nbsp;&nbsp;{{$alumnos[0]->alu_Sexo}}</h6>           
-                <h6>Status&nbsp;:&nbsp;&nbsp;{{ $alumnos[0]->alu_StatusAct }}</h6>           
+                <h6>Carrera&nbsp;:&nbsp;&nbsp;{{$alumnos->car_Nombre}}</h6>
+                <h6>Sexo&nbsp;:&nbsp;&nbsp;{{$alumnos->alu_Sexo}}</h6>           
+                <h6>Status&nbsp;:&nbsp;&nbsp;{{ $alumnos->alu_StatusAct }}</h6>           
             </div>
         </div>
     </div>
@@ -39,214 +40,112 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>                        
-                        @if ($especiales > 0 || $nivelaciones >= 10 || $repeticiones > 2) <!-- rojo -->
-                            <div  class="CirculoRojo" data-mdb-toggle="tooltip" 
-                            title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
-                            ></div>
-                        @else
-                            @if ($repeticiones <= 2 && ($nivelaciones >= 3 && $nivelaciones <10)) <!-- naranja -->
-                                <div class="CirculoNaranja" data-mdb-toggle="tooltip" 
-                                title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
-                                ></div>
-                            @else
-
-                                @if ($nivelaciones > 1 && $nivelaciones <=5)<!-- amarillo -->
-                                    <div class="CirculoAmarillo" data-mdb-toggle="tooltip" 
-                                    title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
-                                    ></div>
-                                @else
-                                    @if ($nivelaciones <= 1)<!-- verde --> 
-                                        <div class="CirculoVerde" data-mdb-toggle="tooltip" 
-                                        title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
-                                        ></div>
-                                    @else
-                                        <div class="CirculoNegro" data-mdb-toggle="tooltip" 
-                                        title="Nivelaciones:&nbsp;{{$nivelaciones}}&nbsp;&nbsp;Repeticiones:&nbsp;{{$repeticiones}}&nbsp;&nbsp;Especiales:&nbsp;{{$especiales}}"
-                                        ></div>
-                                    @endif
-                                @endif
-                            @endif
-                        @endif
-                    </td>
-                    <td>
-                        @if ($tamsempsicologico > 0)
-                            @if ($tam_msm_psicologico == 0)
-                                @if ($psicologico[0]->status_psico == 0) <!-- verde --> 
-                                    <div class="CirculoVerde" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif
-                                @if ($psicologico[0]->status_psico == 1) <!-- amarillo -->
-                                    <div class="CirculoAmarillo" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif
-                                @if ($psicologico[0]->status_psico == 2) <!-- naranja -->
-                                    <div class="CirculoNaranja" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif							
-                                @if ($psicologico[0]->status_psico == 3) <!-- rojo -->
-                                    <div class="CirculoRojo" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif									
-                            @else
-                                @if ($psicologico[0]->status_psico == 0) <!-- verde --> 
-                                    <div class="CirculoVerde" data-mdb-toggle="tooltip" title="{{$msm_psicologico[0]->mensaje}}"></div>
-                                @endif
-                                @if ($psicologico[0]->status_psico == 1) <!-- amarillo -->
-                                    <div class="CirculoAmarillo" data-mdb-toggle="tooltip" title="{{$msm_psicologico[0]->mensaje}}"></div>
-                                @endif
-                                @if ($psicologico[0]->status_psico == 2) <!-- naranja -->
-                                    <div class="CirculoNaranja" data-mdb-toggle="tooltip" title="{{$msm_psicologico[0]->mensaje}}"></div>
-                                @endif							
-                                @if ($psicologico[0]->status_psico == 3) <!-- rojo -->
-                                    <div class="CirculoRojo" data-mdb-toggle="tooltip" title="{{$msm_psicologico[0]->mensaje}}"></div>
-                                @endif                                
-                            @endif
-                        @else
-                            <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Sin Evaluar"></div>
-                        @endif
-                    
-                    </td>
-                    <td>
-                        @if ($tamsemmedico > 0)
-                            @if ($tam_msm_medico == 0)
-
-                                @if ($medico[0]->status_medico == 0) <!-- verde --> 
-                                    <div class="CirculoVerde" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif
-                                @if ($medico[0]->status_medico == 1) <!-- amarillo -->
-                                    <div class="CirculoAmarillo" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif
-                                @if ($medico[0]->status_medico == 2) <!-- naranja -->
-                                    <div class="CirculoNaranja" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif							
-                                @if ($medico[0]->status_medico == 3) <!-- rojo -->
-                                        <div class="CirculoRojo" data-mdb-toggle="tooltip" title="No hay Comentarios"></div>
-                                @endif								
-
-                            @else
-                                
-                                @if ($medico[0]->status_medico == 0) <!-- verde --> 
-                                    <div class="CirculoVerde" data-mdb-toggle="tooltip" title="{{$msm_medico[0]->mensaje}}"></div>
-                                @endif
-                                @if ($medico[0]->status_medico == 1) <!-- amarillo -->
-                                    <div class="CirculoAmarillo" data-mdb-toggle="tooltip" title="{{$msm_medico[0]->mensaje}}"></div>
-                                @endif
-                                @if ($medico[0]->status_medico == 2) <!-- naranja -->
-                                    <div class="CirculoNaranja" data-mdb-toggle="tooltip" title="{{$msm_medico[0]->mensaje}}"></div>
-                                @endif							
-                                @if ($medico[0]->status_medico == 3) <!-- rojo -->
-                                        <div class="CirculoRojo" data-mdb-toggle="tooltip" title="{{$msm_medico[0]->mensaje}}"></div>
-                                @endif
-
-                            @endif
-
-                        @else
-                            <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Sin Evaluar"></div>
-                        @endif
-                    </td>
+                    <td><div class="{{ $alumnos->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="Académico"></div></td>
+                    <td><div class="{{ $alumnos->semaforos['semaforoMedico'] }}" data-mdb-toggle="tooltip" title="Medico"></div></td>
+                    <td><div class="{{ $alumnos->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div></td>                      
                 </tr>
             </tbody>
         </table>
         <br>
         <div>
+            {{-- Dibuja la tabla con las calificaciones del semestre actual --}}
             <h2>{{$calificacionesvariable}}</h2>	
-            <table class="table">
-                <tbody>	
+            <table class="table table-sm">
+                <thead>
                     <tr>
-                        <td>{{$unidadesvariable}}</td>
+                        {{-- Dibuja en la tabla el numero maximo de unidades --}}
+                        <th>{{$unidadesvariable}}</th>
                         @foreach ($unidades as $uni)
-                            <td>Unidad&nbsp;{{$uni->lsc_NumUnidad}}</td>
+                            <th>Unidad&nbsp;{{$uni->lsc_NumUnidad}}</th>
                         @endforeach                
-                    </tr>            
-                        @php
-                            $m = true;
-                        @endphp
-                        @foreach ($tablacalificaciones as $calif)                
-                            @if ($m == true)
-                                <tr>
-                                <td>{{$calif->ret_NomCompleto}}&nbsp; <b>-- {{$calif->lse_clave}}</b> </td>	
-                                @php
-                                    $m = false;
-                                @endphp	
-                            @endif
-                            @if ($calif -> lsc_NumUnidad == $calif->ret_NumUnidades)
-                                @if ($calif->lsc_Calificacion<=69)
-                                    @if ($calif->lsc_Corte)
-                                        <!-- Color Rojo -->
-                                        @if ($tamcomentarios == 0)
-                                            <td class="txtRojo" data-mdb-toggle="tooltip" title="El profesor no agrego comentario">{{$calif->lsc_Calificacion}}</td>			
-                                        @else
-                                        @foreach ($comentarios as $rescomentarios)
-                                                @if ($calif->lse_clave == $rescomentarios->lse_clave)
-                                                    @if ($calif -> lsc_NumUnidad == $rescomentarios -> num_tema)
-                                                        <td class="txtRojo" data-mdb-toggle="tooltip" title="{{$rescomentarios->comentario}}">{{$calif->lsc_Calificacion}}</td>				
-                                                    @else
-                                                        <td class="txtRojo" data-mdb-toggle="tooltip" title="El profesor no agrego comentario">{{$calif->lsc_Calificacion}}</td>			
-                                                    @endif
-                                                @endif
-                                            @endforeach
-                                        @endif
-                                    @else                                        
-                                        <td data-mdb-toggle="tooltip" title="El profesor no ha capturado la calificación">----</td>
-                                    @endif
+                    </tr>
+                </thead>
+                <tbody> 
+                    @php
+                        $temp="";                      
+                    @endphp                 
+                    @foreach ( $materias as $calif )  
+                        <tr> 
+                            {{-- Agregamos el nombre de cada materia a la tabla --}}
+                            <td> {{   $calif[0]->ret_NomCompleto; }} <P class="txtSmall">(PROFESOR: {{ $calif[0]->profesor; }})</P></td>                                             
+                            @foreach ($calif as $c)
+                                @if (!$c->lsc_Corte)
+                                    <!-- El profesor no ha capturado calificaciones -->
+                                    <td data-mdb-toggle="tooltip" title="El profesor no ha capturado la calificación">----</td>
+                                @elseif ($c->lsc_Calificacion<70)
+                                    {{-- Cambiar a color Rojo las calificaciones menores a 70 --}}   
+                                    @if ($c->comentario!="")
+                                        {{-- Se agrega el comentario a las materias reprobadas --}}
+                                        @php
+                                            //Cambiamos el numero de motivo de reprobación por su texto correspondiente
+                                            $motivo="";
+                                            switch ($c->motivo) {
+                                                case 1:
+                                                    $motivo="Responsabilidad alumno";
+                                                    break;
+                                                case 2:
+                                                    $motivo="Inasistencia";
+                                                    break; 
+                                                case 3:
+                                                    $motivo="Complejidad materia";
+                                                    break;
+                                                case 4:
+                                                    $motivo="Otro";
+                                                    break;                                                 
+                                                default:
+                                                    $motivo="El profesor no agrego un motivo especifico";
+                                                    break;
+                                            }
+                                        @endphp
+                                        <td class="txtRojo"  data-mdb-toggle="tooltip" title="Motivo: {{ $motivo }}. Comentario: {{ $c->comentario }}"> {{   $c->lsc_Calificacion; }}  </td> 
+                                    @else
+                                        {{-- En caso de que el profesor no agregue comentario --}}
+                                        <td class="txtRojo"  data-mdb-toggle="tooltip" title="El profesor no agrego comentarios"> {{   $c->lsc_Calificacion; }}  </td> 
+                                    @endif                          
+                                @elseif ($c->lsc_Calificacion>=70 && $c->lsc_Calificacion<80)
+                                    {{-- Cambiar a color Naranja las calificaciones menores a 80 --}}                                
+                                    <td class="txtNaranja"> {{   $c->lsc_Calificacion; }}  </td> 
+                                @elseif ($c->lsc_Calificacion>=80 && $c->lsc_Calificacion<86)
+                                    {{-- Cambiar a color Amarillo las calificaciones menores a 86 --}}                                
+                                    <td class="txtNaranja"> {{   $c->lsc_Calificacion; }}  </td> 
                                 @else
-                                    @if ($calif->lsc_Calificacion>=86)
-                                        <!-- Color Verde -->
-                                        <td class="txtVerde">{{$calif->lsc_Calificacion}}</td>	
-                                    @else
-                                        @if ($calif->lsc_Calificacion>=80)
-                                            <!-- Color Amarillo -->
-                                            <td class="txtAmarillo">{{$calif->lsc_Calificacion}}</td>		
-                                        @else
-                                            <!-- Color Naranja -->
-                                            <td class="txtNaranja">{{$calif->lsc_Calificacion}}</td>			
-                                        @endif
-                                        
-                                    @endif
-                                @endif
-                                </tr>
-                                @php
-                                    $m = true;
-                                @endphp
-                            @else	
-                                @if ($calif->lsc_Calificacion<=69)
-                                    @if ($calif->lsc_Corte)
-                                        <!-- Color Rojo -->
-                                        @if ($tamcomentarios == 0)
-                                            <td class="txtRojo" data-mdb-toggle="tooltip" title="El profesor no agrego comentario">{{$calif->lsc_Calificacion}}</td>			
-                                        @else
-                                        @foreach ($comentarios as $rescomentarios)
-                                                @if ($calif->lse_clave == $rescomentarios->lse_clave)
-                                                    @if ($calif -> lsc_NumUnidad == $rescomentarios -> num_tema)
-                                                        <td class="txtRojo" data-mdb-toggle="tooltip" title="{{$rescomentarios->comentario}}">{{$calif->lsc_Calificacion}}</td>				
-                                                    @else
-                                                        <td class="txtRojo" data-mdb-toggle="tooltip" title="El profesor no agrego comentario">{{$calif->lsc_Calificacion}}</td>			
-                                                    @endif
-                                                @endif
-                                            @endforeach
-                                        @endif
-                                    @else
-                                        <!-- Color Blanco -->
-                                        <td data-mdb-toggle="tooltip" title="El profesor no ha capturado la calificación">----</td>
-                                    @endif
-                                @else
-                                    @if ($calif->lsc_Calificacion>=86)
-                                        <!-- Color Verde -->
-                                        <td class="txtVerde">{{$calif->lsc_Calificacion}}</td>	
-                                    @else
-                                        @if ($calif->lsc_Calificacion>=80)
-                                            <!-- Color Amarillo -->
-                                            <td class="txtAmarillo">{{$calif->lsc_Calificacion}}</td>		
-                                        @else
-                                            <!-- Color Naranja -->
-                                            <td class="txtNaranja">{{$calif->lsc_Calificacion}}</td>			
-                                        @endif                                
-                                    @endif
-                                @endif					
-                            @endif                    
-                        @endforeach
-                </tbody>	
+                                    {{-- Cambiar a color Verde las calificaciones mayores a 86 --}} 
+                                    <td class="txtVerde"> {{   $c->lsc_Calificacion; }}  </td> 
+                                @endif                               
+                            @endforeach  
+                        </tr>                                                                                                     
+                    @endforeach
+                </tbody>
             </table>
         </div>
     </div>
 </div>
+<hr>
+@if (Auth::User()->hasAnyPermission(['VIP_STA','STA_TUTOR','STA_DEP_TUTORIA']))
+    <div class="row">
+        <div class="col-sm-4">
+            <h2>Observaciones</h2>
+        </div>
+        <div class="col-sm-6">
+            <textarea name="observaciones" id="observaciones" cols="30" rows="4" class="form-control">{{ $alumnos->observaciones }}</textarea>
+        </div>
+        <div class="col-sm-2">
+            <br>
+            <br>
+            <br>
+            <button class="btn btn-primary" onclick="guardarObservaciones()">Actualizar</button>
+        </div>
+    </div>
+@else
+    <div class="row">
+        <div class="col-sm-4">
+            <h2>Observaciones</h2>
+        </div>
+        <div class="col-sm-6">
+            <textarea name="observaciones" id="observaciones" cols="30" rows="4" class="form-control" readonly>{{ $alumnos->observaciones }}</textarea>
+        </div>       
+    </div>
+@endif
 
 <hr>
 
@@ -318,9 +217,7 @@
                 <tr id="FilaDatosCardex">
                     <td id="DatosCardex">@php $contador++; echo $contador; @endphp</td>	
                     <td id="DatosCardex">{{$res -> ret_NomCompleto}}</td>	
-                    <td id="DatosCardexCentrados">{{$res -> cdx_AnioXPrime}}</td>	
-                    
-                        
+                    <td id="DatosCardexCentrados">{{$res -> cdx_AnioXPrime}}</td>                      
                 @if ($res->cdx_Calif<=69)
                         <!-- Color Rojo -->
                         <td class="txtRojo" data-mdb-toggle="tooltip" title="No Acreditada ">{{$res->cdx_Calif}}</td>		
@@ -338,9 +235,7 @@
                         @endif
                         
                     @endif
-                @endif	
-                    
-                        
+                @endif               
                     @if ($res -> cdx_UltOpcAcred == 1)
                         <td class="txtVerde">Ordinario</td>		
                     @endif
@@ -364,4 +259,32 @@
         @endforeach
     </tbody>
 </table>	
+@endsection
+
+@section('js')
+    <script>
+        function guardarObservaciones()
+        {
+            //Guardamos las observaciones en la tabla de alumnos
+            var observaciones = $('#observaciones').val(); 
+            var no_Control = $('#no_Control').val(); 
+            //Guardamos el registro en la base de datos                
+            $.ajax({
+                    url: "{{ route('tutores.storeAlumnoObs') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        observaciones: observaciones,
+                        no_Control: no_Control,                        
+                    },
+                    success: function(response){                                          
+                        swal('Exito',response.mensaje,'success');                                    
+                    },
+                    error: function(e){
+                        console.log(e);
+                        swal('Error',e.mensaje,'error');                        
+                    }
+                });
+        }
+    </script>
 @endsection

@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->integer('area')->unsigned();
             $table->enum('active',['true','false'])->default('true');
+            $table->enum('tutor',[1,0])->default(0);
             $table->foreign('area')->references('id')->on('areas')->onDelete('cascade');
             $table->rememberToken();
             $table->timestamps();

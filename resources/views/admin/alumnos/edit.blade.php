@@ -20,6 +20,11 @@
                         <label for="no_control">Numero de Control</label>
                         <input type="text" name="no_control" id="no_control" value="{{ $alumno->no_control }}" class="form-control" placeholder="Numero de control" required readonly>                                
                     </div>
+
+                    <div class="form-group">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" name="email" id="email" class="form-control" placeholder="Email" required value="{{ $alumno->email }}">            
+                    </div>
         
                     <div class="form-group">
                         <label for="nombre">Nombre</label>

@@ -18,6 +18,11 @@
                     <label for="no_control">Numero de Control</label>
                     <input type="text" name="no_control" id="no_control" class="form-control" placeholder="Numero de control" required>            
                 </div>
+
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" name="email" id="email" class="form-control" placeholder="Email" required>            
+                </div>
         
                 <div class="form-group">
                     <label for="nombre">Nombre</label>

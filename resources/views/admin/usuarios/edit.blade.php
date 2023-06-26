@@ -52,6 +52,25 @@
         </select>          
     </div>
     <br>
+    <div class="form-group">
+      <label for="active" class="control-label">Podra ser tutor?</label>
+      <div>
+        <select id="tutor" type="select" class="form-control" name="tutor" required>
+          <option value="" disabled selected>Este usuario podra ser nombrado como tutor?</option>
+          <option value="1"
+            @if ($user->tutor=="1")
+              {{ "selected" }}            
+            @endif>SI
+          </option>
+          <option value="0"
+            @if ($user->tutor=="0")
+              {{ "selected" }}            
+            @endif>NO
+          </option>
+        </select>	        
+      </div>
+    </div>
+    <br>
     <div class="form-outline">
       <input type="password" id="password" name="password" class="form-control form-control-lg" value="{{ $user->password }}" required />
       <label class="form-label" for="password">Password</label>

@@ -11,11 +11,11 @@
         @csrf
         <div class="row">       
             <div class="col-sm-3" >
-                <h5>Selecciona una generación</h5>        
+                <h5>Selecciona una generación</h5>       
                 <select class="form-control " name="generacion" id="generacion" required>
                     <option selected value="">Selecciona una opción</option>
                     @foreach ($generaciones as $gen )
-                        @if($generacion==$gen->Alu_AnioIngreso)
+                        @if($generacion==$gen->Alu_AnioIngreso )
                             <option value="{{ $gen->Alu_AnioIngreso }}" selected>{{ $gen->Alu_AnioIngreso }}</option>
                         @else
                             <option value="{{ $gen->Alu_AnioIngreso }}">{{ $gen->Alu_AnioIngreso }}</option>
@@ -24,7 +24,7 @@
                 </select>             
             </div>
             <div class="col-sm-3" >
-                <h5>Selecciona una carrera</h5>         
+                <h5>Selecciona una carrera</h5>        
                 <select class="form-control " name="carrera" id="carrera" required>
                     <option selected value="">Selecciona una opción</option>
                     @foreach ($carreras as $car )
@@ -63,23 +63,37 @@
                         <td>{{ $gru->control }}</td>
                         <td>{{ $gru->aPaterno }} {{ $gru->aMaterno }} {{ $gru->nombre }}</td>
                         <td>{{ $gru->semestre }}</td>
-                        <td>{{ $gru->status }}</td>
-                        <td>  
+                        <td>
+                            @switch($gru->status)
+                            @case('BD')
+                                Baja definitiva
+                                @break
+                            @case('BT')
+                                Baja temporal
+                                @break
+                            @case('VI')
+                                Vigente
+                                @break                        
+                            @default
+                                Sin status                       
+                        @endswitch
+                        </td>
+                        <td>
                             <div class="row">
                                 <div class="col-sm-2">
-                                    <div class="{{ $gru->semaforoAcad }}" data-mdb-toggle="tooltip" title="Académico"></div>
+                                    <div class="{{ $gru->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="Académico"></div>
                                 </div>
                                 <div class="col-sm-2">
-                                    <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Medico"></div>
+                                    <div class="{{ $gru->semaforos['semaforoMedico'] }}" data-mdb-toggle="tooltip" title="Medico"></div>
                                 </div>
                                 <div class="col-sm-2">
-                                    <div class="CirculoNegro" data-mdb-toggle="tooltip" title="Psicologico"></div>
+                                    <div class="{{ $gru->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div>
                                 </div>
-                            </div>                            
+                            </div>                           
                         </td>
                         <td>
                             <a href="{{ route('analisis.alumno',$gru->control) }}" class="btn btn-primary" title="Ver más"><i class="fas fa-search-plus"></i></a>
-                            <a href="{{ route('analisis.ficha',$gru->control) }}" class="btn btn-secondary" title="Ver ficha"><i class="fas fa-file-invoice"></i></a>
+                            <a href="{{ route('analisis.ficha',[$gru->control,1]) }}" class="btn btn-secondary" title="Ver ficha"><i class="fas fa-file-invoice"></i></a>
                         </td>
                     </tr>                
                 @endforeach

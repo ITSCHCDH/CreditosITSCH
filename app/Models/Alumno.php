@@ -9,10 +9,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Alumno extends Authenticatable
 {
     use Notifiable;
+   
     //Nombre de la tabla
     protected $table="alumnos";
-    //Datos visibles para los objetos json
-    protected $fillable=['no_control','password','nombre','carrera','status','foto'];
+    //Datos visibles para los objetos json   
+    protected $fillable=['no_control','password','nombre','carrera','status','foto','observaciones','email','ficha','nombre_i','a_pat','a_mat','creditos','fec_nac','lug_pro','curp','sexo','est_civ','tel','tel_emer','beca','grupo','nom_ficha','generacion'];
 
 
     //Relacion con la tablas de alumno(uno) a participante(muchos)
@@ -25,13 +26,7 @@ class Alumno extends Authenticatable
     public function avances()
     {
         return $this->hasMany('App\Avance');
-    }
-
-    //Crea el buscador de actividades (Scope)
-    public function scopeSearch($query,$valor)
-    {
-        return $query->where('nombre','LIKE',"%$valor%")->orwhere('no_control','LIKE',"%$valor%")->orwhere('carrera','LIKE',"%$valor%");
-    }
+    }   
 }
 
 

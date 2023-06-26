@@ -48,6 +48,7 @@
 						<tr>
 							<td>
 								<a href="{{ route('mensajes.ver',['mensaje_id' => $msj->mensaje_id,'receptor_id' => $msj->receptor_id]) }}" class="btn btn-warning btn-sm"><i class="far fa-envelope" style="font-size:14px"></i></a>
+								
 							</td>
 							<td>{{ $msj->usuario_nombre }}</td>
 							<td>{{ $msj->notificacion }}</td>
@@ -57,6 +58,7 @@
 						<tr>
 							<th>
 								<a href="{{ route('mensajes.ver',['mensaje_id' => $msj->mensaje_id,'receptor_id' => $msj->receptor_id]) }}" class="btn btn-warning btn-sm"><i class="far fa-envelope" style="font-size:14px"></i></a>
+								<a href="{{ route('mensajes.eliminar',['mensaje_id' => $msj->mensaje_id,'receptor_id' => $msj->receptor_id]) }}" class="btn btn-danger btn-sm" title="Eliminar mensaje"><i class="fas fa-trash-alt"></i></a>
 							</th>
 							<th>{{ $msj->usuario_nombre }}</th>
 							<th>{{ $msj->notificacion }}</th>

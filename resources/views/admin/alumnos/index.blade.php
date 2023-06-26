@@ -127,8 +127,9 @@
             function undo_alumno(i,n)
             {
                 document.getElementById("e_id").value = i;
-                document.getElementById("e_name").value = n;
-                document.getElementById("prueba").href = "alumnos/"+i+"/destroy";
+                document.getElementById("e_name").value = n;  
+                ruta="{{ url('') }}/admin/alumnos/"+i+"/destroy";                            
+                document.getElementById("prueba").href =ruta;
             }
         </script>
     @endsection

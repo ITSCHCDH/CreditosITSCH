@@ -23,6 +23,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\JefesController; 
 use App\Http\Controllers\STAController;
 use App\Http\Controllers\AlumnosStaController;
+use App\Http\Controllers\GruposController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -201,6 +202,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('mensajes/destinatarios','MensajesController@destinatarios')->name('mensajes.destinatarios');
     Route::get('mensajes/nuevos_mensajes','MensajesController@nuevosMensajes')->name('mensajes.nuevos_mensajes');
     Route::get('mensajes/mensajes_vistos','MensajesController@mensajesVistos')->name('mensajes.vistos');
+    Route::get('mensajes/eliminar','MensajesController@eliminarMensaje')->name('mensajes.eliminar');
 
     Route::get('areas/lista','AreasController@inicio')->name('areas.inicio');
     Route::get('areas/crear','AreasController@crear')->name('areas.crear');
@@ -221,11 +223,38 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('/sta/analisis',[JefesController::class,'index'])->name('analisis.index');
     Route::post('/sta/analisis/generación',[JefesController::class,'generacion'])->name('analisis.generacion');
     Route::get('/sta/analisis/alumno/{nc}',[JefesController::class,'diagnostico'])->name('analisis.alumno'); 
-    Route::get('/sta/analisis/ficha/{nc}',[JefesController::class,'ficha'])->name('analisis.ficha');   
+    Route::get('/sta/analisis/ficha/{nc},/{usr}',[JefesController::class,'ficha'])->name('analisis.ficha'); 
+    Route::get('/sta/pdf/{nc}', [AlumnosStaController::class,'pdf'])->name('analisis.sta.pdf');      
 
     //Rutas profesores
     Route::get('/sta/profesores',[STAController::class,'indexProfesores'])->name('profesores.index'); 
+    Route::post('/sta/units/find',[STAController::class,'findUnits'])->name('units.find');  
     Route::post('/sta/profesores/find',[STAController::class,'findProfesores'])->name('profesores.find');  
+    Route::post('/sta/materias/find',[STAController::class,'findMaterias'])->name('materias.find'); 
+    Route::post('/sta/lista/calificaciones/find',[STAController::class,'findListaCali'])->name('listaCali.find'); 
+    Route::post('/sta/comentarios/guardar',[STAController::class,'saveComent'])->name('comentarios.save');  
+
+    //Rutas departamento de tutorias
+    Route::get('/sta/tutorias',[STAController::class,'indexTutorias'])->name('tutorias.index');
+    Route::post('/sta/tutorias/get/grupos',[GruposController::class,'getGruposCar'])->name('tutorias.getGruposCar');
+    Route::post('/sta/tutorias/save/grupo',[GruposController::class,'saveGrupo'])->name('tutorias.saveGrupo');
+    Route::get('/sta/tutorias/grupos',[GruposController::class,'getGruposAll'])->name('tutorias.getGruposAll');    
+    Route::post('/sta/tutorias/grupos/{id}/update',[GruposController::class,'updateGrupo'])->name('tutorias.updateGrupo');
+    Route::get('/sta/tutorias/grupos/{id}/delete',[GruposController::class,'deleteGrupo'])->name('tutorias.deleteGrupo');
+    Route::post('/sta/tutorias/saveGrupoTutorias',[GruposController::class,'saveGrupoTut'])->name('tutorias.saveGrupoTut');
+    Route::get('/sta/tutorias/tutoriasDestroy/{id}/',[GruposController::class,'tutoriasDestroy'])->name('tutorias.destroy');
+    Route::get('/sta/tutorias/tutoriasEdit/{id}/',[GruposController::class,'tutoriasEdit'])->name('tutorias.tutoriasEdit'); 
+    Route::get('/sta/tutorias/asigTutPDF/{id}/',[GruposController::class,'asigTutPDF'])->name('tutorias.asigTutPDF');
+    Route::get('/sta/tutorias/libTutPDF/{id}/',[GruposController::class,'libTutPDF'])->name('tutorias.libTutPDF');
+
+    //Rutas de tutores
+    Route::get('/sta/tutores',[STAController::class,'indexTutores'])->name('tutores.index');
+    Route::get('/sta/tutores/show/grupo/{id}/{nom}',[STAController::class,'showGrupo'])->name('tutores.showGrupo');
+    Route::post('/sta/tutores/store/grupo',[STAController::class,'storeGrupo'])->name('tutores.storeGrupo');
+    Route::post('/sta/tutores/delete/alumno',[STAController::class,'deleteAlumno'])->name('tutores.deleteAlumno');
+    Route::post('/sta/tutores/store/alumno/observaciones',[JefesController::class,'storeAlumnoObs'])->name('tutores.storeAlumnoObs');
+   
+
 });
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
@@ -238,19 +267,18 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::get('actividades/peticion_evidencia', [AlumnosRutasController::class, 'peticionEvidencia'])->name('alumnos.peticion_evidencia');
     Route::get('actividades/eliminar_evidencia', [AlumnosRutasController::class, 'peticionEliminar'])->name('alumnos.eliminar_evidencia');
     Route::get('constancias/imprimir','AlumnosRutasController@imprimir')->name('alumnos.constancias_imprimir');
-    Route::get('/alumnos/{id}/perfil',[AlumnosController::class,'perfil'])->name('alumnos.perfil');
-    Route::post('/alumnos/{id}/edit/perfil',[AlumnosController::class,'editPerfil'])->name('alumnos.edit.perfil');
+    Route::get('/{id}/perfil',[AlumnosController::class,'perfil'])->name('alumnos.perfil');
+    Route::post('/{id}/edit/perfil',[AlumnosController::class,'editPerfil'])->name('alumnos.edit.perfil');
 
     //Rutas STA alumnos
-    Route::get('alumnos/ficha',[AlumnosStaController::class,'ficha'])->name('alumnos.sta.ficha');    
-    Route::get('alumnos/ficha/guardar/{nc}',[AlumnosStaController::class,'guardarDatFam'])->name('alumnos.sta.ficha.guargar');
-    Route::get('alumnos/editDatSalud/{nc}',[AlumnosStaController::class,'editDatSalud'])->name('alumnos.sta.editDatSalud');
-    Route::get('alumnos/updtDatSalud/{nc}',[AlumnosStaController::class,'updtDatSalud'])->name('alumnos.sta.updtDatSalud');
-    Route::get('alumnos/dfamiliares/guardar/{nc}',[AlumnosStaController::class,'updtDatFam'])->name('alumnos.sta.dfamiliares.guargar');
-    Route::get('alumnos/dsociales/guardar/{nc}',[AlumnosStaController::class,'updtDatSoc'])->name('alumnos.sta.dsociales.guargar');
-    Route::get('alumnos/autorizar/guardar/{nc}',[AlumnosStaController::class,'autorizar'])->name('alumnos.sta.autorizar.guargar');
-    Route::get('alumnos/pdf/{nc}', [AlumnosStaController::class,'pdf'])->name('alumnos.sta.pdf');
-    
+    Route::get('/ficha',[AlumnosStaController::class,'ficha'])->name('alumnos.sta.ficha');    
+    Route::get('/ficha/guardar/{nc}',[AlumnosStaController::class,'guardarDatFam'])->name('alumnos.sta.ficha.guargar');
+    Route::get('/editDatSalud/{nc}',[AlumnosStaController::class,'editDatSalud'])->name('alumnos.sta.editDatSalud');
+    Route::get('/updtDatSalud/{nc}',[AlumnosStaController::class,'updtDatSalud'])->name('alumnos.sta.updtDatSalud');
+    Route::get('/dfamiliares/guardar/{nc}',[AlumnosStaController::class,'updtDatFam'])->name('alumnos.sta.dfamiliares.guargar');
+    Route::get('/dsociales/guardar/{nc}',[AlumnosStaController::class,'updtDatSoc'])->name('alumnos.sta.dsociales.guargar');
+    Route::get('/autorizar/guardar/{nc}',[AlumnosStaController::class,'autorizar'])->name('alumnos.sta.autorizar.guargar');
+    Route::get('/pdf/{nc}', [AlumnosStaController::class,'pdf'])->name('alumnos.sta.pdf');    
 });
 //Route::get('alumnos/login','AlumnosLoginController@showLoginForm')->name('alumnos.login');
 Route::post('alumnos/login','AlumnosLoginController@login')->name('alumnos.login');

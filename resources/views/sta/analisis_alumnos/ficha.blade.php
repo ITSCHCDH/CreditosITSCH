@@ -3,7 +3,7 @@
 @section('title','Alumnos')
 
 @section('ruta')
-    <label class="label label-success"> <a href="#">STA</a> / <a href="{{ route('analisis.index') }}">Jefes de carrera</a>/Ficha del alumno</label> 
+    <label class="label label-success"> <a href="#">STA</a> /Ficha del alumno</label> 
 @endsection
 
 @section('contenido')
@@ -21,28 +21,28 @@
             }else {
                 $enfermedades = "Sí, las siguientes: ";
                 if ($clinicos->diabetes == 'Diabetes') {
-                    $enfermedades = $enfermedades . 'Diabetes ';
+                    $enfermedades = $enfermedades . 'Diabetes, ';
                 }
                 if ($clinicos->hipertension == 'Hipertensión') {
-                    $enfermedades = $enfermedades . 'Hipertensión ';
+                    $enfermedades = $enfermedades . 'Hipertensión, ';
                 }
                 if ($clinicos->epilepsia == 'Epilepsia') {
-                    $enfermedades = $enfermedades . 'Epilepsia ';
+                    $enfermedades = $enfermedades . 'Epilepsia, ';
                 }
                 if ($clinicos->anorexia == 'Anorexia') {
-                    $enfermedades = $enfermedades . 'Anorexia ';
+                    $enfermedades = $enfermedades . 'Anorexia, ';
                 }
                 if ($clinicos->bulimia == 'Bulimia') {
-                    $enfermedades =  $enfermedades . 'Bulimia ';
+                    $enfermedades =  $enfermedades . 'Bulimia, ';
                 }
                 if ($clinicos->sexual == 'Enfermedad de Transmisión Sexual') {
                     $enfermedades = $enfermedades . 'Enfermedad de Transmisión Sexual ';
                 }
                 if ($clinicos->depresion == 'Depresión') {
-                    $enfermedades = $enfermedades . 'Depresión ';
+                    $enfermedades = $enfermedades . 'Depresión, ';
                 }
                 if ($clinicos->tristeza == 'Tristeza Profunda') {
-                    $enfermedades = $enfermedades . 'Tristeza Profunda ';
+                    $enfermedades = $enfermedades . 'Tristeza Profunda, ';
                 }
                 if ($clinicos->otra_enf != '') {
                     $enfermedades = $enfermedades . $clinicos->otra_enf;
@@ -53,16 +53,16 @@
             }else {
                 $discapacidades = "Sí, las siguientes: ";
                 if ($clinicos->vista == 'Vista') {
-                    $discapacidades = $discapacidades . 'Vista ';
+                    $discapacidades = $discapacidades . 'Vista, ';
                 }
                 if ($clinicos->oido == 'Oído') {
-                    $discapacidades = $discapacidades . 'Oído ';
+                    $discapacidades = $discapacidades . 'Oído, ';
                 }
                 if ($clinicos->lenguaje == 'Lenguaje') {
-                    $discapacidades = $discapacidades . 'Lenguaje ';
+                    $discapacidades = $discapacidades . 'Lenguaje, ';
                 }
                 if ($clinicos->motora == 'Motora') {
-                    $discapacidades = $discapacidades . 'Motora ';
+                    $discapacidades = $discapacidades . 'Motora, ';
                 }
                 if ($clinicos->otra_enf != '') {
                     $discapacidades =  $discapacidades . $clinicos->otra_enf;
@@ -94,17 +94,20 @@
          
         <hr style="height: 1px; border:none; background-color: orange;">     
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <b>Numero de Control:</b> {{ $alu1->alu_NumControl }}            
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <b>Nombre:</b> {{ $alu1->alu_Nombre }} {{ $alu1->alu_ApePaterno }} {{$alu1->alu_ApeMaterno }}
             </div>
             <div class="col-sm-4">
                 <b>Carrera:</b> {{$car->car_NombreCorto}}
             </div>
+            <div class="col-sm-2">
+                <a href="{{ route('analisis.sta.pdf',$alu1->alu_NumControl) }}" target="_blank" class="btn btn-primary" title="Imprimir ficha"><i class="fas fa-print"></i></a>
+            </div>
         </div>  
-        <br>
+        <hr style="height: 1px; border:none; background-color: orange;">
         <h5>Datos personales</h5>
         <hr>  
         <div class="row">
@@ -179,19 +182,19 @@
                     <tbody>
                         <tr>
                             <td><b>Nombre del padre:</b></td>
-                            <td>{{ $dPad->nombre }}</td>
+                            <td>{{ $padres[0]->nombre }}</td>
                         </tr>
                         <tr>
                             <td><b>Teléfono:</b> </td>
-                            <td>{{ $dPad->tel }}</td>
+                            <td>{{ $padres[0]->tel }}</td>
                         </tr>
                         <tr>
                             <td><b>Edad:</b></td>
-                            <td>{{ $dPad->edad }}</td>
+                            <td>{{ $padres[0]->edad }}</td>
                         </tr>
                         <tr>
                             <td><b>Trabaja: </b></td>
-                            <td>{{ $dPad->ocupacion }}</td>
+                            <td>{{ $padres[0]->ocupacion }}</td>
                         </tr>
                         <tr>
                             <td><b>Domicilio:</b></td>
@@ -201,7 +204,7 @@
                         </tr>
                         <tr>
                             <td><b>Profesión:</b> </td>
-                            <td>{{ $dPad->profesion }}</td>
+                            <td>{{ $padres[0]->profesion }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -217,19 +220,19 @@
                     <tbody>
                         <tr>
                             <td><b>Nombre de la madre:</b></td>
-                            <td>{{ $dMad->nombre }}</td>
+                            <td>{{ $padres[1]->nombre }}</td>
                         </tr>
                         <tr>
                             <td><b>Teléfono:</b> </td>
-                            <td>{{ $dMad->tel }}</td>
+                            <td>{{ $padres[1]->tel }}</td>
                         </tr>
                         <tr>
                             <td><b>Edad:</b></td>
-                            <td>{{ $dMad->edad }}</td>
+                            <td>{{ $padres[1]->edad }}</td>
                         </tr>
                         <tr>
                             <td><b>Trabaja:</b> </td>
-                            <td>{{ $dMad->ocupacion }}</td>
+                            <td>{{ $padres[1]->ocupacion }}</td>
                         </tr>
                         <tr>
                             <td><b>Domicilio:</b></td>
@@ -239,7 +242,7 @@
                         </tr>
                         <tr>
                             <td><b>Profesión:</b> </td>
-                            <td>{{ $dMad->profesion }}</td>
+                            <td>{{ $padres[1]->profesion }}</td>
                         </tr>
                     </tbody>
                 </table>
