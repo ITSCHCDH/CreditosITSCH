@@ -158,7 +158,7 @@
     {           
         swal({
             title: "¿Estás seguro?",
-            text: "Una vez eliminado el alumno no podrá ser recuperado",
+            text: "En verdad quieres eliminar al alumno del grupo de tutorías",
             icon: "warning",
             buttons: true,
             dangerMode: true,

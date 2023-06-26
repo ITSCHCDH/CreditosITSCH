@@ -52,7 +52,7 @@ class STAController extends Controller
             ->where('d.dep_Clave',$dpto->dep_Clave)
             ->where('c.car_Status','VIGENTE')
             ->where('ca.cat_Status','VI')
-            ->groupBy('ca.cat_Clave')
+            ->groupBy('ca.cat_Clave','d.dep_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
             ->orderBy('ca.cat_Nombre','desc')
             ->get();
         }else if(Auth::User()->hasAnyPermission(['STA_PROFESOR'])){ 
@@ -64,7 +64,7 @@ class STAController extends Controller
             ->join('departamentos as d','r.dep_Clave','=','d.dep_Clave') 
             ->join('catedraticos as ca','ca.dep_Clave','=','d.dep_Clave')            
             ->where('ca.cat_Clave', $cat_Clave)
-            ->groupBy('ca.cat_Clave')
+            ->groupBy('ca.cat_Clave','d.dep_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
             ->get();
         }   
         return response()->json($profesores);       
@@ -139,6 +139,14 @@ class STAController extends Controller
         ->select('reticula.ret_NomCompleto','reticula.ret_NumUnidades','grupossemestre.ret_Clave','grupossemestre.gse_Anio','grupossemestre.gse_Observaciones','grupossemestre.gse_Clave')
         ->orderBy('reticula.ret_NomCompleto','asc')
         ->get();
+
+        //Verificamos si el profesor tiene materias asignadas y si no tiene le asignamos un mensaje de error 500 
+        if($materias->isEmpty()){
+            $materias = array(
+                'error' => '500',
+                'message' => 'El profesor no tiene materias asignadas'
+            );
+        }       
       
         return response()->json($materias);
     }

@@ -141,13 +141,22 @@
                         data:{                           
                             profesor:profesor                                                 
                         },
-                        success: function(materias){                                                                              
-                            $('#materia').empty();                                                    
-                            $.each(materias, function(i, item) {
-                                valor = JSON.stringify(item); 
-                                $('#materia').prepend(`<option value= '${valor}'>${item.ret_NomCompleto}  ${item.gse_Observaciones}</option>`);
-                            });     
-                            $('#materia').prepend(`<option value="" selected>Selecciona una materia</option>`);                        
+                        success: function(materias){                               
+                            //Verificamos si existe un mensaje de error
+                            if(materias.error==500){
+                                $('#materia').empty();  
+                                $('#materia').prepend(`<option value="" selected>No tiene materias asignadas</option>`);
+                                swal('Error',materias.message,'error');                                
+                                return;
+                            }    
+                            else{
+                                $('#materia').empty();                                                    
+                                $.each(materias, function(i, item) {
+                                    valor = JSON.stringify(item); 
+                                    $('#materia').prepend(`<option value= '${valor}'>${item.ret_NomCompleto}  ${item.gse_Observaciones}</option>`);
+                                });     
+                                $('#materia').prepend(`<option value="" selected>Selecciona una materia</option>`);  
+                            }                                         
                         },
                         error: function(e){                        
                             console.log('Error al buscar las materias de este profesor',e);                        

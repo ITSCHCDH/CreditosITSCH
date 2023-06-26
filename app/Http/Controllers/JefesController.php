@@ -223,31 +223,41 @@ class JefesController extends Controller
         ->join('alumnos', 'alumnos.alu_NumControl', '=', 'cardex.alu_NumControl')
         ->where('cardex.alu_NumControl', '=', $nc)
         ->groupBy('alumnos.alu_StatusAct')
-        ->first();
+        ->first(); 
         //Declaramos un arreglo para guardar los semaforos
         $semaforos = [];
 
-        $nivelaciones = $indicesAcad->nivelacionesOrdinario + $indicesAcad->nivelacionesRepe + $indicesAcad->nivelacionesEspecial;
+        // Revisamos que las nivelaciónes no sean nulas        
+        if ($indicesAcad !== null && property_exists($indicesAcad, 'nivelacionesOrdinario')) {
+            // El objeto $indicesAcad no es nulo y tiene la propiedad 'nivelacionesOrdinario'
+            // Calculamos el total de nivelaciones
+            $nivelaciones = $indicesAcad->nivelacionesOrdinario + $indicesAcad->nivelacionesRepe + $indicesAcad->nivelacionesEspecial;
 
-        // Calculamos el semáforo académico
-        switch (true) {
-            case $indicesAcad->especiales > 0 || $nivelaciones >= 10 || $indicesAcad->repeticiones > 2 || $indicesAcad->alu_StatusAct == 'BD':
-                $semaforos['semaforoAcad'] = 'CirculoRojo';
-                break;
-            case ($indicesAcad->repeticiones <= 2 && ($nivelaciones >= 3 && $nivelaciones < 10)) || $indicesAcad->alu_StatusAct == 'BT':
-                $semaforos['semaforoAcad'] = 'CirculoNaranja';
-                break;
-            case $nivelaciones > 1 && $nivelaciones <= 5:
-                $semaforos['semaforoAcad'] = 'CirculoAmarillo';
-                break;
-            case $nivelaciones <= 1:
-                $semaforos['semaforoAcad'] = 'CirculoVerde';
-                break;
-            default:
-                $semaforos['semaforoAcad'] = 'CirculoNegro';
+            // Calculamos el semáforo académico
+            switch (true) {
+                case $indicesAcad->especiales > 0 || $nivelaciones >= 10 || $indicesAcad->repeticiones > 2 || $indicesAcad->alu_StatusAct == 'BD':
+                    $semaforos['semaforoAcad'] = 'CirculoRojo';
+                    break;
+                case ($indicesAcad->repeticiones <= 2 && ($nivelaciones >= 3 && $nivelaciones < 10)) || $indicesAcad->alu_StatusAct == 'BT':
+                    $semaforos['semaforoAcad'] = 'CirculoNaranja';
+                    break;
+                case $nivelaciones > 1 && $nivelaciones < 3:
+                    $semaforos['semaforoAcad'] = 'CirculoAmarillo';
+                    break;
+                case $nivelaciones == 1:
+                    $semaforos['semaforoAcad'] = 'CirculoVerde';
+                    break;
+                default:
+                    $semaforos['semaforoAcad'] = 'CirculoNegro';
+                    break;
+            }
+        } else {
+            // El objeto $indicesAcad es nulo o no tiene la propiedad 'nivelacionesOrdinario'
+            $semaforos['semaforoAcad'] = 'CirculoNegro'; 
+
         }
-
-        $semPsico=2;
+       
+        $semPsico=5;
 
         // Calculamos el semáforo psicológico
         switch ($semPsico) {
@@ -267,7 +277,7 @@ class JefesController extends Controller
                 $semaforos['semaforoPsico'] = 'CirculoNegro';
         }
 
-        $semMedico=1;
+        $semMedico=5;
         // Calculamos el semáforo médico
         switch ($semMedico) {
             case 1:
