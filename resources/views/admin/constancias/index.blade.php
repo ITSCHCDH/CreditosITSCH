@@ -65,14 +65,14 @@
 						@if ($datos_globales->count()>0)
 							@foreach ($users as $user)
 								@if ($datos_globales[0]->jefe_depto==$user->id)
-									<option value = "{{ $user->id }}" selected style="background-color: blue; color: white;">{{ $user->name }}</option>
+									<option value = "{{ $user->id }}" selected style="background-color: blue; color: white;">{{ strtoupper($user->name)  }}</option>
 								@else
-									<option value = "{{ $user->id }}">{{ $user->name }}</option>
+									<option value = "{{ $user->id }}">{{ strtoupper($user->name) }}</option>
 								@endif
 							@endforeach
 						@else
 							@foreach ($users as $user)
-								<option value = "{{ $user->id }}">{{ $user->name }}</option>
+								<option value = "{{ $user->id }}">{{ strtoupper($user->name) }}</option>
 							@endforeach
 						@endif
 					</select>
@@ -125,14 +125,14 @@
 						@if ($datos_globales->count()>0)
 							@foreach ($users as $user)
 								@if ($datos_globales[0]->certificador==$user->id)
-									<option value = "{{ $user->id }}" selected style="background-color: blue; color: white;">{{ $user->name }}</option>
+									<option value = "{{ $user->id }}" selected style="background-color: blue; color: white;">{{ strtoupper($user->name) }}</option>
 								@else
-									<option value = "{{ $user->id }}">{{ $user->name }}</option>
+									<option value = "{{ $user->id }}">{{ strtoupper($user->name) }}</option>
 								@endif
 							@endforeach
 						@else
 							@foreach ($users as $user)
-								<option value = "{{ $user->id }}">{{ $user->name }}</option>
+								<option value = "{{ $user->id }}">{{ strtoupper($user->name) }}</option>
 							@endforeach
 						@endif
 					</select>
