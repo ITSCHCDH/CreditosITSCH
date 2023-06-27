@@ -39,7 +39,8 @@
 							<a href="{{ route('usuarios.edit',$user->id) }}" class="btn btn-warning btn-sm" title="Modificar usuario"><i class="fas fa-user-edit"></i></i></a>							
 						@endif
 						@if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_USUARIOS']))							
-							<a title="Eliminar usuario" href="{{ route('usuarios.destroy',$user->id) }}" onclick="return confirm('¿Estas seguro que deseas eliminarlo?')" class="btn btn-danger btn-sm"><i class="fas fa-user-minus"></i></a>							
+							<a title="Eliminar usuario" class="btn btn-danger btn-sm" onclick="eliminarUsr({{ $user->id }})"><i class="fas fa-user-minus"></i></a>														
+							<form method="get" id="formEliminarUsr"></form>
 						@endif
 						@if (Auth::User()->hasAnyPermission(['VIP','ASIGNAR_REMOVER_ROLES_USUARIOS']))
 							
@@ -57,6 +58,24 @@
 	
 	@section('js')
 		<script>
+			//Codigo para mostrar mensaje de confirmación de eliminación
+			function eliminarUsr(id){											
+				swal({
+					title: "Confirmación",
+					text: "¿Estás seguro de que deseas eliminar este usuario?",
+					icon: "warning",
+					buttons: ["Cancelar", "Aceptar"],
+					}).then(function (result) {
+					if (result) {
+						//Asignamos la ruta con el id del usuario al formEliminarUsr
+						var ruta = "{{ route('usuarios.destroy', ['id' => ':id']) }}";
+						ruta = ruta.replace(':id', id);
+						$("#formEliminarUsr").attr('action',ruta);
+						$("#formEliminarUsr").submit();
+					}
+				});
+			};
+
 			 //Codigo para adornar las tablas con datatables
 			 $(document).ready(function() {
                 $('#tabUsuarios').DataTable({
@@ -95,9 +114,8 @@
                     ],
                     language: {
                         url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
-                    },
-                   
-                });
+                    },                  
+                });				
             });
 		</script>
 	@endsection

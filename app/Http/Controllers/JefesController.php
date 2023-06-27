@@ -244,7 +244,7 @@ class JefesController extends Controller
                 case $nivelaciones > 1 && $nivelaciones < 3:
                     $semaforos['semaforoAcad'] = 'CirculoAmarillo';
                     break;
-                case $nivelaciones == 1:
+                case $nivelaciones <= 1:
                     $semaforos['semaforoAcad'] = 'CirculoVerde';
                     break;
                 default:

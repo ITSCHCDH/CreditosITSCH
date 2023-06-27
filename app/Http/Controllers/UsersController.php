@@ -167,7 +167,7 @@ class UsersController extends Controller
     }
 
 
-    public function destroy($id){
+    public function destroy($id){ 
         if(Auth::User()->id==$id){
             Alert::error('Error','No te puedes autoeliminar');
             return redirect()->route('usuarios.index');
@@ -177,17 +177,18 @@ class UsersController extends Controller
             Alert::error('Error','El usuario no existe');
             return redirect()->route('usuarios.index');
         }
-
         if(Auth::User()->can('VIP')){
             $actividades = DB::table('actividad as a')->where('a.id_user','=',$id)->get()->count()>0? true: false;
             $responsable = DB::table('actividad_evidencia as ae')->where('ae.user_id','=',$id)->orwhere('ae.user_id','=',$id)->get()->count()>0?true:false;
             $roles = DB::table('model_has_roles')->where('model_id','=',$id)->get()->count()>0?true:false;
 
             if($roles || $actividades || $responsable){
-                return redirect()->route('usuarios.index')
-                ->with("error","El usuarios ".$user->name." no puede ser eliminado debido debido a claves foraneas");
+                Alert::error('Error','El usuarios '.$user->name.' no puede ser eliminado debido a que es responsable de actividades, tiene roles asignados o es responsable de evidencias');
+                return redirect()->route('usuarios.index');                
             }
+            
             $user->delete();
+            Alert::success('Correcto','El usuario '.$user->name.' se elimino correctamente');
             return redirect()->back();
         }else{
             if($user->area!=Auth::User()->area){
@@ -210,7 +211,6 @@ class UsersController extends Controller
             Alert::success('Correcto','El usuario se elimino correctamente');
             return redirect()->back();
         }
-
     }
 
     public function asignarRoles($id){

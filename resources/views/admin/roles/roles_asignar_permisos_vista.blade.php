@@ -114,9 +114,40 @@
 					});					
 				}
 				$(document).ready(function(){
-					inicializarArreglo();
+					inicializarArreglo();					
 					$('#tabla_permisos').DataTable({
-						"pagingType":"full_numbers"
+						dom: 'Bfrtip',
+						responsive: {
+							breakpoints: [
+							{name: 'bigdesktop', width: Infinity},
+							{name: 'meddesktop', width: 1366},
+							{name: 'smalldesktop', width: 1280},
+							{name: 'medium', width: 1188},
+							{name: 'tabletl', width: 1024},
+							{name: 'btwtabllandp', width: 848},
+							{name: 'tabletp', width: 768},
+							{name: 'mobilel', width: 600},
+							{name: 'mobilep', width: 320}
+							]
+						},
+						lengthMenu: [
+							[ 7, 10, 25, 50, -1 ],
+							[ '7 reg', '10 reg', '25 reg', '50 reg', 'Ver todo' ]
+						],
+						buttons: [
+							{extend: 'collection', text: 'Exportar',
+								buttons: [
+									{ extend: 'copyHtml5', text: 'Copiar' },
+									'excelHtml5',
+									'pdfHtml5',
+									{ extend: 'print', text: 'Imprimir' },
+								]},
+							{ extend: 'colvis', text: 'Columnas visibles' },
+							{ extend:'pageLength',text:'Ver registros'},
+						],
+						language: {
+							url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+						},
 					});
 					
 					agregarPermisosArreglo();
