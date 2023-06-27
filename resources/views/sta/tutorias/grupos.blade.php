@@ -136,21 +136,26 @@
     <!-- Modal Eliminar-->      
     <div class="modal fade" id="myModalDelete" tabindex="-1" aria-labelledby="myModalDelete" aria-hidden="true">
         <div class="modal-dialog">
-            <form action="{{ route('tutorias.deleteGrupo',$grupo->id) }}" method="get">
-                <div class="modal-content">
-                    <div class="modal-header">
-                    <h5 class="modal-title" id="myModalDelete">Eliminar Grupo</h5>
-                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+            {{-- Creamos un form sin action para cuando la variable grupo no contiene datos --}}
+            @if(isset($grupo))
+                <form action="{{ route('tutorias.deleteGrupo',$grupo->id) }}" method="get">
+            @else
+                <form action="" method="get">
+            @endif            
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="myModalDelete">Eliminar Grupo</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            
+                            <p id="mensaje"></p>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Eliminar</button>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        
-                        <p id="mensaje"></p>
-                    </div>
-                    <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Eliminar</button>
-                    </div>
-                </div>
             </form>
         </div>
     </div>
