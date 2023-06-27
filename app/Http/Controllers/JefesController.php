@@ -9,7 +9,7 @@ use App\Models\Historial_clinico;
 use App\Models\Datos_familiares;
 use App\Models\Motivoreprobacion;
 use Illuminate\Support\Facades\Auth;
-use App\Models\ALumno;
+use App\Models\Alumno;
 use App\Models\Direccion;
 use App\Models\Familiar;
 use App\Models\Personales;
