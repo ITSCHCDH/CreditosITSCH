@@ -138,9 +138,9 @@
         <div class="modal-dialog">
             {{-- Creamos un form sin action para cuando la variable grupo no contiene datos --}}
             @if(isset($grupo))
-                <form action="{{ route('tutorias.deleteGrupo',$grupo->id) }}" method="get">
+                <form action="{{ route('tutorias.deleteGrupo',$grupo->id) }}" method="get" id="formDeleteGrupo">
             @else
-                <form action="" method="get">
+                <form action="" method="get" id="formDeleteGrupo">
             @endif            
                     <div class="modal-content">
                         <div class="modal-header">
@@ -178,7 +178,7 @@
             $("#formUpdateGrupo").attr('action', "{{ URL::to('/admin/sta') }}/tutorias/grupos/"+grupo.id+"/update"); 
         }
 
-        function eliminarGrupo(grupo){
+        function eliminarGrupo(grupo){            
             $("#mensaje").html("¿Estas seguro de eliminar el grupo "+grupo.gpo_Nombre+"?");
             $("#formDeleteGrupo").attr('action', "{{ URL::to('/admin/sta') }}/tutorias/grupos/"+grupo.id+"/delete"); 
         }

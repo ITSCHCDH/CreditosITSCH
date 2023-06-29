@@ -12,7 +12,7 @@
         <div class="col-sm-6"></div>
         <div class="col-sm-2">           
             <a href="{{ route('tutorias.getGruposAll') }}" type="button" class="btn btn-primary" title="Agregar grupo"><i class="fas fa-users"></i></a>
-            <a href="{{ route('analisis.index') }}" class="btn btn-success" title="Analisar alumnos"><i class="fas fa-user-graduate"></i></a>
+            <a href="{{ route('analisis.index') }}" class="btn btn-success" title="Analizar alumnos"><i class="fas fa-user-graduate"></i></a>
         </div>
     </div>
     <hr>
@@ -145,7 +145,7 @@
         //Funcion para llimpiar grupos cuando cambie el semestre
         $("#gtu_Semestre").change(function(){
             $('#selGrupos').empty(); 
-            $("#selGrupos").append("<option value='0' selected='selected'>Seleccione un grupo</option>"); 
+            $("#selGrupos").append("<option value='' selected='selected' >Seleccione un grupo</option>"); 
             //Cambiamos la opción seleccionada del select de carreras
             $("#selCarreras").val(""); 
         });
@@ -163,7 +163,7 @@
                 },
                 success: function(data){                        
                     $('#selGrupos').empty(); 
-                    $("#selGrupos").append("<option value='0' selected='selected'>Seleccione un grupo</option>");  
+                    $("#selGrupos").append("<option value='' selected='selected'>Seleccione un grupo</option>");  
                     $.each(data, function(key, value){ 
                         $('#selGrupos').append('<option value="'+value.id+'">'+value.gpo_Nombre+'</option>');
                     });                                               

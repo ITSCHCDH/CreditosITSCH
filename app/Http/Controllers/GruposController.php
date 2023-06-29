@@ -47,51 +47,80 @@ class GruposController extends Controller
     //Función para guardar los grupos con el modelo Grupo
     public function saveGrupo(Request $request)
     { 
-        //Guarda el grupo si no existe en la tabla de grupos
-        $grupo=Grupo::updateOrCreate(
-            ['gpo_Nombre' => $request->gpo_Nombre],
-            ['gpo_Semestre' => $request->gpo_Semestre, 'id_Carrera' => $request->id_Carrera, 'gpo_Status' => 0]
-        );         
-        if ($grupo->wasRecentlyCreated) {
-            // El grupo no existía y se creó
-            Alert::success('Correcto',"El grupo se ha creado correctamente");
-            //Regresamos a la vista de grupos
-            return redirect()->route('tutorias.getGruposAll');                    
-        } 
-        else {
-            // El usuario ya existía y se actualizó
-            Alert::success('Correcto',"El grupo se ha actualizado correctamente");
+        try
+        {
+             //Verificamos si el grupo existe y solo si no, lo damos de alta
+            $grupoExiste=Grupo::where([
+                ['gpo_Nombre','=',$request->gpo_Nombre],
+                ['id_Carrera','=',$request->id_Carrera],
+                ['gpo_Semestre','=',$request->gpo_Semestre],
+                ['id','<>',$request->id]
+            ])->get()->count()>0?true: false;       
+            if($grupoExiste){
+                Alert::error('Error','Este grupo ya se encuentra dado de alta');
+                return redirect()->back();
+            }
+            //Creamos el grupo
+            $grupo = new Grupo();
+            $grupo->gpo_Nombre = $request->gpo_Nombre;
+            $grupo->id_Carrera = $request->id_Carrera;
+            $grupo->gpo_Status = $request->gpo_Status;
+            $grupo->gpo_Semestre= $request->gpo_Semestre;
+            $grupo->save();
+            Alert::success('Correcto',"El grupo se ha guardado correctamente");
             //Regresamos a la vista de grupos
             return redirect()->route('tutorias.getGruposAll');
-        }        
+        }
+        catch(\Exception $e)
+        {
+            Alert::error('Error','Ocurrio un error al guardar el grupo');
+            return redirect()->back();
+        }            
     }
 
     //Función para eliminar un grupo    
     public function deleteGrupo($id)
-    {
-        //Obtenemos el grupo a eliminar
-        $grupo = Grupo::find($id);
-        //Eliminamos el grupo
-        $grupo->delete();
-        Alert::success('Correcto',"El grupo se ha eliminado correctamente");
-        //Regresamos a la vista de grupos
-        return redirect()->route('tutorias.getGruposAll');
+    {  
+        try
+        {
+            //Obtenemos el grupo a eliminar
+            $grupo = Grupo::find($id);
+            //Eliminamos el grupo
+            $grupo->delete();
+            Alert::success('Correcto',"El grupo se ha eliminado correctamente");
+            //Regresamos a la vista de grupos
+            return redirect()->route('tutorias.getGruposAll');
+        }
+        catch(\Exception $e)
+        {
+            Alert::error('Error','Ocurrio un error al eliminar el grupo, ya que tiene un tutor asignado');
+            return redirect()->back();
+        }
+       
     }
 
     //Función para modificar un grupo
     public function updateGrupo(Request $request, $id)
-    {   
-        //Obtenemos el grupo a modificar
-        $grupo = Grupo::find($id); 
-        //Actualizamos el grupo
-        $grupo->gpo_Nombre = $request->gpo_Nombre;
-        $grupo->id_Carrera = $request->id_Carrera;
-        $grupo->gpo_Status = $request->gpo_Status;
-        $grupo->gpo_Semestre= $request->gpo_Semestre;
-        $grupo->save();
-        Alert::success('Correcto',"El grupo se ha actualizado correctamente");
-        //Regresamos a la vista de grupos
-        return redirect()->route('tutorias.getGruposAll');
+    {   try
+        {
+            //Obtenemos el grupo a modificar
+            $grupo = Grupo::find($id); 
+            //Actualizamos el grupo
+            $grupo->gpo_Nombre = $request->gpo_Nombre;
+            $grupo->id_Carrera = $request->id_Carrera;
+            $grupo->gpo_Status = $request->gpo_Status;
+            $grupo->gpo_Semestre= $request->gpo_Semestre;
+            $grupo->save();
+            Alert::success('Correcto',"El grupo se ha actualizado correctamente");
+            //Regresamos a la vista de grupos
+            return redirect()->route('tutorias.getGruposAll');
+        }
+        catch(\Exception $e)
+        {
+            Alert::error('Error','Ocurrio un error al modificar el grupo');
+            return redirect()->back();
+        }
+       
     }
 
     //Funcion para guardar los grupos de tutorias

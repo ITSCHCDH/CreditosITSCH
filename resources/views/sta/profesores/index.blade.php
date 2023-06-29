@@ -123,7 +123,9 @@
                             $('#profesor').prepend(`<option value="" selected>Selecciona un profesor</option>`);  
                             //Ponemos los datos de la carrera en datos del filtro                                                  
                         },
-                        error: function(e){                        
+                        error: function(e){  
+                            $('#profesor').empty();   
+                            $('#profesor').prepend(`<option value="" selected>No existen profesores asignados</option>`);                        
                             console.log('Error al buscar los profesores de esta carrera',e);                        
                         }
                     });

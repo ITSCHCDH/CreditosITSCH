@@ -12,7 +12,7 @@ use App\Models\Personales;
 use App\Models\Padres;
 use App\Models\Social;
 use Barryvdh\DomPDF\Facade\Pdf;
-
+use Illuminate\Console\View\Components\Alert;
 use Illuminate\Http\Request;
 
 class AlumnosStaController extends Controller
@@ -171,177 +171,208 @@ class AlumnosStaController extends Controller
 
    public function updtDatSalud(Request $request, $nc)
    {
-      $alu = Alumno::where('no_control',$nc)->first();
-      $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
-      if ($request->alu_enf == 'No') {
-          $clinicos->enfermedad = $request->alu_enf;
-          $clinicos->diabetes = "";
-          $clinicos->hipertension = "";
-          $clinicos->epilepsia = "";
-          $clinicos->anorexia = "";
-          $clinicos->bulimia = "";
-          $clinicos->sexual = "";
-          $clinicos->depresion = "";
-          $clinicos->tristeza = "";
-          $clinicos->otra_enf = "";
-      } else {
-          $clinicos->enfermedad = $request->alu_enf;
-          if ($request->fm_diabetes == 'Diabetes') {
-              $clinicos->diabetes = $request->fm_diabetes;
-          }
-          if ($request->fm_hipertencion == 'Hipertensión') {
-              $clinicos->hipertension = $request->fm_hipertencion;
-          }
-          if ($request->fm_epilepsia == 'Epilepsia') {
-              $clinicos->epilepsia = $request->fm_epilepsia;
-          }
-          if ($request->fm_anorexia == 'Anorexia') {
-              $clinicos->anorexia = $request->fm_anorexia;
-          }
-          if ($request->fm_bulimia == 'Bulimia') {
-              $clinicos->bulimia = $request->fm_bulimia;
-          }
-          if ($request->fm_trans_sexual == 'Enfermedad de Transmisión Sexual') {
-              $clinicos->sexual = $request->fm_trans_sexual;
-          }
-          if ($request->fm_depresion == 'Depresión') {
-              $clinicos->depresion = $request->fm_depresion;
-          }
-          if ($request->fm_tristesa == 'Tristeza Profunda') {
-              $clinicos->tristeza = $request->fm_tristesa;
-          }
-          if ($request->fm_otra != '') {
-              $clinicos->otra_enf = $request->fm_otra;
-          }
-      }
-      if ($request->alu_disfi == 'No') {
-          $clinicos->cap_dif = $request->alu_disfi;
-          $clinicos->vista = "";
-          $clinicos->oido = "";
-          $clinicos->lenguaje = "";
-          $clinicos->motora = "";
-          $clinicos->otra_dis = "";
-      } else {
-          $clinicos->cap_dif = $request->alu_disfi;
-          if ($request->fm_dis_vista == 'Vista') {
-              $clinicos->vista = $request->fm_dis_vista;
-          }
-          if ($request->fm_dis_oido == 'Oído') {
-              $clinicos->oido = $request->fm_dis_oido;
-          }
-          if ($request->fm_dis_lenguaje == 'Lenguaje') {
-              $clinicos->lenguaje = $request->fm_dis_lenguaje;
-          }
-          if ($request->fm_dis_motora == 'Motora') {
-              $clinicos->motora = $request->fm_dis_motora;
-          }
-          if ($request->fm_dis_otra != '') {
-              $clinicos->otra_dis = $request->fm_dis_otra;
-          }
-      }
-      if ($request->dx_psicologico == 'No') {
-          $clinicos->dia_psico = $request->dx_psicologico;
-          $clinicos->cuanto_psico = '';
-      } else {
-          $clinicos->dia_psico = $request->dx_psicologico_c;
-          $clinicos->cuanto_psico = $request->dx_psicologico_tm;
-      }
-      if ($request->medRadio == 'No') {
-          $clinicos->dia_med = $request->medRadio;
-          $clinicos->cuanto_med = '';
-      } else {
-          $clinicos->dia_med = $request->dx_medico;
-          $clinicos->cuanto_med = $request->dx_medico_tm;
-      }
-      $clinicos->save();
-      $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();     
-      $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
-      $fam = Datos_familiares::where('id_alu', $alu->id)->first();
-      if ($fam == null) {
-          $fam = new Datos_familiares();
-          $fam->id_alu = $alu->id;
-          $fam->save();
-      }
-      $familiares = Familiar::where('id_alu', $alu->id)->get();     
-      return view('alumnos.sta.dfamiliares', compact('alu1', 'alu', 'fam', 'familiares','alumno_data'));
+        try
+        {
+            $alu = Alumno::where('no_control',$nc)->first();
+            $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
+            if ($request->alu_enf == 'No') {
+                $clinicos->enfermedad = $request->alu_enf;
+                $clinicos->diabetes = "";
+                $clinicos->hipertension = "";
+                $clinicos->epilepsia = "";
+                $clinicos->anorexia = "";
+                $clinicos->bulimia = "";
+                $clinicos->sexual = "";
+                $clinicos->depresion = "";
+                $clinicos->tristeza = "";
+                $clinicos->otra_enf = "";
+            } else {
+                $clinicos->enfermedad = $request->alu_enf;
+                if ($request->fm_diabetes == 'Diabetes') {
+                    $clinicos->diabetes = $request->fm_diabetes;
+                }
+                if ($request->fm_hipertencion == 'Hipertensión') {
+                    $clinicos->hipertension = $request->fm_hipertencion;
+                }
+                if ($request->fm_epilepsia == 'Epilepsia') {
+                    $clinicos->epilepsia = $request->fm_epilepsia;
+                }
+                if ($request->fm_anorexia == 'Anorexia') {
+                    $clinicos->anorexia = $request->fm_anorexia;
+                }
+                if ($request->fm_bulimia == 'Bulimia') {
+                    $clinicos->bulimia = $request->fm_bulimia;
+                }
+                if ($request->fm_trans_sexual == 'Enfermedad de Transmisión Sexual') {
+                    $clinicos->sexual = $request->fm_trans_sexual;
+                }
+                if ($request->fm_depresion == 'Depresión') {
+                    $clinicos->depresion = $request->fm_depresion;
+                }
+                if ($request->fm_tristesa == 'Tristeza Profunda') {
+                    $clinicos->tristeza = $request->fm_tristesa;
+                }
+                if ($request->fm_otra != '') {
+                    $clinicos->otra_enf = $request->fm_otra;
+                }
+            }
+            if ($request->alu_disfi == 'No') {
+                $clinicos->cap_dif = $request->alu_disfi;
+                $clinicos->vista = "";
+                $clinicos->oido = "";
+                $clinicos->lenguaje = "";
+                $clinicos->motora = "";
+                $clinicos->otra_dis = "";
+            } else {
+                $clinicos->cap_dif = $request->alu_disfi;
+                if ($request->fm_dis_vista == 'Vista') {
+                    $clinicos->vista = $request->fm_dis_vista;
+                }
+                if ($request->fm_dis_oido == 'Oído') {
+                    $clinicos->oido = $request->fm_dis_oido;
+                }
+                if ($request->fm_dis_lenguaje == 'Lenguaje') {
+                    $clinicos->lenguaje = $request->fm_dis_lenguaje;
+                }
+                if ($request->fm_dis_motora == 'Motora') {
+                    $clinicos->motora = $request->fm_dis_motora;
+                }
+                if ($request->fm_dis_otra != '') {
+                    $clinicos->otra_dis = $request->fm_dis_otra;
+                }
+            }
+            if ($request->dx_psicologico == 'No') {
+                $clinicos->dia_psico = $request->dx_psicologico;
+                $clinicos->cuanto_psico = '';
+            } else {
+                $clinicos->dia_psico = $request->dx_psicologico_c;
+                $clinicos->cuanto_psico = $request->dx_psicologico_tm;
+            }
+            if ($request->medRadio == 'No') {
+                $clinicos->dia_med = $request->medRadio;
+                $clinicos->cuanto_med = '';
+            } else {
+                $clinicos->dia_med = $request->dx_medico;
+                $clinicos->cuanto_med = $request->dx_medico_tm;
+            }
+            $clinicos->save();
+            $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();     
+            $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
+            $fam = Datos_familiares::where('id_alu', $alu->id)->first();
+            if ($fam == null) {
+                $fam = new Datos_familiares();
+                $fam->id_alu = $alu->id;
+                $fam->save();
+            }
+            $familiares = Familiar::where('id_alu', $alu->id)->get();     
+            return view('alumnos.sta.dfamiliares', compact('alu1', 'alu', 'fam', 'familiares','alumno_data'));
+        }
+        catch(\Illuminate\Database\QueryException $e)
+        {
+            //Regresamos a la pagina anterior con un mensaje de error
+            Alert::error('Error', 'No se pudo actualizar la información, revisa que todos los datos esten correctos');
+            return redirect()->back();
+        }      
    }
 
    public function updtDatFam(Request $request, $nc)
    {
-        $alu = Alumno::where('no_control',$nc)->first();
-        $familiares = Familiar::where('id_alu', $alu->id)->get();
-        foreach ($familiares as &$famil) {
-            $famil->delete();
-        }
+        try
+        {
+            //Buscamos al alumno
+            $alu = Alumno::where('no_control',$nc)->first();
+            $familiares = Familiar::where('id_alu', $alu->id)->get();
+            foreach ($familiares as &$famil) {
+                $famil->delete();
+            }
 
-
-        for ($i = 0; $i < count($request->edad); $i++) {
-            $familiar = new Familiar();
-            $familiar->id_alu = $alu->id;
-            $familiar->nombre = $request->nombre[$i];
-            $familiar->edad = $request->edad[$i];
-            $familiar->escolaridad = $request->escolaridad[$i];
-            $familiar->parentesco = $request->parentesco[$i];
-            $familiar->relacion = $request->actitud[$i];
-            $familiar->save();
-        }
-
-        $fam = Datos_familiares::where('id_alu', $alu->id)->first();
-        if ($request->dif == 'No') {
-            $fam->dificultades = $request->dif;
-        } else {
-            $fam->dificultades = $request->fiden_dificultades;
-        }
-        $fam->ligado = $request->fiden_ligue;
-        $fam->ligado_por = $request->fiden_ligue_T;
-        $fam->edu = $request->fiden_edu;
-        $fam->carrera = $request->fiden_influ;
-        $fam->otro_dato = $request->fiden_otro_dato;
-        $fam->save();
+            //Verificamos que venga algun familiar antes de guardar
+            if (isset($request->nombre[0])  ) {
+                for ($i = 0; $i < count($request->edad); $i++) {
+                    $familiar = new Familiar();
+                    $familiar->id_alu = $alu->id;
+                    $familiar->nombre = $request->nombre[$i];
+                    $familiar->edad = $request->edad[$i];
+                    $familiar->escolaridad = $request->escolaridad[$i];
+                    $familiar->parentesco = $request->parentesco[$i];
+                    $familiar->relacion = $request->actitud[$i];
+                    $familiar->save();
+                }
+            }
         
-        
-        $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
-        $soc = Social::where('id_alu', $alu->id)->first();
-        if ($soc == null) {
-            $soc = new Social();
-            $soc->id_alu = $alu->id;
-            $soc->save();
+
+            $fam = Datos_familiares::where('id_alu', $alu->id)->first();
+            if ($request->dif == 'No') {
+                $fam->dificultades = $request->dif;
+            } else {
+                $fam->dificultades = $request->fiden_dificultades;
+            }
+            $fam->ligado = $request->fiden_ligue;
+            $fam->ligado_por = $request->fiden_ligue_T;
+            $fam->edu = $request->fiden_edu;
+            $fam->carrera = $request->fiden_influ;
+            $fam->otro_dato = $request->fiden_otro_dato;
+            $fam->save();
+            
+            
+            $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
+            $soc = Social::where('id_alu', $alu->id)->first();
+            if ($soc == null) {
+                $soc = new Social();
+                $soc->id_alu = $alu->id;
+                $soc->save();
+            }
+            $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+            return view('alumnos.sta.dsocial', compact('alu1', 'alu', 'soc','alumno_data'));
         }
-        $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
-        return view('alumnos.sta.dsocial', compact('alu1', 'alu', 'soc','alumno_data'));
+        catch(\Illuminate\Database\QueryException $e)
+        {
+            //Regresamos a la pagina anterior con un mensaje de error
+            Alert::error('Error', 'No se pudo actualizar la información, revisa que todos los datos esten correctos');
+            return redirect()->back();
+        }
    }
 
    public function updtDatSoc(Request $request, $nc)
    { 
-        $alu = Alumno::where('no_control',$nc)->first();
-        $soc = Social::where('id_alu', $alu->id)->first();
-        $soc->rel_comp = $request->rel_comp;
-        $soc->comp_por = $request->rel_comp_t;
-        $soc->rel_amig = $request->rel_ami;
-        $soc->amig_por = $request->rel_ami_t;
-        if ($request->alu_par == 'No') {
-            $soc->pareja = $request->alu_par;
-        } else {
-            $soc->pareja = $request->rel_alu_par;
-        }
-        $soc->rel_prof = $request->rel_pro;
-        $soc->prof_por = $request->rel_pro_t;
-        $soc->rel_auto_ac = $request->rel_aut_aca;
-        $soc->auto_ac_por = $request->rel_aut_aca_t;
-        $soc->tiempo_lib = $request->alu_tlibre;
-        $soc->recreativa = $request->alu_act_rec;
-        $soc->planes_in = $request->alu_pl_inme;
-        $soc->metas_vida = $request->alu_metas;
-        $soc->yo_soy = $request->alu_soy;
-        $soc->caracter = $request->alu_caracter;
-        $soc->me_gusta = $request->alu_gusto;
-        $soc->aspiraciones = $request->alu_aspira;
-        $soc->miedo = $request->alu_miedo;
-        $soc->save();
+        try
+        {   
+            $alu = Alumno::where('no_control',$nc)->first();
+            $soc = Social::where('id_alu', $alu->id)->first();
+            $soc->rel_comp = $request->rel_comp;
+            $soc->comp_por = $request->rel_comp_t;
+            $soc->rel_amig = $request->rel_ami;
+            $soc->amig_por = $request->rel_ami_t;
+            if ($request->alu_par == 'No') {
+                $soc->pareja = $request->alu_par;
+            } else {
+                $soc->pareja = $request->rel_alu_par;
+            }
+            $soc->rel_prof = $request->rel_pro;
+            $soc->prof_por = $request->rel_pro_t;
+            $soc->rel_auto_ac = $request->rel_aut_aca;
+            $soc->auto_ac_por = $request->rel_aut_aca_t;
+            $soc->tiempo_lib = $request->alu_tlibre;
+            $soc->recreativa = $request->alu_act_rec;
+            $soc->planes_in = $request->alu_pl_inme;
+            $soc->metas_vida = $request->alu_metas;
+            $soc->yo_soy = $request->alu_soy;
+            $soc->caracter = $request->alu_caracter;
+            $soc->me_gusta = $request->alu_gusto;
+            $soc->aspiraciones = $request->alu_aspira;
+            $soc->miedo = $request->alu_miedo;
+            $soc->save();
 
-        $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
-        $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
-        return view('alumnos.sta.autorizar', compact('alu1', 'alu','alumno_data'));
+            $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
+            $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+            return view('alumnos.sta.autorizar', compact('alu1', 'alu','alumno_data'));
+        }
+        catch(\Illuminate\Database\QueryException $e)
+        {
+            //Regresamos a la pagina anterior con un mensaje de error
+            Alert::error('Error', 'No se pudo actualizar la información, revisa que todos los datos esten correctos');
+            return redirect()->back();
+        }    
    }
 
    public function autorizar($nc)
@@ -351,27 +382,36 @@ class AlumnosStaController extends Controller
 
    public function pdf($nc)
     {
-        $alu = Alumno::where('no_control',$nc)->first();
-        $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
-        $car = DB::connection('contEsc')->table('carreras')->where('car_Clave', $alu1->car_Clave)->first();
-        $alu2 = DB::connection('contEsc')->table('alumcom')->where('alu_NumControl', $alu1->alu_NumControl)->first();
-
-        $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
-
-        $dPad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Padre')->first();
-        $dMad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Madre')->first();
-        $direccion = Direccion::where('id_alu', $alu->id)->first();
-        $direccionP = Direccion::where('id_fam', $dPad->id)->first();
-        $direccionM = Direccion::where('id_fam', $dMad->id)->first();
-
-        $familiares = Familiar::where('id_alu', $alu->id)->get();
-
-        $person = Personales::where('id_alu', $alu->id)->first();
-        $fam = Datos_familiares::where('id_alu', $alu->id)->first();
-        $soc = Social::where('id_alu', $alu->id)->first();
-       
-        $pdf = PDF::setOptions(['defaultFont' => 'sans-serif'])->loadView('alumnos.sta.pdf', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));       
-        return $pdf->stream($alu->no_cont . ".pdf");        
+        try
+        {
+            $alu = Alumno::where('no_control',$nc)->first();
+            $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
+            $car = DB::connection('contEsc')->table('carreras')->where('car_Clave', $alu1->car_Clave)->first();
+            $alu2 = DB::connection('contEsc')->table('alumcom')->where('alu_NumControl', $alu1->alu_NumControl)->first();
+    
+            $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
+    
+            $dPad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Padre')->first();
+            $dMad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Madre')->first();
+            $direccion = Direccion::where('id_alu', $alu->id)->first();
+            $direccionP = Direccion::where('id_fam', $dPad->id)->first();
+            $direccionM = Direccion::where('id_fam', $dMad->id)->first();
+    
+            $familiares = Familiar::where('id_alu', $alu->id)->get();
+    
+            $person = Personales::where('id_alu', $alu->id)->first();
+            $fam = Datos_familiares::where('id_alu', $alu->id)->first();
+            $soc = Social::where('id_alu', $alu->id)->first();
+           
+            $pdf = PDF::setOptions(['defaultFont' => 'sans-serif'])->loadView('alumnos.sta.pdf', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));       
+            return $pdf->stream($alu->no_cont . ".pdf");    
+        }
+        catch(\Illuminate\Database\QueryException $e)
+        {
+            //Regresamos a la pagina anterior con un mensaje de error
+            Alert::error('Error', 'Ocurrio un error al generar el PDF, intentalo de nuevo');
+            return redirect()->back();
+        }           
     }
    
 }
