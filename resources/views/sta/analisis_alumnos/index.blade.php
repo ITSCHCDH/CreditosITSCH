@@ -81,13 +81,13 @@
                         <td>
                             <div class="row">
                                 <div class="col-sm-2">
-                                    <div class="{{ $gru->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="Académico"></div>
+                                    <a href="{{ route('analisis.alumno',$gru->control) }}"><div class="{{ $gru->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="Académico"></div></a>
                                 </div>
                                 <div class="col-sm-2">
-                                    <div class="{{ $gru->semaforos['semaforoMedico'] }}" data-mdb-toggle="tooltip" title="Medico"></div>
+                                    <a href=""><div class="{{ $gru->semaforos['semaforoMedico'] }}" data-mdb-toggle="tooltip" title="Medico"></div></a>
                                 </div>
                                 <div class="col-sm-2">
-                                    <div class="{{ $gru->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div>
+                                    <a href=""><div class="{{ $gru->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div></a>
                                 </div>
                             </div>                           
                         </td>

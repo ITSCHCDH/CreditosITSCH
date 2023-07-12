@@ -67,7 +67,12 @@ class JefesController extends Controller
         ->orderBy('alumnos.alu_ApePaterno', 'asc')       
         ->where('alumnos.car_Clave','=',$request->carrera)
         ->where('alumnos.Alu_AnioIngreso','=',$request->generacion)
-        ->get();   
+        ->get();  
+        
+        //Verificamos que la generación no este vacia
+        if($grupo->isEmpty()){
+            Alert::warning('No hay alumnos registrados en esta generación')->showConfirmButton('Ok', '#3085d6');
+        }
        
         foreach ($grupo as $row) {
             $row->semaforos = self::calSemaforos($row->control);            
