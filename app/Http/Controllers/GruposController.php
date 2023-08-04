@@ -64,7 +64,7 @@ class GruposController extends Controller
             $grupo = new Grupo();
             $grupo->gpo_Nombre = $request->gpo_Nombre;
             $grupo->id_Carrera = $request->id_Carrera;
-            $grupo->gpo_Status = $request->gpo_Status;
+            $grupo->gpo_Status = 0;
             $grupo->gpo_Semestre= $request->gpo_Semestre;
             $grupo->save();
             Alert::success('Correcto',"El grupo se ha guardado correctamente");

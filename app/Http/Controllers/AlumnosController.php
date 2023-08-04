@@ -214,9 +214,9 @@ class AlumnosController extends Controller
 
                 $height=$imgsize[1];              
 
-                if($width<700  &&  $height<700 )
+                if($width<200  &&  $height<200 )
                 { 
-                    Alert::error('Error','El tamaño de las imagenes debe ser de mas de 600px de alto y 600px de ancho');
+                    Alert::error('Error','El tamaño de las imagenes debe ser de mas de 200px de alto y 200px de ancho');
                     return back()->withInput();
                 }
                 //Generamos la ruta donde se guardaran las imagenes de los articulos
