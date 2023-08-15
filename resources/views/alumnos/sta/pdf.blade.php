@@ -113,13 +113,13 @@
         <table>
             <thead>
                 <th width="120px">                    
-                    <img src="{{ asset('images/itsch.jpg') }}" alt="Logo itsch" style="width: 60px;">
+                   {{--   <img src="{{ asset('images/itsch.jpg') }}" alt="Logo itsch" style="width: 60px;">--}}
                 </th>
                 <th>
                     <h5>TECNOLÓGICO NACIONAL DE MÉXICO CAMPUS CIUDAD HIDALGO</h5>
                 </th>
                 <th>
-                    &nbsp; &nbsp; &nbsp;
+                 {{--     &nbsp; &nbsp; &nbsp;
                     @if($alu->foto==null)
                         <img
                             src="{{ asset('images/user.png') }}"
@@ -135,7 +135,7 @@
                             style="width: 50px;"
                         >
                     @endif
-                    
+                    --}}
                 </th>
             </thead>
         </table>        
