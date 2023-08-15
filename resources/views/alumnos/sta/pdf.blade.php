@@ -112,8 +112,8 @@
         
         <table>
             <thead>
-                <th width="120px">
-                    <img src="{{ asset('/images/itsch.jpg') }}" alt="Logo itsch" style="width: 60px;">
+                <th width="120px">                    
+                    <img src="{{ asset('images/itsch.jpg') }}" alt="Logo itsch" style="width: 60px;">
                 </th>
                 <th>
                     <h5>TECNOLÓGICO NACIONAL DE MÉXICO CAMPUS CIUDAD HIDALGO</h5>
@@ -126,14 +126,14 @@
                             alt="Imagen del alumno"
                             class="img-fluid rounded-start"
                             style="width: 50px;"
-                        />
+                        >
                     @else
                         <img
                             src="{{ asset('storage/alumnos/img/'.$alu->foto) }}"
                             alt="Imagen del alumno"
                             class="img-fluid rounded-start"
                             style="width: 50px;"
-                        />
+                        >
                     @endif
                     
                 </th>
