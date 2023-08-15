@@ -100,7 +100,7 @@
 																class="form-control float-input"
 																value="{{ $clinicos->estatura }}" step="0.1" required>
 															<label for='estatura' class="float-label">Estatura
-																<sub>m</sub></label>
+																<sub>cm</sub></label>
 														</div>
 													</div>
 													<div class="col-sm-4">
