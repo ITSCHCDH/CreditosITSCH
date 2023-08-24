@@ -786,7 +786,7 @@
 								</div>
 								<div class="panel-footer center">
 									<hr>
-									<a data-toggle="tooltip" type="button" class="btn btn-danger">Cancelar</a>
+									<a href="{{ route('alumnos.home_avance') }}" data-toggle="tooltip" type="button" class="btn btn-danger">Cancelar</a>
 									<input type="submit" value="Siguiente" class="btn btn-info">
 								</div>
 						</div>
@@ -814,5 +814,41 @@
 		}
 		this.submit();
 		}
+
+		//Codigó para validr que los campos esten llenos
+		$(document).ready(function() {
+			$("form").submit(function(event) {
+				var formValid = true;
+
+				// Validar cada campo del formulario
+				$(this).find("input[type='text'], input[type='email']").each(function() {
+					if ($(this).val() === "") {
+						formValid = false;
+						$(this).addClass("error");
+					} else {
+						$(this).removeClass("error");
+					}
+				});
+
+				// Validar checkbox
+                if (!$("input[type='checkbox']").is(":checked")) {
+                    formValid = false;
+                    $("input[type='checkbox']").addClass("error");
+                } else {
+                    $("input[type='checkbox']").removeClass("error");
+                }
+
+				if (!formValid) {
+					event.preventDefault();
+				}
+			});
+
+			// Eliminar la clase de error al cambiar el contenido del campo
+			$("input[type='text'], input[type='email']").on("input", function() {
+				$(this).removeClass("error");
+			});
+		});
 	</script>
+
+	
 @endsection

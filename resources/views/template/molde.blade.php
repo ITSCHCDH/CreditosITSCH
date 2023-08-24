@@ -23,6 +23,12 @@
         {{-- Estilos sta --}}
         <link rel="stylesheet" href="{{ asset('css/sta/estilos.css') }}" />
 
+        <style>
+            .error {
+                border: 1px solid red;
+            }
+        </style>
+
         @yield('links')
     </head>
     <body>
