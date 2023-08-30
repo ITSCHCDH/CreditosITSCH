@@ -144,8 +144,12 @@
                             <td>{{ $clinicos->sangre }}</td>
                         </tr>
                         <tr>
-                            <td><b>Correo electronico:</b></td>
+                            <td><b>Correo institucional:</b></td>
                             <td>{{ $alu->email }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Correo personal:</b></td>
+                            <td>{{ $alu->emailPer }}</td>
                         </tr>
                         <tr>
                             <td><b>Estado civil:</b></td>
