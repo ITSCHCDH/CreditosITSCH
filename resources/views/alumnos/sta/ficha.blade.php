@@ -441,7 +441,7 @@
 										<div id="datai2" class="panel-collapse collapse" data-parent="#cr">
 											<div class="panel-body">
 												<div class="row">
-													<div class="col-sm-6">
+													<div class="col-sm-4">
 														<div class="form-group bs-float-label">
 															<input type="text" id="tel" name="tel"
 																class="form-control float-input"
@@ -450,16 +450,24 @@
 															<label for="tel" class="float-label">Número de teléfono</label>
 														</div>
 													</div>
-													<div class="col-sm-6">
+													<div class="col-sm-4">
+														<div class="form-group bs-float-label">
+															<input type="email" id="emailPer" name="emailPer" 
+																class="form-control float-input"
+																value="{{ $alu->emailPer }}"
+																required>
+															<label for="emailPer" class="float-label">Correo personal</label>
+														</div>
+													</div>
+													<div class="col-sm-4">
 														<div class="form-group bs-float-label">
 															<input type="email" id="email" name="email" readonly
 																class="form-control float-input"
-																placeholder="Correo Electronico" value="{{ $alu->email }}"
+																value="{{ $alu->email }}"
 																required>
-															<label for="email" class="float-label">Correo
-																Electrónico</label>
+															<label for="email" class="float-label">Correo institucional</label>
 														</div>
-													</div>
+													</div>													
 												</div>
 											</div>
 										</div>

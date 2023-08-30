@@ -21,7 +21,8 @@ class AddTableAlumnos extends Migration
             $table->integer('carrera')->unsigned();
             $table->string('status',35);
             $table->string('foto',30);
-            $table->string('email',35);           
+            $table->string('email',35);    
+            $table->string('emailPer',35);       
             $table->integer('ficha')->nullable();
             $table->string('nombre_i', 30)->nullable();
             $table->string('a_pat', 30)->nullable();

@@ -88,7 +88,7 @@ class AlumnosStaController extends Controller
       $direccion = Direccion::where('id_alu', $alu->id)->first();
       $direccionP = Direccion::where('id_fam', $dPad->id)->first();
       $direccionM = Direccion::where('id_fam', $dMad->id)->first();
-      $alu->email = $request->email;
+      $alu->emailPer = $request->emailPer;
       $alu->tel = $request->tel;
       $alu->est_civ = $request->est_civ;
       $alu->lug_pro = $request->lug;
