@@ -48,7 +48,7 @@ class AlumnosLoginController extends Controller
      * @return Response
      */
     public function authenticate(Request $request)
-    {
+    {   
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {

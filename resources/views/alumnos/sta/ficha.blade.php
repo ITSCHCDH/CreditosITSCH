@@ -452,7 +452,7 @@
 													</div>
 													<div class="col-sm-6">
 														<div class="form-group bs-float-label">
-															<input type="email" id="email" name="email"
+															<input type="email" id="email" name="email" readonly
 																class="form-control float-input"
 																placeholder="Correo Electronico" value="{{ $alu->email }}"
 																required>

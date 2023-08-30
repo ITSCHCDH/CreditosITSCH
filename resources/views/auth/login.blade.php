@@ -65,7 +65,7 @@
                                                 <div class="col-sm-10">
                                                     <div class="form-outline mb-4">
                                                         <input type="password" id="password" class="form-control form-control-lg" name="password" required/>
-                                                        <label class="form-label" for="password">Password</label>
+                                                        <label class="form-label" for="password" id="passwd">Password</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-2">
@@ -106,13 +106,15 @@
                     event.preventDefault();
                     var tipo_val = $(this).val();
                     if(tipo_val==0){
-                        $("#user").text("email@cdhidalgo.tecnm.mx");
+                        $("#user").text("no_control@cdhidalgo.tecnm.mx");
                         $('#frm_login').attr('action', "{{ route('alumnos.login') }}");
+                        $('#passwd').text('Password del SICE');
                         $('#email').attr('name','email');
                         $('#email').attr('type','text');
                     }else{
                         $("#user").text("Email address");
                         $('#frm_login').attr('action', "{{ route('login') }}");
+                        $('#passwd').text('Password');
                         $('#email').attr('name','email');
                         $('#email').attr('type','email');
                     }
