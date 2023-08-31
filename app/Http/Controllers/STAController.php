@@ -279,7 +279,7 @@ class STAController extends Controller
 
     //Funcion para mostrar los grupos de tutorias
     public function showGrupo($id, $gpo_Nombre)
-    {
+    {  
         //Llamamos a la función para completar el grupo
         $grupo = $this->completarGrupo($id); 
         //Obtenemos el año actual
@@ -302,12 +302,25 @@ class STAController extends Controller
             $alumno->status=$alumnoTem->alu_StatusAct;           
         }
 
+        //Agregamos la ficha de cada alumno del grupo
+        foreach($alumnosGrupo as $alumno)   
+        {
+            $ficha = DB::table('alumnos')
+            ->where('no_control',$alumno->no_Control)
+            ->first();
+            //Si no existe la ficha le asignamos un valor de 0
+            if($ficha==null)
+                $alumno->ficha=0;
+            else            
+                $alumno->ficha=$ficha->ficha;
+        }        
+       
          //Creamos una instancia de la clase JefesController
          $jefe = new JefesController;
 
          foreach ($alumnosGrupo as $row) {             
              $row->semaforos = $jefe->calSemaforos($row->no_Control);            
-         }        
+         }     
              
         return view('sta.tutores.showGrupo',compact('grupo','alumnos','alumnosGrupo'));
     }

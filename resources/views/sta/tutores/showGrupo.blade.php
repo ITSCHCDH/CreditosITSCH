@@ -87,7 +87,11 @@
                     <td>
                         <a class="btn btn-danger" onclick="eliminar('{{ $alumno->no_Control }}')" title="Eliminar"><i class="fas fa-trash-alt"></i></a>                       
                         <a href="{{ route('analisis.alumno',$alumno->no_Control) }}" class="btn btn-primary" title="Ver más"><i class="far fa-eye"></i></a>
-                        <a href="{{ route('analisis.ficha',[$alumno->no_Control,2]) }}" class="btn btn-secondary" title="Ver ficha"><i class="fas fa-file-invoice"></i></a>
+                        @if($alumno->ficha==1)
+                            <a href="{{ route('analisis.ficha',[$alumno->no_Control,2]) }}" class="btn btn-secondary" title="Ver ficha"><i class="fas fa-file-invoice"></i></a>
+                        @else
+                            <button class="btn btn-light" title="Alumno sin ficha"><i class="fas fa-file-invoice"></i></button>
+                        @endif
                     </td>
                 </tr>
             @endforeach           
@@ -207,6 +211,7 @@
             }
         });
     });
+
     //Codigo para adornar las tablas con datatables
     $(document).ready(function() {
         $('#tabGrupoTut').DataTable({

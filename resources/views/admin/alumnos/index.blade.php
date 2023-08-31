@@ -24,14 +24,15 @@
     <div class="table-responsive">
         <table class="table" id="tabla-alumnos">
             <thead>
-            <th>ID</th>
-            <th>Numero de Control</th>
-            <th>Nombre</th>
-            <th>Carrera</th>
-            <th>Estatus</th>
-            @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS','MODIFICAR_ALUMNOS']))
-                <th>Acciónes</th>
-            @endif
+                <th>ID</th>
+                <th>Numero de Control</th>
+                <th>Nombre</th>
+                <th>Carrera</th>
+                <th>Correo</th>
+                <th>Estatus</th>
+                @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS','MODIFICAR_ALUMNOS']))
+                    <th>Acciónes</th>
+                @endif
             </thead>
             <tbody>
             </tbody>
@@ -116,6 +117,7 @@
                         {data: 'no_control'},
                         {data: 'nombre'},
                         {data: 'carrera'},
+                        {data: 'email'},
                         {data: 'status', orderable: true, searchable: false},
                         {data: 'acciones', orderable: false, searchable: false}
                     ],

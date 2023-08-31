@@ -72,10 +72,10 @@
                                     <a class="dropdown-item" href="{{ route('analisis.index') }}">Jefes de carrera</a>
                                 @endif
                                 @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_PROFESOR'))                                    
-                                    <a class="dropdown-item" href="{{ route('profesores.index') }}">Profesores</a>
+                                    <a class="dropdown-item" href="{{ route('profesores.index') }}">Profesor</a>
                                 @endif
                                 @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_TUTOR'))                          
-                                    <a class="dropdown-item" href="{{ route('tutores.index') }}">Tutores</a>
+                                    <a class="dropdown-item" href="{{ route('tutores.index') }}">Tutor</a>
                                 @endif
                                 @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_DEP_TUTORIA'))                                     
                                     <a class="dropdown-item" href="{{ route('tutorias.index') }}">Departamento tutorias</a>

@@ -337,7 +337,7 @@ class AlumnosStaController extends Controller
    { 
         try
         {   
-            $alu = Alumno::where('no_control',$nc)->first();
+            $alu = Alumno::where('no_control',$nc)->first();           
             $soc = Social::where('id_alu', $alu->id)->first();
             $soc->rel_comp = $request->rel_comp;
             $soc->comp_por = $request->rel_comp_t;
@@ -364,7 +364,7 @@ class AlumnosStaController extends Controller
             $soc->save();
 
             $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
-            $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+            $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();          
             return view('alumnos.sta.autorizar', compact('alu1', 'alu','alumno_data'));
         }
         catch(\Illuminate\Database\QueryException $e)
@@ -376,7 +376,10 @@ class AlumnosStaController extends Controller
    }
 
    public function autorizar($nc)
-   {        
+   {     
+        $alu = Alumno::where('no_control',$nc)->first();  
+        $alu->ficha = 1;
+        $alu->save();
         return redirect()->route('alumnos.sta.pdf', $nc);
    }
 

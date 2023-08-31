@@ -36,7 +36,7 @@ class AlumnosController extends Controller
 
     public function cargarAlumnosAjax(Request $request) {
         try {
-            $selectColumns = ['alu.nombre','alu.no_control','alu.status','alu.id as alumno_id','a.nombre as carrera'];
+            $selectColumns = ['alu.nombre','alu.no_control','alu.email','alu.status','alu.id as alumno_id','a.nombre as carrera'];
             $dtAttr = new DataTableAttr($request, $selectColumns);
 
             $alumnos = DB::table('alumnos as alu')
