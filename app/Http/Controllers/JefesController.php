@@ -299,7 +299,50 @@ class JefesController extends Controller
                 break;
             default:
                 $semaforos['semaforoMedico'] = 'CirculoNegro';
-        }         
+        }     
+                   
+        //Verificamos si el alumno ya tiene registrado el servicio social en cardex
+        $listaDeClaves = [720,790,791,792,793,794,838]; // Lista de valores que quieres verificar
+        $ssExists = DB::connection('contEsc')->table('cardex')
+        ->where('cardex.alu_NumControl', '=', $nc)
+        ->whereIn('cardex.ret_Clave', $listaDeClaves)
+        ->exists(); // Devuelve true o false  
+       
+        //cambiamos el semaforo si el alumno ya tiene registrado el servicio social
+        if($ssExists)
+        { 
+            $semaforos['semaforoServicio'] = 'CirculoVerde';
+        }
+        else
+        {
+            $status= DB::connection('contEsc')->table('alumnos')
+            ->select('alumnos.alu_NumControl','alumnos.alu_SemestreAct','alumnos.alu_StatusAct','planesestudios.pes_CredTot','alumnos.alu_CreditosAcum','alumnos.alu_Inscrito')        
+            ->join('planesestudios','planesestudios.pes_Clave','=','alumnos.pes_Clave')  
+            ->join('listasSemestre','listassemestre.alu_NumControl','=','alumnos.alu_NumControl')     
+            ->where('alumnos.alu_NumControl','=',$nc)->first(); 
+            //Calculamos el avance en creditos acumulados
+            $credAcum=($status->alu_CreditosAcum*100)/$status->pes_CredTot; 
+
+            if($status->alu_SemestreAct<=7)
+            { 
+                $semaforos['semaforoServicio'] = 'CirculoAzul';
+            }
+            else if($status->alu_SemestreAct==8 && $credAcum>=80)
+            {
+                $semaforos['semaforoServicio'] = 'CirculoNaranja';
+            }
+            else if($status->alu_SemestreAct>9 && $credAcum>=80)
+            {
+                $semaforos['semaforoServicio'] = 'CirculoRojo';
+            }  
+            else
+            {
+                $semaforos['semaforoServicio'] = 'CirculoNegro';
+            }
+        }
+            
+       
+       
 
         return $semaforos;
     }

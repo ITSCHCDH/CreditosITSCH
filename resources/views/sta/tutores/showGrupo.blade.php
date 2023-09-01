@@ -82,6 +82,26 @@
                             <div class="col-sm-2">
                                 <div class="{{ $alumno->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div>
                             </div>
+                            <div class="col-sm-2">
+                                <div class="{{ $alumno->semaforos['semaforoServicio'] }}" data-mdb-toggle="tooltip" title="
+                                    @switch($alumno->semaforos['semaforoServicio'])
+                                        @case('CirculoVerde')
+                                            Servicio social liberado                                    
+                                            @break
+                                        @case('CirculoAzul')
+                                            Aún no reúne los requisitos para el servicio social
+                                            @break
+                                        @case('CirculoRojo')
+                                            Servicio social retrasado
+                                            @break
+                                        @case('CirculoAmarillo')
+                                            Verificar que el alumno este realizando servicio social                                   
+                                            @break
+                                        @default
+                                            Valor por defecto en caso de que no coincida con ningún caso
+                                    @endswitch
+                                "></div>
+                            </div>
                         </div> 
                     </td>
                     <td>
