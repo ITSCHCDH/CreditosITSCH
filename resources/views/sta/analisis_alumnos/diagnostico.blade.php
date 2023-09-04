@@ -36,13 +36,15 @@
                     <th scope="col" style="text-align: center">Académico</th>
                     <th scope="col" style="text-align: center">Psicológico</th>
                     <th scope="col" style="text-align: center">Médico</th>
+                    <th scope="col" style="text-align: center">Servicio Social</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><div class="{{ $alumnos->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="Académico"></div></td>
+                    <td><div class="{{ $alumnos->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="{{  $alumnos->semaforos['titleAcad'] }}"></div></td>
                     <td><div class="{{ $alumnos->semaforos['semaforoMedico'] }}" data-mdb-toggle="tooltip" title="Medico"></div></td>
-                    <td><div class="{{ $alumnos->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div></td>                      
+                    <td><div class="{{ $alumnos->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicologico"></div></td> 
+                    <td><div class="{{ $alumnos->semaforos['semaforoServicio'] }}" data-mdb-toggle="tooltip" title="{{ $alumnos->semaforos['titleSS'] }}"></div></td>                     
                 </tr>
             </tbody>
         </table>
