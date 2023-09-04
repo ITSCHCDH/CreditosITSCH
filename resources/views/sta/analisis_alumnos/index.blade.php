@@ -73,6 +73,9 @@
                                 @break
                             @case('VI')
                                 Vigente
+                                @break   
+                            @case('EG')
+                                Egresado
                                 @break                        
                             @default
                                 Sin status                       
@@ -96,7 +99,11 @@
                         </td>
                         <td>
                             <a href="{{ route('analisis.alumno',$gru->control) }}" class="btn btn-primary" title="Ver más"><i class="fas fa-search-plus"></i></a>
-                            <a href="{{ route('analisis.ficha',[$gru->control,1]) }}" class="btn btn-secondary" title="Ver ficha"><i class="fas fa-file-invoice"></i></a>
+                            @if($gru->ficha==1)
+                                <a href="{{ route('analisis.ficha',[$gru->control,1]) }}" class="btn btn-secondary" title="Ver ficha"><i class="fas fa-file-invoice"></i></a>
+                            @else
+                                <button class="btn btn-light" title="Alumno sin ficha"><i class="fas fa-file-invoice"></i></button>
+                            @endif                            
                         </td>
                     </tr>                
                 @endforeach

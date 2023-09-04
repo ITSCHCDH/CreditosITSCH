@@ -56,7 +56,7 @@ return [
         
         
         //Conexión a base de datos de prueba con mysql
-       /* 'contEsc' => [
+       /*'contEsc' => [
             'driver' => 'mysql',           
             'host' => env('DB_HOST_SECOND', ''),
             'port' => env('DB_PORT_SECOND', ''),

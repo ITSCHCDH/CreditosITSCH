@@ -68,6 +68,16 @@ class JefesController extends Controller
         ->where('alumnos.car_Clave','=',$request->carrera)
         ->where('alumnos.Alu_AnioIngreso','=',$request->generacion)
         ->get();  
+
+        //Verificamos si los alumnos ya llenaron su ficha
+        foreach($grupo as $alu)
+        {
+            $aluFicha=Alumno::where('no_control',$alu->control)->select('ficha')->first();
+            if(is_null($aluFicha))
+                $alu->ficha=0;
+            else
+                $alu->ficha=$aluFicha->ficha;
+        }
         
         //Verificamos que la generación no este vacia
         if($grupo->isEmpty()){
@@ -265,10 +275,12 @@ class JefesController extends Controller
                     $semaforos['titleAcad'] = 'No se pudo calcular el semáforo académico';
                     break;
             }
-        } else {
+        } 
+        else 
+        {
             // El objeto $indicesAcad es nulo o no tiene la propiedad 'nivelacionesOrdinario'
             $semaforos['semaforoAcad'] = 'CirculoNegro'; 
-
+            $semaforos['titleAcad'] = 'Este alumno aún no tiene indicadores académicos registrados';
         }
        
         $semPsico=5;
@@ -327,8 +339,7 @@ class JefesController extends Controller
         {
             $status= DB::connection('contEsc')->table('alumnos')
             ->select('alumnos.alu_NumControl','alumnos.alu_SemestreAct','alumnos.alu_StatusAct','planesestudios.pes_CredTot','alumnos.alu_CreditosAcum','alumnos.alu_Inscrito')        
-            ->join('planesestudios','planesestudios.pes_Clave','=','alumnos.pes_Clave')  
-            ->join('listasSemestre','listassemestre.alu_NumControl','=','alumnos.alu_NumControl')     
+            ->join('planesestudios','planesestudios.pes_Clave','=','alumnos.pes_Clave')                
             ->where('alumnos.alu_NumControl','=',$nc)->first(); 
 
             //Verificamos si la variable es nula y en caso afirmativo enviamos el semaforo negro
@@ -339,35 +350,39 @@ class JefesController extends Controller
             }
             else
             {
-                //Calculamos el avance en creditos acumulados
-                $credAcum=($status->alu_CreditosAcum*100)/$status->pes_CredTot; 
-
-                if($status->alu_SemestreAct<=7)
-                { 
-                    $semaforos['semaforoServicio'] = 'CirculoAzul';
-                    $semaforos['titleSS'] = 'Este alumno aún no reune los requicitos para tramitar servicio social';
-                }
-                else if($status->alu_SemestreAct==8 && $credAcum>=80)
-                {
-                    $semaforos['semaforoServicio'] = 'CirculoNaranja';
-                    $semaforos['titleSS'] = 'Verificar que el alumno este realizando servicio social';
-                }
-                else if($status->alu_SemestreAct>9 && $credAcum>=80)
-                {
-                    $semaforos['semaforoServicio'] = 'CirculoRojo';
-                    $semaforos['titleSS'] = 'Servicio social retrasado, urgente dar seguimiento';
-                }  
-                else
+                if($status->alu_StatusAct=='BT'||$status->alu_StatusAct=='BD')
                 {
                     $semaforos['semaforoServicio'] = 'CirculoNegro';
-                    $semaforos['titleSS'] = 'Este alumno no tiene registros de servicio social';
+                    $semaforos['titleSS'] = 'El status del alumno es baja, consultar con servicios escolares';
                 }
+                else
+                {
+                    //Calculamos el avance en creditos acumulados
+                    $credAcum=($status->alu_CreditosAcum*100)/$status->pes_CredTot; 
+
+                    if($status->alu_SemestreAct<=7)
+                    { 
+                        $semaforos['semaforoServicio'] = 'CirculoAzul';
+                        $semaforos['titleSS'] = 'Este alumno aún no reune los requicitos para tramitar servicio social';
+                    }
+                    else if($status->alu_SemestreAct==8 && $credAcum>=80)
+                    {
+                        $semaforos['semaforoServicio'] = 'CirculoNaranja';
+                        $semaforos['titleSS'] = 'Verificar que el alumno este realizando servicio social';
+                    }
+                    else if($status->alu_SemestreAct>=9)
+                    {
+                        $semaforos['semaforoServicio'] = 'CirculoRojo';
+                        $semaforos['titleSS'] = 'Servicio social retrasado, urgente dar seguimiento';
+                    }  
+                    else
+                    {
+                        $semaforos['semaforoServicio'] = 'CirculoNegro';
+                        $semaforos['titleSS'] = 'Este alumno no tiene registros de servicio social';
+                    }
+                }               
             }           
         }
-            
-       
-       
-
         return $semaforos;
     }
 
