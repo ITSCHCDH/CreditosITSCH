@@ -123,9 +123,11 @@ class JefesController extends Controller
        
         //Consultamos las observaciones de cada alumno y las agregamos a $buscarAlumno
         $obs=DB::table('alumnos')->where('no_control',$nc)->select('observaciones')->first();
-        $buscarAlumno->observaciones =$obs->observaciones;  
-
-
+        if(is_null($obs))
+            $buscarAlumno->observaciones = "Sin observaciones";
+        else
+            $buscarAlumno->observaciones =$obs->observaciones;
+            
         if($buscarAlumno->alu_Sexo == "F"){
             $buscarAlumno->alu_Sexo = "Femenino";
         }else{
