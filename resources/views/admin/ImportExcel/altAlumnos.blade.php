@@ -9,14 +9,16 @@
 @section('contenido')
 	<div class="col-sm-12 bg-light text-center">		
   		<h5>Este modulo permite la importacion masiva de alumnos, para ello necesitaremos un archivo de excel que contenga los siguientes datos: </h5> 		
-		<b>Columnas del archivo(Nota: solo contenido, el archivo no debe tener encabezados):</b> 
+		<b>Columnas del archivo:</b> 
 		<br>
-		<p>No., Numero de control, Nombre del alumno, Password, Nombre de carrera y Id_Carrera</p>
+		<p>Numero de control, Nombre del alumno, Password, Nombre de carrera y Id_Carrera</p>
 		<p><b>Ejemplo:</b></p>
-		<p>9 |	C17030393 |	ALEJANDRO ROMAN GONZALEZ |	P-n58N_ |	ING. INDUSTRIAL |	2</p> 
+		<p>Control |  Nombre  |   Password    |  Correo   |   Carrera    |   Clave Carr   |</p>
+		<p>C17030393 |	ALEJANDRO ROMAN GONZALEZ |	P-n57uH |	ING. INDUSTRIAL |	2  |</p> 
 		<h6>Para obtener los ID de las carreras en el archivo de excel, usar la siguiente formula:</h6>
-		<p>"=SI(E2="ING. INDUSTRIAL",2,SI(E2="ING. SIST COMP",3,SI(E2="ING. MECATRONICA",5,SI(E2="ING. BIOQUIMICA",6,SI(E2="ING. EN GES EMP",7,SI(E2="ING. EN TICS",9,SI(E2="ING. NANOTEC",10,"")))))))"</p>
-		</p>		
+		<p><b>Office en español:</b> "=SI(E2="ING. INDUSTRIAL",2,SI(E2="ING. SIST COMP",3,SI(E2="ING. MECATRONICA",5,SI(E2="ING. BIOQUIMICA",6,SI(E2="ING. EN GES EMP",7,SI(E2="ING. EN TICS",9,SI(E2="ING. NANOTEC",10,"")))))))"</p>
+		<p><b>Office en ingles:</b> "=IF(E2="ING. INDUSTRIAL",2,IF(E2="ING. SIST COMP",3,IF(E2="ING. MECATRONICA",5,IF(E2="ING. BIOQUIMICA",6,IF(E2="ING. EN GES EMP",7,IF(E2="ING. EN TICS",9,IF(E2="ING. NANOTEC",10,"")))))))"</p>				
+		<p><b>Nota: LAs claves obtenerlas en otro archivo, ya que el que se va a subir, solo debe contener texto, no formulas!</b></p>
 	</div>	
 	<div class="row">			
 		<div class="col-sm-2 ">				
