@@ -22,19 +22,20 @@
         <div class="col-sm-1"></div>
     </div>   
     <div class="row">
-        <div class="col-sm-7"></div>
-        <div class="col-sm-4">
+        <div class="col-sm-6"></div>
+        <div class="col-sm-5">
             {{-- Agregamos un select con todos los alumnos --}}
             <div class="input-group mb-3">
                 <div class="input-group-prepend" style="max-width: 200px">  
-                    <input type="text" id="searchInput" class="form-control" placeholder="Buscar">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Buscar" list="listNoControl">
                 </div>              
                 <select name="alumno" id="alumno" class="form-control mr-2">
                     <option value="">Selecciona un alumno</option>
                     @foreach($alumnos as $alu)
                         <option value="{{ $alu->alu_NumControl }}">{{ $alu->alu_NumControl }} - {{ $alu->alu_Nombre }} {{ $alu->alu_ApePaterno }} {{ $alu->alu_ApeMaterno }}</option>
                     @endforeach
-                </select>          
+                </select>  
+                <input type="text" class="form-control" id="listNoControl" list="listNoControl" placeholder="Agregar lista de alumnos">        
             </div>
         </div>
         <div class="col-sm-1">
@@ -110,8 +111,66 @@
         //Verificamos que se seleccione algo en el select si no marcamos un error
         if($('#alumno').val() == '')
         {
-            swal('Error','Selecciona un alumno','error');
-            return false;
+            if($('#listNoControl').val()=='')
+            {
+                swal('Error','No existen alumnos para agregar','error');
+                return false;
+            }
+            else
+            {
+                // Obtenemos la lista de números de control
+                var listNoControl = $('#listNoControl').val();
+
+                // Separamos los números de control que están separados por espacio, coma o punto y coma
+                var noControl = listNoControl.split(/[ ,;]/);
+
+                // Ajax que recorree el arreglo de numeros de control y los agrega al grupo de tutorias
+                var gpo_Nombre = "{{ $grupo[0]->gpo_Nombre }}"; 
+                //Hacemos un ciclo para recorrer la lista de numeros de control y darlos de alta 
+                for(var i=0;i<noControl.length;i++)
+                {
+                    //Verificamos que el alumno no se haya registrado en la tabla
+                    var existe = false;
+                    $('#tabGrupoTut tbody tr').each(function(){
+                        var num = $(this).find('td').eq(1).text();
+                        if(num == noControl[i])
+                        {
+                            existe = true;
+                        }
+                    });
+                    if(existe)
+                    {
+                        swal('Error','El alumno ya se encuentra registrado en el grupo de tutorias','error');
+                        return false;
+                    }
+                    else
+                    {
+                        $.ajax({
+                            url: "{{ route('tutores.storeGrupo') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                gpo_Nombre: gpo_Nombre,
+                                no_Control: noControl[i],                        
+                            },
+                            success: function(response){                       
+                                  return true;          
+                            },
+                            error: function(xhr, status, error){
+                                swal('Error','Algo salio mal, intentelo de nuevo','error');
+                            }
+                        });
+                    }                    
+                }       
+                //Refrescamos la pagina
+                swal('Exito','Alumnos agregados al grupo de tutorias','success')
+                .then((value) => {
+                    window.location.reload();
+                });       
+                //Limpiamos el campo listNoControl
+                $('#listNoControl').val('');                
+                return false;
+            }            
         }
         else
         {
@@ -252,5 +311,7 @@
             },            
         });
     });
+
+  
 </script>
 @endsection
