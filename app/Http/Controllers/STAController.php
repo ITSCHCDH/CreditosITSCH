@@ -301,7 +301,7 @@ class STAController extends Controller
             //Verificamos que el alumno exista en la base de datos
             if($alumnoTem===null)
             {
-                $alumno->alu_Nombre='NO EXISTE';
+                $alumno->alu_Nombre='EL ALUMNO NO EXISTE, VERIFICA SU NUMERO DE CONTROL!';
             }                
             else 
             {
