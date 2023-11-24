@@ -35,7 +35,7 @@
                         <option value="{{ $alu->alu_NumControl }}">{{ $alu->alu_NumControl }} - {{ $alu->alu_Nombre }} {{ $alu->alu_ApePaterno }} {{ $alu->alu_ApeMaterno }}</option>
                     @endforeach
                 </select>  
-                <input type="text" class="form-control" id="listNoControl" list="listNoControl" placeholder="Agregar lista de alumnos">        
+                <input type="text" class="form-control" id="listNoControl" list="listNoControl" placeholder="Agregar lista de numeros de control">        
             </div>
         </div>
         <div class="col-sm-1">
