@@ -299,11 +299,15 @@ class STAController extends Controller
             ->where('alu_NumControl',$alumno->no_Control)
             ->first();
             //Verificamos que el alumno exista en la base de datos
-            if($alumnoTem==null)
+            if($alumnoTem===null)
+            {
                 $alumno->alu_Nombre='NO EXISTE';
-            else            
+            }                
+            else 
+            {
                 $alumno->alu_Nombre=strtoupper($alumnoTem->alu_Nombre).' '.strtoupper($alumnoTem->alu_ApePaterno).' '.strtoupper($alumnoTem->alu_ApeMaterno);     
-                $alumno->status=$alumnoTem->alu_StatusAct;           
+                $alumno->status=$alumnoTem->alu_StatusAct; 
+            }                             
         }
 
         //Agregamos la ficha de cada alumno del grupo
