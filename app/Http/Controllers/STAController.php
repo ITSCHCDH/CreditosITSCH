@@ -292,15 +292,18 @@ class STAController extends Controller
        
         //Obtenemos los alumnos del grupo
         $alumnosGrupo=GpoTutorias::where('gpo_Nombre',$gpo_Nombre)->get(); 
-        //Agregamos el nombre del alumno al grupo
-        dd($alumnosGrupo);
+        //Agregamos el nombre del alumno al grupo        
         foreach($alumnosGrupo as $alumno)
         {
             $alumnoTem = DB::connection('contEsc')->table('alumnos')
             ->where('alu_NumControl',$alumno->no_Control)
             ->first();
-            $alumno->alu_Nombre=strtoupper($alumnoTem->alu_Nombre).' '.strtoupper($alumnoTem->alu_ApePaterno).' '.strtoupper($alumnoTem->alu_ApeMaterno);     
-            $alumno->status=$alumnoTem->alu_StatusAct;           
+            //Verificamos que el alumno exista en la base de datos
+            if($alumnoTem==null)
+                $alumno->alu_Nombre='NO EXISTE';
+            else            
+                $alumno->alu_Nombre=strtoupper($alumnoTem->alu_Nombre).' '.strtoupper($alumnoTem->alu_ApePaterno).' '.strtoupper($alumnoTem->alu_ApeMaterno);     
+                $alumno->status=$alumnoTem->alu_StatusAct;           
         }
 
         //Agregamos la ficha de cada alumno del grupo
