@@ -293,6 +293,7 @@ class STAController extends Controller
         //Obtenemos los alumnos del grupo
         $alumnosGrupo=GpoTutorias::where('gpo_Nombre',$gpo_Nombre)->get(); 
         //Agregamos el nombre del alumno al grupo
+        dd($alumnosGrupo);
         foreach($alumnosGrupo as $alumno)
         {
             $alumnoTem = DB::connection('contEsc')->table('alumnos')
