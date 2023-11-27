@@ -397,5 +397,48 @@ class STAController extends Controller
             return response()->json(['message' => 'No se pudo eliminar el registro'], 500);
         }
     }
+
+    //Función que devuelve los alumnos de un grupo, materias y calificaciones
+    public function analisisGrupo($id)
+    {
+        //Obtenemos el grupo
+        $grupo = $this->completarGrupo($id); 
+        //Obtenemos los alumnos del grupo
+        $alumnosGrupo=GpoTutorias::where('gpo_Nombre',$grupo[0]->gpo_Nombre)->get();       
+        //Agregamos el nombre del alumno al grupo
+        foreach($alumnosGrupo as $alumno)
+        {
+            $alumnoTem = DB::connection('contEsc')->table('alumnos')
+            ->where('alu_NumControl',$alumno->no_Control)
+            ->first();
+            //Verificamos que el alumno exista en la base de datos
+            if($alumnoTem===null)
+            {
+                $alumno->alu_Nombre='EL ALUMNO NO EXISTE, VERIFICA SU NUMERO DE CONTROL!';
+            }                
+            else 
+            {
+                $alumno->alu_Nombre=strtoupper($alumnoTem->alu_Nombre).' '.strtoupper($alumnoTem->alu_ApePaterno).' '.strtoupper($alumnoTem->alu_ApeMaterno);     
+                $alumno->status=$alumnoTem->alu_StatusAct; 
+            }                             
+        } 
+        //Agregamos las materias que curso cada alumno del grupo
+        foreach($alumnosGrupo as $alumno)
+        {
+            $materias = DB::connection('contEsc')->table('listassemestre')
+            ->join('grupossemestre','listassemestre.gse_Clave','=','grupossemestre.gse_Clave')
+            ->join('reticula','grupossemestre.ret_Clave','=','reticula.ret_Clave')
+            ->join('listassemestrecom','listassemestre.lse_Clave','=','listassemestrecom.lse_clave')
+            ->where('listassemestre.alu_NumControl',$alumno->no_Control)
+            ->select('listassemestre.alu_NumControl','reticula.ret_NomCorto','listassemestrecom.lsc_NumUnidad','listassemestrecom.lsc_Calificacion')
+            ->get();
+          
+           
+                $alumno->materias=$materias;
+        }
+        //dd($alumnosGrupo);
+             
+        return view('sta.tutores.analisis',compact('grupo','alumnosGrupo'));
+    }
    
 }

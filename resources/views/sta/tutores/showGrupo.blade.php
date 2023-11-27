@@ -40,7 +40,7 @@
         </div>
         <div class="col-sm-1">
             <a onclick="agregar()" class="btn btn-primary" title="Agregar alumno al grupo"><i class="fas fa-plus"></i></a>
-            
+            <a href="{{ route('tutores.analisisGrupo',$grupo[0]->id) }}" class="btn btn-secondary" title="Analizar grupo"><i class="far fa-eye"></i></a>
         </div>
     </div>
     <table class="table" id="tabGrupoTut">
