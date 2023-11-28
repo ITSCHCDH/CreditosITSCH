@@ -119,6 +119,7 @@
             }
             else
             {
+                
                 // Obtenemos la lista de números de control
                 var listNoControl = $('#listNoControl').val();
 
@@ -157,8 +158,15 @@
                             success: function(response){                       
                                   return true;          
                             },
-                            error: function(xhr, status, error){
-                                swal('Error','Algo salio mal, intentelo de nuevo','error');
+                            error: function(xhr, status, error, mensaje){                                
+                                // Capturar el mensaje de error desde la respuesta JSON
+                                var errorMessage = "";
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                } else {
+                                    errorMessage = "Error en la solicitud al servidor (HTTP "+xhr.status+")";
+                                }                               
+                                swal('Error', errorMessage, 'error');
                             }
                         });
                     }                    
@@ -311,8 +319,6 @@
                 url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
             },            
         });
-    });
-
-  
+    });  
 </script>
 @endsection

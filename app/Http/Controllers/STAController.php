@@ -368,13 +368,21 @@ class STAController extends Controller
     {
         try
         {
-            //Guardamos el numero de contro y grupo en la tabla gpoTutorias            
-            GpoTutorias::updateOrCreate(
-                ['no_Control' => $request->no_Control],
-                ['gpo_Nombre' => $request->gpo_Nombre]
-            );
-            //Retornamos status 200 y el mensaje de que se guardo correctamente
-            return response()->json(['message' => 'Correcto'], 200);          
+            //Verificamos que el numero de control exista en la base de datos de control escolar
+            $alumno = DB::connection('contEsc')->table('alumnos')
+            ->where('alu_NumControl',$request->no_Control)
+            ->first();
+            if($alumno==null)
+                return response()->json(['message' => 'El alumno con numero de control: '. $request->no_Control .', no existe en la base de datos de control escolar'], 500);
+            else{
+                //Guardamos el numero de control y grupo en la tabla gpoTutorias            
+                GpoTutorias::updateOrCreate(
+                    ['no_Control' => $request->no_Control],
+                    ['gpo_Nombre' => $request->gpo_Nombre]
+                );
+                //Retornamos status 200 y el mensaje de que se guardo correctamente
+                return response()->json(['message' => 'Correcto'], 200);  
+            }        
         }
         catch(\Exception $e)
         {
