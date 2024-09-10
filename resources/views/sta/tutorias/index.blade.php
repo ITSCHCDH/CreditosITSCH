@@ -176,8 +176,8 @@
         
         //Funcion para eliminar un grupo de tutorias
         function eliminarGrupo(grupo){                    
-            $("#miModalLabel").text('Eliminar grupo de tutorias');
-            $("#mensaje").text('¿Esta seguro de eliminar el grupo de tutorias '+grupo.gpo_Nombre+'?');
+            $("#miModalLabel").text('Eliminar asignación de tutorias');
+            $("#mensaje").text('¿Esta seguro de eliminar la la asignación con el grupo '+grupo.gpo_Nombre+'?');
             $("#formEliminar").attr('action', "{{ URL::to('/admin/sta') }}/tutorias/tutoriasDestroy/"+grupo.id);
             $("#idGrupo").val(grupo.gpo_Id);
             $("#gpo_Nombre").val(grupo.gpo_Nombre);
