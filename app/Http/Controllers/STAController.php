@@ -225,22 +225,37 @@ class STAController extends Controller
         ->orderBy('gpo_Nombre','asc')
         ->get(); 
         
-        //Obtenemos el nombre de la carrera y lo agregamos al objeto $gruTutorias
-        foreach($gruTutorias as $gru)
-        {
-            $carrera = DB::connection('contEsc')->table('carreras')
-            ->where('car_Clave',$gru->car_Clave)
-            ->first();
-            $gru->car_Nombre=$carrera->car_Nombre;
+        // Obtén todas las claves de carrera en un solo paso
+        $carClaves = $gruTutorias->pluck('car_Clave')->toArray();
+
+        // Realiza una sola consulta para obtener los nombres de las carreras
+        $carreras = DB::connection('contEsc')->table('carreras')
+            ->whereIn('car_Clave', $carClaves)
+            ->get()
+            ->keyBy('car_Clave'); // Usa keyBy para organizar por car_Clave
+
+        // Agrega el nombre de la carrera a cada objeto $gru
+        foreach($gruTutorias as $gru) {
+            if (isset($carreras[$gru->car_Clave])) {
+                $gru->car_Nombre = $carreras[$gru->car_Clave]->car_Nombre;
+            }
         }
 
-        //Obtenemos el nombre del profesor y lo agregamos al objeto $gruTutorias
-        foreach($gruTutorias as $gru)
-        {
-            $profesor = User::where('id',$gru->tut_Clave)
-            ->first();
-            $gru->name=strtoupper($profesor->name); 
+        // Obtén todas las claves tut_Clave de los tutores
+        $tutClaves = $gruTutorias->pluck('tut_Clave')->toArray();
+
+        // Realiza una sola consulta para obtener los nombres de los profesores
+        $profesores = User::whereIn('id', $tutClaves)
+            ->get()
+            ->keyBy('id'); // Organiza por id para acceso rápido
+
+        // Agrega el nombre del profesor en cada objeto $gru
+        foreach ($gruTutorias as $gru) {
+            if (isset($profesores[$gru->tut_Clave])) {
+                $gru->name = strtoupper($profesores[$gru->tut_Clave]->name);
+            }
         }
+    
 
         return view('sta.tutorias.index',compact('profesores','carreras','gruTutorias')); 
     }
