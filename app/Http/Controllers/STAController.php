@@ -305,38 +305,43 @@ class STAController extends Controller
         ->select('alu_NumControl','alu_Nombre','alu_ApePaterno','alu_ApeMaterno')
         ->get();       
        
-        //Obtenemos los alumnos del grupo
-        $alumnosGrupo=GpoTutorias::where('gpo_Nombre',$gpo_Nombre)->get(); 
-        //Agregamos el nombre del alumno al grupo        
-        foreach($alumnosGrupo as $alumno)
-        {
-            $alumnoTem = DB::connection('contEsc')->table('alumnos')
-            ->where('alu_NumControl',$alumno->no_Control)
-            ->first();
-            //Verificamos que el alumno exista en la base de datos
-            if($alumnoTem===null)
-            {
-                $alumno->alu_Nombre='EL ALUMNO NO EXISTE, VERIFICA SU NUMERO DE CONTROL!';
-            }                
-            else 
-            {
-                $alumno->alu_Nombre=strtoupper($alumnoTem->alu_Nombre).' '.strtoupper($alumnoTem->alu_ApePaterno).' '.strtoupper($alumnoTem->alu_ApeMaterno);     
-                $alumno->status=$alumnoTem->alu_StatusAct; 
-            }                             
-        }
+        // Obtén todos los alumnos del grupo en una sola consulta
+        $alumnosGrupo = GpoTutorias::where('gpo_Nombre', $gpo_Nombre)->get();
 
-        //Agregamos la ficha de cada alumno del grupo
-        foreach($alumnosGrupo as $alumno)   
-        {
-            $ficha = DB::table('alumnos')
-            ->where('no_control',$alumno->no_Control)
-            ->first();
-            //Si no existe la ficha le asignamos un valor de 0
-            if($ficha==null)
-                $alumno->ficha=0;
-            else            
-                $alumno->ficha=$ficha->ficha;
-        }        
+        // Obtén los números de control de los alumnos del grupo
+        $noControles = $alumnosGrupo->pluck('no_Control')->toArray();
+
+        // Consulta todos los datos de los alumnos correspondientes a los números de control en una sola consulta
+        $alumnosDatos = DB::connection('contEsc')->table('alumnos')
+            ->whereIn('alu_NumControl', $noControles)
+            ->get()
+            ->keyBy('alu_NumControl');
+
+        // Consulta las fichas de los alumnos en una sola consulta
+        $fichas = DB::table('alumnos')
+            ->whereIn('no_control', $noControles)
+            ->get()
+            ->keyBy('no_control');
+
+        // Itera sobre los alumnos del grupo y agrega los datos correspondientes
+        foreach ($alumnosGrupo as $alumno) {
+            // Verifica si el alumno existe en la base de datos contEsc
+            if (isset($alumnosDatos[$alumno->no_Control])) {
+                $alumnoTem = $alumnosDatos[$alumno->no_Control];
+                $alumno->alu_Nombre = strtoupper($alumnoTem->alu_Nombre) . ' ' . strtoupper($alumnoTem->alu_ApePaterno) . ' ' . strtoupper($alumnoTem->alu_ApeMaterno);
+                $alumno->status = $alumnoTem->alu_StatusAct;
+            } else {
+                $alumno->alu_Nombre = 'EL ALUMNO NO EXISTE, VERIFICA SU NUMERO DE CONTROL!';
+            }
+
+            // Asigna la ficha correspondiente, o 0 si no existe
+            if (isset($fichas[$alumno->no_Control])) {
+                $alumno->ficha = $fichas[$alumno->no_Control]->ficha;
+            } else {
+                $alumno->ficha = 0;
+            }
+        }
+      
        
          //Creamos una instancia de la clase JefesController
          $jefe = new JefesController;
