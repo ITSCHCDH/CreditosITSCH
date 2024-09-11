@@ -72,38 +72,33 @@ class STAController extends Controller
 
     public function obtCatClave()
     {
-        $catClave=0;
-        //Obtenemos el usuario que esta conectado           
-        $userName=Auth::User()->name;
-        //Convertimos el nombre del usuario a minusculas sin acentos
-        $userName=strtolower($userName);
-        $userName=$this->quitarCaracteres($userName);
-        //Obtenemos la lista de catedraticos para comparar con el nombre del usuario
-        $catedraticos = DB::connection('contEsc')->table('catedraticos as ca')
-        ->select('cat_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
-        ->get();
-        //Concatenamos los nombres y apellidos de los catedraticos
-        foreach($catedraticos as $catedratico){
-            $catNombre=$catedratico->cat_Nombre;
-            $catApePat=$catedratico->cat_ApePat;
-            $catApeMat=$catedratico->cat_ApeMat;
-            $catNombre=strtolower($catNombre);
-            $catApePat=strtolower($catApePat);
-            $catApeMat=strtolower($catApeMat);
-            $catNombre=$catNombre." ".$catApePat." ".$catApeMat;
-            //Llamamos a la funcion quitar caracteres especiales
-            $catNombre=$this->quitarCaracteres($catNombre);            
-            //Verificamos la similitud entre el nombre del usuario y el nombre del catedrático          
+        $catClave = 0;
+        // Obtener el nombre del usuario autenticado y procesarlo
+        $userName = Auth::User()->name;
+        $userName = strtolower($this->quitarCaracteres($userName));  // Minúsculas y sin caracteres especiales
+        
+        // Obtener la lista de catedráticos con nombres y apellidos en una sola consulta
+        $catedraticos = DB::connection('contEsc')->table('catedraticos')
+            ->select('cat_Clave', 'cat_Nombre', 'cat_ApePat', 'cat_ApeMat')
+            ->get();
+    
+        // Iterar sobre los catedráticos y comparar nombres procesados
+        foreach ($catedraticos as $catedratico) {
+            // Procesar el nombre completo del catedrático
+            $catNombre = strtolower($this->quitarCaracteres("{$catedratico->cat_Nombre} {$catedratico->cat_ApePat} {$catedratico->cat_ApeMat}"));
+            
+            // Verificar la similitud entre el nombre del usuario y el nombre del catedrático
             similar_text($userName, $catNombre, $similarity);
-            $threshold = 85; // Establece el umbral de similitud mínimo requerido
+            $threshold = 85; // Umbral de similitud mínimo requerido
             if ($similarity >= $threshold) {
                 $catClave = $catedratico->cat_Clave;
-                //Salimos del ciclo foreach
-                break;
+                break;  // Salir del bucle cuando se encuentre una coincidencia
             }
         }
-        return $catClave;        
+    
+        return $catClave;
     }
+    
 
     //Función para quitar caracteres especiales a una cadena
     function quitarCaracteres($cadena){
@@ -359,12 +354,10 @@ class STAController extends Controller
         }
       
        
-         //Creamos una instancia de la clase JefesController
-         $jefe = new JefesController;
-
-         foreach ($alumnosGrupo as $row) {             
-             $row->semaforos = $jefe->calSemaforos($row->no_Control);            
-         }     
+       // Asumiendo que calSemaforos es ahora estático
+        foreach ($alumnosGrupo as $row) {             
+            $row->semaforos = JefesController::calSemaforos($row->no_Control);            
+        }    
              
         return view('sta.tutores.showGrupo',compact('grupo','alumnos','alumnosGrupo'));
     }
@@ -452,47 +445,49 @@ class STAController extends Controller
         }
     }
 
-    //Función que devuelve los alumnos de un grupo, materias y calificaciones
     public function analisisGrupo($id)
     {
-        //Obtenemos el grupo
+        // Obtener el grupo completo con una sola consulta
         $grupo = $this->completarGrupo($id); 
-        //Obtenemos los alumnos del grupo
-        $alumnosGrupo=GpoTutorias::where('gpo_Nombre',$grupo[0]->gpo_Nombre)->get();       
-        //Agregamos el nombre del alumno al grupo
-        foreach($alumnosGrupo as $alumno)
-        {
-            $alumnoTem = DB::connection('contEsc')->table('alumnos')
-            ->where('alu_NumControl',$alumno->no_Control)
-            ->first();
-            //Verificamos que el alumno exista en la base de datos
-            if($alumnoTem===null)
-            {
-                $alumno->alu_Nombre='EL ALUMNO NO EXISTE, VERIFICA SU NUMERO DE CONTROL!';
-            }                
-            else 
-            {
-                $alumno->alu_Nombre=strtoupper($alumnoTem->alu_Nombre).' '.strtoupper($alumnoTem->alu_ApePaterno).' '.strtoupper($alumnoTem->alu_ApeMaterno);     
-                $alumno->status=$alumnoTem->alu_StatusAct; 
-            }                             
-        } 
-        //Agregamos las materias que curso cada alumno del grupo
-        foreach($alumnosGrupo as $alumno)
-        {
-            $materias = DB::connection('contEsc')->table('listassemestre')
-            ->join('grupossemestre','listassemestre.gse_Clave','=','grupossemestre.gse_Clave')
-            ->join('reticula','grupossemestre.ret_Clave','=','reticula.ret_Clave')
-            ->join('listassemestrecom','listassemestre.lse_Clave','=','listassemestrecom.lse_clave')
-            ->where('listassemestre.alu_NumControl',$alumno->no_Control)
-            ->select('listassemestre.alu_NumControl','reticula.ret_NomCorto','listassemestrecom.lsc_NumUnidad','listassemestrecom.lsc_Calificacion')
-            ->get();
-          
-           
-                $alumno->materias=$materias;
+        
+        // Obtener los alumnos del grupo
+        $alumnosGrupo = GpoTutorias::where('gpo_Nombre', $grupo[0]->gpo_Nombre)->get();
+    
+        // Obtener todos los alumnos y sus datos en una sola consulta
+        $noControles = $alumnosGrupo->pluck('no_Control'); // Recolectar los no_Control de los alumnos
+        $alumnosTem = DB::connection('contEsc')->table('alumnos')
+            ->whereIn('alu_NumControl', $noControles)
+            ->get()
+            ->keyBy('alu_NumControl'); // Indexar por número de control para acceso rápido
+    
+        // Verificar y asignar datos del alumno en el grupo
+        foreach($alumnosGrupo as $alumno) {
+            if (isset($alumnosTem[$alumno->no_Control])) {
+                $alumnoTem = $alumnosTem[$alumno->no_Control];
+                $alumno->alu_Nombre = strtoupper($alumnoTem->alu_Nombre) . ' ' . strtoupper($alumnoTem->alu_ApePaterno) . ' ' . strtoupper($alumnoTem->alu_ApeMaterno);
+                $alumno->status = $alumnoTem->alu_StatusAct;
+            } else {
+                $alumno->alu_Nombre = 'EL ALUMNO NO EXISTE, VERIFICA SU NUMERO DE CONTROL!';
+            }
         }
-        //dd($alumnosGrupo);
-             
-        return view('sta.tutores.analisis',compact('grupo','alumnosGrupo'));
+    
+        // Obtener todas las materias y calificaciones de los alumnos en una sola consulta
+        $materias = DB::connection('contEsc')->table('listassemestre')
+            ->join('grupossemestre', 'listassemestre.gse_Clave', '=', 'grupossemestre.gse_Clave')
+            ->join('reticula', 'grupossemestre.ret_Clave', '=', 'reticula.ret_Clave')
+            ->join('listassemestrecom', 'listassemestre.lse_Clave', '=', 'listassemestrecom.lse_clave')
+            ->whereIn('listassemestre.alu_NumControl', $noControles)
+            ->select('listassemestre.alu_NumControl', 'reticula.ret_NomCorto', 'listassemestrecom.lsc_NumUnidad', 'listassemestrecom.lsc_Calificacion')
+            ->get()
+            ->groupBy('alu_NumControl'); // Agrupar materias por número de control
+    
+        // Asignar materias a cada alumno
+        foreach($alumnosGrupo as $alumno) {
+            $alumno->materias = $materias->get($alumno->no_Control, collect()); // Si no hay materias, asigna una colección vacía
+        }
+    
+        return view('sta.tutores.analisis', compact('grupo', 'alumnosGrupo'));
     }
+    
    
 }

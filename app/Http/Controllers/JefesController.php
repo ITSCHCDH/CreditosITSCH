@@ -236,7 +236,7 @@ class JefesController extends Controller
         -> with('materias',$materias);				      
     }
 
-    public function calSemaforos($nc) {
+    public static function calSemaforos($nc) {
         
         $indicesAcad = DB::connection('contEsc')->table("cardex")
         ->select(
