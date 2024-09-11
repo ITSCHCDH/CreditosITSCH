@@ -260,37 +260,53 @@ class STAController extends Controller
         return view('sta.tutorias.index',compact('profesores','carreras','gruTutorias')); 
     }
 
-    //Función para vista de tutores
     public function indexTutores()
-    {   
-        if( Auth::User()->can('VIP_STA'))        
-            $grupos=AsignacionTutores::all();        
-        else       
-            $grupos=AsignacionTutores::where('tut_Clave',Auth::user()->id)->get();        
-        //Agregamos el nombre del tutor al grupo
-        foreach($grupos as $gru)
-        {
-            $tutor = User::where('id',$gru->tut_Clave)
-            ->first();
-            $gru->name=strtoupper($tutor->name); 
+    {
+        // Obtener el usuario autenticado
+        $user = Auth::User();
+        
+        // Obtener los grupos dependiendo de los permisos
+        if ($user->can('VIP_STA')) {        
+            $grupos = AsignacionTutores::all();        
+        } else {       
+            $grupos = AsignacionTutores::where('tut_Clave', $user->id)->get();        
         }
-        //Agregamos el nombre del grupo al grupo de tutorias
-        foreach($grupos as $gru)
-        {
-            $grupo = Grupo::where('id',$gru->gpo_Id)
-            ->first();
-            $gru->gpo_Nombre=strtoupper($grupo->gpo_Nombre); 
+    
+        // Extraer las claves necesarias
+        $tutClaves = $grupos->pluck('tut_Clave')->toArray();
+        $gpoIds = $grupos->pluck('gpo_Id')->toArray();
+        $carClaves = $grupos->pluck('car_Clave')->toArray();
+    
+        // Consultar los tutores, grupos y carreras en bloque
+        $tutores = User::whereIn('id', $tutClaves)->get()->keyBy('id');
+        $gruposInfo = Grupo::whereIn('id', $gpoIds)->get()->keyBy('id');
+        $carreras = DB::connection('contEsc')->table('carreras')
+            ->whereIn('car_Clave', $carClaves)
+            ->get()
+            ->keyBy('car_Clave');
+    
+        // Iterar sobre los grupos y agregar la información correspondiente
+        foreach ($grupos as $gru) {
+            // Asignar nombre del tutor
+            if (isset($tutores[$gru->tut_Clave])) {
+                $gru->name = strtoupper($tutores[$gru->tut_Clave]->name);
+            }
+    
+            // Asignar nombre del grupo
+            if (isset($gruposInfo[$gru->gpo_Id])) {
+                $gru->gpo_Nombre = strtoupper($gruposInfo[$gru->gpo_Id]->gpo_Nombre);
+            }
+    
+            // Asignar nombre de la carrera
+            if (isset($carreras[$gru->car_Clave])) {
+                $gru->car_Nombre = strtoupper($carreras[$gru->car_Clave]->car_Nombre);
+            }
         }
-        //Agregamos el nombre de la carrera al grupo de tutorias
-        foreach($grupos as $gru)
-        {
-            $carrera = DB::connection('contEsc')->table('carreras')
-            ->where('car_Clave',$gru->car_Clave)
-            ->first();
-            $gru->car_Nombre=strtoupper($carrera->car_Nombre);
-        }
-        return view('sta.tutores.index',compact('grupos'));
+    
+        // Retornar la vista con los datos
+        return view('sta.tutores.index', compact('grupos'));
     }
+    
 
     //Funcion para mostrar los grupos de tutorias
     public function showGrupo($id, $gpo_Nombre)
