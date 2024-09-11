@@ -353,35 +353,45 @@ class STAController extends Controller
         return view('sta.tutores.showGrupo',compact('grupo','alumnos','alumnosGrupo'));
     }
 
-    //Función para completar un grupo con la información de nombre de tutor, carrera y grupo
     public function completarGrupo($id)
     {              
-        $grupo=AsignacionTutores::where('id',$id)->get();  
-         //Agregamos el nombre del tutor al grupo
-         foreach($grupo as $gru)
-         {
-             $tutor = User::where('id',$gru->tut_Clave)
-             ->first();
-             $gru->nomTutor=strtoupper($tutor->name); 
-         } 
-         //Agregamos el nombre del grupo al grupo de tutorias
-         foreach($grupo as $gru)
-         {
-             $grupoTem = Grupo::where('id',$gru->gpo_Id)
-             ->first();
-             $gru->gpo_Nombre=strtoupper($grupoTem->gpo_Nombre); 
-         }  
-         //Agregamos el nombre de la carrera al grupo de tutorias
-         foreach($grupo as $gru)
-         {
-             $carrera = DB::connection('contEsc')->table('carreras')
-             ->where('car_Clave',$gru->car_Clave)
-             ->first();
-             $gru->car_Nombre=strtoupper($carrera->car_Nombre);
-         }      
-         
+        // Obtén la información del grupo
+        $grupo = AsignacionTutores::where('id', $id)->get();  
+    
+        // Extraer las claves de tutor, grupo y carrera
+        $tutClaves = $grupo->pluck('tut_Clave')->toArray();
+        $gpoIds = $grupo->pluck('gpo_Id')->toArray();
+        $carClaves = $grupo->pluck('car_Clave')->toArray();
+    
+        // Obtener los datos de los tutores, grupos y carreras en una sola consulta
+        $tutores = User::whereIn('id', $tutClaves)->get()->keyBy('id');
+        $grupos = Grupo::whereIn('id', $gpoIds)->get()->keyBy('id');
+        $carreras = DB::connection('contEsc')->table('carreras')
+            ->whereIn('car_Clave', $carClaves)
+            ->get()
+            ->keyBy('car_Clave');
+    
+        // Iterar sobre el grupo y agregar los datos del tutor, grupo y carrera
+        foreach ($grupo as $gru) {
+            // Asignar el nombre del tutor
+            if (isset($tutores[$gru->tut_Clave])) {
+                $gru->nomTutor = strtoupper($tutores[$gru->tut_Clave]->name);
+            }
+    
+            // Asignar el nombre del grupo
+            if (isset($grupos[$gru->gpo_Id])) {
+                $gru->gpo_Nombre = strtoupper($grupos[$gru->gpo_Id]->gpo_Nombre);
+            }
+    
+            // Asignar el nombre de la carrera
+            if (isset($carreras[$gru->car_Clave])) {
+                $gru->car_Nombre = strtoupper($carreras[$gru->car_Clave]->car_Nombre);
+            }
+        }
+    
         return $grupo;
     }
+    
 
     //Función para guardar los alumnos de un grupo
     public function storeGrupo(Request $request)

@@ -62,56 +62,66 @@ class JefesController extends Controller
 
     public function generacion(Request $request)
     { 
+        // Obtener el grupo de alumnos basado en carrera y año de ingreso
         $grupo = DB::connection('contEsc')->table('alumnos')         
-        ->select("alu_NumControl AS control","alu_ApePaterno AS aPaterno","alu_ApeMaterno AS aMaterno","alu_Nombre AS nombre","alu_SemestreAct AS semestre",'alu_StatusAct AS status')
-        ->orderBy('alumnos.alu_ApePaterno', 'asc')       
-        ->where('alumnos.car_Clave','=',$request->carrera)
-        ->where('alumnos.Alu_AnioIngreso','=',$request->generacion)
-        ->get();  
-
-        //Verificamos si los alumnos ya llenaron su ficha
-        foreach($grupo as $alu)
-        {
-            $aluFicha=Alumno::where('no_control',$alu->control)->select('ficha')->first();
-            if(is_null($aluFicha))
-                $alu->ficha=0;
-            else
-                $alu->ficha=$aluFicha->ficha;
+            ->select("alu_NumControl AS control", "alu_ApePaterno AS aPaterno", "alu_ApeMaterno AS aMaterno", "alu_Nombre AS nombre", "alu_SemestreAct AS semestre", 'alu_StatusAct AS status')
+            ->where('alumnos.car_Clave', '=', $request->carrera)
+            ->where('alumnos.Alu_AnioIngreso', '=', $request->generacion)
+            ->orderBy('alumnos.alu_ApePaterno', 'asc')       
+            ->get();
+    
+        // Verificar fichas de alumnos en una sola consulta
+        $fichas = Alumno::whereIn('no_control', $grupo->pluck('control'))
+            ->select('no_control', 'ficha')
+            ->get()
+            ->keyBy('no_control');
+    
+        // Iterar sobre el grupo y asignar los valores correspondientes
+        foreach ($grupo as $alu) {
+            // Asignar ficha si existe, de lo contrario 0
+            $alu->ficha = $fichas->get($alu->control)->ficha ?? 0;
+    
+            // Calcular semáforos
+            $alu->semaforos = self::calSemaforos($alu->control);
         }
-        
-        //Verificamos que la generación no este vacia
-        if($grupo->isEmpty()){
+    
+        // Verificar si el grupo está vacío
+        if ($grupo->isEmpty()) {
             Alert::warning('No hay alumnos registrados en esta generación')->showConfirmButton('Ok', '#3085d6');
         }
-       
-        foreach ($grupo as $row) {
-            $row->semaforos = self::calSemaforos($row->control);            
+    
+        // Obtener el usuario actual solo una vez
+        $usuario = Auth::User();
+    
+        // Obtener carreras basado en los permisos del usuario
+        if ($usuario->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA'])) {
+            $carreras = DB::connection('contEsc')->table('carreras')
+                ->where('car_Status', 'VIGENTE')
+                ->get();
+        } else {
+            $carreras = DB::connection('contEsc')->table('carreras')
+                ->where('car_Clave', $usuario->area)
+                ->get();
         }
-
-        //Verificamos si el usuario tiene permiso VIP_STA para darle acceso a todas las carreras si no, lo limitamos solo a su carrera
-        if(Auth::User()->hasAnyPermission(['VIP_STA','STA_DEP_TUTORIA'])){       
-            $carreras = DB::connection('contEsc')->table('carreras')->where('car_Status','VIGENTE')->get();
-        }
-        else{
-            $carreras = DB::connection('contEsc')->table('carreras')->where('car_Clave',auth()->user()->area)->get();
-        }
-       
+    
+        // Obtener generaciones únicas
         $generaciones = DB::connection('contEsc')->table('alumnos')
-        ->select("alumnos.Alu_AnioIngreso")
-        ->where('alumnos.Alu_AnioIngreso', '!=', 0)
-        ->whereNotNull('alumnos.Alu_AnioIngreso')
-        ->orderBy('Alu_AnioIngreso', 'asc')
-        ->distinct()
-        ->get();
-
-               
+            ->select("alumnos.Alu_AnioIngreso")
+            ->where('alumnos.Alu_AnioIngreso', '!=', 0)
+            ->whereNotNull('alumnos.Alu_AnioIngreso')
+            ->distinct()
+            ->orderBy('Alu_AnioIngreso', 'asc')
+            ->get();
+    
+        // Retornar la vista con los datos procesados
         return view('sta.analisis_alumnos.index')
-        ->with('grupo',$grupo)
-        ->with('carreras',$carreras)
-        ->with('generaciones',$generaciones)
-        ->with('generacion',$request->generacion)
-        ->with('carrera',$request->carrera);
+            ->with('grupo', $grupo)
+            ->with('carreras', $carreras)
+            ->with('generaciones', $generaciones)
+            ->with('generacion', $request->generacion)
+            ->with('carrera', $request->carrera);
     }
+    
 
     public function diagnostico($nc)
     {		
