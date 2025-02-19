@@ -201,58 +201,54 @@ class STAController extends Controller
     //Funciones para el modulo del departamento de tutorias
     public function indexTutorias()
     {
-        //Obtener los profesores
-        $profesores = User::select('id',DB::raw('UPPER(name) as nombre'))
-        ->where('active','true')
-        ->where('tutor','1')
-        ->orderBy('name','asc')
-        ->get();   
-        
-        //Obtener las carreras
-        $carreras = DB::connection('contEsc')->table('carreras')
-        ->where('car_Status','VIGENTE')
-        ->orderBy('car_Nombre','asc')
+        // Obtener los profesores activos y que sean tutores (desde MySQL)
+        $profesores = User::select('id', DB::raw('UPPER(name) as nombre'))
+        ->where('active', true)
+        ->where('tutor', 1)
+        ->orderBy('name', 'asc')
+        ->get()
+        ->keyBy('id'); // Para acceso rápido
+
+        // Obtener las carreras vigentes (desde SQL Server)
+        $carreras = DB::connection('contEsc')
+        ->table('carreras')
+        ->where('car_Status', 'VIGENTE')
+        ->orderBy('car_Nombre', 'asc')
+        ->get()
+        ->keyBy('car_Clave'); // Organiza por clave
+
+        // Obtener los grupos y asignaciones de tutores (desde MySQL)
+        $gruTutorias = Grupo::select('grupos.gpo_Nombre', 'at.*')
+        ->join('asignaciones_tutores as at', 'grupos.id', '=', 'at.gpo_Id')
+        ->orderBy('grupos.gpo_Nombre', 'asc')
         ->get();
 
-        //Unimos la tabla grupos con la de AsignacionTutores
-        $gruTutorias = Grupo::select('gpo_Nombre','at.*')
-        ->join('asignaciones_tutores as at','grupos.id','=','at.gpo_Id')
-        ->orderBy('gpo_Nombre','asc')
-        ->get(); 
-        
-        // Obtén todas las claves de carrera en un solo paso
-        $carClaves = $gruTutorias->pluck('car_Clave')->toArray();
+        // Obtener todas las claves de carrera para hacer una sola consulta a SQL Server
+        $carClaves = $gruTutorias->pluck('car_Clave')->unique()->toArray();
 
-        // Realiza una sola consulta para obtener los nombres de las carreras
-        $carreras = DB::connection('contEsc')->table('carreras')
-            ->whereIn('car_Clave', $carClaves)
-            ->get()
-            ->keyBy('car_Clave'); // Usa keyBy para organizar por car_Clave
+        // Obtener los nombres de las carreras desde SQL Server en un solo paso
+        $carrerasSQL = DB::connection('contEsc')
+        ->table('carreras')
+        ->whereIn('car_Clave', $carClaves)
+        ->get()
+        ->keyBy('car_Clave'); // Organiza por clave
 
-        // Agrega el nombre de la carrera a cada objeto $gru
-        foreach($gruTutorias as $gru) {
-            if (isset($carreras[$gru->car_Clave])) {
-                $gru->car_Nombre = $carreras[$gru->car_Clave]->car_Nombre;
-            }
-        }
-
-        // Obtén todas las claves tut_Clave de los tutores
-        $tutClaves = $gruTutorias->pluck('tut_Clave')->toArray();
-
-        // Realiza una sola consulta para obtener los nombres de los profesores
-        $profesores = User::whereIn('id', $tutClaves)
-            ->get()
-            ->keyBy('id'); // Organiza por id para acceso rápido
-
-        // Agrega el nombre del profesor en cada objeto $gru
+        // Agregar el nombre de la carrera a cada grupo
         foreach ($gruTutorias as $gru) {
-            if (isset($profesores[$gru->tut_Clave])) {
-                $gru->name = strtoupper($profesores[$gru->tut_Clave]->name);
-            }
+        $gru->car_Nombre = $carrerasSQL[$gru->car_Clave]->car_Nombre ?? 'Desconocido';
         }
-    
 
-        return view('sta.tutorias.index',compact('profesores','carreras','gruTutorias')); 
+        // Agregar el nombre del profesor a cada grupo
+        foreach ($gruTutorias as $gru) {
+        if (isset($profesores[$gru->tut_Clave])) {
+            $gru->name = $profesores[$gru->tut_Clave]->nombre;
+        }
+        }
+
+        // Retornar la vista con los datos
+        return view('sta.tutorias.index', compact('profesores', 'carreras', 'gruTutorias'));
+
+
     }
 
     public function indexTutores()
