@@ -203,12 +203,13 @@ class STAController extends Controller
     {
         // Obtener los profesores activos y que sean tutores (desde MySQL)
         $profesores = User::select('id', DB::raw('UPPER(name) as nombre'))
-        ->where('active', true)
-        ->where('tutor', 1)
+        ->where('active', 'true')
+        ->where('tutor', '1')
         ->orderBy('name', 'asc')
         ->get()
         ->keyBy('id'); // Para acceso rápido
 
+       
         // Obtener las carreras vigentes (desde SQL Server)
         $carreras = DB::connection('contEsc')
         ->table('carreras')
