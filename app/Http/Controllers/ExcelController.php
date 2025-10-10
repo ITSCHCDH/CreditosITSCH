@@ -19,7 +19,7 @@ class ExcelController extends Controller
     return view('admin.ImportExcel.index');
   }
 
-  public function importClaves(Request $request)
+ public function importClaves(Request $request)
   {      
       try{
           $request->validate([
@@ -35,14 +35,17 @@ class ExcelController extends Controller
           {          
               $contador = 0;
               $errores = 0;
-              
-              // Usar transacción para mayor velocidad
-              DB::beginTransaction();
+              $procesados = 0;
               
               foreach ($array[0] as $index => $row)       
               {       
                   if (isset($row[1]) && isset($row[2]) && !empty($row[1]) && !empty($row[2])) {
-                      // Usar update directo sin Eloquent para mayor velocidad
+                      
+                      // Pequeña pausa cada 20 registros
+                      if ($procesados > 0 && $procesados % 20 === 0) {
+                          usleep(50000); // 50ms
+                      }
+                      
                       $actualizados = DB::table('alumnos')
                                       ->where('no_control', $row[1])
                                       ->update(['password' => bcrypt($row[2])]);
@@ -50,12 +53,13 @@ class ExcelController extends Controller
                       if ($actualizados) {
                           $contador++;
                       }
+                      
+                      $procesados++;
+                      
                   } else {
                       $errores++;
                   }
               }
-              
-              DB::commit();
               
               $mensaje = "Se actualizaron {$contador} contraseñas exitosamente";
               if ($errores > 0) {
@@ -71,7 +75,6 @@ class ExcelController extends Controller
       } 
       catch (\Exception $e)
       {    
-          DB::rollBack();
           \Log::error('Error en importClaves: ' . $e->getMessage());
         
           Alert::error('Error', 'Ocurrio un error durante la actualización: ' . $e->getMessage());
