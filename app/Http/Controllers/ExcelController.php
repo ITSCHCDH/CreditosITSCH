@@ -19,29 +19,46 @@ class ExcelController extends Controller
   }
 
 
-  public function importClaves(Request $request)
-  {      
-      try{
-        ini_set('max_execution_time',0);  //Quita el limite de tiempo a la ejecucion de archivos
-        $array = Excel::toArray(new AlumnosImport,$request->excel->path());    //Importa el archivo de excel a la base de datos
-        if ($array) 
+public function importClaves(Request $request)
+{      
+    try{
+        // Validar que se subió un archivo
+        $request->validate([
+            'excel' => 'required|file|mimes:xlsx,xls,csv'
+        ]);
+
+        ini_set('max_execution_time', 0);
+        
+        $array = Excel::toArray(new AlumnosImport, $request->excel->path());
+        
+        if ($array && count($array[0]) > 0) 
         {          
-            $alumnos = Alumno::all();  //Hace la consulta de los alumnos existentes en la base de datos           
+            $contador = 0;
             foreach ($array[0] as $row)       
             {                     
-                Alumno::where('no_control', $row[2])->update(['password' => bcrypt($row[3])]);  //Modifica a los alumnos que coinsiden en el archivo de excel con la bd y les cambia el password                   
+                $actualizados = Alumno::where('no_control', $row[2])->update(['password' => bcrypt($row[3])]);
+                if ($actualizados) {
+                    $contador++;
+                }
             }            
             
-              Alert::success('Correcto','Los alumnos se importaron de forma exitosa');
-              return redirect()->route('ImportExcel.index');           
+            Alert::success('Correcto', "Se actualizaron {$contador} contraseñas exitosamente");
+            return redirect()->route('ImportExcel.index');           
+        } else {
+            Alert::warning('Advertencia', 'El archivo está vacío o no tiene datos válidos');
+            return back()->withInput();
         }
-      } catch (\Exception $e)
-      {    
-          Alert::error('Error','Ocurrio un error durante la actualización xxxx', $e->getMessage());
-          return back()->withInput();
-      }  
-  }    
+    } 
+    catch (\Exception $e)
+    {    
+      \Log::error('Error en importClaves: ' . $e->getMessage());
+      \Log::error('File: ' . $e->getFile());
+      \Log::error('Line: ' . $e->getLine());
       
+      Alert::error('Error', 'Ocurrio un error durante la actualización: ' . $e->getMessage());
+      return back()->withInput();
+    }
+  }          
   
 }
 
