@@ -18,18 +18,16 @@ class ExcelController extends Controller
     return view('admin.ImportExcel.index');
   }
 
-
   public function importClaves(Request $request)
   {      
       try{
-          // Validar que se subió un archivo
           $request->validate([
               'excel' => 'required|file|mimes:xlsx,xls,csv'
           ]);
 
           ini_set('max_execution_time', 0);
+          ini_set('memory_limit', '512M');
           
-          // Usar el archivo directamente sin obtener el path
           $array = Excel::toArray(new AlumnosImport, $request->file('excel'));
           
           if ($array && count($array[0]) > 0) 
@@ -37,20 +35,26 @@ class ExcelController extends Controller
               $contador = 0;
               $errores = 0;
               
+              // Usar transacción para mayor velocidad
+              DB::beginTransaction();
+              
               foreach ($array[0] as $index => $row)       
               {       
-                  // Validar que la fila tenga las columnas necesarias (1 y 2)
-                  // $row[1] = no_control, $row[2] = password
                   if (isset($row[1]) && isset($row[2]) && !empty($row[1]) && !empty($row[2])) {
-                      $actualizados = Alumno::where('no_control', $row[1])->update(['password' => bcrypt($row[2])]);
+                      // Usar update directo sin Eloquent para mayor velocidad
+                      $actualizados = DB::table('alumnos')
+                                      ->where('no_control', $row[1])
+                                      ->update(['password' => bcrypt($row[2])]);
+                      
                       if ($actualizados) {
                           $contador++;
                       }
                   } else {
                       $errores++;
-                      \Log::warning("Fila {$index} no tiene datos válidos - NoControl: " . ($row[1] ?? 'VACIO') . ", Password: " . ($row[2] ?? 'VACIO'));
                   }
-              }            
+              }
+              
+              DB::commit();
               
               $mensaje = "Se actualizaron {$contador} contraseñas exitosamente";
               if ($errores > 0) {
@@ -66,14 +70,14 @@ class ExcelController extends Controller
       } 
       catch (\Exception $e)
       {    
-        \Log::error('Error en importClaves: ' . $e->getMessage());
-        \Log::error('File: ' . $e->getFile());
-        \Log::error('Line: ' . $e->getLine());
+          DB::rollBack();
+          \Log::error('Error en importClaves: ' . $e->getMessage());
         
-        Alert::error('Error', 'Ocurrio un error durante la actualización: ' . $e->getMessage());
-        return back()->withInput();
+          Alert::error('Error', 'Ocurrio un error durante la actualización: ' . $e->getMessage());
+          return back()->withInput();
       }
   }
+  
 
 }
 
