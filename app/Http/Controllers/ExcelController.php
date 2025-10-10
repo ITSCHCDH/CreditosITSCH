@@ -37,7 +37,7 @@ class ExcelController extends Controller
         }
       } catch (\Exception $e)
       {    
-          Alert::error('Error','Ocurrio un error durante la actualización', $e->getMessage());
+          Alert::error('Error','Ocurrio un error durante la actualización xxxx', $e->getMessage());
           return back()->withInput();
       }  
   }    
