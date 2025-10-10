@@ -1,6 +1,9 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
+use App\Models\Alumno;
 
 class GenerarAlumnos extends Seeder
 {
@@ -11,6 +14,7 @@ class GenerarAlumnos extends Seeder
      */
     public function run()
     {
-        $alumnos = factory(App\Models\Alumno::class,500)->create();
+        // Para Laravel 8+ - nuevo sistema de factories
+        $alumnos = Alumno::factory()->count(500)->create();
     }
 }
