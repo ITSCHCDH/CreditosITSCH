@@ -17,6 +17,8 @@ class ExcelController extends Controller
   {     
     return view('admin.ImportExcel.index');
   }
+
+
   public function importClaves(Request $request)
   {      
       try{
@@ -27,41 +29,35 @@ class ExcelController extends Controller
 
           ini_set('max_execution_time', 0);
           
-          // Obtener el archivo y su extensión
-          $file = $request->file('excel');
-          $extension = strtolower($file->getClientOriginalExtension());
-          
-          // Determinar el tipo de archivo explícitamente
-          $fileType = null;
-          switch ($extension) {
-              case 'xlsx':
-                  $fileType = \Maatwebsite\Excel\Excel::XLSX;
-                  break;
-              case 'xls':
-                  $fileType = \Maatwebsite\Excel\Excel::XLS;
-                  break;
-              case 'csv':
-                  $fileType = \Maatwebsite\Excel\Excel::CSV;
-                  break;
-              default:
-                  throw new \Exception("Formato de archivo no soportado: {$extension}");
-          }
-          
-          // Importar especificando el tipo de archivo
-          $array = Excel::toArray(new AlumnosImport, $file->getPathname(), null, $fileType);
+          // Usar el archivo directamente sin obtener el path
+          $array = Excel::toArray(new AlumnosImport, $request->file('excel'));
           
           if ($array && count($array[0]) > 0) 
           {          
               $contador = 0;
-              foreach ($array[0] as $row)       
-              {                     
-                  $actualizados = Alumno::where('no_control', $row[2])->update(['password' => bcrypt($row[3])]);
-                  if ($actualizados) {
-                      $contador++;
+              $errores = 0;
+              
+              foreach ($array[0] as $index => $row)       
+              {       
+                  // Validar que la fila tenga las columnas necesarias (1 y 2)
+                  // $row[1] = no_control, $row[2] = password
+                  if (isset($row[1]) && isset($row[2]) && !empty($row[1]) && !empty($row[2])) {
+                      $actualizados = Alumno::where('no_control', $row[1])->update(['password' => bcrypt($row[2])]);
+                      if ($actualizados) {
+                          $contador++;
+                      }
+                  } else {
+                      $errores++;
+                      \Log::warning("Fila {$index} no tiene datos válidos - NoControl: " . ($row[1] ?? 'VACIO') . ", Password: " . ($row[2] ?? 'VACIO'));
                   }
               }            
               
-              Alert::success('Correcto', "Se actualizaron {$contador} contraseñas exitosamente");
+              $mensaje = "Se actualizaron {$contador} contraseñas exitosamente";
+              if ($errores > 0) {
+                  $mensaje .= ". {$errores} filas tenían datos incompletos";
+              }
+              
+              Alert::success('Correcto', $mensaje);
               return redirect()->route('ImportExcel.index');           
           } else {
               Alert::warning('Advertencia', 'El archivo está vacío o no tiene datos válidos');
@@ -77,7 +73,8 @@ class ExcelController extends Controller
         Alert::error('Error', 'Ocurrio un error durante la actualización: ' . $e->getMessage());
         return back()->withInput();
       }
-  } 
+  }
+
 }
 
 
