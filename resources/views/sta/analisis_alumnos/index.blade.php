@@ -114,44 +114,86 @@
 
 @section('js')
     <script>
-        //Codigo para adornar las tablas con datatables
+       // Codigo para adornar las tablas con datatables
         $(document).ready(function() {
-	        $('#tabGrupos').DataTable({ 	           
-	            dom: 'Bfrtip',
-	            responsive: {
-				    breakpoints: [
-				      {name: 'bigdesktop', width: Infinity},
-				      {name: 'meddesktop', width: 1366},
-				      {name: 'smalldesktop', width: 1280},
-				      {name: 'medium', width: 1188},
-				      {name: 'tabletl', width: 1024},
-				      {name: 'btwtabllandp', width: 848},
-				      {name: 'tabletp', width: 768},
-				      {name: 'mobilel', width: 600},
-				      {name: 'mobilep', width: 320}
-				    ]
-				},	            		    
+            $('#tabGrupos').DataTable({ 	           
+                dom: 'Bfrtip',
+                responsive: {
+                    breakpoints: [
+                        {name: 'bigdesktop', width: Infinity},
+                        {name: 'meddesktop', width: 1366},
+                        {name: 'smalldesktop', width: 1280},
+                        {name: 'medium', width: 1188},
+                        {name: 'tabletl', width: 1024},
+                        {name: 'btwtabllandp', width: 848},
+                        {name: 'tabletp', width: 768},
+                        {name: 'mobilel', width: 600},
+                        {name: 'mobilep', width: 320}
+                    ]
+                },	            		    
 
-	            lengthMenu: [
-			        [ 5, 10, 25, 50, -1 ],
-			        [ '5 reg', '10 reg', '25 reg', '50 reg', 'Ver todo' ]
-			    ],
-	            buttons: [
-	            	{extend: 'collection', text: 'Exportar',
-	            		buttons: [ 
-	            			{ extend: 'copyHtml5', text: 'Copiar' },
-	            			'csvHtml5', 
-	            			'excelHtml5', 
-	            			'pdfHtml5',
-	            			{ extend: 'print', text: 'Imprimir' }, 
-	            		]},                 
-	                { extend: 'colvis', text: 'Columnas visibles' },                       
-	                { extend:'pageLength',text:'Ver registros'},               
-	            ],
-	            "language": {
-                   "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
-               }  
-	        });
-	    });	    
+                // Configuración de paginación mejorada
+                "paging": true,
+                "pageLength": 5,
+                "lengthMenu": [
+                    [5, 10, 25, 50, -1],
+                    ['5 reg', '10 reg', '25 reg', '50 reg', 'Ver todo']
+                ],
+                "pagingType": "full_numbers",
+                
+                buttons: [
+                    {
+                        extend: 'collection', 
+                        text: 'Exportar',
+                        className: 'btn-primary btn-sm',
+                        buttons: [ 
+                            { 
+                                extend: 'copyHtml5', 
+                                text: '<i class="fas fa-copy"></i> Copiar',
+                                className: 'btn-sm'
+                            },
+                            { 
+                                extend: 'csvHtml5',
+                                text: '<i class="fas fa-file-csv"></i> CSV',
+                                className: 'btn-sm'
+                            }, 
+                            { 
+                                extend: 'excelHtml5',
+                                text: '<i class="fas fa-file-excel"></i> Excel',
+                                className: 'btn-sm'
+                            }, 
+                            { 
+                                extend: 'pdfHtml5',
+                                text: '<i class="fas fa-file-pdf"></i> PDF',
+                                className: 'btn-sm'
+                            },
+                            { 
+                                extend: 'print', 
+                                text: '<i class="fas fa-print"></i> Imprimir',
+                                className: 'btn-sm'
+                            }, 
+                        ]
+                    },                 
+                    { 
+                        extend: 'colvis', 
+                        text: '<i class="fas fa-columns"></i> Columnas visibles',
+                        className: 'btn-info btn-sm'
+                    },                       
+                    { 
+                        extend: 'pageLength',
+                        text: '<i class="fas fa-list"></i> Ver registros',
+                        className: 'btn-warning btn-sm'
+                    },               
+                ],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                },
+                
+                // Opciones adicionales para mejor rendimiento
+                "deferRender": true,
+                "processing": true,
+                "stateSave": true
+            });
+        });   
     </script>
 @endsection
