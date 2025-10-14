@@ -80,8 +80,10 @@ return [
             'database' => env('DB_DATABASE_SECOND', 'forge'),
             'username' => env('DB_USERNAME_SECOND', 'forge'),
             'password' => env('DB_PASSWORD_SECOND', ''),
-            'charset' => 'utf8',
+            'charset' => 'utf8',            
             'prefix' => '',
+            'encrypt' => 'no',  
+            'trust_server_certificate' => 'no',  
         ],
 
         

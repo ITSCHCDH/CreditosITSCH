@@ -265,28 +265,51 @@
 
 @section('js')
     <script>
-        function guardarObservaciones()
-        {
-            //Guardamos las observaciones en la tabla de alumnos
+        function guardarObservaciones() {
             var observaciones = $('#observaciones').val(); 
             var no_Control = $('#no_Control').val(); 
-            //Guardamos el registro en la base de datos                
+            
+            // Mostrar loading
+            swal({
+                title: 'Guardando...',
+                text: 'Por favor espere',
+                icon: 'info',
+                buttons: false,
+                closeOnClickOutside: false,
+                closeOnEsc: false
+            });
+            
             $.ajax({
-                    url: "{{ route('tutores.storeAlumnoObs') }}",
-                    type: "POST",
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        observaciones: observaciones,
-                        no_Control: no_Control,                        
-                    },
-                    success: function(response){                                          
-                        swal('Exito',response.mensaje,'success');                                    
-                    },
-                    error: function(e){
-                        console.log(e);
-                        swal('Error',e.mensaje,'error');                        
+                url: "{{ route('tutores.storeAlumnoObs') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    observaciones: observaciones,
+                    no_Control: no_Control,                        
+                },
+                success: function(response){  
+                    swal.close();
+                    if (response.status === 200) {
+                        swal('Éxito', response.mensaje, 'success');
+                    } else {
+                        swal('Error', response.mensaje, 'error');
+                    }                                  
+                },
+                error: function(xhr) {
+                    swal.close();
+                    var mensajeError = 'Error en la conexión con el servidor';
+                    if (xhr.status === 404) {
+                        mensajeError = 'Recurso no encontrado';
+                    } else if (xhr.status === 500) {
+                        mensajeError = 'Error interno del servidor';
                     }
-                });
+                    if (xhr.responseJSON && xhr.responseJSON.mensaje) {
+                        mensajeError = xhr.responseJSON.mensaje;
+                    }
+                    swal('Error', mensajeError, 'error');
+                    console.error('Error detallado:', xhr.responseJSON);
+                }
+            });
         }
     </script>
 @endsection

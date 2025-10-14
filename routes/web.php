@@ -252,7 +252,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('/sta/tutores/show/grupo/{id}/{nom}',[STAController::class,'showGrupo'])->name('tutores.showGrupo');
     Route::post('/sta/tutores/store/grupo',[STAController::class,'storeGrupo'])->name('tutores.storeGrupo');
     Route::post('/sta/tutores/delete/alumno',[STAController::class,'deleteAlumno'])->name('tutores.deleteAlumno');
-    Route::post('/sta/tutores/store/alumno/observaciones',[JefesController::class,'storeAlumnoObs'])->name('tutores.storeAlumnoObs');    
+    Route::post('/sta/tutores/store/alumno/observaciones',[JefesController::class,'storeAlumnoObs'])->name('tutores.storeAlumnoObs');   
     Route::get('/sta/tutores/analisis_grupo/{id_gpo}',[STAController::class,'analisisGrupo'])->name('tutores.analisisGrupo');     
 
 });

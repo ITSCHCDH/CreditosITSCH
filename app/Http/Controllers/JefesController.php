@@ -452,17 +452,29 @@ class JefesController extends Controller
     //Funcion para guardar las observaciones del alumno
     public function storeAlumnoObs(Request $request)
     {
-        $noControl = $request->no_Control;
+        $noControl = trim($request->no_Control);       
         try {
             $alumno = Alumno::where('no_control', $noControl)->firstOrFail();
             $alumno->observaciones = $request->observaciones;
             $alumno->save();
             
-            return response()->json(['mensaje' => 'Observaciones guardadas correctamente', 'status' => 200, 'noControl' => $noControl]);
+            return response()->json([
+                'mensaje' => 'Observaciones guardadas correctamente', 
+                'status' => 200, 
+                'noControl' => $noControl
+            ], 200); // ← Agrega el código HTTP aquí
+            
         } catch (ModelNotFoundException $e) {
-            return response()->json(['mensaje' => 'No se encontró el registro del alumno'.$noControl.', informalo al administrador de sistemas', 'status' => 404]);
+            return response()->json([
+                'mensaje' => 'No se encontró el registro del alumno: '.$noControl.', es probable que no esté registrado en la base de datos de creditos, infórmalo al administrador de sistemas', 
+                'status' => 404
+            ], 404); // ← Código HTTP 404
+            
         } catch (\Exception $e) {
-            return response()->json(['mensaje' => 'Error al guardar las observaciones: '.$e->getMessage(), 'status' => 500]);
+            return response()->json([
+                'mensaje' => 'Error al guardar las observaciones: '.$e->getMessage(), 
+                'status' => 500
+            ], 500); // ← Código HTTP 500
         }
     }
 }
