@@ -123,7 +123,8 @@
                 // Obtenemos la lista de números de control
                 var listNoControl = $('#listNoControl').val();
 
-                // Separamos los números de control que están separados por espacio, coma o punto y coma
+                // Separamos los números de control que están separados por espacio, coma o punto y coma y nos aseguramos de que esten en mayusculas
+                listNoControl = listNoControl.toUpperCase();
                 var noControl = listNoControl.split(/[ ,;]/);
 
                 // Ajax que recorree el arreglo de numeros de control y los agrega al grupo de tutorias
