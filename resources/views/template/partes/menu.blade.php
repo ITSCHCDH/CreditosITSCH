@@ -63,28 +63,43 @@
                         </li>
                     @endif   
                     {{-- Menú de STA --}}
-                    @if (Auth::User()->hasAnyPermission(['VIP_STA','STA_COR_CARRERA','STA_PROFESOR','STA_TUTOR','STA_DEP_TUTORIA']))
+                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_STA','STA_COR_CARRERA','STA_PROFESOR','STA_TUTOR','STA_DEP_TUTORIA']))
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">STA</a>
                             <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
-                                @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_COR_CARRERA'))                                    
+                                @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_COR_CARRERA') || Auth::User()->can('VIP'))                                    
                                     <a class="dropdown-item" href="{{ route('analisis.index') }}">Jefes de carrera</a>
                                 @endif
-                                @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_PROFESOR'))                                    
+                                @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_PROFESOR') || Auth::User()->can('VIP'))                                    
                                     <a class="dropdown-item" href="{{ route('profesores.index') }}">Profesor</a>
                                 @endif
-                                @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_TUTOR'))                          
+                                @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_TUTOR') || Auth::User()->can('VIP'))                          
                                     <a class="dropdown-item" href="{{ route('tutores.index') }}">Tutor</a>
                                 @endif
-                                @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_DEP_TUTORIA'))                                     
+                                @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_DEP_TUTORIA') || Auth::User()->can('VIP'))                                     
                                     <a class="dropdown-item" href="{{ route('tutorias.index') }}">Departamento tutorias</a>
                                 @endif
                             </div>
                         </li>
-                    @endif                     
+                    @endif      
+                    <!-- Menú sistema medico -->
+                    @if (Auth::User()->hasAnyPermission(['VIP','VER_CITAS_MEDICAS','MODIFICAR_CITAS_MEDICAS']))
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">Sistema Médico</a>
+                            <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_MEDICO']))
+                                    <a class="dropdown-item" href="{{ route('medico.index') }}">Agenda médica</a>
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP','CREAR_CITAS_MEDICAS']))
+                                    <a class="dropdown-item" href="{{ route('paciente.index.citas') }}">Mis cita</a>
+                                @endif
+                            </div>
+                        </li>
+                    @endif                    
                     <!-- Menú de administración -->
-                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS']))
+                    @if (Auth::User()->hasAnyPermission(['VIP','VER_USUARIOS']))
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">Administración</a>

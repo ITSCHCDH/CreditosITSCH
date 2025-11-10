@@ -27,6 +27,8 @@
         <link rel="stylesheet" href="{{ asset('css/mdb.min.css') }}" />
         {{-- Estilos sta --}}
         <link rel="stylesheet" href="{{ asset('css/sta/estilos.css') }}" />
+        <!-- Incluir SweetAlert2 CSS -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <style>
             .error {
@@ -119,6 +121,7 @@
 
         <!-- Bootstrap 4 -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
               {{-- Librerías REQUERIDAS para los botones --}}
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>

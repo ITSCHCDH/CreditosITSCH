@@ -105,6 +105,14 @@ class RolesPermisos extends Seeder
         Permission::create(['name' => 'STA_COR_CARRERA']);
         Permission::create(['name' => 'STA_PROFESOR']);
 
+        //Permisos relacionados con el sistema medico
+        Permission::create(['name' => 'VER_CITAS_MEDICAS']);
+        Permission::create(['name' => 'CREAR_CITAS_MEDICAS']);
+        Permission::create(['name' => 'MODIFICAR_CITAS_MEDICAS']);
+        Permission::create(['name' => 'VIP_MEDICO']);
+        Permission::create(['name' => 'VIP_PSICOLOGO']);
+        Permission::create(['name' => 'ELIMINAR_CITAS_MEDICAS']);        
+
        	//Creacion de un administrador por defecto
        	DB::table('users')->insert([
           'id' => 1,

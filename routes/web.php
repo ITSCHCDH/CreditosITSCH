@@ -24,6 +24,8 @@ use App\Http\Controllers\JefesController;
 use App\Http\Controllers\STAController;
 use App\Http\Controllers\AlumnosStaController;
 use App\Http\Controllers\GruposController;
+use App\Http\Controllers\SistemaMedicoController;
+use App\Http\Controllers\PacienteController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -253,7 +255,25 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::post('/sta/tutores/store/grupo',[STAController::class,'storeGrupo'])->name('tutores.storeGrupo');
     Route::post('/sta/tutores/delete/alumno',[STAController::class,'deleteAlumno'])->name('tutores.deleteAlumno');
     Route::post('/sta/tutores/store/alumno/observaciones',[JefesController::class,'storeAlumnoObs'])->name('tutores.storeAlumnoObs');   
-    Route::get('/sta/tutores/analisis_grupo/{id_gpo}',[STAController::class,'analisisGrupo'])->name('tutores.analisisGrupo');     
+    Route::get('/sta/tutores/analisis_grupo/{id_gpo}',[STAController::class,'analisisGrupo'])->name('tutores.analisisGrupo');   
+    
+    //Rutas del sistema medico
+    Route::get('/sta/medico',[SistemaMedicoController::class,'index'])->name('medico.index');   
+    Route::get('/sta/medico/editar/cita/{id}',[SistemaMedicoController::class,'edit'])->name('medico.editar.cita');
+    Route::post('/sta/medico/update/cita/{id}',[SistemaMedicoController::class,'update'])->name('medico.update.cita');   
+    Route::get('/sta/medico/atender/cita/{id}',[SistemaMedicoController::class,'atenderCita'])->name('medico.atender.cita');
+    Route::post('/sta/medico/guardar/historial/{id}',[SistemaMedicoController::class,'guardarHistorial'])->name('medico.guardar.historial');
+    Route::get('/sta/medico/generar/receta/{id}',[SistemaMedicoController::class,'generarReceta'])->name('medico.generar.receta'); 
+    Route::post('/sta/medico/guardar/receta/{id}',[SistemaMedicoController::class,'guardarReceta'])->name('medico.guardar.receta');
+
+    Route::get('/sta/paciente/mis_citas',[PacienteController::class,'index'])->name('paciente.index.citas');
+    Route::get('/sta/paciente/create/cita',[PacienteController::class,'create'])->name('paciente.create.cita');
+    Route::post('/sta/paciente/store/cita',[PacienteController::class,'store'])->name('paciente.store.cita');
+    Route::get('/sta/paciente/editar/cita/{id}',[PacienteController::class,'edit'])->name('paciente.editar.cita');
+    Route::post('/sta/paciente/update/cita/{id}',[PacienteController::class,'update'])->name('paciente.update.cita');
+    Route::post('/sta/paciente/destroy/cita/{id}',[PacienteController::class,'destroy'])->name('paciente.destroy.cita');
+    Route::post('/sta/paciente/store/perfil',[PacienteController::class,'storePerfil'])->name('paciente.store.perfil');
+    Route::get('/sta/paciente/editar/perfil',[PacienteController::class,'editPerfil'])->name('paciente.editar.perfil');
 
 });
 /******************************/
