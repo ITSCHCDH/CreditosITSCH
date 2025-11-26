@@ -47,12 +47,11 @@
                             <div class="form-control" style="height: 300px; overflow-y: auto; white-space: pre-wrap;">
                                     @if($historialMedico->isNotEmpty())
                                         @foreach($historialMedico as $historial)
-                                            Fecha: {{ $historial->created_at->format('d/m/Y H:i') }}
-                                            Notas: {{ $historial->notas_adicionales ?? 'Sin notas' }}                                                                                       
-                                            ----------------------------------------
-                                            Antecedentes: {{ $historial->antecedentes ?? 'Ninguno' }}
-                                            Diagnosticos: {{ $historial->diagnosticos ?? 'Ninguno' }}
-                                            Tratamientos: {{ $historial->tratamientos ?? 'Ninguno' }}
+                                            Fecha Cita: {{ $historial->created_at->format('d/m/Y H:i') }}
+                                            <strong>Notas:</strong> {{ $historial->notas_adicionales ?? 'Sin notas' }}                                                                                       
+                                            ----------------------------------------                                           
+                                            <strong>Diagnostico:</strong> {{ $historial->diagnostico ?? 'Ninguno' }}                                           
+                                            <strong>Tratamiento:</strong> {{ preg_replace('/\s+/', ' ', $historial->tratamiento ?? 'Ninguno') }}
                                             ========================================
                                         @endforeach
                                     @else

@@ -6,7 +6,7 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Models\Cita;
 use App\Models\Paciente;
-use App\Models\HistorialMedico;
+use App\Models\Historial_Medico;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class SistemaMedicoController extends Controller
@@ -83,9 +83,24 @@ class SistemaMedicoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
+    public function guardarReceta($cita_id, Request $request)
+    {        
+        //Guardamos el tratamiento como historial medico
+        $historialMedico = new Historial_Medico();
+        $historialMedico->paciente_id =  $user = auth()->user()->id;
+        $historialMedico->cita_id = $cita_id;
+        $historialMedico->diagnostico = $request->input('diagnostico');
+        $historialMedico->tratamiento = $request->input('tratamiento');
+        $historialMedico->notas_adicionales = $request->input('notas_adicionales');
+        $historialMedico->semaforo = $request->input('semaforo');
+        $historialMedico->save();  
+        //Cambiamos el status de la cita a atendida
+        $cita = Cita::findOrFail($cita_id);
+        $cita->estado_cita = 'Atendida';
+        $cita->save();
+        //Redirigir a la vista de citas médicas con un mensaje de éxito
+        Alert::success('Correcto','El historial médico ha sido guardado exitosamente!');
+        return redirect()->route('medico.index'); 
     }
     
 
@@ -143,7 +158,7 @@ class SistemaMedicoController extends Controller
         $medico = User::where('id', $cita->medico_id)->first();
         $paciente= Paciente::where('id',$cita->paciente_id)->first();
         $usuarioPaciente= User::where('id',$paciente->user_id)->first(); 
-        $historialMedico= HistorialMedico::where('paciente_id',$paciente->id)->get(); 
+        $historialMedico= Historial_Medico::where('paciente_id',$paciente->id)->get(); 
         //Si es alumno buscamos su historial clinico de lo contrario lo omitimos
         if($paciente->tipo=='Alumno'){
             $historialClinico= HistorialClinico::where('paciente_id',$paciente->id)->first();

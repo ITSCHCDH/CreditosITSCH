@@ -318,7 +318,9 @@ class JefesController extends Controller
                 $semaforos['semaforoPsico'] = 'CirculoNegro';
         }
 
-        $semMedico=5;
+        //Consultamos el tipo de semaforo correspondiente al área médica de la tabla historiales_medicos
+        $semMedico= Historial_Medico::where('paciente_id', $pacienteId)->value('semaforo')->last(); dd($semMedico);
+
         // Calculamos el semáforo médico
         switch ($semMedico) {
             case 1:

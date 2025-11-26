@@ -348,10 +348,8 @@ class STAController extends Controller
             } else {
                 $alumno->ficha = 0;
             }
-        }
+        }      
       
-       
-       // Asumiendo que calSemaforos es ahora estático
         foreach ($alumnosGrupo as $row) {             
             $row->semaforos = JefesController::calSemaforos($row->no_Control);            
         }    

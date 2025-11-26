@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('historiales_medicos', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('paciente_id');
-            $table->unsignedBigInteger('cita_id');
-            $table->text('antecedentes')->nullable();
-            $table->text('diagnosticos')->nullable();
-            $table->text('tratamientos')->nullable();
+            $table->unsignedBigInteger('cita_id');            
+            $table->text('diagnostico')->nullable();
+            $table->text('tratamiento')->nullable();
             $table->text('notas_adicionales')->nullable();
             $table->integer('semaforo')->default(1); // 1: Verde, 2: Amarillo, 3: Rojo
             $table->timestamps();

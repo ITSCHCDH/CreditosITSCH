@@ -30,16 +30,18 @@
                             <form action="{{ route('medico.guardar.receta', $cita->id) }}" method="post">
                                 @csrf
                                 <label for="diagnostico"><strong>Diagnóstico:</strong></label>
-                                <textarea class="form-control" name="diagnostico" id="" cols="30" rows="2"></textarea>
+                                <textarea class="form-control" name="diagnostico" id="" cols="30" rows="2" required></textarea>
                                 <label for="medicamentos"><strong>Medicamentos Recetados:</strong></label>
-                                <textarea class="form-control" name="medicamentos" id="" cols="30" rows="10" placeholder="Lista de medicamentos recetados"></textarea>
-                                <label for="semaforo">Semaforo:</label>
-                                <select name="semaforo" id="semaforo" class="form-control">
-                                    <option value="4">Verde</option>
-                                    <option value="3">Amarillo</option>
-                                    <option value="2">Naranja</option>
-                                    <option value="1">Rojo</option>                                    
+                                <textarea class="form-control" name="tratamiento" id="" cols="30" rows="10" placeholder="Lista de medicamentos recetados y/o tratamiento a seguir" required></textarea>
+                                <label for="semaforo"><strong>Semaforo:</strong></label>
+                                <select name="semaforo" id="semaforo" class="form-control" required>                                    
+                                    <option value="1">Verde</option>
+                                    <option value="2">Amarillo</option>
+                                    <option value="3">Naranja</option>
+                                    <option value="4">Rojo</option>                                    
                                 </select>
+                                <label for="notas"><strong>Notas Adicionales:</strong></label>
+                                <textarea class="form-control" name="notas_adicionales" cols="30" rows="2"></textarea>
                                 <hr>
                                 <button type="submit" class="btn btn-success"><i class="fas fa-print"></i> Guardar e Imprimir</button>
                             </form>

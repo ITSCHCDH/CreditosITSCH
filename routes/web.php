@@ -274,6 +274,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::post('/sta/paciente/destroy/cita/{id}',[PacienteController::class,'destroy'])->name('paciente.destroy.cita');
     Route::post('/sta/paciente/store/perfil',[PacienteController::class,'storePerfil'])->name('paciente.store.perfil');
     Route::get('/sta/paciente/editar/perfil',[PacienteController::class,'editPerfil'])->name('paciente.editar.perfil');
+    
 
 });
 /******************************/
