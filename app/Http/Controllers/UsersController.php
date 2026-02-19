@@ -10,6 +10,7 @@ use App\Models\Area;
 use Spatie\Permission\Models\Role;
 use DB;
 use Alert;
+use RealRashid\SweetAlert\Facades\Alert as FacadesAlert;
 
 class UsersController extends Controller
 {
@@ -204,7 +205,7 @@ class UsersController extends Controller
             $roles = DB::table('model_has_roles')->where('model_id','=',$id)->get()->count()>0?true:false;
 
             if($roles || $actividades || $responsable){
-                Alert::error('Error','El usuarios '.$user->name.' no puede ser eliminado debido debido a claves foraneas');
+                Alert::error('Error','El usuarios '.$user->name.' no puede ser eliminado ya que es responsable de actividades, tiene roles asignados o es responsable de evidencias');
                 return redirect()->route('usuarios.index');
             }
             $user->delete();
@@ -268,20 +269,31 @@ class UsersController extends Controller
 
     }
 
-    public function guardarRoles(Request $request){
-        if(!$request->has('user_id')) return redirect()->route('usuarios.index');
-        if($request->has('roles_id')){
-            $user = User::find($request->user_id);
-            $user->syncRoles($request->roles_id);
-        }else{
-            $user= User::find($request->user_id);
+    public function guardarRoles(Request $request)
+{
+        if(!$request->has('user_id')) {
+            return redirect()->route('usuarios.index');
+        }
+        
+        $user = User::find($request->user_id);
+        
+        if($request->has('roles_id') && !empty($request->roles_id)) {
+            // Convertir los IDs a nombres de roles
+            $roleNames = Role::whereIn('id', $request->roles_id)
+                ->pluck('name')
+                ->toArray();
+            
+            // Ahora sincronizar con los nombres
+            $user->syncRoles($roleNames);
+        } else {
+            // Si no hay roles seleccionados, eliminar todos
             $roles = $user->getRoleNames();
-            if(count($roles)>0){
+            if(count($roles) > 0) {
                 $user->syncRoles([]);
             }
         }
 
-        return redirect()->route('usuarios.index')
-        ->with("success","Roles asignados correctamente");
+        Alert::success('Correcto', 'Los roles del usuario ' . $user->name . ' se han actualizado correctamente');
+        return redirect()->route('usuarios.index');
     }
 }

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Cita;
 use App\Models\Paciente;
 use App\Models\Historial_Medico;
+use App\Models\HistorialClinico;
+use App\Models\Alumno;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class SistemaMedicoController extends Controller
@@ -16,43 +18,43 @@ class SistemaMedicoController extends Controller
      */
     public function index(Request $request)
     {
-          $user = auth()->user();     
-    $esMedico = $user->hasPermissionTo('VIP_MEDICO') || $user->hasPermissionTo('VIP_PSICOLOGO');          
-    
-    // Determinar qué estados mostrar según el filtro
-    $filtro = $request->get('filtro', 'Pendiente'); // Por defecto mostrar pendientes
-    
-    $estados = $this->obtenerEstadosPorFiltro($filtro);
-    
-    if ($esMedico) {
-        $citas = Cita::where('medico_id', $user->id)
-                ->when(!empty($estados), function($query) use ($estados) {
-                    return $query->whereIn('estado_cita', $estados);
-                })
-                ->with([
-                    'paciente.user:id,name,email',
-                    'paciente:id,user_id,tipo,alergias'
-                ])
-                ->orderBy('fecha_cita', 'asc')
-                ->orderBy('hora_cita', 'asc')
-                ->get();
-        } elseif ($user->hasPermissionTo('VIP')) {
-            $citas = Cita::when(!empty($estados), function($query) use ($estados) {
-                    return $query->whereIn('estado_cita', $estados);
-                })
-                ->with([
-                    'paciente.user:id,name,email',
-                    'paciente:id,user_id,tipo,alergias',
-                    'medico:id,name'
-                ])
-                ->orderBy('fecha_cita', 'asc')
-                ->orderBy('hora_cita', 'asc')
-                ->get();
-        } else {
-            abort(403, 'Acceso denegado');
-        }
+        $user = auth()->user();     
+        $esMedico = $user->hasPermissionTo('VIP_MEDICO') || $user->hasPermissionTo('VIP_PSICOLOGO');          
+        
+        // Determinar qué estados mostrar según el filtro
+        $filtro = $request->get('filtro', 'Pendiente'); // Por defecto mostrar pendientes
+        
+        $estados = $this->obtenerEstadosPorFiltro($filtro);
+        
+        if ($esMedico) {
+            $citas = Cita::where('medico_id', $user->id)
+                    ->when(!empty($estados), function($query) use ($estados) {
+                        return $query->whereIn('estado_cita', $estados);
+                    })
+                    ->with([
+                        'paciente.user:id,name,email',
+                        'paciente:id,user_id,tipo,alergias'
+                    ])
+                    ->orderBy('fecha_cita', 'asc')
+                    ->orderBy('hora_cita', 'asc')
+                    ->get();
+            } elseif ($user->hasPermissionTo('VIP')) {
+                $citas = Cita::when(!empty($estados), function($query) use ($estados) {
+                        return $query->whereIn('estado_cita', $estados);
+                    })
+                    ->with([
+                        'paciente.user:id,name,email',
+                        'paciente:id,user_id,tipo,alergias',
+                        'medico:id,name'
+                    ])
+                    ->orderBy('fecha_cita', 'asc')
+                    ->orderBy('hora_cita', 'asc')
+                    ->get();
+            } else {
+                abort(403, 'Acceso denegado');
+            }
 
-        return view('sistema_medico.medico.index', compact('citas', 'filtro'));
+            return view('sistema_medico.medico.index', compact('citas', 'filtro'));
     }
 
     // Método para obtener estados según el filtro
@@ -75,9 +77,43 @@ class SistemaMedicoController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function actualizarSemaforo($id)
     {
-        //
+        // Abrimos el formulario de semaforo para ser llenado por el medico
+        $cita = Cita::find($id);
+        $medico = User::where('id', $cita->medico_id)->first();
+        $paciente= Paciente::where('id',$cita->paciente_id)->first(); 
+        //Verificamos si es alumno y consultamos su nombre de la tabla pacientes de lo contrario consultamos el nombre de la tabla usuarios y lo agregamos a $paciente
+        if($paciente->tipo=='Alumno'){
+            $usuarioPaciente=Alumno::where('id',$paciente->user_id)->first();
+            $paciente->nombre = $usuarioPaciente->nombre;
+        }else{
+            $usuarioPaciente= User::where('id',$paciente->user_id)->first();
+            $paciente->nombre = $usuarioPaciente->name;
+        }        
+        $dat_medicos=Alumno::where('id',$paciente->id)->first(['sem_med', 'observaciones_med']);
+        return view('sistema_medico.medico.semaforo', compact('cita', 'medico', 'paciente', 'dat_medicos'));
+    }
+
+    public function guardarSemaforo($cita_id, Request $request)
+    {        
+        //Verificamos si el paciente es alumno para guardar su semaforo, en caso contrario solo enviamos un mensaje de error
+        $cita = Cita::findOrFail($cita_id);
+        $paciente= Paciente::where('id',$cita->paciente_id)->first();         
+        if($paciente->tipo=='Alumno'){           
+            //Guardamos el semaforo en la tabla de alumnos
+            $alumno= Alumno::where('id',$paciente->id)->first();
+            $alumno->sem_med = $request->input('semaforo');            
+            $alumno->observaciones_med = $alumno->observaciones_med + $request->input('observaciones_med');
+            $alumno->save();
+            //Redirigir a la vista de citas médicas con un mensaje de éxito
+            Alert::success('Correcto','El semáforo ha sido guardado exitosamente!');
+            return redirect()->route('medico.index'); 
+        }else{
+            //Redirigir a la vista de citas médicas con un mensaje de error
+            Alert::error('Error','Solo los pacientes de tipo Alumno pueden tener semáforo médico.');
+            return redirect()->route('medico.index');
+        }
     }
 
     /**
@@ -90,9 +126,7 @@ class SistemaMedicoController extends Controller
         $historialMedico->paciente_id =  $user = auth()->user()->id;
         $historialMedico->cita_id = $cita_id;
         $historialMedico->diagnostico = $request->input('diagnostico');
-        $historialMedico->tratamiento = $request->input('tratamiento');
-        $historialMedico->notas_adicionales = $request->input('notas_adicionales');
-        $historialMedico->semaforo = $request->input('semaforo');
+        $historialMedico->tratamiento = $request->input('tratamiento');        
         $historialMedico->save();  
         //Cambiamos el status de la cita a atendida
         $cita = Cita::findOrFail($cita_id);

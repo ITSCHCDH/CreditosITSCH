@@ -20,6 +20,9 @@
                     <li class="nav-item active">
                         <a class="nav-link" aria-current="page" href="{{ route('alumnos.sta.ficha',1) }}" title="Créditos">Ficha</a>
                     </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{ route('paciente.alumno.index.citas') }}" title="Citas medicas">Mis citas</a>
+                    </li>
                 @else
                     <li class="nav-item active">
                         <a class="nav-link" aria-current="page" href="{{ url('/home') }}" title="Inicio"><i class="fas fa-home"></i></a>
@@ -147,9 +150,7 @@
                     @endif
                     <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
                         @if (!Auth::guard('alumno')->check())
-                            <a class="dropdown-item" href="{{ route('perfil.index') }}">Mi perfil</a> 
-                        @else
-                            <a class="dropdown-item" href="{{ route('alumnos.perfil',$alumno_data[0]->alumno_id) }}">Mi perfil</a>
+                            <a class="dropdown-item" href="{{ route('perfil.index') }}">Mi perfil</a>                                                                   
                         @endif
                         <a class="dropdown-item" href="{{ route('logout') }}"
                             onclick="event.preventDefault();

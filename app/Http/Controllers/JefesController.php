@@ -15,6 +15,7 @@ use App\Models\Familiar;
 use App\Models\Personales;
 use App\Models\Padres;
 use App\Models\Social;
+use App\Models\Historial_Medico;
 use Alert;
 
 class JefesController extends Controller
@@ -319,7 +320,7 @@ class JefesController extends Controller
         }
 
         //Consultamos el tipo de semaforo correspondiente al área médica de la tabla historiales_medicos
-        $semMedico= Historial_Medico::where('paciente_id', $pacienteId)->value('semaforo')->last(); dd($semMedico);
+        $semMedico= 5;
 
         // Calculamos el semáforo médico
         switch ($semMedico) {

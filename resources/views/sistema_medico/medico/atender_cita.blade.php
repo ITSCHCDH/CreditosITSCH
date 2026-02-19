@@ -18,6 +18,7 @@
                             </div>
                             <div class="col-md-6" style="text-align: right;">
                                  <a class="btn btn-primary" href="{{ route('medico.generar.receta', $cita->id) }}"><i class="fas fa-prescription"></i> Receta</a>
+                                 <a class="btn btn-secondary" href="{{ route('medico.actualizar.semaforo', $cita->id) }}"><i class="fas fa-user-md"></i> Semaforo</a>
                             </div>
                         </div>              
                         <hr>
