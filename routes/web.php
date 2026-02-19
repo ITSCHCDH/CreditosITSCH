@@ -53,7 +53,7 @@ Route::get('/', function () {
         return redirect("alumnos/home");
     }
     return view('auth.login');
-})->name('login');
+})->name('alumnos.login');
 /* Agregamos la ruta al html para listar los resposables de una actividad
 +*/
 
@@ -265,7 +265,10 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::post('/sta/medico/guardar/historial/{id}',[SistemaMedicoController::class,'guardarHistorial'])->name('medico.guardar.historial');
     Route::get('/sta/medico/generar/receta/{id}',[SistemaMedicoController::class,'generarReceta'])->name('medico.generar.receta'); 
     Route::post('/sta/medico/guardar/receta/{id}',[SistemaMedicoController::class,'guardarReceta'])->name('medico.guardar.receta');
-
+    Route::get('/sta/medico/actualizar/semaforo/{id}',[SistemaMedicoController::class,'actualizarSemaforo'])->name('medico.actualizar.semaforo');
+    Route::post('/sta/medico/guardar/semaforo/{id}',[SistemaMedicoController::class,'guardarSemaforo'])->name('medico.guardar.semaforo');
+    
+    //Rutas del paciente
     Route::get('/sta/paciente/mis_citas',[PacienteController::class,'index'])->name('paciente.index.citas');
     Route::get('/sta/paciente/create/cita',[PacienteController::class,'create'])->name('paciente.create.cita');
     Route::post('/sta/paciente/store/cita',[PacienteController::class,'store'])->name('paciente.store.cita');
@@ -300,11 +303,15 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::get('/dsociales/guardar/{nc}',[AlumnosStaController::class,'updtDatSoc'])->name('alumnos.sta.dsociales.guargar');
     Route::get('/autorizar/guardar/{nc}',[AlumnosStaController::class,'autorizar'])->name('alumnos.sta.autorizar.guargar');
     Route::get('/pdf/{nc}', [AlumnosStaController::class,'pdf'])->name('alumnos.sta.pdf');    
-});
-//Route::get('alumnos/login','AlumnosLoginController@showLoginForm')->name('alumnos.login');
-Route::post('alumnos/login','AlumnosLoginController@login')->name('alumnos.login');
-Route::post('alumnos/logout','AlumnosLoginController@logout')->name('alumnos.logout');
 
+    //Rutas del sistema medico para alumnos
+    Route::get('/sta/paciente/alumno/mis_citas',[PacienteController::class,'index'])->name('paciente.alumno.index.citas');
+});
+
+//Rutas compartidas entre alumnos y usuarios
+Route::group(['prefix'=>'compartido', 'middleware' => ['auth', 'alumno']],function(){
+    
+});
 
 
 Auth::routes();

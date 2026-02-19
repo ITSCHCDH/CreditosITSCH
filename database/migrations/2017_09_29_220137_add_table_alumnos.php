@@ -40,6 +40,10 @@ class AddTableAlumnos extends Migration
             $table->string('nom_ficha', 100)->nullable();
             $table->integer('generacion')->nullable();
             $table->string('observaciones', 500)->nullable();
+            $table->string('observaciones_med', 500)->nullable();
+            $table->integer('sem_med')->nullable();
+            $table->string('observaciones_psic', 500)->nullable();
+            $table->integer('sem_psic')->nullable();
             $table->timestamps();
         });
     }

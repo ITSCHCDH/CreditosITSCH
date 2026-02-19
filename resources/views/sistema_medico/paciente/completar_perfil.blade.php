@@ -14,7 +14,9 @@
                 <div class="card mb-4 ">
                     <div class="card-header">
                         <h3>Completar Perfil de Paciente</h3>
-                        <a href="{{ route('paciente.index.citas') }}" class="btn btn-secondary float-right" title="Regresar"><i class="fas fa-arrow-left"></i></a>
+                        <button type="button" onclick="window.history.back()" class="btn btn-secondary float-right" title="Regresar">
+                            <i class="fas fa-arrow-left"></i> Regresar
+                        </button>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('paciente.store.perfil') }}" method="POST">
@@ -22,39 +24,39 @@
                             <input type="hidden" name="user_id" value="{{ $usuario->id }}">
                             <div class="form-group">
                                 <label for="nombre">Nombre Completo:</label>
-                                <input type="text" class="form-control" id="nombre" name="nombre_completo" value="{{ $usuario->name }}" readonly>   
+                                <input type="text" class="form-control" id="nombre" name="nombre_completo" value="{{ $usuario->name ?? 'Sin nombre registrado' }}" readonly>   
                             </div>
                             <div class="form-group">
                                 <label for="edad">Edad:</label>
-                                <input type="number" class="form-control" id="edad" name="edad" value="{{ $paciente->edad }}" required>
+                                <input type="number" class="form-control" id="edad" name="edad" value="{{ $paciente->edad ?? 'Sin edad registrada' }}" required>
                             </div>  
                             <div class="form-group">
                                 <label for="tipo">Tipo de Paciente:</label>
                                 <select class="form-control" id="tipo" name="tipo"  required>
                                     <option value="">Seleccione una opción</option>
-                                    <option value="Alumno" {{ $paciente->tipo === 'Alumno' ? 'selected' : '' }}>Alumno</option>
-                                    <option value="Trabajador" {{ $paciente->tipo === 'Trabajador' ? 'selected' : '' }}>Trabajador</option>
+                                    <option value="Alumno" {{ (isset($paciente) && $paciente->tipo === 'Alumno') ? 'selected' : '' }}>Alumno</option>
+                                    <option value="Trabajador" {{ (isset($paciente) && $paciente->tipo === 'Trabajador') ? 'selected' : '' }}>Trabajador</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="alergias">Alergias:</label>
-                                <textarea class="form-control" id="alergias" name="alergias" rows="3" placeholder="Explica si tienes alguna alergia o si eres alérgico a algún medicamento">{{ $paciente->alergias }}</textarea>   
+                                <textarea class="form-control" id="alergias" name="alergias" rows="3" placeholder="Explica si tienes alguna alergia o si eres alérgico a algún medicamento">{{ $paciente->alergias ?? 'Sin alergias registradas' }}</textarea>   
                             </div>
                             <div class="form-group">
                                 <label for="enfermedades">Enfermedades Crónicas:</label>
-                                <textarea class="form-control" id="enfermedades" name="enfermedades_cronicas" rows="3" placeholder="Enumera las enfermedades crónicas que padeces">{{ $paciente->enfermedades_cronicas }}</textarea>  
+                                <textarea class="form-control" id="enfermedades" name="enfermedades_cronicas" rows="3" placeholder="Enumera las enfermedades crónicas que padeces">{{ $paciente->enfermedades_cronicas ?? 'Sin enfermedades crónicas registradas' }}</textarea>  
                             </div>
                             <div class="form-group">
                                 <label for="medicamentos">Medicamentos Actuales:</label>
-                                <textarea class="form-control" id="medicamentos" name="medicamentos_actuales" rows="3" placeholder="Enumera los medicamentos que estás tomando actualmente">{{ $paciente->medicamentos_actuales }}</textarea>
+                                <textarea class="form-control" id="medicamentos" name="medicamentos_actuales" rows="3" placeholder="Enumera los medicamentos que estás tomando actualmente">{{ $paciente->medicamentos_actuales ?? 'Sin medicamentos actuales registrados' }}</textarea>
                             </div>
                             <div class="form-group">
                                 <label for="contacto_emergencia">Contacto de Emergencia:</label>
-                                <input type="text" class="form-control" id="contacto_emergencia" name="contacto_emergencia" placeholder="Nombre del contacto de emergencia" value="{{ $paciente->contacto_emergencia }}" required>
+                                <input type="text" class="form-control" id="contacto_emergencia" name="contacto_emergencia" placeholder="Nombre del contacto de emergencia" value="{{ $paciente->contacto_emergencia ?? 'Sin contacto de emergencia registrado' }}" required>
                             </div>
                             <div class="form-group">
                                 <label for="telefono_emergencia">Teléfono de Emergencia:</label>
-                                <input type="text" class="form-control" id="telefono_emergencia" name="telefono_emergencia" placeholder="Teléfono del contacto de emergencia" value="{{ $paciente->telefono_emergencia }}" required>
+                                <input type="text" class="form-control" id="telefono_emergencia" name="telefono_emergencia" placeholder="Teléfono del contacto de emergencia" value="{{ $paciente->telefono_emergencia ?? 'Sin teléfono de emergencia registrado' }}" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Actualizar Perfil</button>
                         </form>

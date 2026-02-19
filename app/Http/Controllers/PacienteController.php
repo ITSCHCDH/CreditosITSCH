@@ -16,7 +16,7 @@ class PacienteController extends Controller
         //Consultamos las citas ordenadas por fecha y los pasamos a la vista       
         $citas = Cita::where('paciente_id', auth()->user()->id)->orderBy('fecha_cita', 'asc')->get();
         //Consultamos si este usuario ya es paciente, si no, lo redirigimos a completar su perfil
-        $usuario = auth()->user();
+        $usuario = auth()->user(); 
         $esPaciente = Paciente::where('user_id', $usuario->id)->first();
         if (!$esPaciente) {
             //Redirigimos a la vista para completar el perfil de paciente y enviamos los datos del usuario

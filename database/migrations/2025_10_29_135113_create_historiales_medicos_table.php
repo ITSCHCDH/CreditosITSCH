@@ -16,9 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('paciente_id');
             $table->unsignedBigInteger('cita_id');            
             $table->text('diagnostico')->nullable();
-            $table->text('tratamiento')->nullable();
-            $table->text('notas_adicionales')->nullable();
-            $table->integer('semaforo')->default(1); // 1: Verde, 2: Amarillo, 3: Rojo
+            $table->text('tratamiento')->nullable();                       
             $table->timestamps();
 
             $table->foreign('paciente_id')->references('id')->on('pacientes')->onDelete('cascade');
