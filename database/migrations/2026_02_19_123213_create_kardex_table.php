@@ -24,7 +24,7 @@ return new class extends Migration
             $table->integer('anio');
 
             // Datos del catedratico que impartió la materia           
-            $table->string('catedratico_clave', 20)->nullable();
+            $table->integer('catedratico_clave')->nullable();
             
             // CALIFICACIÓN FINAL de la materia
             $table->decimal('calificacion_final', 4, 2);

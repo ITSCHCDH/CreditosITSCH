@@ -9,15 +9,13 @@ class Catedratico extends Model
     protected $table = 'catedraticos';
     
     protected $fillable = [
-        'profesor_clave',
+        'catedratico_clave',
         'nombre',
         'apellido_paterno',
         'apellido_materno',
         'titulo',        
         'departamento_clave',        
-        'email',
-        'email_institucional',
-        'telefono',
+        'email',      
         'celular',       
         'fecha_ingreso',
         'fecha_baja',       

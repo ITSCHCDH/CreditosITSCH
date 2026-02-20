@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('materia_clave', 20);
             
             // Relación con profesor (tabla catedraticos)
-            $table->string('catedratico_clave', 20);
+            $table->integer('catedratico_clave');
             
             // Datos del grupo/periodo
             $table->string('grupo_clave', 30);

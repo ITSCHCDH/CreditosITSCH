@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             
             // Identificador único del profesor
-            $table->string('catedratico_clave', 20)->unique();
+            $table->integer('catedratico_clave')->unique();
             
             // Datos personales
             $table->string('nombre', 100);

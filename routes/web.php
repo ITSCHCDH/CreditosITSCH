@@ -26,6 +26,7 @@ use App\Http\Controllers\AlumnosStaController;
 use App\Http\Controllers\GruposController;
 use App\Http\Controllers\SistemaMedicoController;
 use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\Admin\MigracionController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -277,9 +278,13 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::post('/sta/paciente/destroy/cita/{id}',[PacienteController::class,'destroy'])->name('paciente.destroy.cita');
     Route::post('/sta/paciente/store/perfil',[PacienteController::class,'storePerfil'])->name('paciente.store.perfil');
     Route::get('/sta/paciente/editar/perfil',[PacienteController::class,'editPerfil'])->name('paciente.editar.perfil');
-    
 
-});
+    //Rutas para migración de datos        
+    Route::get('/migraciones', [MigracionController::class, 'index'])->name('migraciones.index');
+    Route::post('/migraciones/importar', [MigracionController::class, 'importar'])->name('migraciones.importar');
+    Route::post('/migraciones/depurar', [MigracionController::class, 'depurar'])->name('migraciones.depurar');
+});    
+
 /******************************/
 Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::get('home','AlumnosRutasController@avance')->name('alumnos.home_avance');

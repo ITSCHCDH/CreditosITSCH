@@ -95,7 +95,7 @@
 
             <!-- Copyright -->
             <div class="text-center py-3" style="background-color: rgba(0, 0, 0, 0.2);">© 2022 Copyright:
-                <a href="https://github.com/kioselsa" target="_blank"> Kioselsar</a> & <a href="https://github.com/Madophs" target="_blank">Madophs</a> ,Contact: <a href="https://kioselsar.com" target="_blank">kioselsar.com</a>
+                <a href="https://github.com/kioselsa" target="_blank"> Kioselsar</a>, Contact: <a href="https://kioselsar.com" target="_blank">kioselsar.com</a>
             </div>
             <!-- Copyright -->
 

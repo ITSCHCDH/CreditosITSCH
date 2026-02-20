@@ -31,10 +31,7 @@ return new class extends Migration
             $table->string('departamento_nombre', 255)->nullable();
             
             // Créditos y horas
-            $table->integer('creditos')->default(0);
-            $table->integer('horas_teoria')->default(0);
-            $table->integer('horas_practica')->default(0);
-            $table->integer('horas_totales')->default(0);
+            $table->integer('creditos')->default(0);           
             
             // Información de unidades/temas
             $table->integer('num_unidades')->default(5); // Número de unidades que tiene la materia

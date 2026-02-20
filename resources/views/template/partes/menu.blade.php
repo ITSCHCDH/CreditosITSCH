@@ -135,7 +135,10 @@
                                 @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ROLES']))
                                     <a class="dropdown-item" href="{{ route('roles.index') }}">Roles</a>
-                                @endif                                                     
+                                @endif  
+                                @if (Auth::User()->hasAnyPermission(['VIP']))
+                                    <a class="dropdown-item" href="{{ route('migraciones.index') }}">Importar datos escolares</a>
+                                @endif                                                   
                             </div>
                         </li>
                     @endif                       
