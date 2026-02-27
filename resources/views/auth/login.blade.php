@@ -88,17 +88,17 @@
                     </div>
                 </div>
             </div>
-          </section>
+        </section>
 
         <!-- MDB -->
         <script
         type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.js"
         ></script>
-        <!-- Scripts -->
-        <script src="{{ asset('js/app.js') }}"></script>
+        <!-- jQuery PRIMERO -->
         <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
-
+        <!-- Luego app.js -->
+        <script src="{{ asset('js/app.js') }}"></script>
 
         <script type="text/javascript">
             function comboTipo(){
