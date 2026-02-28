@@ -88,4 +88,24 @@ class LoginController extends Controller
         return $this->sendFailedLoginResponse($request);
     }
 
+    public function alumnoLogin(Request $request)
+    {
+        $this->validateLogin($request);
+
+        if ($this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+            return $this->sendLockoutResponse($request);
+        }
+
+        // Intentar autenticar con el guard 'alumno'
+        if (\Auth::guard('alumno')->attempt(['email' => $request->email, 'password' => $request->password])) {
+            return redirect()->intended('alumnos/home');
+        }
+
+        $this->incrementLoginAttempts($request);
+        Alert::error("Error", "El usuario o la contraseña son incorrectos");
+        return redirect()->back()->withInput($request->only('email'));
+    }
+
+
 }

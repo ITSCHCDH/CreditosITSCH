@@ -54,6 +54,9 @@ Route::get('/', function () {
     }
     return view('auth.login');
 })->name('alumnos.login');
+
+Route::post('/alumnos/login', [App\Http\Controllers\Auth\LoginController::class, 'alumnoLogin'])->name('alumnos.login');
+
 /* Agregamos la ruta al html para listar los resposables de una actividad
 +*/
 
