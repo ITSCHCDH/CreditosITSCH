@@ -43,7 +43,7 @@
          </table>
     </head>
     <h5>A QUIEN CORRESPONDA: </h5>
-    <p style="line-height:3;">LOS QUE SUSCRIBEN, LA MTRA. MARIA DE LOURDES SÁNCHEZ MORA. JEFA DEL DEPARTAMENTO DE TUTORIAS Y SERVICIOS PSICOPEDAGÓGICOS Y EL ISC. OSCAR DELGADO CAMACHO, ENCARGADO DE LA SUBDIRECCIÓN ACADÉMICA DEL INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO: </p>
+    <p style="line-height:3;">LOS QUE SUSCRIBEN, LA DRA. MARIA DE LOURDES SÁNCHEZ MORA. ENCARGADA DEL DEPARTAMENTO DE DESARROLLO ACADÉMICO Y EL ISC. OSCAR DELGADO CAMACHO, SUBDIRECTOR ACADÉMICO DEL INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO: </p>
     <div style="text-align: center;">
         <b>HACEN CONSTAR</b>
     </div>
@@ -72,8 +72,8 @@
                     <br>
                     <br>
                     <br>
-                    <b><small>MTRA. MARÍA DE LOURDES SÁNCHEZ MORA</small></b>
-                    <p><small>JEFA DEL DEPARTAMENTO DE TUTORIAS Y SERV. PSICO.</small></p>
+                    <b><small>DRA. MARÍA DE LOURDES SÁNCHEZ MORA</small></b>
+                    <p><small>ENCARGADA DEL DEPARTAMENTO DE DESARROLLO ACADÉMICO</small></p>
                     <p><small>INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO</small></p>
                 </td>
                 <td style="width: 40px;"></td>
@@ -86,7 +86,7 @@
                     <br>
                     <br>
                     <b><small>ISC. OSCAR DELGADO CAMACHO</small></b>
-                    <p><small>ENCARGADO DE LA SUBDIRECCIÓN ACADÉMICA</small></p>
+                    <p><small>SUBDIRECTOR ACADÉMICO</small></p>
                     <p><small>INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO</small></p>
                 </td>               
             </tr>
