@@ -18,7 +18,7 @@
                         <a class="nav-link" aria-current="page" href="{{ route('alumnos.home_avance')}}" title="Inicio"><i class="fas fa-home"></i></a>
                     </li>                   
                     <li class="nav-item active">
-                        <a class="nav-link" aria-current="page" href="{{ route('alumnos.sta.ficha',1) }}" title="Créditos">Ficha</a>
+                        <a class="nav-link" aria-current="page" href="{{ route('alumnos.sta.ficha',1) }}" title="CrÃ©ditos">Ficha</a>
                     </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="{{ route('paciente.alumno.index.citas') }}" title="Citas medicas">Mis citas</a>
@@ -32,7 +32,7 @@
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_ACTIVIDAD','VIP_ACTIVIDAD','VER_PARTICIPANTES','VIP_EVIDENCIA','VER_EVIDENCIA']))             
                         <!-- Dropdown -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-bs-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">Actividades</a>
                             <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
                                 @if (Auth::User()->can('VIP')|| Auth::User()->can('VER_ACTIVIDAD') || Auth::User()->can('VIP_ACTIVIDAD') || Auth::User()->can('VIP_SOLO_LECTURA'))
@@ -53,7 +53,7 @@
                     @if (Auth::User()->hasAnyPermission('VIP','VIP_AVANCE_ALUMNO','VER_AVANCE_ALUMNO','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VER_REPORTES_CARRERA','VIP_REPORTES'))           
                         <!-- Dropdown -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-bs-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">Avance</a>
                             <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
@@ -65,10 +65,10 @@
                             </div>
                         </li>
                     @endif   
-                    {{-- Menú de STA --}}
+                    {{-- MenÃº de STA --}}
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_STA','STA_COR_CARRERA','STA_PROFESOR','STA_TUTOR','STA_DEP_TUTORIA']))
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-bs-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">STA</a>
                             <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
                                 @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_COR_CARRERA') || Auth::User()->can('VIP'))                                    
@@ -86,14 +86,14 @@
                             </div>
                         </li>
                     @endif      
-                    <!-- Menú sistema medico -->
+                    <!-- MenÃº sistema medico -->
                     @if (Auth::User()->hasAnyPermission(['VIP','VER_CITAS_MEDICAS','MODIFICAR_CITAS_MEDICAS']))
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">Sistema Médico</a>
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">Sistema MÃ©dico</a>
                             <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_MEDICO']))
-                                    <a class="dropdown-item" href="{{ route('medico.index') }}">Agenda médica</a>
+                                    <a class="dropdown-item" href="{{ route('medico.index') }}">Agenda mÃ©dica</a>
                                 @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','CREAR_CITAS_MEDICAS']))
                                     <a class="dropdown-item" href="{{ route('paciente.index.citas') }}">Mis cita</a>
@@ -101,11 +101,11 @@
                             </div>
                         </li>
                     @endif                    
-                    <!-- Menú de administración -->
+                    <!-- MenÃº de administraciÃ³n -->
                     @if (Auth::User()->hasAnyPermission(['VIP','VER_USUARIOS']))
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">Administración</a>
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">AdministraciÃ³n</a>
                             <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
                                 @if(Auth::User()->hasAnyPermission('VIP','VER_AREAS','VIP_SOLO_LECTURA'))
                                     <a class="dropdown-item" href="{{ route('areas.inicio') }}">Areas</a>
@@ -144,9 +144,9 @@
             <ul class="navbar-nav ml-auto mr-4">
                 <li class="nav-item dropdown">
                     @if (!Auth::guard('alumno')->check())
-                        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ Auth::user()->name }}</a>
+                        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ Auth::user()->name }}</a>
                     @else
-                        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ Auth::guard('alumno')->user()->nombre }}</a>
+                        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ Auth::guard('alumno')->user()->nombre }}</a>
                     @endif
                     <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
                         @if (!Auth::guard('alumno')->check())

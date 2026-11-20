@@ -47,7 +47,7 @@
             <!-- Modal Header -->
             <div class="modal-header">
             <h4 class="modal-title">Mensaje</h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
             </div>
 
             <!-- Modal body -->
@@ -60,7 +60,7 @@
             <!-- Modal footer -->
             <div class="modal-footer">
                 <a  class="btn btn-danger" id="prueba">Aceptar</a>
-                <button type="button" class="btn btn-success" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Cancelar</button>
             </div>
         </div>
         </div>

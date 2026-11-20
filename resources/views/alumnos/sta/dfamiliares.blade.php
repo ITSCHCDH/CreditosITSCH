@@ -21,7 +21,7 @@
 								<div>
 									<div class="panel-heading">
 										<h3 class="head text-center">FICHA DE
-											IDENTIFICACIÓN DEL ALUMNO TUTORADO</h3>
+											IDENTIFICACIÃ“N DEL ALUMNO TUTORADO</h3>
 										<div class="head text-center">
 											<h4>Datos Familiares</h4>
 										</div>
@@ -36,11 +36,11 @@
 								<div id="cr">
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h5 class="accordion-toggle collapsed" data-toggle="collapse"
+											<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse"
 												href="#collapseWidthExample" class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-													href="#tableFam">Nombra a los integrantes de tu familia (Mamá, Papá,
-													Hermanos, del mayor al menor incluyéndote).</a>
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+													href="#tableFam">Nombra a los integrantes de tu familia (MamÃ¡, PapÃ¡,
+													Hermanos, del mayor al menor incluyÃ©ndote).</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
 										</div>
@@ -56,9 +56,9 @@
 																<th>Edad</th>
 																<th>Escolaridad</th>
 																<th>Parentesco</th>
-																<th>Relación con el/ella</th>
+																<th>RelaciÃ³n con el/ella</th>
 																<th><input class="btn btn-info btn-sm" type="button"
-																		value="Añadir otro" onclick="agregar()"></th>
+																		value="AÃ±adir otro" onclick="agregar()"></th>
 															</tr>
 														</thead>
 														<tbody>
@@ -160,10 +160,10 @@
 
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#fam2"
+											<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#fam2"
 												class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-													href="#fam2">¿Existen dificultades?</a>
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+													href="#fam2">Â¿Existen dificultades?</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
 										</div>
@@ -176,7 +176,7 @@
 															@endif type="radio" name="dif" id="inlineRadio1" value="Si"
 															onclick="$('#fiden_dificultades').attr('readonly',
 															false).attr('required',true);">
-															Sí
+															SÃ­
 														</label>
 														<label class="radio-inline">
 															<input required @if($fam->dificultades=='No') checked @endif
@@ -188,7 +188,7 @@
 													</div>
 													<div class="col-sm-5">
 														<div class="form-group bs-float-label">
-															<label for="fiden_dificultades">¿De qué tipo?</label>
+															<label for="fiden_dificultades">Â¿De quÃ© tipo?</label>
 															<input @if($fam->dificultades=='No') readonly @endif
 															class="form-control float-input" name="fiden_dificultades"
 															value="{{ $fam->dificultades }}" placeholder=""
@@ -201,10 +201,10 @@
 									</div>
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#fam4"
+											<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#fam4"
 												class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-													href="#fam4">¿Con quién te sientes más ligado afectivamente?</a>
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+													href="#fam4">Â¿Con quiÃ©n te sientes mÃ¡s ligado afectivamente?</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
 										</div>
@@ -215,7 +215,7 @@
 														<div class="col-sm-6">
 															<select id="fiden_ligue" name="fiden_ligue"
 																class="form-control float-input" required>
-																<option value=''>Selecciona una opción
+																<option value=''>Selecciona una opciÃ³n
 																</option>
 																<option value='Madre' @if($fam->
 																	ligado=='Madre') selected @endif>Madre</option>
@@ -229,17 +229,17 @@
 																	ligado=='Hermana') selected @endif>Hermana</option>
 																<option value='Hermano' @if($fam->
 																	ligado=='Hermano') selected @endif>Hermano</option>
-																<option value='Tía' @if($fam->
-																	ligado=='Tía') selected @endif>Tía</option>
-																<option value='Tío' @if($fam->
-																	ligado=='Tío') selected @endif>Tío</option>
+																<option value='TÃ­a' @if($fam->
+																	ligado=='TÃ­a') selected @endif>TÃ­a</option>
+																<option value='TÃ­o' @if($fam->
+																	ligado=='TÃ­o') selected @endif>TÃ­o</option>
 																<option value='Otro' @if($fam->
 																	ligado=='Otro') selected @endif>Otro</option>
 															</select>
 														</div>
 														<div class="col-sm-6">
 															<div class="form-group bs-float-label">
-																<label for="fiden_ligue_T">Especifica por qué</label>
+																<label for="fiden_ligue_T">Especifica por quÃ©</label>
 																<input required class="form-control float-input"
 																	name="fiden_ligue_T" placeholder="" id="fiden_ligue_T"
 																	value="{{ $fam->ligado_por }}">
@@ -252,12 +252,12 @@
 									</div>
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#fam5"
+											<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#fam5"
 												class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-													href="#fam5">¿Quién
-													se ocupa más en tu
-													educación?</a>
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+													href="#fam5">Â¿QuiÃ©n
+													se ocupa mÃ¡s en tu
+													educaciÃ³n?</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
 										</div>
@@ -277,12 +277,12 @@
 									</div>
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#fam6"
+											<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#fam6"
 												class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-													href="#fam6">¿Quién
-													ha influido más en tu
-													decisión para estudiar esta carrera?</a>
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+													href="#fam6">Â¿QuiÃ©n
+													ha influido mÃ¡s en tu
+													decisiÃ³n para estudiar esta carrera?</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
 										</div>
@@ -302,11 +302,11 @@
 									</div>
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#fam7"
+											<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#fam7"
 												class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
 													href="#fam7">Consideras importante facilitar
-													algún otro dato sobre tu ambiente familiar</a>
+													algÃºn otro dato sobre tu ambiente familiar</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
 										</div>

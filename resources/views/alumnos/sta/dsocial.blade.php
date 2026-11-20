@@ -20,7 +20,7 @@
                                 {{--cabecera--}}
                                 <div>
                                     <div class="panel-heading">
-                                        <h3 class="head text-center">ÁREAS PERSONAL Y SOCIAL</h3>
+                                        <h3 class="head text-center">ÃREAS PERSONAL Y SOCIAL</h3>
                                         <div class="head text-center">
                                             <h4>Datos sobre tu vida social</h4>
                                         </div>
@@ -35,11 +35,11 @@
                                 <div id="cr">
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#soc">¿Cómo
-                                                    es la relación con tus compañeros?</a>
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#soc">Â¿CÃ³mo
+                                                    es la relaciÃ³n con tus compaÃ±eros?</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
                                         </div>
@@ -64,7 +64,7 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <div class="form-group bs-float-label">
-                                                            <label for="rel_comp_t">¿Por qué?</label>
+                                                            <label for="rel_comp_t">Â¿Por quÃ©?</label>
                                                             <textarea required id="rel_comp_t" name="rel_comp_t"
                                                                 placeholder=""
                                                                 class="form-control float-input">{{ $soc->comp_por }}</textarea>
@@ -76,11 +76,11 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc1"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc1"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#soc1">¿Cómo
-                                                    es la relación con tus amigos?</a>
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#soc1">Â¿CÃ³mo
+                                                    es la relaciÃ³n con tus amigos?</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
                                         </div>
@@ -105,7 +105,7 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <div class="form-group bs-float-label">
-                                                            <label for="rel_ami_t">¿Por qué?</label>
+                                                            <label for="rel_ami_t">Â¿Por quÃ©?</label>
                                                             <textarea required id="rel_ami_t" name="rel_ami_t"
                                                                 placeholder=""
                                                                 class="form-control float-input">{{ $soc->amig_por }}</textarea>
@@ -117,10 +117,10 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc2"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc2"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#soc2">¿Tienes pareja?</a>
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#soc2">Â¿Tienes pareja?</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
                                         </div>
@@ -143,8 +143,8 @@
                                                         </label>
                                                     </div>
                                                     <div class="col-sm-5">
-                                                        <label for="rel_alu_par">¿Cómo
-                                                            es su relación?</label>
+                                                        <label for="rel_alu_par">Â¿CÃ³mo
+                                                            es su relaciÃ³n?</label>
                                                         <select name="rel_alu_par" id="rel_alu_par" @if($soc->pareja=='No')
                                                             readonly
                                                             @endif class="form-control float-input">
@@ -167,11 +167,11 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc3"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc3"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#soc3">¿Cómo
-                                                    es la relación con tus
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#soc3">Â¿CÃ³mo
+                                                    es la relaciÃ³n con tus
                                                     profesores?</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
@@ -197,7 +197,7 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <div class="form-group bs-float-label">
-                                                            <label for="rel_pro_t">¿Por qué?</label>
+                                                            <label for="rel_pro_t">Â¿Por quÃ©?</label>
                                                             <textarea required id="rel_pro_t" name="rel_pro_t"
                                                                 placeholder=""
                                                                 class="form-control float-input">{{ $soc->prof_por }}</textarea>
@@ -209,10 +209,10 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc4"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc4"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#soc4">¿Cómo es tu relación con las autoridades académicas?</a>
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#soc4">Â¿CÃ³mo es tu relaciÃ³n con las autoridades acadÃ©micas?</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
                                         </div>
@@ -237,7 +237,7 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <div class="form-group bs-float-label">
-                                                            <label for="rel_aut_aca_t">¿Por qué?</label>
+                                                            <label for="rel_aut_aca_t">Â¿Por quÃ©?</label>
                                                             <textarea required id="rel_aut_aca_t" name="rel_aut_aca_t"
                                                                 placeholder=""
                                                                 class="form-control float-input">{{ $soc->auto_ac_por }}</textarea>
@@ -249,10 +249,10 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc5"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc5"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#soc5">¿Qué haces en tu tiempo libre?</a>
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#soc5">Â¿QuÃ© haces en tu tiempo libre?</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
                                         </div>
@@ -272,10 +272,10 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc6"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc6"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#soc6">¿Cuál
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#soc6">Â¿CuÃ¡l
                                                     es tu actividad recreativa?</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
@@ -296,10 +296,10 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc7"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc7"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#soc7">¿Cuáles son tus planes inmediatos?</a>
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#soc7">Â¿CuÃ¡les son tus planes inmediatos?</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
                                         </div>
@@ -319,10 +319,10 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc8"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc8"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#soc8">¿Cuáles son tus metas en la vida?</a>
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#soc8">Â¿CuÃ¡les son tus metas en la vida?</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
                                         </div>
@@ -342,9 +342,9 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc9"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc9"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse" href="#soc9">Yo
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse" href="#soc9">Yo
                                                     soy...(Responde lo primero que se te venga a la mente)</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
@@ -365,10 +365,10 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc10"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc10"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#soc10">¿Mi carácter es...?</a>
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#soc10">Â¿Mi carÃ¡cter es...?</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
                                         </div>
@@ -388,9 +388,9 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc11"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc11"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse" href="#soc11">A mí me gusta que...</a>
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse" href="#soc11">A mÃ­ me gusta que...</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
                                         </div>
@@ -410,9 +410,9 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc12"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc12"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
                                                     href="#soc12">Yo aspiro en la vida...</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
@@ -433,9 +433,9 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#soc13"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#soc13"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
                                                     href="#soc13">Yo tengo miedo que...</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>

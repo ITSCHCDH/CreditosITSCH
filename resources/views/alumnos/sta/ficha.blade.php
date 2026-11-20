@@ -5,7 +5,7 @@
 @section('ruta')
 	<a href="" class="label label-info">STA</a>
 	/
-	<label class="label label-success">Ficha de identificación</label>
+	<label class="label label-success">Ficha de identificaciÃ³n</label>
 @endsection
 
 @section('contenido')
@@ -28,7 +28,7 @@
 								{{--cabecera--}}
 								<div>
 									<div class="panel-heading">
-										<h3 class="head text-center">FICHA DE IDENTIFICACIÓN DEL ALUMNO TUTORADO</h3>
+										<h3 class="head text-center">FICHA DE IDENTIFICACIÃ“N DEL ALUMNO TUTORADO</h3>
 										<div class="head text-center">
 											<h4>Datos Personales </h4>
 										</div>
@@ -79,9 +79,9 @@
 									<div class="panel ">
 										<div class="panel-heading ">
 											<h5 class="panel-title" class="accordion-toggle collapsed"
-												data-toggle="collapse" href="#fisic">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-													href="#fisic">Físico</a>
+												data-bs-toggle="collapse" href="#fisic">
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+													href="#fisic">FÃ­sico</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
 										</div>
@@ -161,9 +161,9 @@
 									{{--Grupo--}}
 									<div class="panel ">
 										<div class="panel-heading">
-											<h5 class="panel-title" lass="accordion-toggle collapsed" data-toggle="collapse"
+											<h5 class="panel-title" lass="accordion-toggle collapsed" data-bs-toggle="collapse"
 												href="#grupo">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
 													href="#grupo">Grupo</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
@@ -194,8 +194,8 @@
 									<div class="panel">
 										<div class="panel-heading ">
 											<h5 class="panel-title" class="accordion-toggle collapsed"
-												data-toggle="collapse" href="#fenac">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
+												data-bs-toggle="collapse" href="#fenac">
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
 													href="#fenac">Fecha
 													de nacimiento</a>
 												<a> <i class="fa fa-angle-down"></i></a>
@@ -226,9 +226,9 @@
 									{{--Estado civil--}}
 									<div class="panel ">
 										<div class="panel-heading ">
-											<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#edci"
+											<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#edci"
 												class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
 													href="#edci">Estado civil</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
@@ -240,7 +240,7 @@
 														<div class="form-group bs-float-label">
 															<select class="form-control float-input" id="est_civ"
 																name="est_civ" required>
-																<option value="">Seleccione una opción
+																<option value="">Seleccione una opciÃ³n
 																</option>
 																<option value='Soltero' @if($alu->
 																	est_civ=='Soltero')
@@ -257,13 +257,13 @@
 																	est_civ=='Divorciado')
 																	selected
 																	@endif>Divorciado</option>
-																<option value='Viúdo' @if($alu->
-																	est_civ=='Viúdo') selected
-																	@endif>Viúdo</option>
-																<option value='Unión Libre' @if($alu->
-																	est_civ=='Unión
+																<option value='ViÃºdo' @if($alu->
+																	est_civ=='ViÃºdo') selected
+																	@endif>ViÃºdo</option>
+																<option value='UniÃ³n Libre' @if($alu->
+																	est_civ=='UniÃ³n
 																	Libre') selected
-																	@endif>Unión Libre</option>
+																	@endif>UniÃ³n Libre</option>
 															</select>
 															<label class="float-label">Estado Civil</label>
 														</div>
@@ -275,10 +275,10 @@
 									{{--Trabajo--}}
 									<div class="panel panel-default">
 										<div class="panel-heading ">
-											<h5 class="accordion-toggle collapsed " data-toggle="collapse"
+											<h5 class="accordion-toggle collapsed " data-bs-toggle="collapse"
 												href="#inputTrabajo" class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-													href="#inputTrabajo">¿Trabajas?</a>
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+													href="#inputTrabajo">Â¿Trabajas?</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
 										</div>
@@ -304,7 +304,7 @@
 															<input @if($person->trab=='No') readonly @endif type="text"
 															name="trabajo" id="trabajo"
 															class="form-control float-input" value="{{ $person->trab }}" />
-															<label for="trabajo" class="float-label">En qué lugar
+															<label for="trabajo" class="float-label">En quÃ© lugar
 																trabajas</label>
 														</div>
 													</div>
@@ -315,9 +315,9 @@
 									{{--Domicilio Actual--}}
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#domi"
+											<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#domi"
 												class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
 													href="#domi">Domicilio actual</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
@@ -344,9 +344,9 @@
 													<div class="col-sm-4">
 														<div class="form-group bs-float-label">
 															<input required type="number" class="form-control float-input"
-																if="cp" name="cp" placeholder="Código postal"
+																if="cp" name="cp" placeholder="CÃ³digo postal"
 																value="{{ $direccion->cp }}">
-															<label for="cp" class="float-label">Código postal</label>
+															<label for="cp" class="float-label">CÃ³digo postal</label>
 														</div>
 													</div>
 												</div>
@@ -375,9 +375,9 @@
 									{{--casa--}}
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h5 class="accordion-toggle collapsed " data-toggle="collapse" href="#casaedo"
+											<h5 class="accordion-toggle collapsed " data-bs-toggle="collapse" href="#casaedo"
 												class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
 													href="#casaedo">La casa donde vives es:</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
@@ -431,10 +431,10 @@
 									{{--identificacion 2--}}
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#datai2"
+											<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#datai2"
 												class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-													href="#datai2">Datos de identificación 2</a>
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+													href="#datai2">Datos de identificaciÃ³n 2</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
 										</div>
@@ -445,9 +445,9 @@
 														<div class="form-group bs-float-label">
 															<input type="text" id="tel" name="tel"
 																class="form-control float-input"
-																placeholder="Número de Teléfono" value="{{ $alu->tel }}"
+																placeholder="NÃºmero de TelÃ©fono" value="{{ $alu->tel }}"
 																required>
-															<label for="tel" class="float-label">Número de teléfono</label>
+															<label for="tel" class="float-label">NÃºmero de telÃ©fono</label>
 														</div>
 													</div>
 													<div class="col-sm-4">
@@ -475,10 +475,10 @@
 									{{--num de personas con las que vives--}}
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#nump"
+											<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#nump"
 												class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-													href="#nump">Número de personas con las que
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+													href="#nump">NÃºmero de personas con las que
 													vives</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
@@ -490,9 +490,9 @@
 														<div class="form-group bs-float-label">
 															<input type="number" name="num_person" id="num_person"
 																class="form-control float-input"
-																placeholder="Número de personas con las que vives"
+																placeholder="NÃºmero de personas con las que vives"
 																value="{{ $person->num_person }}" required />
-															<label for="num_person" class="float-label">Número de
+															<label for="num_person" class="float-label">NÃºmero de
 																personas
 																con las que vives</label>
 														</div>
@@ -512,9 +512,9 @@
 									{{--datos del padre--}}
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#datPad"
+											<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#datPad"
 												class="panel-title">
-												<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
+												<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
 													href="#datPad">Datos del padre</a>
 												<a> <i class="fa fa-angle-down"></i></a>
 											</h5>
@@ -544,7 +544,7 @@
 															<input required type="text" name="TelPa" id="TelPa"
 																class="form-control float-input"
 																placeholder="Telefono del padre" value="{{ $dPad->tel }}" />
-															<label for="TelPa" class="float-label">Teléfono del
+															<label for="TelPa" class="float-label">TelÃ©fono del
 																padre</label>
 														</div>
 													</div>
@@ -552,7 +552,7 @@
 												<br>
 												<div class="row">
 													<div class="col-sm-4">
-														<label>¿Trabaja?</label>
+														<label>Â¿Trabaja?</label>
 														<label class="radio-inline">
 															<input required @if($dPad->ocupacion!='No') checked
 															@endif type="radio" name="trPad" id="trPad1" value="Si"
@@ -581,7 +581,7 @@
 																class="form-control float-input"
 																placeholder="Profecion del Padre"
 																value="{{ $dPad->profesion }}" />
-															<label for="ProfPa" class="float-label">Profesión del
+															<label for="ProfPa" class="float-label">ProfesiÃ³n del
 																Padre</label>
 														</div>
 													</div>
@@ -589,7 +589,7 @@
 												<br>
 												<div class="row">
 													<div class="col-sm-12">
-														<label style="font-weight: bold">Dirección del Padre</label>
+														<label style="font-weight: bold">DirecciÃ³n del Padre</label>
 														<div class="form-group bs-float-label">
 															<div class="row">
 																<div class="col-sm-4">
@@ -616,9 +616,9 @@
 																	<div class="form-group bs-float-label">
 																		<input required type="number"
 																			class="form-control float-input" if="cpP"
-																			name="cpP" placeholder="Código postal"
+																			name="cpP" placeholder="CÃ³digo postal"
 																			value="{{ $direccionP->cp }}">
-																		<label for="cpP" class="float-label">Código
+																		<label for="cpP" class="float-label">CÃ³digo
 																			postal</label>
 																	</div>
 																</div>
@@ -655,9 +655,9 @@
 								{{--datos de la madre--}}
 								<div class="panel panel-default">
 									<div class="panel-heading">
-										<h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#datMad"
+										<h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#datMad"
 											class="panel-title">
-											<a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
+											<a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
 												href="#datMad">Datos de la madre</a>
 											<a> <i class="fa fa-angle-down"></i></a>
 										</h5>
@@ -686,7 +686,7 @@
 														<input required type="text" name="TelMa" id="TelMa"
 															class="form-control float-input"
 															placeholder="Telefono de la Madre" value="{{ $dMad->tel }}" />
-														<label for="TelMa" class="float-label">Teléfono de la
+														<label for="TelMa" class="float-label">TelÃ©fono de la
 															Madre</label>
 													</div>
 												</div>
@@ -694,7 +694,7 @@
 											<br>
 											<div class="row">
 												<div class="col-sm-4">
-													<label>¿Trabaja?</label>
+													<label>Â¿Trabaja?</label>
 													<label class="radio-inline">
 														<input required @if($dMad->ocupacion!='No') checked
 														@endif type="radio" name="trMad" id="trMad1" value="Si"
@@ -722,7 +722,7 @@
 															class="form-control float-input"
 															placeholder="Profecion de la Madre"
 															value="{{ $dMad->profesion }}" />
-														<label for="ProfMa" class="float-label">Profesión de la
+														<label for="ProfMa" class="float-label">ProfesiÃ³n de la
 															Madre</label>
 													</div>
 												</div>
@@ -730,7 +730,7 @@
 											<br>
 											<div class="row">
 												<div class="col-sm-12">
-													<label style="font-weight: bold">Dirección de la Madre</label>
+													<label style="font-weight: bold">DirecciÃ³n de la Madre</label>
 													<div class="form-group bs-float-label">
 														<div class="row">
 															<div class="col-sm-4">
@@ -756,9 +756,9 @@
 																<div class="form-group bs-float-label">
 																	<input required type="number"
 																		class="form-control float-input" if="cpM" name="cpM"
-																		placeholder="Código postal"
+																		placeholder="CÃ³digo postal"
 																		value="{{ $direccionM->cp }}">
-																	<label for="cpM" class="float-label">Código
+																	<label for="cpM" class="float-label">CÃ³digo
 																		postal</label>
 																</div>
 															</div>
@@ -794,7 +794,7 @@
 								</div>
 								<div class="panel-footer center">
 									<hr>
-									<a href="{{ route('alumnos.home_avance') }}" data-toggle="tooltip" type="button" class="btn btn-danger">Cancelar</a>
+									<a href="{{ route('alumnos.home_avance') }}" data-bs-toggle="tooltip" type="button" class="btn btn-danger">Cancelar</a>
 									<input type="submit" value="Siguiente" class="btn btn-info">
 								</div>
 						</div>
@@ -823,7 +823,7 @@
 		this.submit();
 		}
 
-		//Codigó para validr que los campos esten llenos
+		//CodigÃ³ para validr que los campos esten llenos
 		$(document).ready(function() {
 			$("form").submit(function(event) {
 				var formValid = true;

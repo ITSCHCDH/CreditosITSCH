@@ -21,7 +21,7 @@
                                 <br>
                                 <div>
                                     <div class="panel-heading">
-                                        <h3 class="head text-center">FICHA DE IDENTIFICACIÓN DEL
+                                        <h3 class="head text-center">FICHA DE IDENTIFICACIÃ“N DEL
                                             ALUMNO TUTORADO</h3>
                                         <div class="head text-center">
                                             <h4>Datos de Salud </h4>
@@ -37,10 +37,10 @@
                                 <div id="cr">
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#enfermedad"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#enfermedad"
                                                 class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#enfermedad">¿Padeces alguna
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#enfermedad">Â¿Padeces alguna
                                                     enfermedad?</a>
                                                 <a> <i class="fa fa-angle-down">
                                                     </i></a>
@@ -94,9 +94,9 @@
                                                     <div class="col-sm-4">
                                                         <label class="checkbox-inline" for="checkbox2"> <input
                                                                 @if($clinicos->enfermedad=='No') disabled @endif
-                                                            @if($clinicos->hipertension=='Hipertensión') checked @endif
+                                                            @if($clinicos->hipertension=='HipertensiÃ³n') checked @endif
                                                             type="checkbox" name="fm_hipertencion" id="checkbox2"
-                                                            value="Hipertensión"> Hipertensión
+                                                            value="HipertensiÃ³n"> HipertensiÃ³n
                                                         </label>
                                                     </div>
                                                     <div class="col-sm-4">
@@ -125,18 +125,18 @@
                                                     <div class="col-sm-4">
                                                         <label class="checkbox-inline" for="checkbox6"> <input
                                                                 @if($clinicos->enfermedad=='No') disabled @endif
-                                                            @if($clinicos->sexual=='Enfermedad de Transmisión Sexual')
+                                                            @if($clinicos->sexual=='Enfermedad de TransmisiÃ³n Sexual')
                                                             checked @endif
                                                             type="checkbox" name="fm_trans_sexual" id="checkbox6"
-                                                            value="Enfermedad de Transmisión Sexual"> Enfermedad de
-                                                            Transmisión Sexual </label>
+                                                            value="Enfermedad de TransmisiÃ³n Sexual"> Enfermedad de
+                                                            TransmisiÃ³n Sexual </label>
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <label class="checkbox-inline" for="checkbox7"> <input
                                                                 @if($clinicos->enfermedad=='No') disabled @endif
-                                                            @if($clinicos->depresion=='Depresión') checked @endif
+                                                            @if($clinicos->depresion=='DepresiÃ³n') checked @endif
                                                             type="checkbox" name="fm_depresion" id="checkbox7"
-                                                            value="Depresión"> Depresión </label>
+                                                            value="DepresiÃ³n"> DepresiÃ³n </label>
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <label class="checkbox-inline" for="checkbox8"> <input
@@ -161,10 +161,10 @@
                                     </div>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h5 class="accordion-toggle collapsed" data-toggle="collapse"
+                                            <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse"
                                                 href="#discapacidad" class="panel-title">
-                                                <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                    href="#discapacidad">¿Cuentas con alguna discapacidad física?</a>
+                                                <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                    href="#discapacidad">Â¿Cuentas con alguna discapacidad fÃ­sica?</a>
                                                 <a> <i class="fa fa-angle-down"></i></a>
                                             </h5>
                                         </div>
@@ -210,8 +210,8 @@
                                                                 <label class="checkbox-inline" for="inlineRadio2">
                                                                     <input type="checkbox" name="fm_dis_oido"
                                                                         @if($clinicos->cap_dif=='No') disabled @endif
-                                                                    @if($clinicos->oido=='Oído') checked @endif
-                                                                    id="inlineRadio2" value="Oído"> Oído </label>
+                                                                    @if($clinicos->oido=='OÃ­do') checked @endif
+                                                                    id="inlineRadio2" value="OÃ­do"> OÃ­do </label>
                                                             </div>
                                                             <div class="col-sm-2">
                                                                 <label class="checkbox-inline" for="inlineRadio3">
@@ -245,11 +245,11 @@
                                         </div>
                                         <div class="panel panel-default">
                                             <div class="panel-heading">
-                                                <h5 class="accordion-toggle collapsed" data-toggle="collapse"
+                                                <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse"
                                                     href="#clinico" class="panel-title">
-                                                    <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                        href="#clinico">¿Cuentas con algún diagnóstico Psicológico
-                                                        Clínico?</a>
+                                                    <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                        href="#clinico">Â¿Cuentas con algÃºn diagnÃ³stico PsicolÃ³gico
+                                                        ClÃ­nico?</a>
                                                     <a> <i class="fa fa-angle-down"></i></a>
                                                 </h5>
                                             </div>
@@ -264,7 +264,7 @@
                                                                 onclick="$('#clin').attr('value','').attr('readonly',
                                                                 false).attr('required',true);$('#clinT').attr('value','').attr('readonly',
                                                                 false).attr('required',true);">
-                                                                Sí</label>
+                                                                SÃ­</label>
                                                             <label class="radio-inline">
                                                                 <input required @if($clinicos->dia_psico=='No') checked
                                                                 @endif type="radio" name="dx_psicologico" id="inlineRadio2"
@@ -274,17 +274,17 @@
                                                                 > No
                                                             </label>
                                                         </div>
-                                                        <div class="col-sm-4"><a>¿Cuál?</a>
+                                                        <div class="col-sm-4"><a>Â¿CuÃ¡l?</a>
                                                             <input @if($clinicos->dia_psico=='No') readonly @endif
                                                             class="form-control float-input" type="text"
                                                             name="dx_psicologico_c" value="{{ $clinicos->dia_psico }}"
-                                                            placeholder="¿Cuál?" id="clin">
+                                                            placeholder="Â¿CuÃ¡l?" id="clin">
                                                         </div>
-                                                        <div class="col-sm-4"><a>Hace cuánto:</a>
+                                                        <div class="col-sm-4"><a>Hace cuÃ¡nto:</a>
                                                             <input @if($clinicos->dia_psico=='No') readonly @endif
                                                             class="form-control float-input" type="text"
                                                             name="dx_psicologico_tm" value="{{ $clinicos->cuanto_psico }}"
-                                                            placeholder="Hace cuánto:" id="clinT">
+                                                            placeholder="Hace cuÃ¡nto:" id="clinT">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -292,10 +292,10 @@
                                         </div>
                                         <div class="panel panel-default">
                                             <div class="panel-heading">
-                                                <h5 class="accordion-toggle collapsed" data-toggle="collapse" href="#Medico"
+                                                <h5 class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#Medico"
                                                     class="panel-title">
-                                                    <a class="accordion-toggle collapsed txtNegro" data-toggle="collapse"
-                                                        href="#Medico">¿Cuentas con algún diagnóstico Médico?</a>
+                                                    <a class="accordion-toggle collapsed txtNegro" data-bs-toggle="collapse"
+                                                        href="#Medico">Â¿Cuentas con algÃºn diagnÃ³stico MÃ©dico?</a>
                                                     <a> <i class="fa fa-angle-down"></i></a>
                                                 </h5>
                                             </div>
@@ -310,7 +310,7 @@
                                                                 onclick="$('#med').attr('value','').attr('readonly',
                                                                 false).attr('required',true);$('#medT').attr('value','').attr('readonly',
                                                                 false).attr('required',true);">
-                                                                Sí</label>
+                                                                SÃ­</label>
                                                             <label class="radio-inline">
                                                                 <input required @if($clinicos->dia_med=='No') checked
                                                                 @endif type="radio" name="medRadio" id="medinlineRad2"
@@ -319,16 +319,16 @@
                                                                 $('#medT').attr('value','').attr('readonly',true).attr('required',false);"
                                                                 > No</label>
                                                         </div>
-                                                        <div class="col-sm-4"><a>¿Cuál?</a>
+                                                        <div class="col-sm-4"><a>Â¿CuÃ¡l?</a>
                                                             <input @if($clinicos->dia_med=='No') readonly @endif
                                                             class="form-control float-input" type="text" name="dx_medico"
-                                                            value="{{ $clinicos->dia_med }}" placeholder="¿Cuál?" id="med">
+                                                            value="{{ $clinicos->dia_med }}" placeholder="Â¿CuÃ¡l?" id="med">
                                                         </div>
-                                                        <div class="col-sm-4"><a>Hace cuánto:</a>
+                                                        <div class="col-sm-4"><a>Hace cuÃ¡nto:</a>
                                                             <input @if($clinicos->dia_med=='No') readonly @endif
                                                             class="form-control float-input" type="text"
                                                             name="dx_medico_tm" value="{{ $clinicos->cuanto_med }}"
-                                                            placeholder="Hace cuánto:" id="medT">
+                                                            placeholder="Hace cuÃ¡nto:" id="medT">
                                                         </div>
                                                     </div>
                                                 </div>

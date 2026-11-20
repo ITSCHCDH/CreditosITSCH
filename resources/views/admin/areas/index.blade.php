@@ -38,7 +38,7 @@
 	    					<a href="{{ route('areas.editar',$area->id) }}" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
 	    				@endif
 	    				@if(Auth::User()->hasAnyPermission(['VIP','ELIMINAR_AREAS']))
-	    					<a type="button" data-toggle="modal" data-target="#modalBaja" onclick="ruta({{ $area->id }})" class="btn btn-danger btn-sm"><i class="far fa-trash-alt"></i></a>
+	    					<a type="button" data-bs-toggle="modal" data-bs-target="#modalBaja" onclick="ruta({{ $area->id }})" class="btn btn-danger btn-sm"><i class="far fa-trash-alt"></i></a>
 	    				@endif
 	    			</td>
 	    		</tr>
@@ -55,7 +55,7 @@
 			<!-- Modal Header -->
 			<div class="modal-header">
 			<h4 class="modal-title">Eliminación de área</h4>
-			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<button type="button" class="close" data-bs-dismiss="modal">&times;</button>
 			</div>
 	
 			<!-- Modal body -->
@@ -66,7 +66,7 @@
 			<!-- Modal footer -->
 			<div class="modal-footer">
 				<a type="button" class="btn btn-success" id="eliminar">Eliminar</a>
-				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
 			</div>
 	
 		</div>

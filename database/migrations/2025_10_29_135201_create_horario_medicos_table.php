@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('horario_medicos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('medico_id');
+            $table->unsignedInteger('medico_id');
             $table->string('dia_semana'); // e.g., 'Lunes', 'Martes', etc.
             $table->time('hora_inicio');
             $table->time('hora_fin');            

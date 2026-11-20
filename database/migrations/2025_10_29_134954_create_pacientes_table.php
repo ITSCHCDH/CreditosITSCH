@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('pacientes', function (Blueprint $table) {
             $table->id();           
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedInteger('user_id');
             $table->string('tipo')->nullable();
-            $table->int('edad')->nullable();
+            $table->unsignedTinyInteger('edad')->nullable();
             $table->text('alergias')->nullable();
             $table->text('enfermedades_cronicas')->nullable();
             $table->text('medicamentos_actuales')->nullable();

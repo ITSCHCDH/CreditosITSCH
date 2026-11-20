@@ -15,9 +15,9 @@
 			<div class="col-sm-3">					
 				<div class="input-group mb-3">
 					<div class="input-group-prepend">
-						<span class="input-group-text bg-info">Generación</span>
+						<span class="input-group-text bg-info">GeneraciÃ³n</span>
 					</div> 						
-					<select name='generacion' class='form-control' required placeholder='Año-Generación' method='GET'>
+					<select name='generacion' class='form-control' required placeholder='AÃ±o-GeneraciÃ³n' method='GET'>
 						@php
 							echo "<option value = 1>Todos</option>";
 							$anio_actual = (int)explode("-",Carbon\Carbon::now())[0];
@@ -100,7 +100,7 @@
 					</div>					
 					<div class="row">					
 						<div class="col-sm-4">
-							<button class="btn btn-info" id="{{ $suma_creditos[$alumno]->alumno_id }}" data-mdb-toggle="modal" data-mdb-target="#myModalDetalle{{ $suma_creditos[$alumno]->alumno_id }}"><i class='fas fa-eye'></i> Más</button>
+							<button class="btn btn-info" id="{{ $suma_creditos[$alumno]->alumno_id }}" data-mdb-toggle="modal" data-mdb-target="#myModalDetalle{{ $suma_creditos[$alumno]->alumno_id }}"><i class='fas fa-eye'></i> MÃ¡s</button>
 						</div>
 						<div class="col-sm-2">
 							@if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
@@ -181,7 +181,7 @@
 				      <!-- Modal Header -->
 				      <div class="modal-header">
 				        <h4 class="modal-title">Mensaje</h4>
-				        <button type="button" class="close" data-dismiss="modal">&times;</button>
+				        <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
 				      </div>
 
 				      <!-- Modal body -->
@@ -190,12 +190,12 @@
 				        <br>
 				        Nota:
 				        <br>
-				        Tus criterios de busqueda no generarón ningun resultado, te sugerimos modificarlos.
+				        Tus criterios de busqueda no generarÃ³n ningun resultado, te sugerimos modificarlos.
 				      </div>
 
 				      <!-- Modal footer -->
 				      <div class="modal-footer">
-				        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+				        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
 				      </div>
 
 				    </div>
