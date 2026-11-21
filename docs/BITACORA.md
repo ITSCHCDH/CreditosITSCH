@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 15:40 · **Entradas registradas:** 46 · **Último commit previo a esta sesión:** `10a30c0` (2026-11-21 15:31).
+**Última entrada:** 2026-11-21 15:43 · **Entradas registradas:** 47 · **Último commit previo a esta sesión:** `787bd96` (2026-11-21 15:41).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 15:43 — UX del diagnóstico del alumno (STA)
 - 2026-11-21 15:40 — UX de Análisis de alumnos (STA)
 - 2026-11-21 15:30 — Profesores sin filtro por carrera (opción C)
 - 2026-11-21 15:23 — SIT solo lectura: observaciones se guardan en creditos
@@ -132,7 +133,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 10 | 2026-11-20 18:59 – 2026-11-21 15:40 |
+| Trayectoria académica | `trayectoria` | 11 | 2026-11-20 18:59 – 2026-11-21 15:43 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -160,6 +161,44 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 15:43] — UX del diagnóstico del alumno (STA)
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Mejorar la UX de `/admin/sta/analisis/alumno/` con MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/sta/analisis_alumnos/diagnostico.blade.php` (rediseño completo)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; la vista consume los mismos datos del controlador.
+
+**Decisiones tomadas:**
+- Encabezado con breadcrumb a Análisis de alumnos; en móvil se abrevia a «Análisis» para no partir la línea.
+- Tarjeta de identidad con iniciales, control, estatus como badge, semestre, sexo, carrera y grupos.
+- Semáforos en cuatro tarjetas con leyenda; se corrigió el orden Médico/Psicológico que no coincidía con los encabezados anteriores.
+- Calificaciones parciales por unidad: se busca la unidad por número (antes se recorrían las filas y se desalineaban las columnas cuando faltaba una) y se muestran notas con color y tooltip del motivo/comentario.
+- Cardex agrupado por semestre, con badges de acreditación usando los nombres del catálogo de SIT (incluye convalidación, revalidación y equivalencia) en lugar de las condiciones encadenadas.
+- Observaciones en tarjeta con textarea y guardado AJAX; modo solo lectura cuando el usuario no tiene permiso.
+- Se retiraron las clases legacy (`label label-success`, `renMorado`, `txtRojo`) y los estilos de tabla con `id` repetidos.
+
+**Pendientes / Deuda técnica:**
+- En móvil, las tablas de parciales y cardex se desplazan horizontalmente dentro de su tarjeta.
+- El botón de ficha no se incluyó en esta vista; sigue disponible en el listado.
+
+**Tests ejecutados:**
+- ✅ 21 comprobaciones de render: identidad, semáforos, parciales por unidad, observaciones, cardex por semestre, estados vacíos y alumno inexistente.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Capturas de escritorio y móvil revisadas.
+
+**Referencias:**
+- `docs/img/sta-diagnostico-desktop.png`
+- `docs/img/sta-diagnostico-movil.png`
 
 ### [2026-11-21 15:40] — UX de Análisis de alumnos (STA)
 
