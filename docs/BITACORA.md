@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 16:01 · **Entradas registradas:** 49 · **Último commit previo a esta sesión:** `646531d` (2026-11-21 15:48).
+**Última entrada:** 2026-11-21 16:05 · **Entradas registradas:** 50 · **Último commit previo a esta sesión:** `f77e014` (2026-11-21 16:02).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 16:05 — Calificaciones parciales: todas las materias del alumno
 - 2026-11-21 16:01 — Orden ascendente por apellidos garantizado
 - 2026-11-21 15:47 — Orden por apellidos en Análisis de alumnos
 - 2026-11-21 15:43 — UX del diagnóstico del alumno (STA)
@@ -135,7 +136,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 13 | 2026-11-20 18:59 – 2026-11-21 16:01 |
+| Trayectoria académica | `trayectoria` | 14 | 2026-11-20 18:59 – 2026-11-21 16:05 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -163,6 +164,42 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 16:05] — Calificaciones parciales: todas las materias del alumno
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** La vista `admin/sta/analisis/alumno/G23030330` no mostraba todas las materias y unidades cargadas en `listas`.
+
+**Archivos modificados:**
+- `app/Http/Controllers/JefesController.php` (consulta de calificaciones parciales)
+- `resources/views/sta/analisis_alumnos/diagnostico.blade.php` (avance de unidades por materia y pluralización)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- La consulta de parciales cambia los `JOIN` por `LEFT JOIN` con `grupos`, `cat_materias`, `catedraticos`, `users` y `lista_unidades`.
+
+**Decisiones tomadas:**
+- La causa era el `JOIN` interno con `lista_unidades`: las materias sin unidades capturadas desaparecían. Con `LEFT JOIN` se conservan todas las listas del alumno.
+- También se dejó `LEFT JOIN` con catedráticos y usuarios: una materia sin profesor asignado ya no se pierde y muestra «Sin profesor».
+- El nombre de la materia usa `COALESCE` por si el grupo o la materia no existen.
+- La deduplicación por unidad acepta unidades nulas (`lista|-`) para conservar la fila de materias sin capturas.
+- Las columnas de la tabla siguen siendo las unidades capturadas; para que se note lo que falta, cada materia indica «X de Y unidades capturadas» con `cat_materias.num_temas`.
+- Se corrigió la pluralización del encabezado («1 unidad · 6 materias»).
+
+**Pendientes / Deuda técnica:**
+- Si se quiere ver la retícula completa, habría que generar columnas hasta `num_temas` y distinguir «unidad no capturada» de «unidad inexistente».
+
+**Tests ejecutados:**
+- ✅ 20 comprobaciones con G23030330: 6 materias, 3 con unidades, columnas capturadas, nombres/profesores, sin unidades repetidas, render de las seis materias, celdas vacías y otro alumno con varias unidades.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura de la sección revisada.
+
+**Referencias:**
+- `docs/img/sta-diagnostico-parciales.png`
 
 ### [2026-11-21 16:01] — Orden ascendente por apellidos garantizado
 

@@ -173,7 +173,10 @@
             <article class="diag-card">
                 <div class="diag-card-head">
                     <h2><i class="fa-solid fa-pen-to-square me-2"></i>{{ $calificacionesvariable }}</h2>
-                    <span class="text-muted small">{{ count($unidades) }} unidades · {{ count($materias) }} materias</span>
+                    <span class="text-muted small">
+                        {{ count($unidades) }} {{ count($unidades) === 1 ? 'unidad' : 'unidades' }}
+                        · {{ count($materias) }} {{ count($materias) === 1 ? 'materia' : 'materias' }}
+                    </span>
                 </div>
 
                 @if (count($materias) > 0)
@@ -189,10 +192,19 @@
                             </thead>
                             <tbody>
                                 @foreach ($materias as $calif)
+                                    @php
+                                        $capturadas = collect($calif)->filter(fn ($fila) => $fila->lsc_NumUnidad !== null)->count();
+                                        $totalUnidades = (int) ($calif[0]->ret_NumUnidades ?? 0);
+                                    @endphp
                                     <tr>
                                         <td class="diag-materia">
                                             <strong>{{ $calif[0]->ret_NomCompleto }}</strong>
                                             <small><i class="fa-solid fa-user-tie me-1"></i>{{ trim($calif[0]->profesor) ?: 'Sin profesor' }}</small>
+                                            @if ($totalUnidades > 0)
+                                                <small class="d-block text-muted">
+                                                    <i class="fa-solid fa-list-check me-1"></i>{{ $capturadas }} de {{ $totalUnidades }} unidades capturadas
+                                                </small>
+                                            @endif
                                         </td>
                                         @foreach ($unidades as $uni)
                                             @php

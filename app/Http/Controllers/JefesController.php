@@ -137,13 +137,15 @@ class JefesController extends Controller
             ->orderBy('grupos.clave_grupo')
             ->get();
 
-        // Calificaciones parciales por unidad: listas + lista_unidades + grupos
+        // Calificaciones parciales por unidad: todas las listas del alumno.
+        // LEFT JOIN porque una materia puede no tener unidades capturadas o
+        // no tener catedratico asignado, y aun asi debe aparecer.
         $calificaciones = DB::connection('sit')->table('listas')
-            ->join('grupos', 'grupos.id', '=', 'listas.grupo_id')
-            ->join('cat_materias', 'cat_materias.id', '=', 'grupos.materia_id')
-            ->join('catedraticos', 'catedraticos.id', '=', 'listas.catedratico_id')
-            ->join('users as docente', 'docente.id', '=', 'catedraticos.user_id')
-            ->join('lista_unidades', 'lista_unidades.lista_id', '=', 'listas.id')
+            ->leftJoin('grupos', 'grupos.id', '=', 'listas.grupo_id')
+            ->leftJoin('cat_materias', 'cat_materias.id', '=', 'grupos.materia_id')
+            ->leftJoin('catedraticos', 'catedraticos.id', '=', 'listas.catedratico_id')
+            ->leftJoin('users as docente', 'docente.id', '=', 'catedraticos.user_id')
+            ->leftJoin('lista_unidades', 'lista_unidades.lista_id', '=', 'listas.id')
             ->where('listas.alumno_id', $alumno->id)
             ->orderBy('listas.id')
             ->orderBy('lista_unidades.numero_unidad')
@@ -151,8 +153,8 @@ class JefesController extends Controller
             ->orderByDesc('lista_unidades.id')
             ->select(
                 DB::raw("CONCAT_WS(' ', docente.nombre, docente.apellido_paterno, docente.apellido_materno) as profesor"),
-                'cat_materias.nombre as ret_NomCompleto',
-                'cat_materias.num_temas as ret_NumUnidades',
+                DB::raw("COALESCE(cat_materias.nombre, 'Materia sin registrar') as ret_NomCompleto"),
+                DB::raw('COALESCE(cat_materias.num_temas, 0) as ret_NumUnidades'),
                 'lista_unidades.calificacion as lsc_Calificacion',
                 'lista_unidades.numero_unidad as lsc_NumUnidad',
                 'lista_unidades.corte as lsc_Corte',
@@ -163,7 +165,7 @@ class JefesController extends Controller
         // Una sola fila por unidad (la última oportunidad capturada)
         $unicaPorUnidad = [];
         foreach ($calificaciones as $fila) {
-            $clave = $fila->lse_clave.'|'.$fila->lsc_NumUnidad;
+            $clave = $fila->lse_clave.'|'.($fila->lsc_NumUnidad ?? '-');
             if (! isset($unicaPorUnidad[$clave])) {
                 $unicaPorUnidad[$clave] = $fila;
             }
@@ -173,6 +175,7 @@ class JefesController extends Controller
             ->values();
 
         $GetMaxUnidad = $calificaciones->pluck('lsc_NumUnidad')
+            ->filter(fn ($unidad) => $unidad !== null)
             ->unique()
             ->sort()
             ->values()
