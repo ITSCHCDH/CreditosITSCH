@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 15:18 · **Entradas registradas:** 43 · **Último commit previo a esta sesión:** `13eec8b` (2026-11-21 15:13).
+**Última entrada:** 2026-11-21 15:23 · **Entradas registradas:** 44 · **Último commit previo a esta sesión:** `907eac4` (2026-11-21 15:21).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 15:23 — SIT solo lectura: observaciones se guardan en creditos
 - 2026-11-21 15:18 — STA completo sobre SIT y conexión contEsc eliminada
 - 2026-11-21 15:11 — Jefes de carrera migrado de contEsc a SIT
 - 2026-11-21 14:57 — Encabezado de página en avance del alumno
@@ -129,7 +130,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 7 | 2026-11-20 18:59 – 2026-11-21 15:18 |
+| Trayectoria académica | `trayectoria` | 8 | 2026-11-20 18:59 – 2026-11-21 15:23 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -157,6 +158,41 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 15:23] — SIT solo lectura: observaciones se guardan en creditos
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** SIT es únicamente de consulta; no se debe guardar nada en esa base.
+
+**Archivos modificados:**
+- `app/Http/Controllers/JefesController.php` (`storeAlumnoObs` y lectura de observaciones)
+- `database/migrations/2026_11_21_153000_create_observaciones_alumnos_table.php` (nuevo)
+- `app/Models/ObservacionAlumno.php` (nuevo)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Nueva tabla `creditos.observaciones_alumnos` (`no_control` único, `observaciones`, timestamps).
+
+**Decisiones tomadas:**
+- Se elimina la escritura en `sit.alumnos.observaciones` que había introducido la migración anterior; SIT queda estrictamente de consulta.
+- Las observaciones de STA se guardan en `creditos.observaciones_alumnos`, asociadas por `no_control`, sin depender de `creditos.alumnos`.
+- El diagnóstico muestra primero la observación local y, si no existe, la de SIT solo como referencia histórica.
+- Se verificó que no queda ninguna escritura a la conexión `sit` en `app/`.
+
+**Pendientes / Deuda técnica:**
+- La entrada del 15:11 menciona guardar en SIT; queda superada por esta corrección.
+- Evaluar si las tablas propias de tutorías (`grupos`, `asignaciones_tutores`, `gpo_tutorias`) migran o no a SIT.
+
+**Tests ejecutados:**
+- ✅ 7 comprobaciones: guardado en creditos, SIT intacto, lectura local prioritaria, 404 para control inexistente y 0 escrituras a `sit` en `app/`.
+- ✅ `php artisan migrate`, `view:cache` y `php artisan test` (17 passed, 62 assertions).
+
+**Referencias:**
+- `database/migrations/2026_11_21_153000_create_observaciones_alumnos_table.php`
 
 ### [2026-11-21 15:18] — STA completo sobre SIT y conexión contEsc eliminada
 

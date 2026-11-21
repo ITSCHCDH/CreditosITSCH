@@ -11,6 +11,7 @@ use App\Models\Direccion;
 use App\Models\Familiar;
 use App\Models\Historial_clinico;
 use App\Models\Motivoreprobacion;
+use App\Models\ObservacionAlumno;
 use App\Models\Padres;
 use App\Models\Personales;
 use App\Models\Social;
@@ -121,7 +122,8 @@ class JefesController extends Controller
             'alu_SemestreAct' => $alumno->semestre_actual,
             'car_Nombre' => $alumno->carrera?->nombre,
             'alu_Sexo' => $alumno->genero === 'F' ? 'Femenino' : 'Masculino',
-            'observaciones' => $alumno->observaciones ?: 'Sin observaciones',
+            'observaciones' => ObservacionAlumno::where('no_control', $alumno->no_control)->value('observaciones')
+                ?: ($alumno->observaciones ?: 'Sin observaciones'),
         ];
 
         $buscarAlumno->semaforos = self::calSemaforos($alumno->no_control);
@@ -396,13 +398,16 @@ class JefesController extends Controller
         }
     }
 
-    /** Observaciones del alumno: ahora se guardan en sit.alumnos. */
+    /**
+     * Observaciones del alumno. SIT es solo de consulta: se guardan en
+     * creditos.observaciones_alumnos, asociadas por número de control.
+     */
     public function storeAlumnoObs(Request $request)
     {
         $noControl = trim((string) $request->no_Control);
 
         try {
-            $existe = DB::connection('sit')->table('alumnos')->where('no_control', $noControl)->exists();
+            $existe = SitAlumno::where('no_control', $noControl)->exists();
 
             if (! $existe) {
                 return response()->json([
@@ -411,12 +416,10 @@ class JefesController extends Controller
                 ], 404);
             }
 
-            DB::connection('sit')->table('alumnos')
-                ->where('no_control', $noControl)
-                ->update([
-                    'observaciones' => $request->observaciones,
-                    'updated_at' => now(),
-                ]);
+            ObservacionAlumno::updateOrCreate(
+                ['no_control' => $noControl],
+                ['observaciones' => $request->observaciones]
+            );
 
             return response()->json([
                 'mensaje' => 'Observaciones guardadas correctamente',
