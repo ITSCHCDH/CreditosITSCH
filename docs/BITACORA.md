@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 16:09 · **Entradas registradas:** 51 · **Último commit previo a esta sesión:** `524ff6e` (2026-11-21 16:07).
+**Última entrada:** 2026-11-21 16:21 · **Entradas registradas:** 52 · **Último commit previo a esta sesión:** `7e3756e` (2026-11-21 16:10).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 16:21 — Profesores: buscador reutilizable y filtro corregido
 - 2026-11-21 16:09 — Retícula completa de unidades en Calificaciones Parciales
 - 2026-11-21 16:05 — Calificaciones parciales: todas las materias del alumno
 - 2026-11-21 16:01 — Orden ascendente por apellidos garantizado
@@ -137,7 +138,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 15 | 2026-11-20 18:59 – 2026-11-21 16:09 |
+| Trayectoria académica | `trayectoria` | 16 | 2026-11-20 18:59 – 2026-11-21 16:21 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -165,6 +166,46 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 16:21] — Profesores: buscador reutilizable y filtro corregido
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Mejorar la UX de `/admin/sta/profesores` y reemplazar el select de profesor por el buscador reutilizable; corregir la consulta del filtro.
+
+**Archivos modificados:**
+- `resources/views/sta/profesores/index.blade.php` (rediseño con tarjetas MDB y buscador combobox)
+- `app/Http/Controllers/STAController.php` (`buscarProfesores`, filtro por materias y respaldo de `findMaterias`)
+- `routes/web.php` (ruta GET `profesores.busqueda`)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Nueva búsqueda `buscarProfesores` sobre `catedraticos` + `users`, solo profesores activos con grupos o listas.
+- `findMaterias` conserva la consulta por `grupos` y agrega un respaldo por `listas` cuando el profesor no tiene grupos.
+
+**Decisiones tomadas:**
+- El select de profesor se reemplaza por `template.partes.buscador_combobox` en modo `bare` (sin tarjeta ni formulario propios), con `show_submit` desactivado.
+- El componente usa `fetch` (GET), así que se agregó la ruta `profesores.busqueda`; la búsqueda filtra por nombre, apellido paterno, materno o nombre completo y limita a 8 resultados.
+- El filtro solo ofrece profesores con materias (grupos o listas), para que elegir uno siempre cargue materias; antes se podía elegir a cualquiera y aparecía «no tiene materias asignadas».
+- El JS ahora escucha `#profesor_value` (input oculto del componente) y toma el nombre del chip para el resumen del filtro.
+- Se mantiene el flujo materia → unidades → calificaciones y el guardado de comentarios.
+
+**Pendientes / Deuda técnica:**
+- El layout carga DataTables con CSS de Bootstrap 4 y JS de Bootstrap 5; no afecta a esta vista porque no la usa.
+- En móvil la tabla se desplaza horizontalmente.
+
+**Tests ejecutados:**
+- ✅ 14 comprobaciones de la vista y del endpoint de búsqueda (componente, claves, límite, menos de 2 caracteres, sin resultados y búsqueda por apellido materno).
+- ✅ 8 comprobaciones del filtro (solo profesores con materias, materias, unidades y calificaciones reales, y aviso para profesor sin materias).
+- ✅ `php artisan route:cache`, `view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Capturas de escritorio y móvil revisadas.
+
+**Referencias:**
+- `docs/img/sta-profesores-desktop.png`
+- `docs/img/sta-profesores-movil.png`
 
 ### [2026-11-21 16:09] — Retícula completa de unidades en Calificaciones Parciales
 

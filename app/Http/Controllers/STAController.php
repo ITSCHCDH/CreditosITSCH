@@ -18,7 +18,7 @@ class STAController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_PROFESOR')->only(['indexProfesores','findProfesores','findMaterias','findListaCali','saveComent']);
+        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_PROFESOR')->only(['indexProfesores','findProfesores','buscarProfesores','findMaterias','findListaCali','saveComent']);
         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA')->only(['indexTutorias']);       
         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_TUTOR')->only(['indexTutores','showGrupo','storeGrupo','deleteAlumno']);
     }  
@@ -48,6 +48,54 @@ class STAController extends Controller
         }
 
         return response()->json($consulta->orderBy('u.apellido_paterno')->get());       
+    }
+
+    /** Búsqueda de profesores activos para el buscador combobox. */
+    public function buscarProfesores(Request $request)
+    {
+        $termino = trim((string) $request->query('nombre', ''));
+
+        if (mb_strlen($termino) < 2) {
+            return response()->json([]);
+        }
+
+        $consulta = DB::connection('sit')->table('catedraticos as c')
+            ->join('users as u', 'u.id', '=', 'c.user_id')
+            ->where('c.activo', 1)
+            ->where(function ($sub) {
+                // Solo profesores con materias asignadas (grupo o lista)
+                $sub->whereExists(function ($query) {
+                    $query->select(DB::raw(1))->from('grupos')->whereColumn('grupos.catedratico_id', 'c.id');
+                })->orWhereExists(function ($query) {
+                    $query->select(DB::raw(1))->from('listas')->whereColumn('listas.catedratico_id', 'c.id');
+                });
+            })
+            ->where(function ($sub) use ($termino) {
+                $like = '%'.$termino.'%';
+                $sub->where('u.nombre', 'like', $like)
+                    ->orWhere('u.apellido_paterno', 'like', $like)
+                    ->orWhere('u.apellido_materno', 'like', $like)
+                    ->orWhereRaw("CONCAT_WS(' ', u.nombre, u.apellido_paterno, u.apellido_materno) like ?", [$like]);
+            });
+
+        // Un profesor solo se ve a sí mismo
+        if (! Auth::User()->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA'])) {
+            $consulta->where('c.id', $this->obtCatClave());
+        }
+
+        $profesores = $consulta
+            ->orderBy('u.apellido_paterno')
+            ->orderBy('u.apellido_materno')
+            ->orderBy('u.nombre')
+            ->limit(8)
+            ->select(
+                'c.id as cat_Clave',
+                DB::raw("CONCAT_WS(' ', u.nombre, u.apellido_paterno, u.apellido_materno) as nombre_completo"),
+                DB::raw("COALESCE(NULLIF(c.departamento_adscripcion, ''), 'Sin departamento') as departamento")
+            )
+            ->get();
+
+        return response()->json($profesores);
     }
 
     /** Catedrático de SIT que corresponde al usuario autenticado (por nombre). */
@@ -115,6 +163,27 @@ class STAController extends Controller
             )
             ->orderBy('m.nombre', 'asc')
             ->get();
+
+        // Respaldo: materias de las listas del profesor cuando no tiene
+        // grupos en el periodo (por ejemplo, grupos aún sin crear).
+        if ($materias->isEmpty()) {
+            $materias = DB::connection('sit')->table('listas')
+                ->join('grupos', 'grupos.id', '=', 'listas.grupo_id')
+                ->join('cat_materias as m', 'm.id', '=', 'grupos.materia_id')
+                ->leftJoin('cat_periodos_escolares as p', 'p.id', '=', 'grupos.periodo_id')
+                ->where('listas.catedratico_id', $request->profesor)
+                ->select(
+                    'm.nombre as ret_NomCompleto',
+                    'm.num_temas as ret_NumUnidades',
+                    'm.id as ret_Clave',
+                    'p.nombre as gse_Anio',
+                    'grupos.clave_grupo as gse_Observaciones',
+                    'grupos.id as gse_Clave'
+                )
+                ->distinct()
+                ->orderBy('m.nombre', 'asc')
+                ->get();
+        }
 
         if($materias->isEmpty()){
             $materias = array(
