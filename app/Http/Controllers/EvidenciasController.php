@@ -197,6 +197,10 @@ class EvidenciasController extends Controller
     }
 
     public function peticionGaleria(Request $request){
+        // El nombre del alumno se toma de SIT, no de creditos.alumnos
+        $sitDb = config('database.connections.sit.database');
+        $nombreAlumno = DB::raw("NULLIF(TRIM(CONCAT_WS(' ', au.nombre, au.apellido_paterno, au.apellido_materno)), '') as alumno_nombre");
+
         if($request->has('responsable_id') && $request->has('actividad_id')){
             if($request->get('responsable_id')=='nulo'){
                 $evidencias = DB::table('evidencia as e')
@@ -206,12 +210,14 @@ class EvidenciasController extends Controller
                     })
                     ->join('users as u','u.id','=','ae.user_id')
                     ->join('actividad as a','a.id','=','ae.actividad_id')
-                    ->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')
+                    ->leftjoin("{$sitDb}.alumnos as alu",'alu.no_control','=','e.alumno_no_control')
+                    ->leftjoin("{$sitDb}.users as au",'au.id','=','alu.user_id')
                     ->select('e.nom_imagen',DB::raw('DATE_FORMAT(e.created_at, "%d-%m-%Y") as fecha_creacion'),'u.name as responsable_nombre',
-                        'a.nombre as actividad_nombre','e.id as evidencia_id','alu.nombre as alumno_nombre'
+                        'a.nombre as actividad_nombre','e.id as evidencia_id',$nombreAlumno
                         ,'ae.validado','u.id as user_id', 'e.nom_original', 'a.id as actividad_id')
                     ->get();
-                return response()->json($evidencias);
+
+                return response()->json($this->conParticipantes($evidencias, $request->get('actividad_id')));
             }
             $evidencias = DB::table('users')
                 ->join('actividad_evidencia as ae',function($join) use($request){
@@ -221,14 +227,41 @@ class EvidenciasController extends Controller
                 })
                 ->join('actividad as a','a.id','=','ae.actividad_id')
                 ->join('evidencia as e','e.id_asig_actividades','=','ae.id')
-                ->leftjoin('alumnos as alu','alu.no_control','=','e.alumno_no_control')
+                ->leftjoin("{$sitDb}.alumnos as alu",'alu.no_control','=','e.alumno_no_control')
+                ->leftjoin("{$sitDb}.users as au",'au.id','=','alu.user_id')
                 ->select('users.name as responsable_nombre','a.nombre as actividad_nombre','e.nom_imagen',
-                    DB::raw('DATE_FORMAT(e.created_at, "%d-%m-%Y") as fecha_creacion'),'e.id as evidencia_id','alu.nombre as alumno_nombre',
+                    DB::raw('DATE_FORMAT(e.created_at, "%d-%m-%Y") as fecha_creacion'),'e.id as evidencia_id',$nombreAlumno,
                     'ae.validado','users.id as user_id', 'e.nom_original', 'a.id as actividad_id')
                 ->get();
-            return response()->json($evidencias);
+
+            return response()->json($this->conParticipantes($evidencias, $request->get('actividad_id')));
         }
         return response()->json(0);
+    }
+
+    /**
+     * La evidencia pertenece a la actividad, no a un alumno: store() guarda
+     * alumno_no_control en null y los alumnos viven en participantes. Se
+     * devuelve solo el total para no arrastrar cientos de nombres.
+     */
+    private function conParticipantes($evidencias, $actividadId)
+    {
+        $total = $this->totalParticipantes($actividadId);
+
+        return $evidencias->map(function ($fila) use ($total) {
+            $fila->participantes_total = $total;
+            return $fila;
+        });
+    }
+
+    private function totalParticipantes($actividadId)
+    {
+        return (int) DB::table('participantes as p')
+            ->join('actividad_evidencia as ae','ae.id','=','p.id_evidencia')
+            ->where('ae.actividad_id','=',$actividadId)
+            ->whereNotNull('p.no_control')
+            ->distinct()
+            ->count('p.no_control');
     }
 
     public function peticionEliminar(Request $request){

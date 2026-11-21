@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 14:15 · **Entradas registradas:** 35 · **Último commit previo a esta sesión:** `8760f6d` (2026-11-21 13:47).
+**Última entrada:** 2026-11-21 14:27 · **Entradas registradas:** 36 · **Último commit previo a esta sesión:** `3be46fb` (2026-11-21 14:19).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -17,6 +17,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 | Árbol de trabajo Git | ⚠️ Pendiente de commit al registrar esta entrada |
 | Buscador de alumnos (`template.partes.buscador_combobox`) | ✅ 43 + 17 pruebas de interacción, 12 + 38 + 12 de render, capturas en 3 anchos |
 | Reporte de avance sobre `sit.alumnos` | ✅ 21 + 12 pruebas con datos reales, 10 + 10 de render, 8 de sincronización; 1.11 s en el peor caso |
+| Galería de evidencias | ✅ 7 pruebas del endpoint, 13 de render y 19 de DOM |
 
 ### Riesgos abiertos
 
@@ -35,6 +36,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 14:27 — UX de la galería de evidencias
 - 2026-11-21 14:15 — Filtros de reportes en cascada y sin campos obligatorios
 - 2026-11-21 13:38 — Filtro de carreras unificado con el catálogo del SIT
 - 2026-11-21 13:31 — Buscador de alumnos del SIT en reportes
@@ -116,7 +118,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 20 | 2026-11-21 11:49 – 14:15 |
+| Créditos complementarios | `créditos` | 21 | 2026-11-21 11:49 – 14:27 |
 | Trayectoria académica | `trayectoria` | 4 | 2026-11-20 18:59 – 19:09 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -145,6 +147,56 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 14:27] — UX de la galería de evidencias
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la UX de la vista `/admin/evidencias` con MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/evidencias/index.blade.php` (reescritura: cards de filtros y galería, contadores, estados y tarjetas)
+- `app/Http/Controllers/EvidenciasController.php` (`peticionGaleria()` toma el nombre del alumno de SIT)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Las dos consultas de `peticionGaleria()` dejan de hacer `leftjoin` a `creditos.alumnos` y lo hacen a `sit.alumnos` + `sit.users`, con el nombre completo concatenado.
+
+**Decisiones tomadas:**
+- La vista se organiza en dos cards: filtros y galería, con contadores de evidencias, PDF, imágenes y validadas.
+- Las tarjetas de evidencia usan miniatura 4:3, badge de tipo (PDF/Imagen), badge de estado (Validada/Pendiente), metadatos con iconos y título sin extensión.
+- El borrado pasa de una imagen a un botón accesible: aparece con hover, con foco de teclado y siempre en dispositivos sin hover.
+- Se añaden estados de carga y de vacío con mensajes según la selección.
+- El botón «Subir evidencia» se habilita solo con actividad y responsable elegidos, porque `create` exige ambos parámetros.
+- `initProcesoEliminar()` usa `currentTarget` para que el clic funcione aunque se pulse el icono dentro del botón.
+- La galería se vacía antes de cada recarga para no duplicar tarjetas.
+- Se conservan todos los ids y contratos que usan el visor (`Viewer`), el lector PDF y el modal de eliminación.
+
+**Corrección durante la validación con datos reales:**
+- La tarjeta mostraba «Sin alumno asignado» en la evidencia de Congreso NEXUS aunque la actividad sí tiene alumnos. La causa: `EvidenciasController::store()` nunca llena `evidencia.alumno_no_control`, así que la evidencia pertenece a la **actividad**, y los alumnos viven en `participantes`.
+- `peticionGaleria()` ahora devuelve `participantes_total` con el número de alumnos de la actividad, y la tarjeta muestra solo el conteo («Participante: 1», «Participantes: 500») porque listar cientos de nombres no es viable; conserva el alumno individual si la evidencia lo tuviera.
+- El título de la tarjeta mostraba el nombre original del archivo (`1795059676`), que no dice nada al usuario. Ahora se usa una etiqueta legible: si el nombre trae texto se muestra humanizado («Constancia asistencia»); si es numérico o generado por la app se usa «Evidencia N»; el archivo real queda en el tooltip («Archivo: …»).
+
+**Pendientes / Deuda técnica:**
+- Validar en la app autenticada; la galería se verificó con datos simulados en vista previa porque solo existe una evidencia real en el entorno.
+- El lector PDF depende de los archivos locales de `pdf.js` y `viewer.min.js`.
+- `evidencia.alumno_no_control` existe en el esquema pero ningún flujo lo llena; conviene decidir si se elimina o si se usará para evidencias individuales.
+
+**Tests ejecutados:**
+- ✅ 7 comprobaciones del endpoint de galería con datos reales (claves, filtro por responsable, actividad sin evidencias y caso sin parámetros).
+- ✅ 7 comprobaciones de participantes (total desde `participantes`, coincidencia con la base, sin nombres en el JSON y alumno individual nulo).
+- ✅ 13 comprobaciones de render (ids del visor, contadores, estados, modales y botón de subida).
+- ✅ 19 + 10 comprobaciones en jsdom (tarjetas, contadores, badges, metadatos, borrado, visor, vaciado y conteo de participantes, incluido el caso de 500).
+- ✅ 10 comprobaciones del título de la tarjeta (nombres numéricos, generados, con guiones, sin nombre y tooltip con el archivo real).
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Capturas a 1280 px y 500 px.
+
+**Referencias:**
+- `docs/img/evidencias-desktop.png`
+- `docs/img/evidencias-movil.png`
 
 ### [2026-11-21 14:15] — Filtros de reportes en cascada y sin campos obligatorios
 
