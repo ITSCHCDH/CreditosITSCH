@@ -69,7 +69,7 @@
 @php
     $paginado = $suma_creditos instanceof \Illuminate\Pagination\LengthAwarePaginator ? $suma_creditos : null;
     $sinDatos = $paginado === null || $paginado->total() === 0;
-    $filtrado = request()->has('generacion') && request()->filled('carrera');
+    $filtrado = (bool) ($filtrosAplicados ?? false);
     $puntosTotales = max(1, (int) $creditos * 100);
     $detallePorAlumno = $reportes_data ? collect($reportes_data)->groupBy('no_control') : collect();
     $r = $resumen ?? ['total' => 0, 'liberados' => 0, 'enProceso' => 0, 'sinAvance' => 0, 'bajas' => 0, 'promedio' => 0];
@@ -86,26 +86,24 @@
         <span class="report-icon"><i class="fa-solid fa-filter" aria-hidden="true"></i></span>
         <div>
             <h2>Filtros</h2>
-            <p>Elige generación y carrera; el status y la búsqueda son opcionales.</p>
+            <p>Son opcionales y se acotan entre sí: la carrera depende de la generación, y el alumno se busca dentro de lo ya elegido.</p>
         </div>
     </div>
     <form action="{{ route('verifica_evidencia.reportes') }}" method="get" class="report-filters">
         <div class="row g-3 align-items-end">
             <div class="col-sm-6 col-xl-2">
                 <label class="form-label" for="generacion">Generación</label>
-                <select name="generacion" id="generacion" class="form-select" required>
-                    <option value="1" @if((int) $generacion === 1) selected @endif>Todos</option>
-                    @for($anio = 2013; $anio <= now()->year; $anio++)
-                        <option value="{{ $anio }}" @if((int) $generacion === $anio) selected @endif>{{ $anio }}</option>
-                    @endfor
+                <select name="generacion" id="generacion" class="form-select">
+                    <option value="1" @if((int) $generacion === 1 || (int) $generacion === 0) selected @endif>Todos</option>
+                    @foreach($anios as $anioDisponible)
+                        <option value="{{ $anioDisponible }}" @if((int) $generacion === (int) $anioDisponible) selected @endif>{{ $anioDisponible }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="col-sm-6 col-xl-2">
                 <label class="form-label" for="carrera">Carrera</label>
-                <select class="form-select" required name="carrera" id="carrera">
-                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_REPORTES','VIP_SOLO_LECTURA']))
-                        <option value="">Seleccione una carrera</option>
-                    @endif
+                <select class="form-select" name="carrera" id="carrera">
+                    <option value="">Todas las carreras</option>
                     @foreach($carreras as $carrera)
                         <option value="{{ $carrera->id }}" title="{{ $carrera->nombre }}" @selected($carrera_seleccionada == $carrera->id)>{{ $carrera->nombre_corto ?: $carrera->nombre }}</option>
                     @endforeach
@@ -132,7 +130,7 @@
                         'field' => 'busqueda',
                         'endpoint' => route('verifica_evidencia.alumnos_busqueda'),
                         'query_param' => 'nombre',
-                        'params' => ['peticion' => '0', 'carrera' => (string) ($carrera_seleccionada ?? '')],
+                        'params' => ['peticion' => '0', 'carrera' => (string) ($carrera_seleccionada ?? ''), 'anio' => (int) $generacion > 1 ? (string) (int) $generacion : ''],
                         'keys' => ['value' => 'no_control', 'label' => 'nombre', 'meta' => ''],
                         'initial' => $alumnoFiltro ?? null,
                     ],
@@ -151,10 +149,17 @@
 <script>
     (function () {
         const carrera = document.getElementById('carrera');
+        const generacion = document.getElementById('generacion');
         const combo = document.getElementById('alumnoFiltro_combo');
-        if (!carrera || !combo || typeof combo.cbxSetParams !== 'function') { return; }
-        const sync = function () { combo.cbxSetParams({ carrera: carrera.value || '' }); };
+        if (!carrera || !generacion || !combo || typeof combo.cbxSetParams !== 'function') { return; }
+
+        const sync = function () {
+            const anio = generacion.value && generacion.value !== '1' ? generacion.value : '';
+            combo.cbxSetParams({ carrera: carrera.value || '', anio: anio });
+        };
+
         carrera.addEventListener('change', sync);
+        generacion.addEventListener('change', sync);
         sync();
     })();
 </script>
@@ -165,10 +170,10 @@
             <i class="fa-solid {{ $filtrado ? 'fa-circle-question' : 'fa-chart-simple' }}" aria-hidden="true"></i>
             @if($filtrado)
                 <h2>Sin resultados</h2>
-                <p>Ningún alumno coincide con los criterios elegidos en generación, carrera, status o búsqueda. Ajusta los filtros e inténtalo de nuevo.</p>
+                <p>Ningún alumno coincide con la combinación elegida. Recuerda que la carrera se acota por la generación y la búsqueda de alumno por ambos filtros; ajusta la selección e inténtalo de nuevo.</p>
             @else
-                <h2>Selecciona los filtros para generar el reporte</h2>
-                <p>El avance se calcula por crédito: {{ $creditos }} créditos registrados, {{ $puntosTotales }} puntos posibles por alumno.</p>
+                <h2>Elige al menos un filtro</h2>
+                <p>Puedes filtrar por generación, por carrera o buscar directamente un alumno; no es necesario llenar todos. El avance se calcula por crédito: {{ $creditos }} créditos registrados, {{ $puntosTotales }} puntos posibles por alumno.</p>
             @endif
         </div>
     </article>

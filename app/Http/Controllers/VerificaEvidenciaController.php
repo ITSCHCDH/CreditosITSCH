@@ -308,12 +308,14 @@ class VerificaEvidenciaController extends Controller
         $puntosTotales = max(1, $creditos * 100);
 
         $busqueda = $request->get('busqueda');
+        $textoBusqueda = is_string($busqueda) ? trim($busqueda) : '';
         $carreraSit = $request->get('carrera');
-        $generacion = $request->get('generacion');
+        $generacion = (int) $request->get('generacion', 0);
+        $anio = $generacion > 1 ? $generacion : null;
         $estadoFiltro = $request->get('status', 'todos');
 
         $puedeVerTodas = Auth::User()->hasAnyPermission(['VIP', 'VIP_REPORTES', 'VIP_SOLO_LECTURA']);
-        $carreras = $puedeVerTodas
+        $carrerasPermitidas = $puedeVerTodas
             ? $this->carrerasSitVisibles()
             : $this->carrerasSitVisibles(Area::CarrerasUsuario(Auth::User()->id)->pluck('id'));
 
@@ -322,11 +324,42 @@ class VerificaEvidenciaController extends Controller
         $resumen = null;
 
         $carreraValida = $carreraSit !== null && $carreraSit !== ''
-            && $carreras->contains(fn ($carrera) => (string) $carrera->id === (string) $carreraSit);
+            && $carrerasPermitidas->contains(fn ($carrera) => (string) $carrera->id === (string) $carreraSit);
 
-        if ($request->has('generacion') && $carreraValida) {
+        // Filtros en cascada: la carrera se acota por la generación elegida
+        $carreras = $carrerasPermitidas;
+        if ($anio !== null) {
+            $carrerasConAlumnos = SitAlumno::where('anio_ingreso', $anio)->pluck('carrera_id')->unique();
+            $carreras = $carrerasPermitidas
+                ->filter(fn ($carrera) => $carrerasConAlumnos->contains($carrera->id) || (string) $carrera->id === (string) $carreraSit)
+                ->values();
+        }
+
+        // Y los años disponibles se acotan por la carrera elegida
+        $consultaAnios = SitAlumno::query()->select('anio_ingreso')->distinct();
+        if ($carreraValida) {
+            $consultaAnios->where('carrera_id', $carreraSit);
+        }
+        $anios = $consultaAnios->orderByDesc('anio_ingreso')
+            ->pluck('anio_ingreso')
+            ->map(fn ($valor) => (int) $valor)
+            ->filter()
+            ->values();
+
+        if ($anio !== null && ! $anios->contains($anio)) {
+            $anios = $anios->push($anio)->sortDesc()->values();
+        }
+
+        $filtrosAplicados = $carreraValida || $anio !== null || $textoBusqueda !== '';
+
+        if ($filtrosAplicados) {
             // Los alumnos salen exclusivamente de sit.alumnos
-            $alumnos = $this->alumnosReporte($carreraSit, $generacion, $busqueda);
+            $alumnos = $this->alumnosReporte(
+                $carreraValida ? $carreraSit : null,
+                $anio,
+                $textoBusqueda,
+                $puedeVerTodas ? null : $carrerasPermitidas->pluck('id')
+            );
 
             $avance = $alumnos->isEmpty() ? collect() : DB::table('avance')
                 ->whereIn('no_control', $alumnos->pluck('no_control')->all())
@@ -427,22 +460,32 @@ class VerificaEvidenciaController extends Controller
         ->with('suma_creditos', $suma_creditos)
         ->with('resumen', $resumen)
         ->with('carreras', $carreras)
+        ->with('anios', $anios)
+        ->with('filtrosAplicados', $filtrosAplicados)
         ->with('carrera_seleccionada', $carreraSit)
         ->with('busqueda', $busqueda)
         ->with('status', $request->get('status'))
-        ->with('generacion', $request->get('generacion'))
+        ->with('generacion', $generacion)
         ->with('alumnoFiltro', $alumnoFiltro);
     }
 
     /** Alumnos del reporte: fuente única sit.alumnos (nombre desde sit.users, carrera desde sit.cat_carreras). */
-    private function alumnosReporte($carreraSit, $generacion, $busqueda)
+    private function alumnosReporte($carreraSit, $anio, $busqueda, $carrerasPermitidas = null)
     {
-        $consulta = SitAlumno::query()
-            ->with(['user', 'carrera'])
-            ->where('carrera_id', $carreraSit);
+        $consulta = SitAlumno::query()->with(['user', 'carrera']);
 
-        if ($generacion !== null && (int) $generacion > 1) {
-            $consulta->where('anio_ingreso', (int) $generacion);
+        if ($carreraSit !== null && $carreraSit !== '') {
+            $consulta->where('carrera_id', $carreraSit);
+        }
+
+        if ($anio !== null && (int) $anio > 1) {
+            $consulta->where('anio_ingreso', (int) $anio);
+        }
+
+        // Los usuarios sin privilegios nunca pueden salir de sus carreras, aunque no elijan una
+        if ($carrerasPermitidas !== null) {
+            $ids = collect($carrerasPermitidas)->filter()->values();
+            $consulta->whereIn('carrera_id', $ids->isEmpty() ? [-1] : $ids->all());
         }
 
         $texto = is_string($busqueda) ? trim($busqueda) : '';
@@ -527,6 +570,11 @@ class VerificaEvidenciaController extends Controller
         } elseif ($request->filled('carrera')) {
             // El filtro llega con el id del catálogo SIT
             $query->where('carrera_id', $request->get('carrera'));
+        }
+
+        // Cascada desde el filtro de generación
+        if ($request->filled('anio') && (int) $request->get('anio') > 1) {
+            $query->where('anio_ingreso', (int) $request->get('anio'));
         }
 
         $lista = $query->orderBy('no_control')

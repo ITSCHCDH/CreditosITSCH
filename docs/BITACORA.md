@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 13:45 · **Entradas registradas:** 34 · **Último commit previo a esta sesión:** `cc5f3ed` (2026-11-21 12:55).
+**Última entrada:** 2026-11-21 14:15 · **Entradas registradas:** 35 · **Último commit previo a esta sesión:** `8760f6d` (2026-11-21 13:47).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -16,7 +16,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 | `public/storage` (enlaces de evidencias) | ✅ Existe |
 | Árbol de trabajo Git | ⚠️ Pendiente de commit al registrar esta entrada |
 | Buscador de alumnos (`template.partes.buscador_combobox`) | ✅ 43 + 17 pruebas de interacción, 12 + 38 + 12 de render, capturas en 3 anchos |
-| Reporte de avance sobre `sit.alumnos` | ✅ 21 pruebas con datos reales + 10 de render; 0.75 s en el peor caso |
+| Reporte de avance sobre `sit.alumnos` | ✅ 21 + 12 pruebas con datos reales, 10 + 10 de render, 8 de sincronización; 1.11 s en el peor caso |
 
 ### Riesgos abiertos
 
@@ -35,6 +35,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 14:15 — Filtros de reportes en cascada y sin campos obligatorios
 - 2026-11-21 13:38 — Filtro de carreras unificado con el catálogo del SIT
 - 2026-11-21 13:31 — Buscador de alumnos del SIT en reportes
 - 2026-11-21 13:26 — UX de reportes con cards
@@ -115,7 +116,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 18 | 2026-11-21 11:49 – 13:38 |
+| Créditos complementarios | `créditos` | 20 | 2026-11-21 11:49 – 14:15 |
 | Trayectoria académica | `trayectoria` | 4 | 2026-11-20 18:59 – 19:09 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -144,6 +145,46 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 14:15] — Filtros de reportes en cascada y sin campos obligatorios
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Al dejar los filtros vacíos y elegir solo un alumno, el formulario obligaba a seleccionar una carrera. Los filtros deben respetar una jerarquía y ninguno debe ser obligatorio si se elige el último.
+
+**Archivos modificados:**
+- `app/Http/Controllers/VerificaEvidenciaController.php` (`reportes()` sin exigir carrera; listas dependientes de generación y carrera; `alumnosBusqueda()` acepta `anio`)
+- `resources/views/admin/verifica_evidencia/reportes.blade.php` (selects sin `required`, opción «Todas las carreras», años desde SIT y sincronización de ambos filtros)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- `sit.alumnos` ahora se consulta con cualquier combinación de `carrera_id`, `anio_ingreso` y búsqueda; ninguna es obligatoria.
+- Los años y carreras disponibles se obtienen con `distinct` sobre `sit.alumnos`, acotados por el otro filtro.
+
+**Decisiones tomadas:**
+- Generación y carrera dejan de ser obligatorias; se puede filtrar solo por alumno.
+- Cascada al enviar el formulario: las carreras se acotan a las que tienen alumnos en la generación elegida y los años a los que existen en la carrera elegida.
+- La cascada hacia el buscador es en vivo: al cambiar generación o carrera se actualizan los parámetros del endpoint (`anio` y `carrera`), sin recargar.
+- Sin ningún filtro no se consulta la base; se muestra un estado vacío que invita a elegir al menos uno.
+- El status sigue siendo un modificador: por sí solo no dispara la consulta, porque obligaría a recorrer los once mil alumnos del SIT.
+- Los usuarios sin privilegios quedan acotados a sus carreras incluso cuando no eligen carrera, para que un `no_control` ajeno no exponga datos.
+
+**Pendientes / Deuda técnica:**
+- Las listas de generación y carrera se recalculan al pulsar «Filtrar»; no se refrescan en vivo como el buscador.
+- El status no acota las opciones del buscador porque se deriva del avance en créditos, no de SIT.
+
+**Tests ejecutados:**
+- ✅ 12 comprobaciones con datos reales: solo alumno, solo generación, solo carrera, generación+carrera, cascada de carreras y de años, alumno dentro/fuera de la combinación, sin filtros y carrera inexistente.
+- ✅ 10 comprobaciones de render (sin `required`, opción «Todas las carreras», años del SIT, parámetros y script de sincronización).
+- ✅ 8 comprobaciones en jsdom de la sincronización en vivo al cambiar generación y carrera.
+- ✅ `php artisan test` (17 passed, 62 assertions).
+
+**Referencias:**
+- `docs/img/reportes-filtro-alumno.png` (solo alumno, sin generación ni carrera)
+- `docs/img/reportes-desktop.png` (solo generación 2025)
 
 ### [2026-11-21 13:45] — Reporte de avance con fuente única sit.alumnos
 
