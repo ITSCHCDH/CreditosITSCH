@@ -2,13 +2,103 @@
 
 Este archivo registra cronológicamente todos los cambios, decisiones y pendientes del proyecto de migración al esquema `sit`. Entradas más recientes arriba.
 
-## Índice de módulos
-- [Créditos complementarios](#créditos-complementarios)
-- [Trayectoria académica](#trayectoria-académica)
-- [Tutorías](#tutorías)
-- [Infraestructura](#infraestructura)
+## Estado actual
 
----
+**Última entrada:** 2026-11-21 12:45 · **Entradas registradas:** 27 · **Último commit:** `cc5f3ed` (2026-11-21 12:55).
+
+**Verificaciones de cierre hechas el 2026-11-21 12:56:**
+
+| Verificación | Resultado |
+|---|---|
+| `php artisan test tests/Feature/Auth/UnifiedLoginTest.php` | ✅ 10 passed, 34 assertions |
+| Migración `2026_11_21_120000_remove_legacy_alumno_foreign_keys_from_creditos` | ✅ Ejecutada (batch 3) |
+| FKs de `creditos` que apuntan a `creditos.alumnos` | ✅ 0 restantes (26 FK en total en el esquema) |
+| `public/storage` (enlaces de evidencias) | ✅ Existe |
+| Árbol de trabajo Git | ✅ Limpio |
+
+### Riesgos abiertos
+
+| # | Riesgo | Evidencia | Prioridad |
+|---|---|---|---|
+| 1 | Identidad académica aún duplicada: 13 controladores usan `App\Models\Alumno` (11) o la conexión `contEsc` (4) | `app/Http/Controllers/*` | Alta |
+| 2 | SQL crudo con concatenación de `$busqueda` en `VerificaEvidenciaController::avanceAlumno()` (8 consultas) | Inyección SQL latente | Alta |
+| 3 | Sin clave puente estable entre `sit.alumnos` y las tablas auxiliares de `creditos` (`personales`, `padres`, `direcciones`, `historiales_clinicos`); `id_alu` sobrevive sin FK | Verificación 2026-11-21 12:56 | Alta |
+| 4 | Contraseña de prueba `Prueba123!` documentada y `PruebaActividadesSeeder` versionado | Entrada 2026-11-21 12:10 | Media |
+| 5 | El login depende del CDN `mdb-ui-kit@9.3.0` (jsdelivr) mientras el resto usa assets locales | `resources/views/auth/login.blade.php` | Media |
+| 6 | Siete cambios de interfaz sin validación en navegador autenticado | Lista siguiente | Media |
+
+### Validación visual pendiente
+
+Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
+
+- 2026-11-21 11:49 — Corrección de actividades y participantes con alumnos SIT
+- 2026-11-20 19:40 — UX moderna del módulo de mensajes
+- 2026-11-20 19:30 — Actualización del menú principal con MDB y Font Awesome
+- 2026-11-20 19:15 — Corrección definitiva de la vista Mis citas
+- 2026-11-20 19:12 — Corrección de la vista Mis citas del alumno
+- 2026-11-20 19:09 — Reingeniería frontend del área de alumno
+- 2026-11-20 18:53 — Modernización UX de la entrada al sistema
+
+### ADR pendientes
+
+- ADR: identidad y autenticación de alumnos (`sit.users` frente a identidad propia de `creditos`).
+- ADR: estrategia de claves de alumno (`id`, `no_control`, `user_id` y mapeo histórico).
+- ADR: mapeo de `creditos.alumnos` a `sit.alumnos`.
+- ADR: destino funcional de las 28 tablas de `creditos` sin equivalente en `sit`.
+- ADR: conservación o migración de datos personales sensibles y credenciales.
+
+## Convenciones de la bitácora
+
+**Campos por entrada:** `Estatus`, `Agente`, `Módulo` y `Prompt/Tarea original`; después `Archivos modificados`, `Decisiones tomadas` y, de forma opcional, `Diagnóstico`, `Acción realizada`, `Datos creados`, `Consultas SQL`, `Archivos eliminados`, `Pendientes / Deuda técnica`, `Tests ejecutados` y `Referencias`.
+
+**Estados:** `✅ completado` significa *implementado*, no necesariamente verificado en navegador. Esa verificación se sigue aparte en [Estado actual](#estado-actual) para no reescribir el historial. Cuando se agregue una entrada nueva, usar además `🚧 en progreso` o `❌ revertido` en lugar de forzar `✅`.
+
+**Etiquetas de módulo:** las entradas conservan la etiqueta original con la que se registraron; el nombre canónico se indica en la tabla del índice.
+
+**Para registrar una entrada nueva:**
+
+1. Fecha y hora local (`America/Mexico_City`, UTC−6) en el encabezado, formato `### [YYYY-MM-DD HH:MM] — Título`.
+2. Módulo canónico y agente responsable.
+3. Hash de commit cuando el cambio ya esté versionado, o la nota de que quedó sin commit.
+4. Si toca esquema: si la migración se ejecutó y en qué base.
+5. Si el cambio es de interfaz: marcar explícitamente la validación en navegador como pendiente o realizada.
+
+## Índice
+
+- [Estado actual](#estado-actual)
+- [Convenciones de la bitácora](#convenciones-de-la-bitácora)
+- [Bitácora cronológica](#bitácora-cronológica)
+- [Inventario inicial del sistema](#inventario-inicial-del-sistema)
+
+| Módulo | Etiqueta en entradas | Entradas | Rango |
+|---|---|---|---|
+| Créditos complementarios | `créditos` | 13 | 2026-11-21 11:49 – 12:45 |
+| Trayectoria académica | `trayectoria` | 4 | 2026-11-20 18:59 – 19:09 |
+| Infraestructura | `infraestructura` | 10 | 2026-11-20 18:32 – 2026-11-21 11:27 |
+| Tutorías | — | 0 | Sin entradas registradas |
+
+## Trazabilidad con Git
+
+Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas por fecha. Comprende desde el inicio del proyecto de migración.
+
+| Commit | Fecha | Asunto |
+|---|---|---|
+| `cc5f3ed` | 2026-11-21 12:55 | Modernización UX de avance alumnos |
+| `abdffe5` | 2026-11-21 12:43 | Actualización UX de créditos |
+| `57cdaac` | 2026-11-21 11:55 | Corrige actividades y participantes contra SIT |
+| `393701a` | 2026-11-21 11:32 | Actualización de la recuperación de contraseñas |
+| `adebb03` | 2026-11-21 11:26 | Mejoras al inicio de sesión |
+| `3b95a28` | 2026-11-20 19:42 | Actualización de la UX de mensajes |
+| `6aea3e9` | 2026-11-20 19:38 | Actualización de footer |
+| `73d549d` | 2026-11-20 19:33 | Actualización del menú a MDB y Font Awesome |
+| `c9204de` | 2026-11-20 19:29 | Instalación de Font Awesome |
+| `f22a82a` | 2026-11-20 19:16 | Reingeniería de las vistas del alumno y citas |
+| `5d44fd5` | 2026-11-20 19:08 | Corrige carga SIT de la ficha académica |
+| `4db0107` | 2026-11-20 19:03 | Unifica autenticación SIT y moderniza el login |
+| `a2a0c10` | 2026-11-20 18:44 | Añade capa Eloquent de solo lectura para SIT |
+| `a02fb92` | 2026-11-20 18:17 | Añade inventario inicial y bitácora de cambios |
+
+## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
@@ -728,7 +818,9 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 - `docs/db/sit.sql`
 - ADR pendiente: identidad y autenticación de alumnos
 
-## 2026-11-20 — Inventario inicial del sistema
+## Inventario inicial del sistema
+
+**Fecha:** 2026-11-20 · **Agente:** no registrado · **Estatus:** ✅ completado
 
 ### Contexto
 
