@@ -204,11 +204,12 @@
                         @foreach ($grupo as $gru)
                             @php
                                 [$estatusTexto, $estatusClase] = $estatusMap[$gru->status] ?? ['Sin estatus', 'bg-secondary'];
+                                $ordenNombre = \Illuminate\Support\Str::upper(\Illuminate\Support\Str::ascii($gru->aPaterno.' '.$gru->aMaterno.' '.$gru->nombre));
                             @endphp
                             <tr>
                                 <td class="text-muted">{{ $loop->iteration }}</td>
                                 <td><span class="font-monospace">{{ $gru->control }}</span></td>
-                                <td>
+                                <td data-order="{{ $ordenNombre }}">
                                     <strong class="d-block">{{ $gru->aPaterno }} {{ $gru->aMaterno }}</strong>
                                     <small class="text-muted">{{ $gru->nombre }}</small>
                                 </td>
@@ -271,7 +272,8 @@
                 pageLength: 10,
                 lengthMenu: [[10, 25, 50, -1], ['10 registros', '25 registros', '50 registros', 'Ver todos']],
                 pagingType: 'full_numbers',
-                order: [[1, 'asc']],
+                // Orden inicial por apellido paterno, materno y nombre (data-order normalizado)
+                order: [[2, 'asc']],
                 columnDefs: [
                     { orderable: false, targets: [5, 6] }
                 ],
