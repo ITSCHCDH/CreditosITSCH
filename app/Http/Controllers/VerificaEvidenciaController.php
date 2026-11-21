@@ -369,8 +369,17 @@ class VerificaEvidenciaController extends Controller
 
     public function verEvidencia($id){
         $evidencias = DB::table('actividad_evidencia as ae')->join('users as u','u.id','=','ae.user_id')->join('actividad as a','a.id','=','ae.actividad_id')->join('evidencia as e','e.id_asig_actividades','=','ae.id')->where('ae.id','=',$id)->select('u.name as usuario_nombre','a.nombre as actividad_nombre','e.created_at as fecha_subida','ae.id as actividad_evidencia_id','e.nom_imagen')->get();
+        $actividadEvidencia = Actividad_Evidencia::find($id);
+        $puedeValidar = $actividadEvidencia
+            && (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA'])
+                || Auth::User()->id == $actividadEvidencia->validador_id
+                || Auth::User()->id == $actividadEvidencia->user_id);
+
         return view('admin.verifica_evidencia.ver_evidencia')
-        ->with('evidencias',$evidencias);
+        ->with('evidencias',$evidencias)
+        ->with('actividad_evidencia_id',$id)
+        ->with('actividad_validada',$actividadEvidencia?->validado ?? 'false')
+        ->with('puede_validar',$puedeValidar);
     }
 
     public function alumnosBusqueda(Request $request){

@@ -124,7 +124,7 @@
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ Auth::guard('alumno')->check() ? route('alumnos.home_avance') : url('/home') }}">
             <img class="brand-mark" src="{{ asset('images/itsch.jpg') }}" alt="ITSCH" loading="lazy">
-            <span class="d-none d-sm-inline">Creditsch</span>
+            <span class="d-none d-sm-inline">STA</span>
         </a>
 
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"

@@ -5,34 +5,45 @@
 @section('links')
     <link rel="stylesheet" href="{{ asset('css/checkbox.css')}}">
     <script type="text/javascript" src="{{ asset('plugins/jsCookie/js.cookie.js') }}"></script>
+    <style>
+        .activity-page-toolbar { display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1rem; }
+        .activity-page-toolbar h1 { margin:0;color:#102b4a;font-size:clamp(1.5rem,3vw,2.1rem);font-weight:700; }
+        .activity-page-toolbar p { margin:.35rem 0 0;color:#6b7280; }
+        .activity-filter-card { display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem;padding:.85rem 1rem;border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06); }
+        .activity-table-card { border:1px solid #e7edf4;border-radius:1.1rem;background:#fff;overflow:hidden;box-shadow:0 1rem 2.25rem rgba(29,78,116,.12),0 .25rem .65rem rgba(16,43,74,.07); }
+        .activity-table-card .table { margin:0; }
+        @media(max-width:767.98px){.activity-page-toolbar,.activity-filter-card{align-items:flex-start;flex-direction:column}.activity-filter-card .btn{width:100%}}
+    </style>
 @endsection
 
 @section('ruta')
-    <label class="label label-success"> Actividades</label>
 @endsection
 
 @section('contenido')
+<div class="activity-page-toolbar">
+    <div><h1>Actividades</h1><p>Consulta, administra y asigna participantes.</p></div>
+    @if(Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))
+        <a href="{{ route('actividades.create') }}" class="btn btn-primary rounded-pill"><i class="fa-solid fa-plus me-2"></i>Nueva actividad</a>
+    @endif
+</div>
+
+<div class="activity-filter-card">
+    <div class="d-flex align-items-center gap-2">
+        <i class="fa-solid fa-filter text-primary"></i>
+        <strong>Filtros</strong>
+    </div>
     <form action="{{ route('actividades.index') }}" method="GET" id="actividades-submit">
-        <div class="row">
-            <div class="col-sm-4"></div>
-            <div class="col-sm-4">
-                <input type="checkbox" id="vigente" class="css-checkbox" name="vigente"/>
-                <label for="vigente" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades cerradas</label>
-            </div>
-            <div class="col-sm-4" style="text-align: right !important;">
-                @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD']))
-                    <a href="{{route('actividades.create')}}" class="text-success">
-                        <i class="fa fa-plus fa-2x" aria-hidden="true" title="Agregar actividad"></i>
-                    </a>
-                @endif
-            </div>
+        <div class="form-check form-switch mb-0">
+            <input type="checkbox" id="vigente" class="form-check-input" name="vigente"/>
+            <label for="vigente" class="form-check-label">Mostrar actividades cerradas</label>
         </div>
     </form>
-    <br>
+</div>
 
+<div class="activity-table-card">
     <div class="table-responsive">
-        <table class="table" id="tabActividades">
-            <thead>
+        <table class="table align-middle mb-0" id="tabActividades">
+            <thead class="table-light">
                 <th>Actividad</th>
                 <th>No Alumnos</th>
                 <th>Administrador</th>              
@@ -45,6 +56,7 @@
             </tbody>
         </table>
     </div>
+</div>
 
 
    <!-- Modal -->

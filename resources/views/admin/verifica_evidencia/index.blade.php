@@ -1,176 +1,132 @@
 @extends('template.molde')
 
-@section('title','Verificar Evidencias')
+@section('title','Verificar evidencias')
 
 @section('links')
-	<link rel="stylesheet" type="text/css" href="{{ asset('plugins/checkboxcss/checkbox.css') }}">
-	<link rel="stylesheet" href="{{ asset('css/checkbox.css')}}">
-@endsection
-@section('ruta')
-	@if ($actividades_link == 'true')
-		<a href="{{ route('actividades.index')}} ">Actividades</a>
-		/
-	@endif
-	<label class="label label-success">Verificar Evidencias</label>
+<style>
+    .verification-breadcrumb,.verification-control,.verification-summary,.verification-table-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
+    .verification-breadcrumb{display:flex;align-items:center;gap:.65rem;min-height:64px;margin-bottom:.75rem;padding:.8rem 1rem;color:#64748b}
+    .verification-breadcrumb i{width:38px;height:38px;display:grid;place-items:center;border-radius:.7rem;color:#173c66;background:#edf3f8}
+    .verification-breadcrumb strong{color:#102b4a}
+    .verification-control{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1rem;padding:.9rem 1rem}
+    .verification-control h1{margin:0;color:#102b4a;font-size:1.25rem;font-weight:700}
+    .verification-control p{margin:.2rem 0 0;color:#6b7280;font-size:.88rem}
+    .verification-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin-bottom:1rem}
+    .verification-summary-item{padding:.9rem 1rem;border-right:1px solid #edf1f5}
+    .verification-summary-item:last-child{border-right:0}
+    .verification-summary-item span{display:block;color:#6b7280;font-size:.78rem}
+    .verification-summary-item strong{color:#102b4a;font-size:1.25rem}
+    .verification-table-card{overflow:hidden}
+    .verification-table-card-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid #edf1f5;background:#f8fafc}
+    .verification-table-card-head h2{margin:0;color:#102b4a;font-size:1.05rem}
+    .verification-status{display:inline-flex;align-items:center;gap:.45rem}
+    .verification-status i{width:28px;height:28px;display:grid;place-items:center;border-radius:.55rem}
+    @media(max-width:767.98px){.verification-control{align-items:flex-start;flex-direction:column}.verification-summary{grid-template-columns:1fr}.verification-summary-item{border-right:0;border-bottom:1px solid #edf1f5}.verification-summary-item:last-child{border-bottom:0}.verification-table-card-head{align-items:flex-start;flex-direction:column}}
+</style>
 @endsection
 
 @section('contenido')
-	<!-- Boton de busqueda en la pagina -->
-	<form action="{{ route('verifica_evidencia.index') }}" method="get" id="actividades-submit">	
-		@if ($validadas == "false")
-			<input  type="checkbox" id="checkbox5" class="css-checkbox" checked="checked" name="validadas"/>
-		@else
-			<input type="checkbox" id="checkbox5" class="css-checkbox" name="validadas"/>
-		@endif
-		<label for="checkbox5" name="checkbox2_lbl" class="css-label lite-blue-check">Actividades sin validar </label>
-		<input type="hidden" name="actividades_link" value="{{ $actividades_link }}">
-		
-		<div class="row">
-			<div class="col-sm-4"></div>
-			<div class="col-sm-4"></div>
-			<div class="col-sm-4">
-				<div class="md-form input-group mb-3">
-					<input type="text" class="form-control" placeholder="Buscar...." aria-label="Caja para buscar" aria-describedby="Caja para Buscar" name="busqueda">
-					<div class="input-group-append">
-					  <button class="btn btn-md btn-secondary m-0 px-3" type="submit" id="Buscar" title="buscar"><i class="fas fa-search" style="font-size: 14px"></i></button>
-					</div>
-				</div>	
-			</div>
-		</div>			
-	</form>
-	
-	<form action="{{ route('verifica_evidencia.store') }}" method="post">
-		@csrf
-		<input type="hidden" name="actividades_link" value="{{ $actividades_link }}">
-		<br>
-		<br>
-		<div class="table-responsive">
-			<table class="table" id="tabla_evidencia">
-			   <thead>
-			       <th>Actividad</th>
-			       <th>Validador</th>
-			       <th>Responsable</th>
-			       <th>Crédito</th>
-			       <th>Evidencias</th>
-			       <th>Validar</th>
-			   </thead>
-			   <tbody id="data-parent">
-			   	@foreach ($evidencias_data as $evi)
-			   		<tr class="oculta_validados">
-			   			<td>{{ $evi->nombre }}</td>
-			   			<td>{{ $evi->validador_nombre }}</td>
-			   			<td>{{ $evi->name }}</td>
-			   			<td>{{ $evi->nombre_credito }}</td>
-			   			<td>
-			   				<a href="{{ route('verifica_evidencia.ver_evidencia',$evi->actividad_evidencia_id)}}" class="btn btn-primary" title="Ver evidencias"><i class="far fa-eye fa-lg"></i></a>
-			   			</td>
-			   			<td>
-			   				<label>
-			   					@if($evi->vigente=="false")
-			   						Credito no Vigente
-			   					@else
-				   					@if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA']))
-					   					@if($evi->validado=='false')
-				   							<label class="control control--checkbox">
-				   								<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado">
-				   								<div class="control__indicator"></div>
-				   							</label>
-					   					@else
-					   						<label class="control control--checkbox">
-					   							<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" checked disabled>
-					   							<div class="control__indicator"></div>
-					   						</label>
-					   					@endif
-					   				@elseif(Auth::User()->hasAnyPermission(['VIP_SOLO_LECTURA','VERIFICAR_EVIDENCIA']))
-					   					@if (Auth::User()->can('VERIFICAR_EVIDENCIA') && $evi->validador_id==Auth::User()->id)
-						   					@if($evi->validado=='false')
-					   							<label class="control control--checkbox">
-					   								<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado">
-					   								<div class="control__indicator"></div>
-					   							</label>
-						   					@else
-						   						<label class="control control--checkbox">
-						   							<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" checked disabled>
-						   							<div class="control__indicator"></div>
-						   						</label>
-						   					@endif
-						   				@else
-						   					@if($evi->validado=='false')
-					   							<label class="control control--checkbox">
-					   								<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" disabled>
-					   								<div class="control__indicator"></div>
-					   							</label>
-						   					@else
-						   						<label class="control control--checkbox">
-						   							<input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="validado" checked disabled>
-						   							<div class="control__indicator"></div>
-						   						</label>
-						   					@endif
-					   					@endif
-				   					@endif
-			   					@endif
-			   				</label>
-			   			</td>
-			   		</tr>
-			   	@endforeach
-			   </tbody>
-			</table>
-		</div>
-		@if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA']))
-			<input type="submit" value="Guardar" class="btn btn-primary">			
-		@endif		
-	</form>	
-	
-	@section('js')
-		<script>
-			$('#checkbox5').click(function(){
-				$('#actividades-submit').submit();
-			});
-		</script>
+@php
+    $total = $evidencias_data->count();
+    $validadasCount = $evidencias_data->where('validado','true')->count();
+    $pendientesCount = $total - $validadasCount;
+@endphp
 
-		<script>
-			//Codigo para adornar las tablas con datatables
-			$(document).ready(function() {
-			$('#tabla_evidencia').DataTable({
+<div class="verification-breadcrumb">
+    <i class="fa-solid fa-circle-check"></i>
+    <div>
+        @if($actividades_link == 'true')
+            <a class="text-decoration-none" href="{{ route('actividades.index') }}">Actividades</a><span class="mx-2">/</span>
+        @endif
+        <strong>Verificar evidencias</strong>
+    </div>
+</div>
 
-				dom: 'Bfrtip',
+<div class="verification-control">
+    <div>
+        <h1>Validación de evidencias</h1>
+        <p>Revisa responsables, créditos y estado de cada actividad.</p>
+    </div>
+    <form action="{{ route('verifica_evidencia.index') }}" method="get" id="actividades-submit" class="d-flex align-items-center gap-2 flex-wrap">
+        <input type="hidden" name="actividades_link" value="{{ $actividades_link }}">
+        <div class="form-check form-switch mb-0">
+            <input type="checkbox" id="checkbox5" class="form-check-input" name="validadas" @checked($validadas == 'false')>
+            <label for="checkbox5" class="form-check-label">Actividades sin validar</label>
+        </div>
+        <div class="input-group" style="max-width:320px">
+            <input type="text" class="form-control" placeholder="Buscar actividad, crédito o responsable" name="busqueda" value="{{ $busqueda }}">
+            <button class="btn btn-primary" type="submit" title="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+    </form>
+</div>
 
-				responsive: {
-					breakpoints: [
-					{name: 'bigdesktop', width: Infinity},
-					{name: 'meddesktop', width: 1366},
-					{name: 'smalldesktop', width: 1280},
-					{name: 'medium', width: 1188},
-					{name: 'tabletl', width: 1024},
-					{name: 'btwtabllandp', width: 848},
-					{name: 'tabletp', width: 768},
-					{name: 'mobilel', width: 600},
-					{name: 'mobilep', width: 320}
-					]
-				},
+<div class="verification-summary">
+    <div class="verification-summary-item"><span>Total</span><strong>{{ $total }}</strong></div>
+    <div class="verification-summary-item"><span>Validadas</span><strong class="text-success">{{ $validadasCount }}</strong></div>
+    <div class="verification-summary-item"><span>Pendientes</span><strong class="text-warning">{{ $pendientesCount }}</strong></div>
+</div>
 
-				lengthMenu: [
-					[ 5, 10, 25, 50, -1 ],
-					[ '5 reg', '10 reg', '25 reg', '50 reg', 'Ver todo' ]
-				],
+<form action="{{ route('verifica_evidencia.store') }}" method="post">
+    @csrf
+    <input type="hidden" name="actividades_link" value="{{ $actividades_link }}">
 
-				buttons: [
-					{extend: 'collection', text: 'Exportar',
-						buttons: [
-							{ extend: 'copyHtml5', text: 'Copiar' },
-							'excelHtml5',
-							'pdfHtml5',
-							{ extend: 'print', text: 'Imprimir' },
-						]},
-					{ extend: 'colvis', text: 'Columnas visibles' },
-					{ extend:'pageLength',text:'Ver registros'},
-				],
-				language: {
-					url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
-				},
-				
-			});
-		});
-		</script>
-	@endsection
+    <article class="verification-table-card">
+        <div class="verification-table-card-head">
+            <h2>Listado de evidencias</h2>
+            @if(Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA']))
+                <button type="submit" class="btn btn-primary rounded-pill"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar validación</button>
+            @endif
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr><th>Actividad</th><th>Validador</th><th>Responsable</th><th>Crédito</th><th>Evidencias</th><th>Validar</th></tr>
+                </thead>
+                <tbody>
+                    @forelse($evidencias_data as $evi)
+                        <tr>
+                            <td><strong>{{ $evi->nombre }}</strong></td>
+                            <td>{{ $evi->validador_nombre }}</td>
+                            <td>{{ $evi->name }}</td>
+                            <td>{{ $evi->nombre_credito }}</td>
+                            <td>
+                                <a href="{{ route('verifica_evidencia.ver_evidencia',$evi->actividad_evidencia_id) }}" class="btn btn-outline-primary btn-sm rounded-3" title="Ver evidencias">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                            </td>
+                            <td>
+                                @if($evi->vigente == 'false')
+                                    <span class="badge rounded-pill bg-secondary">Crédito no vigente</span>
+                                @else
+                                    @php
+                                        $puedeValidar = Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA'])
+                                            || (Auth::User()->hasAnyPermission(['VIP_SOLO_LECTURA','VERIFICAR_EVIDENCIA']) && $evi->validador_id == Auth::User()->id);
+                                    @endphp
+                                    @if($puedeValidar)
+                                        <div class="form-check form-switch">
+                                            <input type="checkbox" name="id_evidencias[]" value="{{ $evi->actividad_evidencia_id }}" class="form-check-input" id="validar{{ $evi->actividad_evidencia_id }}" @checked($evi->validado=='true') @disabled($evi->validado=='true')>
+                                            <label class="form-check-label" for="validar{{ $evi->actividad_evidencia_id }}">{{ $evi->validado=='true'?'Validada':'Pendiente' }}</label>
+                                        </div>
+                                    @else
+                                        <span class="badge rounded-pill {{ $evi->validado=='true'?'bg-success':'bg-secondary' }}">{{ $evi->validado=='true'?'Validada':'Pendiente' }}</span>
+                                    @endif
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="6" class="text-center text-muted py-5"><i class="fa-solid fa-inbox fa-2x mb-3"></i><div>No hay evidencias para los filtros seleccionados.</div></td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </article>
+</form>
+@endsection
+
+@section('js')
+<script>
+    document.getElementById('checkbox5')?.addEventListener('change', function () {
+        document.getElementById('actividades-submit').submit();
+    });
+</script>
 @endsection

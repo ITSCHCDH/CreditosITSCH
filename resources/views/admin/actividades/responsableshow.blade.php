@@ -1,165 +1,83 @@
 @extends('template.molde')
 
-@section('title','Responsables')
+@section('title','Responsables asignados')
 
-@section('ruta')
-    <a href="{{route('actividades.index')}}">Actividades</a>
-    / <label class="label label-success">{{ $actividad->nombre }}</label>
-    / <label class="label label-success">Responsables</label>
+@section('links')
+<style>
+    .responsible-breadcrumb,.responsible-control,.responsible-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
+    .responsible-breadcrumb{display:flex;align-items:center;gap:.65rem;min-height:64px;margin-bottom:.75rem;padding:.8rem 1rem;color:#64748b}
+    .responsible-breadcrumb i{width:38px;height:38px;display:grid;place-items:center;border-radius:.7rem;color:#173c66;background:#edf3f8}
+    .responsible-breadcrumb strong{color:#102b4a}
+    .responsible-control{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem;padding:.9rem 1rem}
+    .responsible-control h1{margin:0;color:#102b4a;font-size:1.25rem;font-weight:700}
+    .responsible-control p{margin:.2rem 0 0;color:#6b7280;font-size:.88rem}
+    .responsible-card{overflow:hidden}
+    .responsible-card-head{display:flex;align-items:center;gap:.75rem;padding:1rem 1.25rem;border-bottom:1px solid #edf1f5;background:#f8fafc}
+    .responsible-card-head i{width:38px;height:38px;display:grid;place-items:center;border-radius:.7rem;color:#173c66;background:#edf3f8}
+    .responsible-card-head h2{margin:0;color:#102b4a;font-size:1.05rem}
+    .responsible-row{display:grid;grid-template-columns:minmax(220px,1fr) 180px 100px;align-items:center;gap:.75rem;padding:.85rem 1.25rem;border-bottom:1px solid #edf1f5}
+    .responsible-row:last-child{border-bottom:0}
+    .responsible-name{display:flex;align-items:center;gap:.65rem;font-weight:600;color:#334155}
+    .responsible-avatar{width:38px;height:38px;display:grid;place-items:center;border-radius:.7rem;color:#173c66;background:#edf3f8}
+    @media(max-width:767.98px){.responsible-control{align-items:flex-start;flex-direction:column}.responsible-row{grid-template-columns:1fr 1fr}.responsible-row>div:nth-child(3){grid-column:1/-1;text-align:right}}
+</style>
 @endsection
 
 @section('contenido')
-    
-    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-        @if ($actividad!=null)
-            @if($actividad->vigente=="true")                
-                <a href="{{route('responsables.index',$actividad->id)}}" title="Agregar responsables">
-                    <i class="fas fa-user-plus fa-3x amber-text"></i>
-                </a>                               
+@if($actividad != null)
+    <div class="responsible-breadcrumb"><i class="fa-solid fa-users-gear"></i><div><a class="text-decoration-none" href="{{ route('actividades.index') }}">Actividades</a><span class="mx-2">/</span><strong>{{ $actividad->nombre }}</strong><span class="mx-2">/</span>Responsables</div></div>
+    <div class="responsible-control">
+        <div><h1>Responsables asignados</h1><p>Gestiona usuarios responsables de esta actividad.</p></div>
+        @if($actividad->vigente=='true')
+            @if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']) || (Auth::User()->hasAllPermissions(['AGREGAR_RESPONSABLES','ELIMINAR_RESPONSABLES']) && $actividad->id_user==Auth::User()->id))
+                <a href="{{ route('responsables.index',$actividad->id) }}" class="btn btn-primary rounded-pill"><i class="fa-solid fa-user-plus me-2"></i>Asignar responsables</a>
             @endif
         @endif
-    @elseif(Auth::User()->hasAllPermissions(['AGREGAR_RESPONSABLES','ELIMINAR_RESPONSABLES']))
-        @if ($actividad!=null)
-            @if ($actividad->id_user==Auth::User()->id && $actividad->vigente=="true")
-                <a href="{{route('responsables.index',$actividad->id)}}" title="Agregar responsables">
-                    <i class="fas fa-user-plus fa-3x amber-text"></i>
-                </a>                
-            @endif
-        @endif
-    @endif
-    <br>    
-    <div class="table-responsive">
-        <br>
-        <table class="table" id="tabResponsables">
-            <thead>
-                <th>Nombre</th>
-                <th>Area</th>
-                @if (Auth::User()->hasAnyPermission(['ELIMINAR_RESPONSABLES','VIP','VIP_ACTIVIDAD']))
-                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-                        <th>Accion</th>
-                    @elseif($actividad!=null && Auth::User()->can('ELIMINAR_RESPONSABLES'))
-                        @if($actividad->id_user==Auth::User()->id)
-                            <th>Accion</th>
+    </div>
+    <article class="responsible-card">
+        <div class="responsible-card-head"><i class="fa-solid fa-user-check"></i><h2>Lista de responsables</h2></div>
+        @if($responsables != null && $responsables->count())
+            <div class="d-none d-md-grid responsible-row border-bottom table-light"><strong>Nombre</strong><strong>Área</strong><strong class="text-end">Acción</strong></div>
+            @foreach($responsables as $res)
+                <div class="responsible-row">
+                    <div class="responsible-name"><span class="responsible-avatar"><i class="fa-solid fa-user"></i></span><span>{{ $res->name }}</span></div>
+                    <div>{{ $res->area }}</div>
+                    <div class="text-end">
+                        @if($actividad->vigente=='true' && Auth::User()->hasAnyPermission(['ELIMINAR_RESPONSABLES','VIP','VIP_ACTIVIDAD']))
+                            @if(Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']) || $actividad->id_user==Auth::User()->id)
+                                <button type="button" class="btn btn-outline-danger btn-sm rounded-3" data-mdb-toggle="modal" data-mdb-target="#modEliminarResponsable" onclick="eliminarResponsable({{ $res->actividad_evidencia_id }})" title="Quitar responsable"><i class="fa-solid fa-user-minus"></i></button>
+                            @else
+                                <span class="text-muted">Sin acción</span>
+                            @endif
+                        @else
+                            <span class="badge rounded-pill bg-secondary">Actividad cerrada</span>
                         @endif
-                    @endif
-                @endif
-            </thead>
-            <tbody>
-                @if($responsables!=null && $actividad!=null)
-                    @foreach($responsables as $res)
-                        <tr>
-                            <td>
-                                {{$res->name}}
-                            </td>
-                            <td>
-                                {{$res->area}} 
-                            </td>
-                            @if (Auth::User()->hasAnyPermission(['ELIMINAR_RESPONSABLES','VIP','VIP_ACTIVIDAD']))
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD']))
-                                    @if($actividad->vigente=="true")
-                                        <td>                                            
-                                            <a href="#" data-mdb-toggle="modal"  data-mdb-target="#modEliminar" onclick="eliminar({{ $res->actividad_evidencia_id  }})"  title="Quitar responsable">
-                                                <i class="far fa-trash-alt fa-lg red-text"></i>
-                                            </a>                                                                            
-                                        </td>
-                                    @else
-                                        <td>
-                                            {{ "Ninguna" }}
-                                        </td>
-                                    @endif                     
-                                @elseif($actividad->id_user==Auth::User()->id)
-                                    @if($actividad->vigente=="true")
-                                        <td>
-                                            <a href="#" data-mdb-toggle="modal"  data-mdb-target="#modEliminar" onclick="eliminar({{ $res->actividad_evidencia_id  }})"  title="Quitar responsable">
-                                                <i class="far fa-trash-alt fa-lg red-text"></i>
-                                            </a>                                            
-                                        </td>
-                                    @else
-                                        <td>
-                                            {{ "Ninguna" }}
-                                        </td>
-                                    @endif
-                                @endif
-                            @endif                            
-                        </tr>
-                    @endforeach
-                @endif
-            </tbody>
-        </table>
-    </div>
+                    </div>
+                </div>
+            @endforeach
+        @else
+            <div class="text-center text-muted py-5"><i class="fa-solid fa-users fa-2x mb-3"></i><div>No hay responsables asignados.</div></div>
+        @endif
+    </article>
+@else
+    <div class="responsible-breadcrumb"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Actividad no encontrada</strong></div></div>
+@endif
 
-    <!-- Modal -->
-    <div class="modal fade" id="modEliminar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade" id="modEliminarResponsable" tabindex="-1" aria-labelledby="tituloEliminarResponsable" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Eliminar responsable</h5>
-            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">Estas seguro(a) de eliminar este responsable </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
-            <a id="btnEliminar" type="button" class="btn btn-primary">Eliminar</a>
-            </div>
-        </div>
+            <div class="modal-header"><h5 class="modal-title" id="tituloEliminarResponsable">Eliminar responsable</h5><button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Cerrar"></button></div>
+            <div class="modal-body">¿Estás seguro de quitar este responsable de la actividad?</div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Cancelar</button><form id="formEliminarResponsable" method="POST" action="">@csrf @method('DELETE')<button type="submit" class="btn btn-danger">Eliminar</button></form></div>
         </div>
     </div>
+</div>
+@endsection
 
-
-    <div style="margin-bottom: 50px;"></div>
-    @section('js')
-        <script type="text/javascript">
-            function eliminar(act)
-            {   //Sirve para cambiar una ruta y que no se concatene con lo anterior
-                c="{{ url("")}}";            
-                r=c+"/admin/actividad_evidencias/"+act+"/destroy";  
-                //Agregamos la ruta a una etiqueta a        
-                $('#btnEliminar').attr('href',r);              
-            }
-
-
-             //Codigo para adornar las tablas con datatables
-             $(document).ready(function() {
-                $('#tabResponsables').DataTable({
-
-                    dom: 'Bfrtip',
-
-                    responsive: {
-                        breakpoints: [
-                        {name: 'bigdesktop', width: Infinity},
-                        {name: 'meddesktop', width: 1366},
-                        {name: 'smalldesktop', width: 1280},
-                        {name: 'medium', width: 1188},
-                        {name: 'tabletl', width: 1024},
-                        {name: 'btwtabllandp', width: 848},
-                        {name: 'tabletp', width: 768},
-                        {name: 'mobilel', width: 600},
-                        {name: 'mobilep', width: 320}
-                        ]
-                    },
-
-                    lengthMenu: [
-                        [ 5, 10, 25, 50, -1 ],
-                        [ '5 reg', '10 reg', '25 reg', '50 reg', 'Ver todo' ]
-                    ],
-
-                    buttons: [
-                        {extend: 'collection', text: 'Exportar',
-                            buttons: [
-                                { extend: 'copyHtml5', text: 'Copiar' },
-                                'excelHtml5',
-                                'pdfHtml5',
-                                { extend: 'print', text: 'Imprimir' },
-                            ]},
-                        { extend: 'colvis', text: 'Columnas visibles' },
-                        { extend:'pageLength',text:'Ver registros'},
-                    ],
-                    language: {
-                        url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
-                    },                  
-                   
-                });
-            });           
-        </script>
-    @endsection
+@section('js')
+<script>
+function eliminarResponsable(activityEvidenceId){
+    $('#formEliminarResponsable').attr('action',"{{ url('/admin/actividad_evidencias') }}/"+activityEvidenceId);
+}
+</script>
 @endsection

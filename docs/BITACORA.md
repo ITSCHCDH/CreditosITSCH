@@ -12,6 +12,201 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
+### [2026-11-21 12:39] — Validación inline desde la evidencia
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Agregar un botón para validar la evidencia desde su vista de visualización.
+
+**Archivos modificados:**
+- `app/Http/Controllers/VerificaEvidenciaController.php`
+- `resources/views/admin/verifica_evidencia/ver_evidencia.blade.php`
+
+**Decisiones tomadas:**
+- El botón aparece solo para usuarios con permiso o para el validador asignado.
+- Una evidencia ya validada muestra estado deshabilitado.
+- La acción reutiliza `verifica_evidencia.store` con `id_evidencias[]`.
+
+### [2026-11-21 12:33] — Evidencia PDF accesible mediante storage
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Investigar el enlace roto de `credITSCH_1795285595_0.pdf`.
+
+**Diagnóstico:**
+- El archivo sí existe físicamente en `storage/app/public/evidencias/Congreso NEXUS/credITSCH_1795285595_0.pdf`.
+- El enlace público fallaba porque no existía `public/storage`.
+
+**Acción realizada:**
+- Ejecutado `php artisan storage:link`.
+- Verificada la URL `/storage/evidencias/Congreso%20NEXUS/credITSCH_1795285595_0.pdf`.
+
+**Resultado:**
+- HTTP 200, Content-Type `application/pdf`, tamaño 41455 bytes.
+
+### [2026-11-21 12:30] — UX inline de evidencias verificadas
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Modernizar `admin/verifica_evidencia/{id}/ver_evidencia` con MDB, Font Awesome, cards y visualizador PDF inline.
+
+**Archivos modificados:**
+- `resources/views/admin/verifica_evidencia/ver_evidencia.blade.php`
+- `docs/BITACORA.md`
+
+**Decisiones tomadas:**
+- Se usan cards para información, imagen/PDF y acciones.
+- Los PDF se renderizan con PDF.js local y controles de página.
+- Las imágenes se muestran inline y mantienen abrir/descargar.
+
+### [2026-11-21 12:27] — UX moderna de verificación de evidencias
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Modernizar `admin/verifica_evidencia` con MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/verifica_evidencia/index.blade.php`
+
+**Decisiones tomadas:**
+- Se añadieron cards de filtros, resumen y tabla.
+- Se reemplazó la selección antigua por switches MDB/Bootstrap.
+- Se conservaron el formulario de validación, búsqueda y permisos existentes.
+
+### [2026-11-21 12:24] — UX moderna de carga de evidencias
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Modernizar la vista de creación de evidencias con MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/evidencias/create.blade.php`
+
+**Decisiones tomadas:**
+- Se conservaron los nombres de campos usados por `EvidenciasController::store()`.
+- Se creó una card de contexto y una card de carga de archivos.
+- Se mantiene soporte para PDF, JPG, JPEG y PNG.
+- Se eliminó la dependencia visual del plugin antiguo para el contenedor principal.
+
+### [2026-11-21 12:21] — UX moderna de participantes
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la vista de participantes con MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/participantes/index.blade.php`
+
+**Decisiones tomadas:**
+- Se organizaron actividad, responsable y alumno en una card de controles.
+- Se añadió resumen visual de evidencias y validación.
+- Se creó una card separada para la tabla de participantes.
+- Se conservaron IDs, formularios y callbacks AJAX existentes.
+
+### [2026-11-21 12:10] — Datos de prueba para responsables y actividades
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Crear y ejecutar un seeder con 10 usuarios administrativos/docentes y 10 actividades de prueba.
+
+**Archivos modificados:**
+- `database/seeders/PruebaActividadesSeeder.php`
+- `composer.json` (namespace `Database\Seeders`)
+- `docs/BITACORA.md`
+
+**Datos creados:**
+- 10 usuarios activos con correos `responsable1@prueba.itsch.mx` a `responsable10@prueba.itsch.mx`.
+- Contraseña compartida de prueba: `Prueba123!`.
+- Rol `Responsable de Prueba` con permisos de responsables, participantes y evidencias.
+- 10 actividades vigentes con 10% de liberación y fechas de cierre futuras.
+
+**Verificaciones:**
+- ✅ 10 usuarios activos fuera del administrador principal.
+- ✅ 10 asignaciones al rol responsable.
+- ✅ 10 actividades vigentes creadas.
+
+### [2026-11-21 12:07] — Fuente de datos para responsables
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Restaurar la lista de administrativos/docentes para asignar responsables.
+
+**Archivos modificados:**
+- `app/Http/Controllers/ResponsablesController.php` (listado desde `creditos.users`)
+- `resources/views/admin/actividades/responsablesindex.blade.php` (combobox restaurado)
+
+**Decisiones tomadas:**
+- Fuente correcta: usuarios activos de `creditos.users`.
+- La asignación se almacena en `actividad_evidencia.user_id`, por lo que cada responsable debe existir en `creditos.users`.
+- Se excluye al usuario administrador principal `id = 1`.
+- No se usan permisos para filtrar la lista; se muestran todos los usuarios activos disponibles.
+
+**Pendientes / Deuda técnica:**
+- La base actual solo contiene el usuario administrador activo, por lo que no aparecerán otros responsables hasta registrar/crear usuarios administrativos o docentes en `creditos.users`.
+
+### [2026-11-21 12:05] — Restauración del selector de responsables
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Recuperar el selector para buscar administrativos o docentes al asignar responsables.
+
+**Archivos modificados:**
+- `resources/views/admin/actividades/responsablesindex.blade.php`
+
+**Decisiones tomadas:**
+- Se añadió un `<select>` MDB con los mismos usuarios elegibles mostrados en la tarjeta.
+- La selección del combobox sincroniza el switch correspondiente.
+- Los usuarios inactivos o bloqueados aparecen deshabilitados.
+
+### [2026-11-21 12:00] — UX de asignación de responsables
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la UX de agregar responsables usando MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/actividades/responsablesindex.blade.php`
+- `resources/views/admin/actividades/responsableshow.blade.php`
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Decisiones tomadas:**
+- Se separaron breadcrumb, cabecera de control y listado con cards.
+- Se reemplazaron checkboxes antiguos por switches MDB/Bootstrap.
+- Se añadieron iconos Font Awesome y estados visuales activos/bloqueados.
+- Elimina responsable ahora usa el método DELETE de Laravel.
+
+### [2026-11-21 11:56] — UX moderna de actividades
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la UX de las vistas de actividades usando MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/actividades/index.blade.php`
+- `resources/views/admin/actividades/create.blade.php`
+- `resources/views/admin/actividades/edit.blade.php`
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Decisiones tomadas:**
+- Se añadieron cards para filtros, formularios y tablas.
+- El filtro de actividades cerradas usa un switch MDB/Bootstrap.
+- Se conservaron rutas, campos y permisos existentes.
+
 ### [2026-11-21 11:49] — Corrección de actividades y participantes con alumnos SIT
 
 - **Estatus:** ✅ completado

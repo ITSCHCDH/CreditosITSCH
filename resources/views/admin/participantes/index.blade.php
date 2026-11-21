@@ -3,109 +3,111 @@
 @section('title','Participantes')
 @section('links')
     <script type="text/javascript" src="{{ asset('plugins/jsCookie/js.cookie.js') }}"></script>
+    <style>
+        .participant-breadcrumb,.participant-control-card,.participant-summary-card,.participant-table-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
+        .participant-breadcrumb{display:flex;align-items:center;gap:.65rem;min-height:64px;margin-bottom:.75rem;padding:.8rem 1rem;color:#64748b}
+        .participant-breadcrumb i{width:38px;height:38px;display:grid;place-items:center;border-radius:.7rem;color:#173c66;background:#edf3f8}
+        .participant-breadcrumb strong{color:#102b4a}
+        .participant-control-card{margin-bottom:1rem;padding:1.25rem}
+        .participant-control-card h1{margin:0;color:#102b4a;font-size:1.25rem;font-weight:700}
+        .participant-control-card p{margin:.2rem 0 0;color:#6b7280;font-size:.88rem}
+        .participant-summary-card{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin-bottom:1rem}
+        .participant-summary-item{padding:.9rem 1rem;border-right:1px solid #edf1f5}
+        .participant-summary-item:last-child{border-right:0}
+        .participant-summary-item span{display:block;color:#6b7280;font-size:.78rem}
+        .participant-summary-item strong{color:#102b4a}
+        .participant-table-card{overflow:hidden}
+        .participant-table-card-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid #edf1f5;background:#f8fafc}
+        .participant-table-card-head h2{margin:0;color:#102b4a;font-size:1.05rem}
+        .participant-table-card .table{margin:0}
+        @media(max-width:767.98px){.participant-summary-card{grid-template-columns:1fr}.participant-summary-item{border-right:0;border-bottom:1px solid #edf1f5}.participant-summary-item:last-child{border-bottom:0}.participant-table-card-head{align-items:flex-start;flex-direction:column}}
+    </style>
 @endsection
 @section('ruta')    
-    <a href="{{ route('actividades.index') }}">Actividades</a>
-    /   
-    <label>Participantes</label>
 @endsection
 <!-- HTML index de los participantes -->
 @section('contenido')
 
-<div id="mensaje-actividad-alumnos"></div>
-
-@if (Auth::User()->hasAnyPermission(['VIP','CREAR_EVIDENCIA']))
-    <form action="{{ route('evidencias.create') }}" method="get">
-        <input type="hidden" name="id_actividad" value='-1' id='input_id_actividad'>
-        <input type="hidden" name="id_responsable" value='-1' id='input_id_responsable'>
-        <button type="submit" class="btn btn-outline-primary waves-effect" title="Agregar evidencia" style="border:none">
-            <i class="fas fa-cloud-upload-alt fa-5x"></i>
-        </button>
-    </form>
-@endif
-
-<div class="pull-right" style="text-align: right">
-    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA']))
-        <p>Total de evidencias: <strong id = "numero-evidencias">0</strong> <a href="{{ route('evidencias.index',['ruta' => 'participantes']) }}" id="evidencia-total">VER</a></p>
-    @endif
-    <p>Evidencias del responsable seleccionado: <strong id = "numero-evidencias-responsable">0</strong> <a href="{{ route('evidencias.index',['ruta' => 'participantes']) }}" id="evidencia-parcial">VER</a></p>
-    <p id="parrafo-validado" style="display: none;">Validado: <strong id="validado">NO</strong></p>
+<div class="participant-breadcrumb">
+    <i class="fa-solid fa-users"></i>
+    <div><a class="text-decoration-none" href="{{ route('actividades.index') }}">Actividades</a><span class="mx-2">/</span><strong>Participantes</strong></div>
 </div>
-<br><br><br><br><br><br>
-<div class="row">
-    <div class="col-sm-3">
-        <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
-        al que estan asignados los participantes -->
 
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text bg-info">Actividad</span>
-            </div>
-            <select name="actividades_id" id="actividades_id" required class="form-control">
+<div class="participant-control-card">
+    <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+        <div><h1>Asignar participantes</h1><p>Selecciona una actividad, responsable y alumno de SIT.</p></div>
+        @if (Auth::User()->hasAnyPermission(['VIP','CREAR_EVIDENCIA']))
+            <form action="{{ route('evidencias.create') }}" method="get" class="mb-0">
+                <input type="hidden" name="id_actividad" value="-1" id="input_id_actividad">
+                <input type="hidden" name="id_responsable" value="-1" id="input_id_responsable">
+                <button type="submit" class="btn btn-outline-primary rounded-pill" title="Agregar evidencia"><i class="fa-solid fa-cloud-arrow-up me-2"></i>Evidencia</button>
+            </form>
+        @endif
+    </div>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label" for="actividades_id">Actividad</label>
+            <select name="actividades_id" id="actividades_id" required class="form-select">
                 @foreach ($actividades as $act)
                     <option value="{{ $act->id }}">{{ $act->nombre }}</option>
                 @endforeach
             </select>
         </div>
-    </div>
-    <div class="col-sm-3">
-        <!--Cargamos las actividades y sus ID's, valor seleccionado por defecto es id de la actividad
-        al que estan asignados los participantes -->
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text bg-info">Responsable</span>
-            </div>
-            <select name="responsables_id[]" id="responsables_id" class="form-control" required></select>
+        <div class="col-md-4">
+            <label class="form-label" for="responsables_id">Responsable</label>
+            <select name="responsables_id[]" id="responsables_id" class="form-select" required></select>
         </div>
+        @if (Auth::User()->hasAnyPermission(['AGREGAR_PARTICIPANTES','VIP']))
+            <div class="col-md-4">
+                <label class="form-label" for="participante_nombre">Alumno</label>
+                <input id="participante_nombre" type="text" placeholder="Nombre del alumno" class="form-control">
+            </div>
+        @endif
     </div>
     @if (Auth::User()->hasAnyPermission(['AGREGAR_PARTICIPANTES','VIP']))
-        <div class="col-sm-3">
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text bg-info">Alumno</span>
-                </div>
-                <input id="participante_nombre" type="text" placeholder="Nombre" class="form-control">
-            </div>
-        </div>
-        <div class="col-sm-3">
-                <!-- Abrimos el formulario para guardar los participantes -->
-            <form id="frm" method="POST" class="form-inline">
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text bg-info">N. Control</span>
-                    </div>
+        <form id="frm" method="POST" class="mt-3">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-9">
+                    <label class="form-label" for="no_control">Número de control</label>
                     <input type="hidden" value="{{ csrf_token() }}" id="token">
                     <input type="hidden" name="id_actividad" id="id_actividad_oculto" value="-1">
-                    <input type="hidden" name="id_responsable" id="responsable_oculto" value='-1'>
-                    <input type="text" name="no_control" id="no_control" placeholder="No Control" class="form-control" list="list_no_control">
-                    <input type="submit" value="Agregar"  class="btn btn-outline-primary btn-sm" data-mdb-ripple-color="dark">
+                    <input type="hidden" name="id_responsable" id="responsable_oculto" value="-1">
+                    <input type="text" name="no_control" id="no_control" placeholder="Ej. 00030001" class="form-control" list="list_no_control">
                 </div>
-            </form>
-        </div>
+                <div class="col-md-3 d-grid">
+                    <button type="submit" class="btn btn-primary rounded-pill"><i class="fa-solid fa-user-plus me-2"></i>Agregar</button>
+                </div>
+            </div>
+        </form>
     @endif
 </div>
 
-<datalist id="list_no_control">
-</datalist>
-{{-- ---------------------------------------------------------------------------------------------------------------- --}}
-{{-- Tabla donde se muestran los participantes  --}}
-    <br>
-    <input class="form-control pull-right" id="myInput" type="text" placeholder="Buscar........" style="width: 250px;">
-    <br>
-    <br>
-<div class="table-responsive">
-    <table class="table" id="mitabla">
-       <input type="hidden" id="participante_id" name="participante_id">
-       <thead>
-            <th>ID</th>
-            <th>Numero de Control</th>
-            <th>Nombre</th>
-            <th>Carrera</th>
-            <th>Acción</th>
-       </thead>
-       <tbody>
-       </tbody>
-    </table>
+<datalist id="list_no_control"></datalist>
+
+<div class="participant-summary-card">
+    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA']))
+        <div class="participant-summary-item"><span>Total de evidencias</span><strong id="numero-evidencias">0</strong></div>
+    @endif
+    <div class="participant-summary-item"><span>Evidencias del responsable</span><strong id="numero-evidencias-responsable">0</strong></div>
+    <div class="participant-summary-item" id="parrafo-validado" style="display:none"><span>Actividad validada</span><strong id="validado">NO</strong></div>
+</div>
+
+<div id="mensaje-actividad-alumnos"></div>
+
+<div class="participant-table-card">
+    <div class="participant-table-card-head">
+        <h2>Participantes asignados</h2>
+        <input class="form-control" id="myInput" type="text" placeholder="Buscar participante..." style="max-width:260px">
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0" id="mitabla">
+            <input type="hidden" id="participante_id" name="participante_id">
+            <thead class="table-light">
+                <tr><th>ID</th><th>Número de control</th><th>Nombre</th><th>Carrera</th><th>Acción</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Modal -->
