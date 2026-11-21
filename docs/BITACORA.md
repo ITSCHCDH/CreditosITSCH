@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 15:30 · **Entradas registradas:** 45 · **Último commit previo a esta sesión:** `800d3bb` (2026-11-21 15:30).
+**Última entrada:** 2026-11-21 15:40 · **Entradas registradas:** 46 · **Último commit previo a esta sesión:** `10a30c0` (2026-11-21 15:31).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 15:40 — UX de Análisis de alumnos (STA)
 - 2026-11-21 15:30 — Profesores sin filtro por carrera (opción C)
 - 2026-11-21 15:23 — SIT solo lectura: observaciones se guardan en creditos
 - 2026-11-21 15:18 — STA completo sobre SIT y conexión contEsc eliminada
@@ -131,7 +132,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 9 | 2026-11-20 18:59 – 2026-11-21 15:30 |
+| Trayectoria académica | `trayectoria` | 10 | 2026-11-20 18:59 – 2026-11-21 15:40 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -159,6 +160,43 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 15:40] — UX de Análisis de alumnos (STA)
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Mejorar la UX de `admin/sta/analisis` usando solo MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/sta/analisis_alumnos/index.blade.php` (rediseño completo: encabezado, tarjeta de filtros, KPIs, tarjeta de tabla y estilos MDB)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; la vista consume los mismos datos del controlador.
+
+**Decisiones tomadas:**
+- Se conserva **DataTables** para búsqueda, orden, exportación, columnas visibles y paginación; solo se restilizó con MDB y se fijó en **10 registros por página**.
+- Se agregan cuatro tarjetas KPI (alumnos, vigentes, bajas y riesgo académico) y badges de estatus MDB.
+- El número de fila (#) se renumera con `rowCallback` para que coincida con el orden y el filtro actuales.
+- Los semáforos se mantienen con sus clases de color, con tooltips MDB y una leyenda al pie.
+- Se usa `scrollX` en lugar del plugin responsive porque el layout carga CSS de responsive para Bootstrap 4 y JS para Bootstrap 5; en móvil la tabla se desplaza dentro de la tarjeta sin desbordar la página.
+- En móvil se ocultan los botones de columnas y de registros, el buscador ocupa el ancho completo y la paginación se centra.
+
+**Pendientes / Deuda técnica:**
+- El encabezado de la vista ahora es moderno; quedan las demás vistas de STA con etiquetas legacy.
+- Unificar en el layout las versiones de DataTables (CSS Bootstrap 4 vs JS Bootstrap 5) para poder volver al plugin responsive.
+
+**Tests ejecutados:**
+- ✅ 15 comprobaciones de render: encabezado, tarjeta de filtros, KPIs, DataTables con 10 registros, botones de exportación, badges, semáforos, leyenda, acciones y estados vacío/con datos.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Capturas de escritorio y móvil revisadas.
+
+**Referencias:**
+- `docs/img/sta-analisis-desktop.png`
+- `docs/img/sta-analisis-movil.png`
 
 ### [2026-11-21 15:30] — Profesores sin filtro por carrera (opción C)
 
