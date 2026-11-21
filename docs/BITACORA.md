@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 16:26 · **Entradas registradas:** 53 · **Último commit previo a esta sesión:** `c029122` (2026-11-21 16:23).
+**Última entrada:** 2026-11-21 16:28 · **Entradas registradas:** 54 · **Último commit previo a esta sesión:** `f4517e7` (2026-11-21 16:27).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 16:28 — UX del Departamento de tutorías
 - 2026-11-21 16:26 — UX de la vista Tutor
 - 2026-11-21 16:21 — Profesores: buscador reutilizable y filtro corregido
 - 2026-11-21 16:09 — Retícula completa de unidades en Calificaciones Parciales
@@ -139,7 +140,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 17 | 2026-11-20 18:59 – 2026-11-21 16:26 |
+| Trayectoria académica | `trayectoria` | 18 | 2026-11-20 18:59 – 2026-11-21 16:28 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -167,6 +168,41 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 16:28] — UX del Departamento de tutorías
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Mejorar la UX de la vista `admin/sta/tutorias`.
+
+**Archivos modificados:**
+- `resources/views/sta/tutorias/index.blade.php` (rediseño con MDB, Font Awesome y tarjetas)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; la vista consume `$gruTutorias`, `$profesores` y `$carreras`.
+
+**Decisiones tomadas:**
+- Cuatro tarjetas KPI: asignaciones, tutores, grupos y carreras atendidas.
+- La tarjeta «Asignar tutoría» agrupa el formulario en una sola fila con selects MDB, un texto de ayuda para el grupo y el botón de guardado; los accesos a Grupos y Analizar alumnos pasan a la cabecera de la tarjeta.
+- La tabla se conserva con DataTables (10 registros, exportar, columnas y registros) restilizado, con badges por tipo de tutoría y acciones agrupadas (constancia de asignación, constancia de liberación y eliminar).
+- Se reemplaza la URL remota de idioma de DataTables por las etiquetas en español embebidas, para que no dependa del CDN.
+- Se corrige el `type="submmit"` del formulario y del modal, y se moderniza el modal de eliminación con MDB.
+
+**Pendientes / Deuda técnica:**
+- Las asignaciones siguen en `creditos` (`grupos`, `asignaciones_tutores`, `gpo_tutorias`).
+- En móvil la tabla se desplaza horizontalmente.
+
+**Tests ejecutados:**
+- ✅ 17 comprobaciones: estado vacío (encabezado, KPIs, formulario, mensaje, sin tabla, acciones), y con datos temporales en transacción (dos asignaciones, tutor, grupos, badges, constancias, modal y DataTables), con rollback verificado.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura revisada.
+
+**Referencias:**
+- `docs/img/sta-tutorias-desktop.png`
 
 ### [2026-11-21 16:26] — UX de la vista Tutor
 
