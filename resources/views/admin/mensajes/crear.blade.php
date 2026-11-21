@@ -5,7 +5,7 @@
 @section('links')
 <link rel="stylesheet" href="{{ asset('plugins/Trumbowyg-master/dist/ui/trumbowyg.min.css') }}">
 <style>
-    .message-composer { max-width:980px; margin:auto; border:1px solid #e7edf4; border-radius:1.1rem; background:#fff; box-shadow:0 .55rem 1.5rem rgba(29,78,116,.07); overflow:hidden; }
+    .message-composer { max-width:980px; margin:auto; border:1px solid #e7edf4; border-radius:1.1rem; background:#fff; box-shadow:0 1rem 2.25rem rgba(29,78,116,.12),0 .25rem .65rem rgba(16,43,74,.07); overflow:hidden; }
     .message-composer-head { display:flex; align-items:center; gap:.75rem; padding:1rem 1.25rem; background:#f8fafc; border-bottom:1px solid #edf1f5; }
     .message-composer-head i { width:38px; height:38px; display:grid; place-items:center; border-radius:.7rem; color:#173c66; background:#edf3f8; }
     .message-composer-head h1 { margin:0; color:#102b4a; font-size:1.15rem; }
@@ -15,10 +15,17 @@
 @endsection
 
 @section('ruta')
-<a class="text-decoration-none" href="{{ route('mensajes.index') }}">Mensajes</a> / Crear mensaje
 @endsection
 
 @section('contenido')
+<div class="message-breadcrumb-card">
+    <i class="fa-solid fa-message"></i>
+    <div><a class="text-decoration-none" href="{{ route('mensajes.index') }}">Mensajes</a><span class="mx-2">/</span><strong>Crear mensaje</strong></div>
+</div>
+<div class="message-control-card">
+    <div><h1>Nuevo mensaje</h1><p>Redacta el asunto y selecciona los destinatarios.</p></div>
+    <a href="{{ route('mensajes.index') }}" class="btn btn-outline-secondary rounded-pill"><i class="fa-solid fa-arrow-left me-2"></i>Bandeja</a>
+</div>
 <form action="{{ route('mensajes.enviar') }}" method="post" class="message-composer">
     @csrf
     <div class="message-composer-head">

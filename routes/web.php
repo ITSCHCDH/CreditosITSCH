@@ -179,7 +179,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('actividades/create',[ActividadesController::class,'create'])->name('actividades.create');
     Route::post('actividades/store',[ActividadesController::class,'store'])->name('actividades.store');
     Route::get('actividades/{id}/edit',[ActividadesController::class,'edit'])->name('actividades.edit');
-    Route::get('actividades/{id}/destroy',[ActividadesController::class,'destroy'])->name('actividades.destroy');
+    Route::delete('actividades/{id}',[ActividadesController::class,'destroy'])->name('actividades.destroy');
 
 
     /****Rutas para el controlador de usuarios *****/
@@ -206,11 +206,6 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::resource('participantes','ParticipantesController');
 
     //La siguiente nos crea las rutas para el controlador de participantes(Bajas)
-    Route::get('participantes/{id}/destroy',[
-        'uses'=>'ParticipantesController@destroy',
-        'as'=> 'admin.participantes.destroy'
-    ]);
-
     //Ruta y metodo para las peticiones al servidor mediante Ajax
     Route::get('evidencias/galeria', [EvidenciasController::class, 'peticionGaleria'])->name('evidencias.galeria');
     Route::get('evidencias/peticion',[EvidenciasController::class, 'peticionAjax'])->name('evidencias.peticion');
@@ -219,17 +214,9 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::resource('evidencias','EvidenciasController');
 
     //La siguiente nos crea las rutas para el controlador de evidencias(Bajas)
-    Route::get('evidencias/{id}/destroy',[
-        'uses'=>'EvidenciasController@destroy',
-        'as'=> 'admin.evidencias.destroy'
-    ]);
     /****Rutas para el controlador de actividad_evidencia *****/
     Route::post('actividad_evidencias/asignar_responsables','Actividad_EvidenciasController@asignarResponsables')->name('actividad_evidencias.asignar_responsables');
     Route::resource('actividad_evidencias','Actividad_EvidenciasController');
-    Route::get('actividad_evidencias/{id}/destroy',[
-        'uses'=>'Actividad_EvidenciasController@destroy',
-        'as'=> 'actividad_evidencias.destroy'
-    ]);
 
     Route::get('verifica_evidencia/{id}/ver_evidencia','VerificaEvidenciaController@verEvidencia')->name('verifica_evidencia.ver_evidencia');
     Route::get('verifica_evidencia/reportes','VerificaEvidenciaController@reportes')->name('verifica_evidencia.reportes');

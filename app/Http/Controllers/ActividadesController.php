@@ -190,7 +190,17 @@ class ActividadesController extends Controller
      */
     public function store(Request $request)
     {
-        $act=new Actividad($request->all()); //Obtiene todos los datos de la vista para guardarlos en la BD
+        $request->validate([
+            'nombre' => ['required','string','max:250'],
+            'por_cred_actividad' => ['required','integer','min:0','max:100'],
+            'id_actividad' => ['required','integer','exists:creditos,id'],
+            'fecCierre' => ['required','date','after_or_equal:today'],
+            'alumnos' => ['nullable','in:true,false'],
+        ]);
+
+        $act=new Actividad($request->all());
+        $act->vigente = 'true';
+        $act->alumnos = $request->input('alumnos', 'false');
 
         $act->id_user = Auth::User()->id;
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act->nombre)->get();
@@ -266,13 +276,21 @@ class ActividadesController extends Controller
      */
     public function update(Request $request, $id)
     { 
+        $request->validate([
+            'nombre' => ['required','string','max:250'],
+            'por_cred_actividad' => ['required','integer','min:0','max:100'],
+            'id_actividad' => ['required','integer','exists:creditos,id'],
+            'fecCierre' => ['required','date'],
+            'alumnos' => ['nullable','in:true,false'],
+        ]);
+
         $act_anterior=Actividad::find($id);
         $act_nueva=Actividad::find($id);
         $act_nueva->fill($request->all());
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act_nueva->nombre)->get();
         if($actividad_con_mismo_nombre->count()>0){
             if($actividad_con_mismo_nombre[0]->id!=$id){
-                Alert::error('Error','El nombre ".$act_nueva->nombre." ya ha sido tomado, ingrese uno diferente');
+                Alert::error('Error','El nombre '.$act_nueva->nombre.' ya ha sido tomado, ingrese uno diferente');
                 return back()->withInput();                
             }
         }
@@ -318,15 +336,11 @@ class ActividadesController extends Controller
                 }
                 //Iteramos entre todos los archivos y los vamos moviendo uno por uno
                 for ($i = 0; $i < count($archivos); $i++) {
-                    $tokenizer = strtok($archivos[$i],"/");
-                    //Existen 3 diagonales antes de llegar al nombre del archivo
-                    for ($x = 0; $x < 4 && $tokenizer; $x++) {
-                        echo "$tokenizer $x ";
-                        if($x==3)break;
-                        $tokenizer = strtok("/");
-                    }
-                    //Movemos los archivos al nuevo directorio
-                    Storage::move('public/evidencias/'.$act_anterior->nombre.'/'.$tokenizer,'public/evidencias/'.$act_nueva->nombre.'/'.$tokenizer);
+                    $filename = basename($archivos[$i]);
+                    Storage::move(
+                        'public/evidencias/'.$act_anterior->nombre.'/'.$filename,
+                        'public/evidencias/'.$act_nueva->nombre.'/'.$filename
+                    );
                 }
                 //Eliminamos el directorio anterior
                 Storage::deleteDirectory('public/evidencias/'.$act_anterior->nombre);

@@ -58,7 +58,11 @@
             <div class="modal-body">Estas seguro(a) de eliminar está actividad</div>
             <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
-            <a id="btnEliminar"  type="button" class="btn btn-primary">Eliminar</a>
+            <form id="formEliminar" method="POST" action="">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-primary">Eliminar</button>
+            </form>
             </div>
         </div>
         </div>
@@ -68,8 +72,7 @@
         <script>
             function eliminar(act)
             {   
-                r="{{ url('/admin/actividades') }}"+"/"+act+"/destroy"; 
-                $('#btnEliminar').attr('href',r);
+                $('#formEliminar').attr('action',"{{ url('/admin/actividades') }}/"+act);
             }
 
             function redireccionar(actividad_id)

@@ -3,11 +3,14 @@
 @section('title','Destinatarios')
 
 @section('ruta')
-<a class="text-decoration-none" href="{{ route('mensajes.index') }}">Mensajes</a> / Destinatarios
 @endsection
 
 @section('contenido')
-<div class="messages-toolbar">
+<div class="message-breadcrumb-card">
+    <i class="fa-solid fa-message"></i>
+    <div><a class="text-decoration-none" href="{{ route('mensajes.index') }}">Mensajes</a><span class="mx-2">/</span><strong>Destinatarios</strong></div>
+</div>
+<div class="message-control-card">
     <div><h1>Destinatarios</h1><p>Estado de lectura por persona.</p></div>
     <a href="{{ route('mensajes.enviados') }}" class="btn btn-outline-secondary rounded-pill"><i class="fa-solid fa-arrow-left me-2"></i>Enviados</a>
 </div>

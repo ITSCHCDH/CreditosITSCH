@@ -322,8 +322,8 @@
             var id = $('#participante_id').val();
             var token = $('#token').val();
             $.ajax({
-                type:'GET',
-                url:'participantes/'+id+'/destroy',
+                type:'DELETE',
+                url:"{{ url('/admin/participantes') }}/"+id,
                 dataType:'json',
                 data:{
                     'id':id,

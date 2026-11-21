@@ -3,6 +3,24 @@
 @section('title','Ver mensaje')
 
 @section('contenido')
+<div class="message-breadcrumb-card">
+    <i class="fa-solid fa-message"></i>
+    <div>
+        <a class="text-decoration-none" href="{{ route('mensajes.index') }}">Mensajes</a>
+        @if($ruta)
+            <span class="mx-2">/</span><a class="text-decoration-none" href="{{ route('mensajes.enviados') }}">Enviados</a>
+        @endif
+        <span class="mx-2">/</span><strong>Ver mensaje</strong>
+    </div>
+</div>
+<div class="message-control-card">
+    <div><h1>Contenido del mensaje</h1><p>Lectura y acciones relacionadas.</p></div>
+    @if($ruta)
+        <a href="{{ route('mensajes.enviados') }}" class="btn btn-outline-secondary rounded-pill"><i class="fa-solid fa-arrow-left me-2"></i>Enviados</a>
+    @else
+        <a href="{{ route('mensajes.index') }}" class="btn btn-outline-secondary rounded-pill"><i class="fa-solid fa-arrow-left me-2"></i>Bandeja</a>
+    @endif
+</div>
 <div class="row justify-content-center">
     <div class="col-lg-9">
         <article class="message-panel">

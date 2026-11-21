@@ -12,6 +12,45 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
+### [2026-11-21 11:49] — Corrección de actividades y participantes con alumnos SIT
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Aplicar las correcciones detectadas en la prueba de creación de actividades y alta de alumnos, usando `sit.alumnos` como única fuente.
+
+**Archivos modificados:**
+- `app/Http/Controllers/ParticipantesController.php` (búsqueda, validación y lectura de alumnos desde SIT)
+- `app/Http/Controllers/ActividadesController.php` (validación de creación/edición y corrección de nombre duplicado)
+- `routes/web.php` (eliminación de rutas destructivas GET y nombres duplicados)
+- `resources/views/admin/actividades/index.blade.php` (eliminación de actividad mediante DELETE)
+- `resources/views/admin/participantes/index.blade.php` (eliminación de participantes mediante DELETE)
+- `database/migrations/2026_11_21_120000_remove_legacy_alumno_foreign_keys_from_creditos.php`
+- `docs/BITACORA.md`
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Participantes se valida contra `sit.alumnos.no_control`.
+- Datos de nombre y carrera se obtienen desde `sit.users` y `sit.cat_carreras`.
+- `creditos.avance` y `creditos.participantes` dejaron de depender de FKs hacia `creditos.alumnos`.
+
+**Decisiones tomadas:**
+- `sit.alumnos` es la única fuente de identidad académica.
+- No se modifican ni recalculan datos de alumno en SIT.
+- Las eliminaciones de actividades y participantes usan métodos HTTP DELETE.
+- Se eliminaron rutas con nombres duplicados que impedían `route:cache`.
+
+**Pendientes / Deuda técnica:**
+- Validar visualmente la asignación masiva de alumnos en un navegador autenticado.
+- Completar migración de los demás controladores que todavía consultan `creditos.alumnos`.
+
+**Tests ejecutados:**
+- ✅ Prueba controlada de creación y alta SIT (actividad creada, participante agregado y datos temporales eliminados).
+- ✅ `php artisan route:cache`.
+- ✅ `php artisan test tests/Feature/Auth/UnifiedLoginTest.php` (10 passed, 34 assertions).
+
 ### [2026-11-21 11:27] — Recuperación de contraseña unificada
 
 - **Estatus:** ✅ completado

@@ -178,7 +178,9 @@
                 border-radius: 1.1rem;
                 background: #fff;
                 overflow: hidden;
-                box-shadow: 0 .55rem 1.5rem rgba(29, 78, 116, .07);
+                box-shadow:
+                    0 1rem 2.25rem rgba(29, 78, 116, .12),
+                    0 .25rem .65rem rgba(16, 43, 74, .07);
             }
             .message-panel table {
                 margin: 0;
@@ -216,6 +218,56 @@
                 background: #2563a8;
                 box-shadow: 0 0 0 .18rem rgba(37, 99, 168, .12);
             }
+            .message-breadcrumb-card,
+            .message-control-card {
+                border: 1px solid #e7edf4;
+                border-radius: 1rem;
+                background: #fff;
+                box-shadow:
+                    0 .75rem 1.5rem rgba(29, 78, 116, .10),
+                    0 .18rem .45rem rgba(16, 43, 74, .06);
+            }
+            .message-breadcrumb-card {
+                display: flex;
+                align-items: center;
+                gap: .65rem;
+                min-height: 64px;
+                margin-bottom: .75rem;
+                padding: .8rem 1rem;
+                color: #64748b;
+            }
+            .message-breadcrumb-card i {
+                width: 38px;
+                height: 38px;
+                display: grid;
+                place-items: center;
+                flex: 0 0 auto;
+                border-radius: .7rem;
+                color: #173c66;
+                background: #edf3f8;
+            }
+            .message-breadcrumb-card strong {
+                color: #102b4a;
+            }
+            .message-control-card {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                margin-bottom: 1rem;
+                padding: .8rem 1rem;
+            }
+            .message-control-card h1 {
+                margin: 0;
+                color: #102b4a;
+                font-size: 1.25rem;
+                font-weight: 700;
+            }
+            .message-control-card p {
+                margin: .2rem 0 0;
+                color: #6b7280;
+                font-size: .88rem;
+            }
             @media (max-width: 767.98px) {
                 .system-footer-inner {
                     align-items: flex-start;
@@ -234,6 +286,10 @@
                     width: 100%;
                 }
                 .messages-toolbar {
+                    align-items: flex-start;
+                    flex-direction: column;
+                }
+                .message-control-card {
                     align-items: flex-start;
                     flex-direction: column;
                 }

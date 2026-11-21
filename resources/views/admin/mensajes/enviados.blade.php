@@ -3,11 +3,14 @@
 @section('title','Mensajes enviados')
 
 @section('ruta')
-<a class="text-decoration-none" href="{{ route('mensajes.index') }}">Mensajes</a> / Enviados
 @endsection
 
 @section('contenido')
-<div class="messages-toolbar">
+<div class="message-breadcrumb-card">
+    <i class="fa-solid fa-message"></i>
+    <div><a class="text-decoration-none" href="{{ route('mensajes.index') }}">Mensajes</a><span class="mx-2">/</span><strong>Enviados</strong></div>
+</div>
+<div class="message-control-card">
     <div><h1>Mensajes enviados</h1><p>Consulta y revisa los destinatarios de tus mensajes.</p></div>
     <a href="{{ route('mensajes.crear') }}" class="btn btn-primary rounded-pill">
         <i class="fa-solid fa-plus me-2"></i>Nuevo mensaje

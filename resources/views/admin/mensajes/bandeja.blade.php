@@ -26,15 +26,16 @@
 @endsection
 
 @section('ruta')
-<a class="text-decoration-none" href="{{ route('home') }}">Inicio</a> / Mensajes
 @endsection
 
 @section('contenido')
-<div class="messages-toolbar">
-    <div>
-        <h1>Bandeja de entrada</h1>
-        <p>Mensajes recibidos, estados de lectura y notificaciones.</p>
-    </div>
+<div class="message-breadcrumb-card">
+    <i class="fa-solid fa-message"></i>
+    <div><strong>Mensajes</strong><span class="mx-2">/</span>Bandeja de entrada</div>
+</div>
+
+<div class="message-control-card">
+    <div><h1>Bandeja de entrada</h1><p>Mensajes recibidos, estados de lectura y notificaciones.</p></div>
     <div class="message-actions">
         <a href="{{ route('mensajes.crear') }}" class="btn btn-primary" title="Crear mensaje">
             <i class="fa-solid fa-envelope me-2"></i>Crear
