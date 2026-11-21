@@ -182,7 +182,7 @@
                 @endif
             </div>
             <span class="text-muted small">
-                <i class="fa-solid fa-circle-info me-1"></i>Buscá, ordená y exportá desde la tabla
+                <i class="fa-solid fa-arrow-down-a-z me-1"></i>Ordenado por apellido paterno, materno y nombre
             </span>
         </div>
 
@@ -272,8 +272,9 @@
                 pageLength: 10,
                 lengthMenu: [[10, 25, 50, -1], ['10 registros', '25 registros', '50 registros', 'Ver todos']],
                 pagingType: 'full_numbers',
-                // Orden inicial por apellido paterno, materno y nombre (data-order normalizado)
-                order: [[2, 'asc']],
+                // Sin orden inicial: se respeta el orden del servidor
+                // (apellido paterno, apellido materno y nombre)
+                order: [],
                 columnDefs: [
                     { orderable: false, targets: [5, 6] }
                 ],
@@ -285,7 +286,9 @@
                 scrollX: true,
                 scrollCollapse: true,
                 deferRender: true,
-                stateSave: true,
+                // Sin stateSave: evita que un orden anterior (por control)
+                // se restaure por encima del orden de apellidos
+                stateSave: false,
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
                 },

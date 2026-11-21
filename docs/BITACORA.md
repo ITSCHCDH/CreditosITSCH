@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 15:47 · **Entradas registradas:** 48 · **Último commit previo a esta sesión:** `c9a4f59` (2026-11-21 15:46).
+**Última entrada:** 2026-11-21 16:01 · **Entradas registradas:** 49 · **Último commit previo a esta sesión:** `646531d` (2026-11-21 15:48).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 16:01 — Orden ascendente por apellidos garantizado
 - 2026-11-21 15:47 — Orden por apellidos en Análisis de alumnos
 - 2026-11-21 15:43 — UX del diagnóstico del alumno (STA)
 - 2026-11-21 15:40 — UX de Análisis de alumnos (STA)
@@ -134,7 +135,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 12 | 2026-11-20 18:59 – 2026-11-21 15:47 |
+| Trayectoria académica | `trayectoria` | 13 | 2026-11-20 18:59 – 2026-11-21 16:01 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -162,6 +163,39 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 16:01] — Orden ascendente por apellidos garantizado
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Ordenar la lista de `analisis/generación` de forma ascendente por apellido paterno, luego materno y al final nombre.
+
+**Archivos modificados:**
+- `resources/views/sta/analisis_alumnos/index.blade.php` (sin orden inicial de DataTables, sin `stateSave` y aviso de orden)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna: el controlador ya ordena por `apellido_paterno`, `apellido_materno` y `nombre`.
+
+**Decisiones tomadas:**
+- `order: []` en DataTables: la tabla respeta el orden del servidor (paterno → materno → nombre) en lugar de reordenar por la primera columna.
+- `stateSave: false`: aunque el orden inicial ya no es Control, el estado guardado podía restaurar un orden anterior por control en visitas repetidas.
+- Se conserva `data-order` con la clave normalizada para que al hacer clic en «Nombre» el orden siga siendo por apellidos y no por el texto con acentos o Ñ.
+- La cabecera de la tabla indica «Ordenado por apellido paterno, materno y nombre» para que el criterio sea visible.
+
+**Pendientes / Deuda técnica:**
+- Ninguno relacionado.
+
+**Tests ejecutados:**
+- ✅ 7 comprobaciones: primer alumno por apellidos, orden del HTML con los cinco primeros, sin orden inicial en DataTables, `stateSave` desactivado, sin orden por control, clave `data-order` por fila y aviso en la cabecera.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura de la lista ordenada revisada.
+
+**Referencias:**
+- `docs/img/sta-analisis-orden-apellidos.png`
 
 ### [2026-11-21 15:47] — Orden por apellidos en Análisis de alumnos
 
