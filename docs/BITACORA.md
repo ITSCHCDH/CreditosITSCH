@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 16:43 · **Entradas registradas:** 55 · **Último commit previo a esta sesión:** `9a87826` (2026-11-21 16:29).
+**Última entrada:** 2026-11-21 16:44 · **Entradas registradas:** 56 · **Último commit previo a esta sesión:** `edc6e5e` (2026-11-21 16:43).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 16:44 — UX de Grupos de tutoría
 - 2026-11-21 16:43 — Menú: tipografía delgada y menú móvil corregido
 - 2026-11-21 16:28 — UX del Departamento de tutorías
 - 2026-11-21 16:26 — UX de la vista Tutor
@@ -141,7 +142,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 18 | 2026-11-20 18:59 – 2026-11-21 16:28 |
+| Trayectoria académica | `trayectoria` | 19 | 2026-11-20 18:59 – 2026-11-21 16:44 |
 | Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -169,6 +170,42 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 16:44] — UX de Grupos de tutoría
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Mejorar la UX de la vista `admin/sta/tutorias/grupos`.
+
+**Archivos modificados:**
+- `resources/views/sta/tutorias/grupos.blade.php` (rediseño con MDB, Font Awesome y tarjetas)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; la vista consume `$grupos` y `$carreras` del controlador.
+
+**Decisiones tomadas:**
+- Cuatro tarjetas KPI: grupos, asignados, sin asignar y carreras.
+- Tarjeta «Nuevo grupo» con formulario en una fila (semestre, nombre, carrera) y botón de guardado; se conserva el paso a mayúsculas del nombre.
+- Tarjeta de tabla con DataTables (10 registros, exportar, columnas y registros), badges de estatus (Asignado / Sin asignar) y acciones agrupadas de editar y eliminar.
+- Etiquetas de DataTables en español embebidas, sin depender del CDN.
+- Se modernizan los modales de editar y eliminar, se elimina el `@if(isset($grupo))` que arrastraba la última fila del bucle y se corrige el `@extends(...)` con punto y coma.
+- Se agrega acceso «Volver a tutorías» y estado vacío con indicación del formulario.
+
+**Pendientes / Deuda técnica:**
+- Los grupos siguen en `creditos.grupos`, no en SIT.
+- En móvil la tabla se desplaza horizontalmente.
+
+**Tests ejecutados:**
+- ✅ 15 comprobaciones: estado vacío (encabezado, KPIs, formulario, mensaje, sin tabla, modales), y con datos temporales en transacción (dos grupos, nombres, carreras, badges, acciones, DataTables y formularios de modal), con rollback verificado.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura revisada.
+
+**Referencias:**
+- `docs/img/sta-grupos-desktop.png`
 
 ### [2026-11-21 16:43] — Menú: tipografía delgada y menú móvil corregido
 
