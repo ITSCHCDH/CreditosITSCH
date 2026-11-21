@@ -4,14 +4,10 @@
 
 @section('links')
 <style>
-    .advance-breadcrumb,.advance-search-card,.advance-info-card,.advance-progress-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
+    .advance-breadcrumb,.advance-info-card,.advance-progress-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
     .advance-breadcrumb{display:flex;align-items:center;gap:.65rem;min-height:64px;margin-bottom:.75rem;padding:.8rem 1rem;color:#64748b}
     .advance-breadcrumb i{width:38px;height:38px;display:grid;place-items:center;border-radius:.7rem;color:#173c66;background:#edf3f8}
     .advance-breadcrumb strong{color:#102b4a}
-    .advance-search-card{margin-bottom:1rem;padding:1.25rem}
-    .advance-search-card h1{margin:0;color:#102b4a;font-size:1.25rem;font-weight:700}
-    .advance-search-card p{margin:.2rem 0 1rem;color:#6b7280;font-size:.88rem}
-    .advance-search-card .form-control,.advance-search-card .form-select{min-height:48px;border-radius:.75rem}
     .advance-info-card{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;padding:1.25rem}
     .advance-avatar{width:72px;height:72px;object-fit:cover;border-radius:1rem;background:#edf3f8}
     .advance-progress-card{overflow:hidden}
@@ -40,35 +36,39 @@
     <div class="advance-breadcrumb"><i class="fa-solid fa-chart-line"></i><div><strong>Avance del alumno</strong></div></div>
 @endif
 
-<article class="advance-search-card">
-    <h1>Buscar alumno</h1>
-    <p>Escribe un nombre o número de control. Se muestran hasta cinco coincidencias.</p>
-    <form action="{{ route('verifica_evidencia.avance_alumno') }}" method="get" id="studentAdvanceSearch">
-        <input type="hidden" name="no_control" id="student_no_control">
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label" for="student_search">Nombre o número de control</label>
-                <input type="search" id="student_search" class="form-control" placeholder="Ej. Juan Pérez o 00030068" autocomplete="off">
-                <div id="student_search_status" class="small text-muted mt-2"></div>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label" for="student_select">Coincidencias</label>
-                <select id="student_select" class="form-select">
-                    <option value="">Escribe para buscar</option>
-                </select>
-            </div>
-            <div class="col-12 d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary rounded-pill px-4" id="student_search_submit" disabled><i class="fa-solid fa-magnifying-glass me-2"></i>Consultar avance</button>
-            </div>
-        </div>
-    </form>
-</article>
-
 @php
     $primerAlumno = ($alumno_data !== null && count($alumno_data) > 0) ? $alumno_data[0] : null;
     $tempPorcentaje = 0;
     $sumaCreditos = 0;
+    $alumnoInicial = $primerAlumno ? [
+        'no_control' => (string) $primerAlumno->no_control,
+        'nombre' => (string) $primerAlumno->nombre_alumno,
+        'carrera' => (string) ($primerAlumno->carrera ?? ''),
+    ] : null;
 @endphp
+
+@include('template.partes.buscador_combobox', [
+    'config' => [
+        'id' => 'alumno',
+        'title' => 'Buscar alumno',
+        'title_icon' => 'fa-solid fa-user-graduate',
+        'description' => 'Un solo campo: escribe nombre o número de control y elige una coincidencia de la lista. Hasta cinco resultados.',
+        'label' => 'Alumno',
+        'placeholder' => 'Ej. Juan Pérez o 00030068',
+        'matches_label' => 'Coincidencias de alumnos',
+        'submit_label' => 'Consultar avance',
+        'submit_icon' => 'fa-solid fa-chart-line',
+        'action' => route('verifica_evidencia.avance_alumno'),
+        'endpoint' => route('verifica_evidencia.alumnos_busqueda'),
+        'field' => 'no_control',
+        'params' => ['peticion' => '0'],
+        'query_param' => 'nombre',
+        'keys' => ['value' => 'no_control', 'label' => 'nombre', 'meta' => 'carrera'],
+        'initial' => $alumnoInicial,
+        'min_chars' => 2,
+        'limit' => 5,
+    ],
+])
 
 @if($primerAlumno)
     <article class="advance-info-card">
@@ -124,61 +124,4 @@
         </table>
     </div>
 </article>
-@endsection
-
-@section('js')
-<script>
-    (function(){
-        const searchInput = document.getElementById('student_search');
-        const select = document.getElementById('student_select');
-        const hiddenControl = document.getElementById('student_no_control');
-        const submit = document.getElementById('student_search_submit');
-        const status = document.getElementById('student_search_status');
-        let timeout = null;
-
-        function resetMatches(message){
-            select.innerHTML = '<option value="">'+(message || 'Sin coincidencias')+'</option>';
-            hiddenControl.value = '';
-            submit.disabled = true;
-            status.textContent = message || '';
-        }
-
-        searchInput.addEventListener('input', function(){
-            const query = this.value.trim();
-            clearTimeout(timeout);
-            hiddenControl.value = '';
-            submit.disabled = true;
-            if(query.length < 2){
-                resetMatches('Escribe al menos 2 caracteres');
-                return;
-            }
-            timeout = setTimeout(function(){
-                status.textContent = 'Buscando...';
-                fetch("{{ route('verifica_evidencia.alumnos_busqueda') }}?peticion=0&nombre="+encodeURIComponent(query), {
-                    headers:{'Accept':'application/json'}
-                }).then(r=>r.json()).then(rows=>{
-                    if(!rows.length){
-                        resetMatches('Sin coincidencias');
-                        return;
-                    }
-                    select.innerHTML = '<option value="">Selecciona una coincidencia</option>';
-                    rows.slice(0,5).forEach(function(row){
-                        const option=document.createElement('option');
-                        option.value=row.no_control;
-                        option.textContent=row.nombre+' — '+row.no_control+(row.carrera?' · '+row.carrera:'');
-                        select.appendChild(option);
-                    });
-                    status.textContent = rows.length+' coincidencia'+(rows.length===1?'':'s')+' encontrada'+(rows.length===1?'':'s');
-                }).catch(function(){
-                    resetMatches('No fue posible completar la búsqueda');
-                });
-            },300);
-        });
-
-        select.addEventListener('change', function(){
-            hiddenControl.value = this.value;
-            submit.disabled = !this.value;
-        });
-    })();
-</script>
 @endsection

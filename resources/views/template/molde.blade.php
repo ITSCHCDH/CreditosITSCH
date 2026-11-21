@@ -300,6 +300,7 @@
         </style>
 
         @yield('links')
+        @stack('styles')
     </head>
     <body>
         <!--Main Navigation-->
@@ -314,6 +315,7 @@
             <div class="row">
                 <div class="d-none d-lg-block col-lg-1"></div>
                 <div class="col-12 col-lg-10 px-3 px-md-4" style="margin-bottom: 200px;">
+                    <p></p>
                     @hasSection('ruta')
                         <h3 class="mb-4">@yield('ruta')</h3>
                     @endif

@@ -4,17 +4,18 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 12:45 · **Entradas registradas:** 27 · **Último commit:** `cc5f3ed` (2026-11-21 12:55).
+**Última entrada:** 2026-11-21 13:20 · **Entradas registradas:** 30 · **Último commit previo a esta sesión:** `cc5f3ed` (2026-11-21 12:55).
 
-**Verificaciones de cierre hechas el 2026-11-21 12:56:**
+**Verificaciones de cierre (última: 2026-11-21 13:20):**
 
 | Verificación | Resultado |
 |---|---|
-| `php artisan test tests/Feature/Auth/UnifiedLoginTest.php` | ✅ 10 passed, 34 assertions |
+| `php artisan test` (suite completa) | ✅ 17 passed, 62 assertions |
 | Migración `2026_11_21_120000_remove_legacy_alumno_foreign_keys_from_creditos` | ✅ Ejecutada (batch 3) |
 | FKs de `creditos` que apuntan a `creditos.alumnos` | ✅ 0 restantes (26 FK en total en el esquema) |
 | `public/storage` (enlaces de evidencias) | ✅ Existe |
-| Árbol de trabajo Git | ✅ Limpio |
+| Árbol de trabajo Git | ⚠️ Pendiente de commit al registrar esta entrada |
+| Buscador de alumnos (`template.partes.buscador_combobox`) | ✅ 43 pruebas de interacción + 12 de render + capturas en 3 anchos |
 
 ### Riesgos abiertos
 
@@ -25,12 +26,13 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 | 3 | Sin clave puente estable entre `sit.alumnos` y las tablas auxiliares de `creditos` (`personales`, `padres`, `direcciones`, `historiales_clinicos`); `id_alu` sobrevive sin FK | Verificación 2026-11-21 12:56 | Alta |
 | 4 | Contraseña de prueba `Prueba123!` documentada y `PruebaActividadesSeeder` versionado | Entrada 2026-11-21 12:10 | Media |
 | 5 | El login depende del CDN `mdb-ui-kit@9.3.0` (jsdelivr) mientras el resto usa assets locales | `resources/views/auth/login.blade.php` | Media |
-| 6 | Siete cambios de interfaz sin validación en navegador autenticado | Lista siguiente | Media |
+| 6 | Ocho cambios de interfaz sin validación en navegador autenticado | Lista siguiente | Media |
 
 ### Validación visual pendiente
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 13:13 — Buscador de alumnos en un solo control (validado en vista previa estática, no en la app autenticada)
 - 2026-11-21 11:49 — Corrección de actividades y participantes con alumnos SIT
 - 2026-11-20 19:40 — UX moderna del módulo de mensajes
 - 2026-11-20 19:30 — Actualización del menú principal con MDB y Font Awesome
@@ -55,6 +57,40 @@ Estas entradas están marcadas como completadas pero su verificación en navegad
 
 **Etiquetas de módulo:** las entradas conservan la etiqueta original con la que se registraron; el nombre canónico se indica en la tabla del índice.
 
+### Componentes reutilizables
+
+| Parcial | Uso |
+|---|---|
+| `template.partes.buscador_combobox` | Buscador con lista de coincidencias y acción integrada en un solo control |
+
+Se invoca con `@include` y un arreglo `config`; todo lo demás tiene valores por defecto:
+
+```blade
+@include('template.partes.buscador_combobox', [
+    'config' => [
+        'id' => 'alumno',                                   // prefijo único de ids
+        'title' => 'Buscar alumno',
+        'description' => 'Escribe nombre o número de control.',
+        'label' => 'Alumno',
+        'action' => route('verifica_evidencia.avance_alumno'),
+        'endpoint' => route('verifica_evidencia.alumnos_busqueda'),
+        'field' => 'no_control',                            // input oculto del formulario
+        'params' => ['peticion' => '0'],                    // parámetros extra del endpoint
+        'query_param' => 'nombre',                          // parámetro que lleva la búsqueda
+        'keys' => ['value' => 'no_control', 'label' => 'nombre', 'meta' => 'carrera'],
+        'initial' => $alumnoInicial,                        // preselección opcional
+        'submit_label' => 'Consultar avance',
+    ],
+])
+```
+
+Notas de implementación:
+
+- El CSS viaja en `@push('styles')` + `@once`; el molde lo renderiza en el `head` mediante `@stack('styles')`, y se emite una sola vez aunque haya varias instancias.
+- Cada instancia usa ids con prefijo (`{id}_combo`, `{id}_input`, `{id}_value`…) y su propio JavaScript con guard `cbxReady`, por lo que pueden convivir varias en una página.
+- El endpoint debe responder JSON con una lista de objetos; `keys` mapea qué campo es el valor, la etiqueta y el metadato.
+- `show_submit => false` deja el control sin botón, para usos donde la acción se dispara por otro medio.
+
 **Para registrar una entrada nueva:**
 
 1. Fecha y hora local (`America/Mexico_City`, UTC−6) en el encabezado, formato `### [YYYY-MM-DD HH:MM] — Título`.
@@ -72,9 +108,9 @@ Estas entradas están marcadas como completadas pero su verificación en navegad
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 13 | 2026-11-21 11:49 – 12:45 |
+| Créditos complementarios | `créditos` | 15 | 2026-11-21 11:49 – 13:20 |
 | Trayectoria académica | `trayectoria` | 4 | 2026-11-20 18:59 – 19:09 |
-| Infraestructura | `infraestructura` | 10 | 2026-11-20 18:32 – 2026-11-21 11:27 |
+| Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
 ## Trazabilidad con Git
@@ -101,6 +137,113 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 13:20] — Buscador reutilizable en template/partes
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Extraer el buscador integrado a un parcial reutilizable en `template/partes` y consumirlo desde la vista con `@include`.
+
+**Archivos modificados:**
+- `resources/views/template/partes/buscador_combobox.blade.php` (creado: componente con estilos, marcado y comportamiento)
+- `resources/views/admin/verifica_evidencia/avance_alumno.blade.php` (de 480 a ~150 líneas; el buscador se reemplaza por un `@include`)
+- `resources/views/template/molde.blade.php` (nuevo `@stack('styles')` en el `head`)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; el endpoint se recibe por configuración.
+
+**Decisiones tomadas:**
+- El parcial es autónomo: recibe un arreglo `config` con valores por defecto y no depende de variables de la vista.
+- Los `id` se generan con prefijo configurable, así que varias instancias pueden convivir en la misma página.
+- El CSS se emite con `@push('styles')` + `@once` y el molde lo coloca en el `head`; se renderiza una sola vez aunque haya varias instancias.
+- El JS de cada instancia se autoinicializa con guard `cbxReady` y no filtra variables globales.
+- Las claves del JSON (`value`, `label`, `meta`) y los parámetros del endpoint son configurables, para reutilizarlo con alumnos, responsables, actividades u otros catálogos.
+- El botón de acción es opcional (`show_submit`), pensado para usos donde la acción se dispara de otra forma.
+
+**Pendientes / Deuda técnica:**
+- Validar el componente en la app autenticada; sigue verificado con vista previa estática y datos simulados.
+- Documentar en el `Estado actual` nuevos usos cuando se adopte en otras vistas.
+
+**Tests ejecutados:**
+- ✅ `php artisan view:cache`.
+- ✅ 12 comprobaciones de render, incluida la doble instancia con ids únicos y CSS emitido una sola vez.
+- ✅ 43 comprobaciones de interacción en jsdom sobre el componente extraído.
+- ✅ `php artisan test` (17 passed, 62 assertions).
+- ✅ Capturas a 1280 px, 720 px y 500 px del componente renderizado.
+
+**Referencias:**
+- `docs/img/buscador-alumnos-desktop.png`
+- `docs/img/buscador-alumnos-seleccion.png`
+- `docs/img/buscador-alumnos-movil.png`
+- Convenciones → Componentes reutilizables
+
+### [2026-11-21 13:18] — Suite completa de pruebas desbloqueada
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** infraestructura
+- **Prompt/Tarea original:** Detectado al verificar el componente: `php artisan test` abortaba antes de ejecutar cualquier prueba.
+
+**Diagnóstico:**
+- `tests/Pest.php` aplica `Tests\TestCase` a `Feature` y `Unit`.
+- `tests/Unit/Sit/ReadOnlyModelsTest.php` volvía a declarar `uses(TestCase::class)`, y Pest aborta con «Test case [Tests\TestCase] can not be used… already uses the test case».
+- El fallo afectaba también a la ejecución individual de ese archivo, aunque la entrada 2026-11-20 18:32 registró «5 passed, 26 assertions».
+
+**Acción realizada:**
+- Se eliminó el `uses(TestCase::class)` duplicado y su `import` del archivo de pruebas.
+
+**Resultado:**
+- `php artisan test` → 17 passed, 62 assertions.
+
+**Pendientes / Deuda técnica:**
+- Confirmar por qué la entrada del 18:32 reportó esa ejecución; probablemente el archivo se ejecutó con otra configuración de Pest o antes de agregar `tests/Pest.php`.
+
+**Tests ejecutados:**
+- ✅ `php artisan test` (17 passed, 62 assertions).
+
+### [2026-11-21 13:13] — Buscador de alumnos en un solo control
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Integrar el buscador y el botón «Consultar avance» en un único control, manteniendo MDB, Font Awesome 7 y la estructura de cards.
+
+**Archivos modificados:**
+- `resources/views/admin/verifica_evidencia/avance_alumno.blade.php` (combobox único con búsqueda, selección y acción; sin campo ni select separados)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; se reutiliza `verifica_evidencia.alumnos_busqueda` (`SitAlumno`, límite 5 y filtro por carrera según permisos).
+
+**Decisiones tomadas:**
+- El campo de búsqueda, el selector de coincidencias y el botón de consulta viven dentro de un mismo contenedor con borde y foco compartidos.
+- No se usa el componente `Select` de MDB: el bundle local 9.3.0 no lo incluye; el combobox se resuelve con MDB/Bootstrap y JavaScript propio.
+- Al elegir un alumno, el control muestra un chip con nombre, número de control y carrera; la acción se habilita y el foco pasa al botón.
+- La selección no envía el formulario por sí sola: el envío lo decide el usuario.
+- Lista vacía, error de red y respuesta obsoleta tienen estados explícitos; el envío sin selección se cancela con aviso.
+- Breakpoints: el botón comparte línea hasta 576 px y se apila a ancho completo por debajo.
+
+**Pendientes / Deuda técnica:**
+- Validar en la app autenticada contra `sit.alumnos` real; la verificación actual es con vista previa estática y datos simulados.
+- `VerificaEvidenciaController::avanceAlumno()` sigue con SQL crudo concatenado (riesgo 2 del [Estado actual](#estado-actual)).
+
+**Tests ejecutados:**
+- ✅ `php artisan view:cache` (todas las vistas compilan).
+- ✅ Render real de la vista con datos de prueba: 12 comprobaciones de estructura.
+- ✅ 47 comprobaciones de interacción en jsdom (debounce, teclado, chip, guard de envío, errores y descarte de respuestas obsoletas).
+- ✅ `php artisan test tests/Feature/Auth/UnifiedLoginTest.php` (10 passed, 34 assertions).
+- ✅ Capturas a 1280 px, 720 px y 500 px de ancho.
+
+**Referencias:**
+- `docs/img/buscador-alumnos-desktop.png`
+- `docs/img/buscador-alumnos-seleccion.png`
+- `docs/img/buscador-alumnos-movil.png`
 
 ### [2026-11-21 12:45] — UX de avance con buscador integrado
 

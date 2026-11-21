@@ -2,12 +2,9 @@
 
 use App\Models\Sit\Alumno;
 use App\Models\Sit\User;
-use Tests\TestCase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-
-uses(TestCase::class);
 
 it('prohibe save en Alumno y User', function () {
     foreach ([new Alumno(), new User()] as $model) {
