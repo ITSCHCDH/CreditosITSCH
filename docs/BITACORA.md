@@ -12,6 +12,72 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
+### [2026-11-20 19:06] — Prevención de FK cruzada en la ficha académica
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Resolver `SQLSTATE[23000]` al crear registros auxiliares con el ID de `sit.alumnos` en tablas FK de `creditos`.
+
+**Archivos modificados:**
+- `app/Http/Controllers/AlumnosStaController.php` (la carga inicial ya no inserta objetos auxiliares con IDs de SIT)
+- `docs/BITACORA.md` (registro del incidente)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna inserción nueva: la carga de ficha usa únicamente consultas de lectura a tablas auxiliares y objetos vacíos en memoria cuando no existen.
+
+**Decisiones tomadas:**
+- No se reutiliza el ID de `sit.alumnos` como llave de `creditos.personales`, `padres`, `direcciones` o `historiales_clinicos`.
+- Se evita escribir datos de crédito hasta definir el mapeo estable entre ambos esquemas.
+
+**Pendientes / Deuda técnica:**
+- Diseñar la clave puente alumno SIT ↔ registros auxiliares de `creditos`.
+- Migrar `guardarDatFam()` para persistencia compatible con ese mapeo.
+
+**Tests ejecutados:**
+- ✅ Sintaxis PHP validada tras la corrección.
+- ✅ `php artisan test tests/Feature/Auth/UnifiedLoginTest.php` (7 passed, 25 assertions)
+
+**Referencias:**
+- Incidente FK `creditos.personales.id_alu -> creditos.alumnos.id`
+- SQL insertado con `id_alu = 52`
+
+### [2026-11-20 19:04] — Ficha académica migrada del SQL Server legado
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Corregir el error `could not find driver` al consultar la ficha del alumno `00030068@cdhidalgo.tecnm.mx`.
+
+**Archivos modificados:**
+- `app/Http/Controllers/AlumnosStaController.php` (`ficha()` ahora obtiene identidad, carrera y datos complementarios desde SIT)
+- `resources/views/alumnos/sta/ficha.blade.php` (fecha y sexo calculados de forma segura desde datos SIT)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- `AlumnosStaController::ficha()` ya no consulta `contEsc.alumnos`, `contEsc.alumcom` ni `contEsc.carreras`.
+- Los datos editables auxiliares continúan almacenándose en las tablas propias de `creditos`.
+
+**Decisiones tomadas:**
+- Se proyectaron los campos institucionales requeridos por la vista desde `Sit\Alumno`, `Sit\User`, `AlumnoComplemento` y `AlumnoDatoMedico`.
+- Los registros auxiliares legacy de la ficha se crean si no existen, sin depender de SQL Server.
+
+**Pendientes / Deuda técnica:**
+- Migrar gradualmente los demás métodos de `AlumnosStaController` que todavía usan `contEsc`.
+- Migrar los métodos de edición de ficha para que no vuelvan a leer o escribir `App\Models\Alumno`.
+
+**Tests ejecutados:**
+- ✅ `php artisan test tests/Feature/Auth/UnifiedLoginTest.php` (7 passed, 25 assertions)
+
+**Referencias:**
+- Incidente ficha alumno `00030068`
+- `storage/logs/laravel.log`
+
 ### [2026-11-20 18:59] — Corrección de acceso al dashboard de alumno
 
 - **Estatus:** ✅ completado

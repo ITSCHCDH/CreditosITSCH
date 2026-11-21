@@ -14,35 +14,77 @@ use App\Models\Social;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Console\View\Components\Alert;
 use Illuminate\Http\Request;
+use App\Models\Sit\Alumno as SitAlumno;
 
 class AlumnosStaController extends Controller
 {
    public function ficha()
    {    
-      $no_cont=Auth::User()->no_control;      
-      $alu = Alumno::where('no_control',$no_cont)->first();
-      $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $no_cont)->first(); 
-      $alu2 = DB::connection('contEsc')->table('alumcom')->where('alu_NumControl', $alu1->alu_NumControl)->first();
+      $sitUser = Auth::guard('alumno')->user();
+      $sitAlumno = $sitUser
+         ? SitAlumno::with(['user', 'carrera', 'alumnoComplemento', 'alumnoDatoMedico'])
+            ->where('user_id', $sitUser->getAuthIdentifier())
+            ->first()
+         : null;
+
+      if (!$sitAlumno) {
+         Alert::error('Error', 'No se encontró el perfil académico del alumno.');
+         return redirect()->route('login');
+      }
+
+      $no_cont = $sitAlumno->no_control;
+      $alu1 = (object) [
+         'alu_NumControl' => $sitAlumno->no_control,
+         'alu_Nombre' => $sitUser->nombre,
+         'alu_ApePaterno' => $sitUser->apellido_paterno,
+         'alu_ApeMaterno' => $sitUser->apellido_materno,
+         'alu_Sexo' => $sitAlumno->genero,
+         'car_Clave' => $sitAlumno->carrera_id,
+      ];
+
+      $complemento = $sitAlumno->alumnoComplemento;
+      $datoMedico = $sitAlumno->alumnoDatoMedico;
+      $alu2 = (object) [
+         'alu_NumControl' => $sitAlumno->no_control,
+         'alc_FechaNac' => optional($sitAlumno->fecha_nacimiento)->format('Y-m-d'),
+         'alc_TipoSangre' => $datoMedico?->tipo_sangre,
+         'alc_Direccion' => $complemento?->direccion,
+         'alc_CodPostal' => $complemento?->cp,
+         'alc_Colonia' => $complemento?->colonia,
+      ];
+
+      $alu = (object) [
+         'id' => $sitAlumno->id,
+         'no_control' => $sitAlumno->no_control,
+         'grupo' => null,
+         'lug_pro' => null,
+         'est_civ' => null,
+         'tel' => $sitUser->celular,
+         'emailPer' => $complemento?->email_personal,
+         'email' => $sitUser->email,
+      ];
+
+      $car = (object) [
+         'car_Clave' => $sitAlumno->carrera_id,
+         'car_NombreCorto' => $sitAlumno->carrera?->nombre_corto,
+      ];
+
       $person = Personales::where('id_alu', $alu->id)->first();
       if ($person == null) {
          $person = new Personales();
          $person->id_alu = $alu->id;
-         $person->save();
       }
-      $car = DB::connection('contEsc')->table('carreras')->where('car_Clave', $alu1->car_Clave)->first();
       $dPad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Padre')->first();
       if ($dPad == null) {
          $dPad = new Padres();
          $dPad->id_alu = $alu->id;
          $dPad->parentesco = 'Padre';
-         $dPad->save();
       }
       $dMad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Madre')->first();
       if ($dMad == null) {
          $dMad = new Padres();
          $dMad->id_alu = $alu->id;
          $dMad->parentesco = 'Madre';
-         $dMad->save();
       }
       $direccion = Direccion::where('id_alu', $alu->id)->first();
       if ($direccion == null) {
@@ -51,29 +93,27 @@ class AlumnosStaController extends Controller
          $direccion->direccion = $alu2->alc_Direccion;
          $direccion->cp = $alu2->alc_CodPostal;
          $direccion->colonia = $alu2->alc_Colonia;
-         $direccion->save();
       }
       $direccionP = Direccion::where('id_fam', $dPad->id)->first();
       if ($direccionP == null) {
          $direccionP = new Direccion();
          $direccionP->id_fam = $dPad->id;
-         $direccionP->save();
       }
       $direccionM = Direccion::where('id_fam', $dMad->id)->first();
       if ($direccionM == null) {
          $direccionM = new Direccion();
          $direccionM->id_fam = $dMad->id;
-         $direccionM->save();
       }
       $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
       if ($clinicos == null) {
          $clinicos = new Historial_clinico();
          $clinicos->id_alu = $alu->id;
          $clinicos->sangre = $alu2->alc_TipoSangre;
-         $clinicos->save();
       }     
      
-      $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+      $alumno_data = collect([(object) [
+         'alumno_id' => $sitAlumno->id,
+      ]]);
       return view('alumnos.sta.ficha',compact('alu2', 'alu1', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'alu', 'car', 'clinicos', 'person','alumno_data'));
             
    }

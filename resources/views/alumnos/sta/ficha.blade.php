@@ -10,8 +10,10 @@
 
 @section('contenido')
 	<?php
-		$anios = \Carbon\Carbon::parse($alu2->alc_FechaNac)->age;
-		if($alu1->alu_Sexo =="M" ){
+		$anios = $alu2->alc_FechaNac
+			? \Carbon\Carbon::parse($alu2->alc_FechaNac)->age
+			: null;
+		if(in_array($alu1->alu_Sexo, ['M', 'Hombre', 'Masculino'], true)){
 			$sex="Hombre";
 		}else {
 			$sex="Mujer";
