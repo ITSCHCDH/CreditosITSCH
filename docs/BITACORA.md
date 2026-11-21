@@ -12,6 +12,62 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
+### [2026-11-20 19:38] — Footer ampliado y redes del creador
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** infraestructura
+- **Prompt/Tarea original:** Aumentar visualmente el footer del sistema y agregar enlaces a las redes sociales del creador.
+
+**Archivos modificados:**
+- `resources/views/template/molde.blade.php` (footer de mayor altura, identidad institucional, redes sociales y monitor Git)
+- `docs/BITACORA.md` (registro del cambio)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Decisiones tomadas:**
+- Se conservaron los perfiles conocidos de Facebook, LinkedIn, GitHub y sitio web del creador.
+- Todos los enlaces externos usan `target="_blank"` y `rel="noopener noreferrer"`.
+- El footer mantiene una distribución responsive en escritorio y móvil.
+
+**Pendientes / Deuda técnica:**
+- Confirmar enlaces actuales de Facebook y GitHub si cambian las cuentas del creador.
+- Sustituir enlaces sociales por perfiles configurables desde administración si se requiere.
+
+### [2026-11-20 19:34] — Footer moderno y monitor de actualizaciones Git
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** infraestructura
+- **Prompt/Tarea original:** Modernizar el footer del sistema y agregar un indicador de última actualización conectado a los commits Git locales.
+
+**Archivos modificados:**
+- `app/Providers/AppServiceProvider.php` (comparte datos seguros del último commit con el molde)
+- `routes/web.php` (endpoint JSON `/system/update-status`)
+- `resources/views/template/molde.blade.php` (footer responsive, monitor y refresco cada 60 segundos)
+- `docs/BITACORA.md` (registro del cambio)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; el monitor usa `git log -1` local y cachea la información durante cinco minutos.
+
+**Decisiones tomadas:**
+- Se muestran únicamente hash corto, fecha y mensaje del último commit.
+- El navegador refresca el monitor cada minuto sin recargar la página.
+- Se mantiene MDB/Bootstrap 5 y Font Awesome 7.3.1.
+
+**Pendientes / Deuda técnica:**
+- Si el repositorio se despliega sin `.git`, el monitor debe mostrar “Información no disponible”.
+- Considerar consultar el último commit remoto únicamente si se configura una integración autorizada.
+
+**Tests ejecutados:**
+- ✅ Sintaxis PHP/Blade.
+- ✅ Ruta `system.update-status` registrada.
+- ✅ `php artisan test tests/Feature/Auth/UnifiedLoginTest.php` (7 passed, 25 assertions)
+
 ### [2026-11-20 19:30] — Actualización del menú principal con MDB y Font Awesome
 
 - **Estatus:** ✅ completado

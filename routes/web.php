@@ -29,6 +29,49 @@ use App\Http\Controllers\PacienteController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
+
+Route::get('/system/update-status', function () {
+    $info = Cache::remember('system-update-info-live', 60, function () {
+        try {
+            $process = new Process([
+                'git', '-C', base_path(), 'log', '-1',
+                '--format=%H|%h|%cI|%s',
+            ]);
+            $process->run();
+
+            if (! $process->isSuccessful()) {
+                throw new ProcessFailedException($process);
+            }
+
+            [$hash, $shortHash, $date, $message] = array_pad(
+                explode('|', trim($process->getOutput()), 4),
+                4,
+                null
+            );
+
+            return [
+                'hash' => $hash,
+                'short_hash' => $shortHash,
+                'date' => $date,
+                'message' => $message,
+                'checked_at' => now()->toIso8601String(),
+            ];
+        } catch (\Throwable $exception) {
+            return [
+                'hash' => null,
+                'short_hash' => null,
+                'date' => null,
+                'message' => 'Información no disponible',
+                'checked_at' => now()->toIso8601String(),
+            ];
+        }
+    });
+
+    return response()->json($info);
+})->name('system.update-status')->middleware('web');
 
 
 Route::post('/getmsg','ExcelController@camMsg')->name('getmsg')->middleware('auth');

@@ -34,6 +34,134 @@
             .error {
                 border: 1px solid red;
             }
+            body {
+                min-height: 100vh;
+            }
+            .system-footer {
+                border-top: 1px solid rgba(255, 255, 255, .08);
+                background: linear-gradient(135deg, #102b4a 0%, #173c66 100%);
+                color: rgba(255, 255, 255, .86);
+            }
+            .system-footer-inner {
+                min-height: 132px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1.5rem;
+                padding-top: 1.25rem;
+                padding-bottom: 1.25rem;
+            }
+            .system-footer-brand {
+                display: flex;
+                align-items: center;
+                gap: .75rem;
+            }
+            .system-footer-logo {
+                width: 52px;
+                height: 52px;
+                padding: .2rem;
+                border-radius: .65rem;
+                background: #fff;
+                object-fit: contain;
+            }
+            .system-footer-brand strong {
+                font-size: 1.05rem;
+            }
+            .system-footer-brand strong,
+            .system-footer-brand span {
+                display: block;
+            }
+            .system-footer-brand span {
+                color: rgba(255, 255, 255, .62);
+                font-size: .82rem;
+            }
+            .update-monitor {
+                min-width: 265px;
+                display: flex;
+                align-items: center;
+                gap: .75rem;
+                padding: .65rem .85rem;
+                border: 1px solid rgba(255, 255, 255, .11);
+                border-radius: .85rem;
+                background: rgba(255, 255, 255, .07);
+            }
+            .update-monitor-icon {
+                width: 38px;
+                height: 38px;
+                display: grid;
+                place-items: center;
+                flex: 0 0 auto;
+                border-radius: 50%;
+                color: #b8f2c9;
+                background: rgba(74, 222, 128, .12);
+            }
+            .update-monitor-copy {
+                min-width: 0;
+            }
+            .update-monitor-copy strong,
+            .update-monitor-copy span {
+                display: block;
+            }
+            .update-monitor-copy strong {
+                color: #fff;
+                font-size: .88rem;
+            }
+            .update-monitor-copy span {
+                overflow: hidden;
+                color: rgba(255, 255, 255, .68);
+                font-size: .78rem;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .update-status-dot {
+                width: 8px;
+                height: 8px;
+                flex: 0 0 auto;
+                border-radius: 50%;
+                background: #4ade80;
+                box-shadow: 0 0 0 .25rem rgba(74, 222, 128, .12);
+            }
+            .footer-social {
+                display: flex;
+                align-items: center;
+                gap: .65rem;
+            }
+            .footer-social-label {
+                color: rgba(255, 255, 255, .68);
+                font-size: .82rem;
+            }
+            .footer-social-link {
+                width: 42px;
+                height: 42px;
+                display: grid;
+                place-items: center;
+                border: 1px solid rgba(255, 255, 255, .14);
+                border-radius: 50%;
+                color: #fff;
+                background: rgba(255, 255, 255, .07);
+                text-decoration: none;
+                transition: .18s ease;
+            }
+            .footer-social-link:hover,
+            .footer-social-link:focus {
+                color: #102b4a;
+                background: #fff;
+                transform: translateY(-2px);
+            }
+            @media (max-width: 767.98px) {
+                .system-footer-inner {
+                    align-items: flex-start;
+                    flex-direction: column;
+                    padding: 1rem 0;
+                }
+                .update-monitor {
+                    width: 100%;
+                    min-width: 0;
+                }
+                .footer-social {
+                    width: 100%;
+                }
+            }
         </style>
 
         @yield('links')
@@ -59,48 +187,66 @@
         </section>
         <!--Section: Content-->
 
-        <!-- Footer -->
-        <footer class="page-footer font-small fixed-bottom bg-dark text-center text-white">
-            <!-- Footer Elements -->
-            <div class="container">
+        <footer class="system-footer">
+            <div class="container system-footer-inner">
+                <div class="system-footer-brand">
+                    <img class="system-footer-logo" src="{{ asset('images/itsch.jpg') }}" alt="ITSCH" loading="lazy">
+                    <div>
+                        <strong>Creditsch · ITSCH</strong>
+                        <span>Créditos complementarios y trayectoria académica</span>
+                    </div>
+                </div>
 
-            <!-- Grid row-->
-            <div class="row">
-                <!-- Grid column -->
-                <div class="col-md-12 py-3">
-                <div class="list-unstyled list-inline text-center">
-
-                    <!-- Facebook -->
-                    <a class="fb-ic" href="https://www.facebook.com/profile.php?id=100057428089409" target="_blank">
-                        <i class="fab fa-facebook-f fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
-                    </a>  
-                    &nbsp;&nbsp;                 
-                    <!--Linkedin -->
-                    <a class="li-ic" href="https://www.linkedin.com/in/oscar-delgado-camacho-68bab2114/">
-                        <i class="fab fa-linkedin-in fa-lg white-text mr-md-5 mr-3 fa-2x"> </i>
-                    </a>       
-                    &nbsp;&nbsp;
-                    <a href="https://kioselsar.com" target="_blank" >
-                        <i class="fas fa-globe"></i>
+                <div class="footer-social" aria-label="Redes del creador">
+                    <span class="footer-social-label">Creador</span>
+                    <a class="footer-social-link"
+                       href="https://www.facebook.com/profile.php?id=100057428089409"
+                       target="_blank" rel="noopener noreferrer"
+                       title="Facebook" aria-label="Facebook">
+                        <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
+                    </a>
+                    <a class="footer-social-link"
+                       href="https://www.linkedin.com/in/oscar-delgado-camacho-68bab2114/"
+                       target="_blank" rel="noopener noreferrer"
+                       title="LinkedIn" aria-label="LinkedIn">
+                        <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                    </a>
+                    <a class="footer-social-link"
+                       href="https://github.com/kioselsa"
+                       target="_blank" rel="noopener noreferrer"
+                       title="GitHub" aria-label="GitHub">
+                        <i class="fa-brands fa-github" aria-hidden="true"></i>
+                    </a>
+                    <a class="footer-social-link"
+                       href="https://kioselsar.com"
+                       target="_blank" rel="noopener noreferrer"
+                       title="Sitio web" aria-label="Sitio web">
+                        <i class="fa-solid fa-globe" aria-hidden="true"></i>
                     </a>
                 </div>
+
+                <div class="update-monitor" id="update-monitor"
+                     title="{{ $systemUpdate['message'] ?? 'Actualización del sistema' }}">
+                    <div class="update-monitor-icon">
+                        <i class="fa-solid fa-code-branch" aria-hidden="true"></i>
+                    </div>
+                    <div class="update-monitor-copy">
+                        <strong>Última actualización</strong>
+                        <span id="update-monitor-date">
+                            @if($systemUpdate['date'])
+                                {{ $systemUpdate['date']->translatedFormat('d M Y · h:i A') }}
+                            @else
+                                Información no disponible
+                            @endif
+                            @if($systemUpdate['short_hash'] && $systemUpdate['short_hash'] !== 'Sin datos')
+                                · {{ $systemUpdate['short_hash'] }}
+                            @endif
+                        </span>
+                    </div>
+                    <span class="update-status-dot" aria-label="Sistema actualizado"></span>
                 </div>
-                <!-- Grid column -->
-
             </div>
-            <!-- Grid row-->
-
-            </div>
-            <!-- Footer Elements -->
-
-            <!-- Copyright -->
-            <div class="text-center py-3" style="background-color: rgba(0, 0, 0, 0.2);">© 2022 Copyright:
-                <a href="https://github.com/kioselsa" target="_blank"> Kioselsar</a> & <a href="https://github.com/Madophs" target="_blank">Madophs</a> ,Contact: <a href="https://kioselsar.com" target="_blank">kioselsar.com</a>
-            </div>
-            <!-- Copyright -->
-
         </footer>
-        <!-- Footer -->
 
 
         <!-- Scripts Section -->
@@ -147,6 +293,42 @@
 
         <!-- Scripts de la aplicacion -->
         <script type="text/javascript" src="{{ asset('js/utilidades.js') }}"></script>
+
+        <script>
+            (function () {
+                const monitor = document.getElementById('update-monitor');
+                const dateLabel = document.getElementById('update-monitor-date');
+                if (!monitor || !dateLabel) return;
+
+                async function refreshSystemUpdate() {
+                    try {
+                        const response = await fetch('{{ route('system.update-status') }}', {
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        if (!response.ok) return;
+
+                        const update = await response.json();
+                        monitor.title = update.message || 'Actualización del sistema';
+
+                        if (update.date) {
+                            const date = new Intl.DateTimeFormat('es-MX', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }).format(new Date(update.date));
+                            dateLabel.textContent = date + (update.short_hash ? ' · ' + update.short_hash : '');
+                        }
+                    } catch (error) {
+                        monitor.classList.add('update-monitor-offline');
+                    }
+                }
+
+                refreshSystemUpdate();
+                window.setInterval(refreshSystemUpdate, 60000);
+            })();
+        </script>
 
         @yield('js')
 
