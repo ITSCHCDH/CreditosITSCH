@@ -49,12 +49,12 @@
 
             @include('sweetalert::alert')
             <div class="row">
-                <div class="col-sm-1"></div>
-                <div class="col-sm-10" style="margin-bottom: 200px;">
+                <div class="d-none d-lg-block col-lg-1"></div>
+                <div class="col-12 col-lg-10 px-3 px-md-4" style="margin-bottom: 200px;">
                     <h3 class="mb-5"><strong> @yield('ruta','Default') </strong></h3>
                     @yield('contenido','Default')<!-- Contenido general del sistema -->
                 </div>
-                <div class="col-sm-1"></div>
+                <div class="d-none d-lg-block col-lg-1"></div>
             </div>
         </section>
         <!--Section: Content-->

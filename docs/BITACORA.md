@@ -12,6 +12,36 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
+### [2026-11-20 19:30] — Actualización del menú principal con MDB y Font Awesome
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** infraestructura
+- **Prompt/Tarea original:** Modernizar el menú del sistema usando MDB/Bootstrap y los iconos Font Awesome 7 instalados.
+
+**Archivos modificados:**
+- `resources/views/template/partes/menu.blade.php` (navegación responsive, dropdowns con IDs únicos y iconografía Awesome)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna.
+
+**Decisiones tomadas:**
+- Se conservaron todos los permisos, rutas y grupos de menú existentes.
+- Se reutilizaron MDB/Bootstrap 5 y Font Awesome 7.3.1 local.
+- Se separaron los menús de cuenta para alumno y usuario administrativo.
+- Se añadió navegación responsive y estados visuales de hover/focus.
+
+**Pendientes / Deuda técnica:**
+- Validar visualmente los dropdowns en navegador para los permisos reales.
+- Revisar si la navegación móvil requiere colapsar dropdowns automáticamente al seleccionar.
+
+**Tests ejecutados:**
+- ✅ Sintaxis Blade/PHP del menú.
+- ✅ Rutas `alumnos.home_avance` y `paciente.alumno.index.citas` verificadas.
+
 ### [2026-11-20 19:15] — Corrección definitiva de la vista Mis citas
 
 - **Estatus:** ✅ completado
