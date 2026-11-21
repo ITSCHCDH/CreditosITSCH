@@ -8,46 +8,32 @@
 
 @section('contenido')
     <div class="row">
-        <div class="col-sm-3">
-            <input type="hidden" name="gse_clave" id="gse_clave" readonly>
-            <label for="carrera" id="labCarreras">Carrera</label>
-            <div class="input-group mb-3">               
-                <select name="carrera" id="carrera" class="form-control" required>
-                    <option value="">Selecciona una carrera</option>
-                    @foreach ($carreras as $car)            
-                        <option value="{{ $car->car_Clave }}">{{ $car->car_Nombre }}</option>
-                    @endforeach
-                </select>                            
-            </div>
-        </div>
-        <div class="col-sm-3" id="divProfesores" >
-            <label for="profesores"  id="labProfesores">Profesores</label>
-            <div class="input-group mb-3">               
+        <input type="hidden" name="gse_clave" id="gse_clave" readonly>
+        <input type="hidden" name="grupo" id="grupo" readonly>
+        <div class="col-sm-4">
+            <label for="profesor" id="labProfesores">Profesor</label>
+            <div class="input-group mb-3">
                 <select name="profesor" id="profesor" class="form-control" required>
-                    
-                </select>               
+                    <option value="">Cargando profesores…</option>
+                </select>
             </div>
-        </div> 
-        <input type="hidden" name="grupo" id="grupo" readonly>     
-        <div class="col-sm-3" id="divMaterias" >
-            <label for="materia"  id="labMaterias">Materias</label>
-            <div class="input-group mb-3">               
-                <select name="materia" id="materia" class="form-control" required>
-                  
-                </select>                
-            </div>           
         </div>
-        <div class="col-sm-1" id="divFiltrar" >
+        <div class="col-sm-4" id="divMaterias">
+            <label for="materia" id="labMaterias">Materia</label>
+            <div class="input-group mb-3">
+                <select name="materia" id="materia" class="form-control" required>
+                    <option value="">Selecciona un profesor</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-2" id="divFiltrar">
             <div class="row" style="text-align: center">
                 <h6>Filtrar</h6>
             </div>
             <div class="row">
                 <a href="#" type="button" class="btn btn-success" id="findUnits" title="filtrar datos" ><i class="fas fa-filter"></i></a>
             </div>
-        </div>   
-         <div class="col-sm-3">
-           
-        </div>    
+        </div>
     </div>
     <div class="row">
         <div class="col-sm-6">
@@ -91,8 +77,7 @@
 
     @section('js')
         <script type="text/javascript">
-            //Codigo para filtrar los docentes que pertenecen a una carrera
-            $('#divProfesores').hide(); 
+            //Codigo para cargar los profesores activos (SIT no liga profesor-carrera)
             $('#divMaterias').hide(); 
             $('#divFiltrar').hide();          
             // Genera token para solicitudes POST
@@ -101,36 +86,9 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
 			} );
-            //Codigo para obtener profesores de una carrera
-            $(document).ready(function(){                             
-                $("#carrera").change(function(e){
-                    e.preventDefault(); 
-                    txtFiltro();
-                    //Función para obtener los profesores de una carrera
-                    carrera = $('#carrera').val();                     
-                    $.ajax({
-                        type: "post",
-                        dataType: "json",
-                        url:"{{ route('profesores.find') }}",
-                        data:{
-                            carrera:carrera                      
-                        },
-                        success: function(profesores){                                                      
-                            $('#profesor').empty();                                                    
-                            $.each(profesores, function(i, item) {                                
-                                $('#profesor').prepend(`<option value=${item.cat_Clave}>${item.cat_Nombre} ${item.cat_ApePat} ${item.cat_ApeMat}</option>`);
-                            });     
-                            $('#profesor').prepend(`<option value="" selected>Selecciona un profesor</option>`);  
-                            //Ponemos los datos de la carrera en datos del filtro                                                  
-                        },
-                        error: function(e){  
-                            $('#profesor').empty();   
-                            $('#profesor').prepend(`<option value="" selected>No existen profesores asignados</option>`);                        
-                            console.log('Error al buscar los profesores de esta carrera',e);                        
-                        }
-                    });
-                    $('#divProfesores').show();                                   
-                });  
+            //Codigo para obtener todos los profesores activos
+            $(document).ready(function(){
+                cargarProfesores();
                 $("#profesor").change(function(e){
                     e.preventDefault(); 
                     txtFiltro();
@@ -173,6 +131,28 @@
                 });                               
             });
           
+            //Función para cargar los profesores activos
+            function cargarProfesores()
+            {
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    url:"{{ route('profesores.find') }}",
+                    success: function(profesores){
+                        $('#profesor').empty();
+                        $.each(profesores, function(i, item) {
+                            $('#profesor').prepend(`<option value=${item.cat_Clave}>${item.cat_Nombre} ${item.cat_ApePat} ${item.cat_ApeMat}</option>`);
+                        });
+                        $('#profesor').prepend(`<option value="" selected>Selecciona un profesor</option>`);
+                    },
+                    error: function(e){
+                        $('#profesor').empty();
+                        $('#profesor').prepend(`<option value="" selected>No se pudieron cargar los profesores</option>`);
+                        console.log('Error al cargar los profesores',e);
+                    }
+                });
+            }
+
             //Funcion para obtener las calificaciones de una unidad
             function getCalificaciones(unidad){  
                 $("#unidad").text(unidad); 
@@ -245,7 +225,7 @@
                         $("#unidades").html(botones);
                     },
                     error: function(e){                        
-                        console.log('Error al buscar los profesores de esta carrera',e);                        
+                        console.log('Error al buscar las unidades de esta materia',e);                        
                     }
                 });
             });
@@ -284,11 +264,10 @@
 
             function txtFiltro()
             {         
-                c= $('#carrera option:selected').text();
                 p= $('#profesor option:selected').text();
                 m= $('#materia option:selected').text();
                 u= $('#unidad').text();                 
-                txt="CARRERA: "+c+"  |  PROFESOR: "+p+"  |  MATERIA: "+m+"  |UNIDAD: "+u;               
+                txt="PROFESOR: "+p+"  |  MATERIA: "+m+"  |  UNIDAD: "+u;               
                 $("#datosFiltro").text(txt);
             }
             

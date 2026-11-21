@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 15:23 · **Entradas registradas:** 44 · **Último commit previo a esta sesión:** `907eac4` (2026-11-21 15:21).
+**Última entrada:** 2026-11-21 15:30 · **Entradas registradas:** 45 · **Último commit previo a esta sesión:** `800d3bb` (2026-11-21 15:30).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 15:30 — Profesores sin filtro por carrera (opción C)
 - 2026-11-21 15:23 — SIT solo lectura: observaciones se guardan en creditos
 - 2026-11-21 15:18 — STA completo sobre SIT y conexión contEsc eliminada
 - 2026-11-21 15:11 — Jefes de carrera migrado de contEsc a SIT
@@ -130,7 +131,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 8 | 2026-11-20 18:59 – 2026-11-21 15:23 |
+| Trayectoria académica | `trayectoria` | 9 | 2026-11-20 18:59 – 2026-11-21 15:30 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -158,6 +159,40 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 15:30] — Profesores sin filtro por carrera (opción C)
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Resolver la relación profesor-carrera con la opción C: listar todos los profesores activos y filtrar por materia y grupo.
+
+**Archivos modificados:**
+- `app/Http/Controllers/STAController.php` (`indexProfesores` y `findProfesores`; se elimina `departamentosDeCarrera`)
+- `resources/views/sta/profesores/index.blade.php` (sin selector de carrera; carga los profesores al abrir la vista)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- `findProfesores` ya no filtra por departamento ni recibe `carrera`: devuelve `catedraticos` activos con `users`.
+
+**Decisiones tomadas:**
+- Se descarta la atribución profesor → carrera por departamento porque SIT no tiene esa relación (`catedraticos.carrera_id` vacío en 232 de 235; `kardex.catedratico_id` vacío en el 100 %).
+- La pantalla lista a todos los profesores activos (101) y el filtro real es materia y grupo, que sí existen con datos.
+- Un usuario con `STA_PROFESOR` sigue viendo únicamente su propio registro, por coincidencia de nombre contra SIT.
+- El selector de carrera desaparece de la vista; la búsqueda de materias y unidades no cambia.
+
+**Pendientes / Deuda técnica:**
+- La lista incluye el registro «Super Administrador» que existe como catedrático activo en SIT (dato de origen, no del sistema).
+- Sin filtro de carrera, el usuario debe conocer el nombre del profesor para encontrar su materia.
+
+**Tests ejecutados:**
+- ✅ 11 comprobaciones: vista sin selector de carrera, 101 profesores activos, orden por apellido, campos esperados, independencia del parámetro `carrera` y continuidad del flujo materias/unidades.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+
+**Referencias:**
+- `resources/views/sta/profesores/index.blade.php`
 
 ### [2026-11-21 15:23] — SIT solo lectura: observaciones se guardan en creditos
 

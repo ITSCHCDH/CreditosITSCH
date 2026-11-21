@@ -25,21 +25,13 @@ class STAController extends Controller
 
     public function indexProfesores()
     {
-        $carreras = CarrerasSitService::opcionesPorArea();
-
-        // Un profesor solo puede consultar su propia carrera
-        if (Auth::User()->hasAnyPermission(['STA_PROFESOR'])
-            && ! Auth::User()->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA'])) {
-            $carreras = $carreras->where('car_Clave', (int) Auth::User()->area)->values();
-        }
-
-        return view('sta.profesores.index', compact('carreras')); 
+        // Opción C: SIT no relaciona profesor con carrera, así que se listan
+        // todos los profesores activos y el filtro real es materia + grupo.
+        return view('sta.profesores.index'); 
     }
 
     public function findProfesores(Request $request)
     {
-        $carreraSit = CarrerasSitService::deArea((int) $request->carrera);
-
         $consulta = DB::connection('sit')->table('catedraticos as c')
             ->join('users as u', 'u.id', '=', 'c.user_id')
             ->where('c.activo', 1)
@@ -50,32 +42,12 @@ class STAController extends Controller
                 'u.apellido_materno as cat_ApeMat'
             );
 
-        if (Auth::User()->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA'])) {
-            $departamentos = $this->departamentosDeCarrera($carreraSit);
-            if ($departamentos->isNotEmpty()) {
-                $consulta->whereIn('c.departamento_adscripcion', $departamentos);
-            }
-        } else {
+        // Un profesor solo se ve a sí mismo
+        if (! Auth::User()->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA'])) {
             $consulta->where('c.id', $this->obtCatClave());
         }
 
         return response()->json($consulta->orderBy('u.apellido_paterno')->get());       
-    }
-
-    /** Departamentos responsables de las materias del plan de una carrera. */
-    private function departamentosDeCarrera(?int $carreraSit)
-    {
-        if (! $carreraSit) {
-            return collect();
-        }
-
-        return DB::connection('sit')->table('plan_materias')
-            ->join('cat_materias', 'cat_materias.id', '=', 'plan_materias.materia_id')
-            ->join('cat_plan_estudios', 'cat_plan_estudios.id', '=', 'plan_materias.plan_estudio_id')
-            ->join('cat_departamentos_academicos as d', 'd.id', '=', 'cat_materias.departamento_responsable_id')
-            ->where('cat_plan_estudios.carrera_id', $carreraSit)
-            ->distinct()
-            ->pluck('d.nombre');
     }
 
     /** Catedrático de SIT que corresponde al usuario autenticado (por nombre). */
