@@ -4,9 +4,9 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 13:20 · **Entradas registradas:** 30 · **Último commit previo a esta sesión:** `cc5f3ed` (2026-11-21 12:55).
+**Última entrada:** 2026-11-21 13:45 · **Entradas registradas:** 34 · **Último commit previo a esta sesión:** `cc5f3ed` (2026-11-21 12:55).
 
-**Verificaciones de cierre (última: 2026-11-21 13:20):**
+**Verificaciones de cierre (última: 2026-11-21 13:45):**
 
 | Verificación | Resultado |
 |---|---|
@@ -15,23 +15,29 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 | FKs de `creditos` que apuntan a `creditos.alumnos` | ✅ 0 restantes (26 FK en total en el esquema) |
 | `public/storage` (enlaces de evidencias) | ✅ Existe |
 | Árbol de trabajo Git | ⚠️ Pendiente de commit al registrar esta entrada |
-| Buscador de alumnos (`template.partes.buscador_combobox`) | ✅ 43 pruebas de interacción + 12 de render + capturas en 3 anchos |
+| Buscador de alumnos (`template.partes.buscador_combobox`) | ✅ 43 + 17 pruebas de interacción, 12 + 38 + 12 de render, capturas en 3 anchos |
+| Reporte de avance sobre `sit.alumnos` | ✅ 21 pruebas con datos reales + 10 de render; 0.75 s en el peor caso |
 
 ### Riesgos abiertos
 
 | # | Riesgo | Evidencia | Prioridad |
 |---|---|---|---|
 | 1 | Identidad académica aún duplicada: 13 controladores usan `App\Models\Alumno` (11) o la conexión `contEsc` (4) | `app/Http/Controllers/*` | Alta |
-| 2 | SQL crudo con concatenación de `$busqueda` en `VerificaEvidenciaController::avanceAlumno()` (8 consultas) | Inyección SQL latente | Alta |
+| 2 | SQL crudo con concatenación de `$busqueda` en `VerificaEvidenciaController::avanceAlumno()` (8 consultas); el reporte ya migró a SIT | Inyección SQL latente | Alta |
 | 3 | Sin clave puente estable entre `sit.alumnos` y las tablas auxiliares de `creditos` (`personales`, `padres`, `direcciones`, `historiales_clinicos`); `id_alu` sobrevive sin FK | Verificación 2026-11-21 12:56 | Alta |
 | 4 | Contraseña de prueba `Prueba123!` documentada y `PruebaActividadesSeeder` versionado | Entrada 2026-11-21 12:10 | Media |
 | 5 | El login depende del CDN `mdb-ui-kit@9.3.0` (jsdelivr) mientras el resto usa assets locales | `resources/views/auth/login.blade.php` | Media |
-| 6 | Ocho cambios de interfaz sin validación en navegador autenticado | Lista siguiente | Media |
+| 6 | Cambios de interfaz sin validación en navegador autenticado | Lista siguiente | Media |
+| 7 | `creditos.areas` y `sit.cat_carreras` no comparten id; la equivalencia se resuelve por nombre | `mapaCarreras()` en `VerificaEvidenciaController` | Media |
+| 8 | `creditos.alumnos` está vacía (0 filas): el reporte ya usa `sit.alumnos`, pero avance, constancias y altas todavía leen esa tabla | Verificación 2026-11-21 13:45 | Alta |
 
 ### Validación visual pendiente
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 13:38 — Filtro de carreras unificado con el catálogo del SIT
+- 2026-11-21 13:31 — Buscador de alumnos del SIT en reportes
+- 2026-11-21 13:26 — UX de reportes con cards
 - 2026-11-21 13:13 — Buscador de alumnos en un solo control (validado en vista previa estática, no en la app autenticada)
 - 2026-11-21 11:49 — Corrección de actividades y participantes con alumnos SIT
 - 2026-11-20 19:40 — UX moderna del módulo de mensajes
@@ -88,8 +94,9 @@ Notas de implementación:
 
 - El CSS viaja en `@push('styles')` + `@once`; el molde lo renderiza en el `head` mediante `@stack('styles')`, y se emite una sola vez aunque haya varias instancias.
 - Cada instancia usa ids con prefijo (`{id}_combo`, `{id}_input`, `{id}_value`…) y su propio JavaScript con guard `cbxReady`, por lo que pueden convivir varias en una página.
-- El endpoint debe responder JSON con una lista de objetos; `keys` mapea qué campo es el valor, la etiqueta y el metadato.
-- `show_submit => false` deja el control sin botón, para usos donde la acción se dispara por otro medio.
+- El endpoint debe responder JSON con una lista de objetos; `keys` mapea qué campo es el valor, la etiqueta y el metadato. Con `meta => ''` el chip muestra solo valor y etiqueta.
+- Opciones de integración: `bare => true` renderiza solo el control (sin card ni formulario propios, para formularios existentes), `required => false` permite enviar sin selección y `show_submit => false` oculta el botón propio.
+- El control expone `combo.cbxSetParams({ ... })` para actualizar en caliente los parámetros del endpoint; la vista de reportes lo usa para acoplar la carrera elegida a la búsqueda.
 
 **Para registrar una entrada nueva:**
 
@@ -108,7 +115,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 15 | 2026-11-21 11:49 – 13:20 |
+| Créditos complementarios | `créditos` | 18 | 2026-11-21 11:49 – 13:38 |
 | Trayectoria académica | `trayectoria` | 4 | 2026-11-20 18:59 – 19:09 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -137,6 +144,183 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 13:45] — Reporte de avance con fuente única sit.alumnos
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Corregir la consulta del reporte una vez aplicados los filtros para que dependa exclusivamente de `sit.alumnos`.
+
+**Archivos modificados:**
+- `app/Http/Controllers/VerificaEvidenciaController.php` (`reportes()` reescrito sobre SIT y nuevos helpers `alumnosReporte()`, `estadoReporte()` y `paginarReporte()`)
+- `resources/views/admin/verifica_evidencia/reportes.blade.php` (paginador, resumen desde el controlador, sin la marca «sin datos»)
+
+**Archivos eliminados:**
+- Las ocho consultas SQL crudas que leían `creditos.alumnos`, `creditos.areas` y concatenaban los filtros.
+
+**Consultas SQL nuevas o modificadas:**
+- Alumnos: `SitAlumno::with(['user','carrera'])->where('carrera_id', …)->where('anio_ingreso', …)` sobre `sit.alumnos`.
+- Progreso: lectura de `creditos.avance` por `no_control` (sin identidad de alumno).
+- Catálogo: `creditos.creditos` para los nombres y el total de créditos.
+
+**Decisiones tomadas:**
+- La identidad del alumno sale solo de SIT: `sit.alumnos` + nombres de `sit.users` + carrera de `sit.cat_carreras`. `creditos.avance` se usa únicamente como progreso.
+- La generación ahora se filtra por `anio_ingreso` y ya no por el prefijo de `no_control`, porque en SIT convive más de un formato (`00030001`, `A25030002`, `G23030330`).
+- La búsqueda aplica a `no_control` y a nombre/apellidos de `sit.users`.
+- El estado se deriva: **Baja** si el estatus académico de SIT contiene «Baja»; **Liberado** si la suma de créditos alcanza el total; **Pendiente** en el resto.
+- El resumen se calcula en el controlador y se muestra junto a la etiqueta «fuente: sit.alumnos».
+- Se pagina a **10 alumnos por página** (valor por defecto) y el detalle por crédito se arma solo para la página visible, para no generar miles de filas.
+- El paginador es un control propio en español (Anterior / Página X de Y / Siguiente) porque el proyecto no tiene archivos de idioma y el del framework salía en inglés.
+- Desaparece la marca «(sin datos)»: cualquier carrera del SIT puede listar alumnos aunque no tenga área equivalente en créditos.
+
+**Rendimiento medido (carrera con más alumnos, sin filtro de año):**
+
+| Carrera | Alumnos | Filas de detalle | Tiempo |
+|---|---|---|---|
+| 2 (Industrial) | 2,763 | 50 (solo página) | 1.11 s |
+| 3 (Sistemas), 2025 | 102 | 50 | 0.04 s |
+
+**Pendientes / Deuda técnica:**
+- `creditos.avance` sigue siendo la única fuente de progreso; solo tiene 1 fila en este entorno, por lo que casi todos los alumnos aparecen en 0%.
+- El promedio del resumen incluye a los alumnos dados de baja; conviene decidir si debe excluirlos.
+- La búsqueda de `alumnosBusqueda` para usuarios sin privilegios todavía usa la equivalencia por nombre entre `creditos.areas` y `sit.cat_carreras`.
+- El reporte ya no usa `creditos.alumnos`, pero otros flujos del módulo (avance, constancias, altas) siguen dependiendo de esa tabla.
+
+**Tests ejecutados:**
+- ✅ 21 comprobaciones con datos reales del SIT (total por carrera, paginación de 10, suma de avance real, búsqueda por nombre y control, estado derivado, carrera inexistente y caso sin filtros).
+- ✅ 10 comprobaciones de render con datos reales (50 tarjetas, paginador, KPIs, fuente).
+- ✅ `php artisan test` (17 passed, 62 assertions).
+- ✅ Capturas a 1280 px y 500 px.
+
+**Referencias:**
+- `docs/img/reportes-desktop.png`
+- `docs/img/reportes-movil.png`
+
+### [2026-11-21 13:38] — Filtro de carreras unificado con el catálogo del SIT
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Conectar el filtro de carreras de reportes con el catálogo de carreras del SIT y omitir las carreras del sistema de créditos.
+
+**Archivos modificados:**
+- `app/Http/Controllers/VerificaEvidenciaController.php` (catálogo SIT en `reportes()`, mapeo bidireccional área↔carrera, homologación del nombre mostrado, endpoint con id SIT y alcance por área traducido)
+- `resources/views/admin/verifica_evidencia/reportes.blade.php` (select con carreras del SIT, etiqueta corta, `title` con el nombre completo y marca de carreras sin datos)
+- `resources/views/template/partes/buscador_combobox.blade.php` (`title` en el chip para texto truncado)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- El filtro de carrera ya no usa `Area::Carreras()`: se alimenta de `sit.cat_carreras`.
+- Las consultas del reporte se conservan; el id SIT se traduce al área de créditos equivalente antes de interpolar.
+
+**Decisiones tomadas:**
+- Un solo catálogo visible: `sit.cat_carreras` (12 carreras, incluidas las que no tienen área en créditos).
+- Como el reporte sigue leyendo `creditos.alumnos.carrera`, la equivalencia se resuelve por nombre normalizado (minúsculas, sin acentos) y no por id.
+- Una carrera del SIT sin área equivalente devuelve un reporte vacío y se marca «(sin datos)» en el select, para no aparentar resultados que no existen.
+- El nombre de carrera de cada tarjeta se homologa al del SIT.
+- El endpoint de búsqueda recibe ahora el id del catálogo SIT directamente.
+- Se amplió el permiso de `alumnosBusqueda` con `VIP_REPORTES|VER_REPORTES_CARRERA`, porque los usuarios de solo reportes no podían consultar el buscador (403).
+- El alcance por área de los usuarios sin privilegios se traduce a carreras SIT; antes comparaba `areas.id` contra `carrera_id` de SIT, que son catálogos distintos.
+
+**Pendientes / Deuda técnica:**
+- `creditos.alumnos` está **vacía** (0 filas) en este entorno: el reporte no puede mostrar datos reales hasta migrar o poblar esa tabla.
+- Las consultas de `reportes()` siguen concatenando `$busqueda` en SQL crudo (riesgo 2 del [Estado actual](#estado-actual)).
+- La equivalencia depende del nombre: si SIT renombra un programa, hay que ajustar la comparación.
+- La marca «(sin datos)» es estática al cargar la página; no se recalcula al cambiar de filtros.
+
+**Tests ejecutados:**
+- ✅ 10 comprobaciones de extremo a extremo con filas temporales en `creditos.alumnos` (filtro por carrera SIT, exclusión de otras carreras, homologación de nombre, carrera sin área, endpoint acotado y limpieza posterior).
+- ✅ 12 comprobaciones de render del catálogo SIT (12 opciones, etiquetas cortas, `title`, marca «(sin datos)», parámetros del buscador).
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+
+**Referencias:**
+- `docs/img/reportes-desktop.png`
+- `docs/img/reportes-movil.png`
+
+### [2026-11-21 13:31] — Buscador de alumnos del SIT en reportes
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Sustituir el filtro de número de control por el buscador reutilizable y conectarlo con la base de alumnos del SIT.
+
+**Archivos modificados:**
+- `resources/views/admin/verifica_evidencia/reportes.blade.php` (el campo de control pasa a ser el buscador)
+- `app/Http/Controllers/VerificaEvidenciaController.php` (alumno preseleccionado en `reportes()`; carrera opcional y equivalencia de catálogos en `alumnosBusqueda()`)
+- `resources/views/template/partes/buscador_combobox.blade.php` (opciones `bare` y `required`, método `cbxSetParams`, ids con mayúsculas preservadas)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna consulta nueva: la búsqueda usa `SitAlumno` (`sit.alumnos`) a través del endpoint existente `verifica_evidencia.alumnos_busqueda`.
+- Las consultas del reporte no se tocaron.
+
+**Decisiones tomadas:**
+- El buscador reutiliza el endpoint SIT ya existente; no se creó un endpoint paralelo.
+- El valor enviado sigue siendo `busqueda`, así el controlador y sus filtros no cambian de contrato.
+- La selección es opcional (`required => false`): sin alumno, el reporte filtra solo por generación/carrera.
+- Se usa el modo `bare` para no anidar formularios; el botón «Filtrar» del reporte sigue siendo el único submit.
+- El componente expone `cbxSetParams` y la vista sincroniza la carrera elegida con la búsqueda, para no listar alumnos de otra carrera.
+- `creditos.areas` y `sit.cat_carreras` no comparten id (Sistemas es 1 en créditos y 3 en SIT): la equivalencia se resuelve por nombre normalizado; si no hay equivalente se devuelve vacío en lugar de mezclar carreras.
+
+**Pendientes / Deuda técnica:**
+- El reporte sigue leyendo `creditos.alumnos`: un alumno presente en SIT pero ausente en créditos no aparecerá en los resultados.
+- Las consultas de `reportes()` siguen concatenando `$busqueda` en SQL crudo (riesgo 2 del [Estado actual](#estado-actual)).
+- La equivalencia de carreras depende del nombre: si SIT renombra un programa, hay que ajustar la comparación.
+- El alcance por área para usuarios sin privilegios en `alumnosBusqueda()` sigue usando `areas.id` como si fuera `carrera_id` de SIT.
+
+**Tests ejecutados:**
+- ✅ 38 comprobaciones de render en cuatro escenarios (con datos, sin filtros, sin resultados y con alumno preseleccionado).
+- ✅ 17 comprobaciones de interacción en jsdom (búsqueda, parámetros, selección, envío opcional, limpieza y `cbxSetParams`).
+- ✅ Endpoint contra SIT real: 11,300 alumnos, máximo 5 resultados y carrera 1 devolviendo solo Sistemas.
+- ✅ Mapeo verificado de las 7 carreras de créditos contra `sit.cat_carreras`.
+- ✅ `php artisan test` (17 passed, 62 assertions).
+
+**Referencias:**
+- `docs/img/reportes-filtro-alumno.png`
+- `docs/img/reportes-desktop.png`
+
+### [2026-11-21 13:26] — UX de reportes con cards
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la UX de `admin/verifica_evidencia/reportes` con MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/verifica_evidencia/reportes.blade.php` (reescritura completa: filtros, resumen, tarjetas por alumno y modales)
+
+**Archivos eliminados:**
+- Modal jQuery `#alerta` y el espaciador de `200px` por alumno del diseño anterior.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; la vista consume los mismos datos del controlador.
+
+**Decisiones tomadas:**
+- Tres bloques: card de filtros, card de resumen con KPIs y tarjetas por alumno.
+- El resumen calcula alumnos, liberados, en proceso, sin avance y promedio a partir de los datos ya cargados.
+- El avance se calcula como créditos × 100 en lugar del `500` fijo anterior, así no se rompe si cambia el número de créditos.
+- La constancia aparece con `puntos >= puntosTotales`, no con la comparación contra la cadena `'500'`.
+- El detalle del modal se agrupa por `no_control` en una sola pasada, en lugar del índice compartido entre tarjetas.
+- Los estados vacíos distinguen «sin filtros» de «sin resultados».
+- Se eliminan los ids duplicados de los formularios por alumno.
+
+**Pendientes / Deuda técnica:**
+- Validar en la app autenticada con datos reales.
+- Los colores de status dependen de los valores `liberado`, `pendiente` y `baja`; otros valores caen en un badge neutro.
+
+**Tests ejecutados:**
+- ✅ `php artisan view:cache`.
+- ✅ Comprobaciones de render con datos simulados (progresos, KPIs, badges, modales y permisos).
+- ✅ Capturas a 1280 px y 500 px.
+
+**Referencias:**
+- `docs/img/reportes-desktop.png`
+- `docs/img/reportes-movil.png`
 
 ### [2026-11-21 13:20] — Buscador reutilizable en template/partes
 

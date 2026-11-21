@@ -20,6 +20,16 @@
     |
     | El endpoint debe responder JSON con una lista de objetos cuyas claves se
     | indican en 'keys' (por defecto: no_control, nombre, carrera).
+    |
+    | Opciones destacadas:
+    |   'bare'     => true  renderiza solo el control (sin card ni form propio),
+    |                        para usarlo dentro de un formulario existente.
+    |   'required' => false permite enviar el formulario sin selección.
+    |   'show_submit' => false oculta el botón del componente (la acción la
+    |                        dispara otro botón del formulario anfitrión).
+    |
+    | El control expone combo.cbxSetParams({...}) para actualizar los parámetros
+    | del endpoint en caliente (por ejemplo, al cambiar otro filtro).
     */
 
     $options = array_merge([
@@ -37,6 +47,8 @@
         'submit_label' => 'Consultar',
         'submit_icon' => 'fa-solid fa-chart-line',
         'show_submit' => true,
+        'bare' => false,
+        'required' => true,
         'min_chars' => 2,
         'limit' => 5,
         'query_param' => 'nombre',
@@ -50,7 +62,7 @@
         (array) $options['keys']
     );
 
-    $uid = preg_replace('/[^a-z0-9_-]+/', '', strtolower((string) $options['id']));
+    $uid = preg_replace('/[^A-Za-z0-9_-]+/', '', (string) $options['id']);
     $uid = $uid !== '' ? $uid : 'cbx';
 
     $minChars = max(1, (int) $options['min_chars']);
@@ -88,6 +100,7 @@
         'initial' => $initialData,
         'minChars' => $minChars,
         'limit' => $limit,
+        'required' => (bool) $options['required'],
         'messages' => $messages,
     ];
 @endphp
@@ -138,6 +151,7 @@
 @endonce
 @endpush
 
+@if(! $options['bare'])
 <article class="cbx-card">
     <div class="d-flex align-items-start align-items-sm-center gap-3 mb-3">
         <span class="cbx-card-icon"><i class="{{ $options['title_icon'] }}" aria-hidden="true"></i></span>
@@ -149,6 +163,7 @@
         </div>
     </div>
     <form action="{{ $options['action'] }}" method="{{ $options['method'] }}" id="{{ $uid }}_form" autocomplete="off" novalidate>
+@endif
         <input type="hidden" name="{{ $options['field'] }}" id="{{ $uid }}_value" value="{{ $initialValue }}">
         <div>
             <label class="form-label" for="{{ $uid }}_input">{{ $options['label'] }}</label>
@@ -177,8 +192,10 @@
                 <small class="cbx-hint" id="{{ $uid }}_status" role="status" aria-live="polite"></small>
             </div>
         </div>
+@if(! $options['bare'])
     </form>
 </article>
+@endif
 
 <script>
     (function () {
@@ -206,15 +223,21 @@
         const keys = config.keys;
         const minChars = config.minChars;
         const limit = config.limit;
+        const required = config.required !== false;
 
         let matches = [];
         let activeIndex = -1;
         let debounceTimer = null;
         let requestSeq = 0;
         let lastQuery = '';
+        let liveParams = Object.assign({}, config.params || {});
 
         const normalize = function (value) { return String(value || '').replace(/\s+/g, ' ').trim(); };
         const isOpen = function () { return !panel.hidden; };
+
+        combo.cbxSetParams = function (extra) {
+            liveParams = Object.assign(liveParams, extra || {});
+        };
 
         function setHint(message, state) {
             status.textContent = message || '';
@@ -222,7 +245,8 @@
         }
 
         function setSubmitEnabled(enabled) {
-            if (submitButton) { submitButton.disabled = !enabled; }
+            if (!submitButton) { return; }
+            submitButton.disabled = required ? !enabled : false;
         }
 
         function openPanel() {
@@ -332,7 +356,9 @@
             hiddenControl.value = value;
             setSubmitEnabled(true);
             chipLabel.textContent = label;
+            chipLabel.title = label;
             chipMeta.textContent = meta !== '' ? value + ' · ' + meta : value;
+            chipMeta.title = chipMeta.textContent;
             chip.hidden = false;
             input.hidden = true;
             input.value = '';
@@ -364,7 +390,7 @@
         }
 
         function buildUrl(query) {
-            const params = new URLSearchParams(config.params || {});
+            const params = new URLSearchParams(liveParams);
             params.set(config.queryParam, query);
             const separator = String(config.endpoint).indexOf('?') === -1 ? '?' : '&';
             return config.endpoint + separator + params.toString();
@@ -480,13 +506,15 @@
             if (!picker.contains(event.target)) { closePanel(); }
         });
 
-        form.addEventListener('submit', function (event) {
-            if (hiddenControl.value) { return; }
-            event.preventDefault();
-            clearSelection(false);
-            input.focus();
-            setHint(messages.choose_first, 'error');
-        });
+        if (form && required) {
+            form.addEventListener('submit', function (event) {
+                if (hiddenControl.value) { return; }
+                event.preventDefault();
+                clearSelection(false);
+                input.focus();
+                setHint(messages.choose_first, 'error');
+            });
+        }
 
         if (config.initial && normalize(config.initial[keys.value]) !== '') {
             setSelection(config.initial);

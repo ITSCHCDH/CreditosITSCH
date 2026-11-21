@@ -13,6 +13,9 @@ use App\Models\Actividad_Evidencia;
 use App\Models\Actividad;
 use App\Models\Area;
 use App\Models\Sit\Alumno as SitAlumno;
+use App\Models\Sit\Carrera as SitCarrera;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
 use Alert;
 
 class VerificaEvidenciaController extends Controller
@@ -25,7 +28,7 @@ class VerificaEvidenciaController extends Controller
         $this->middleware('permission:VIP|VIP_EVIDENCIA|VERIFICAR_EVIDENCIA')->only(['create','store']);
         $this->middleware('permission:VIP|VIP_EVIDENCIA|VERIFICAR_EVIDENCIA|VIP_SOLO_LECTURA')->only('verEvidencia');
         $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_AVANCE_ALUMNO|VIP_AVANCE_ALUMNO')->only('avanceAlumno');
-        $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_AVANCE_ALUMNO|VIP_AVANCE_ALUMNO')->only('alumnosBusqueda');
+        $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_AVANCE_ALUMNO|VIP_AVANCE_ALUMNO|VIP_REPORTES|VER_REPORTES_CARRERA')->only('alumnosBusqueda');
     }
 
     public function index(Request $request){
@@ -300,77 +303,185 @@ class VerificaEvidenciaController extends Controller
     }
 
     public function reportes(Request $request){
-    	$creditos_count = Credito::all();
-    	$creditos = count($creditos_count);
-        $carreras = Area::Carreras()->get();
+        $catalogoCreditos = Credito::select('id', 'nombre')->orderBy('nombre')->get();
+        $creditos = $catalogoCreditos->count();
+        $puntosTotales = max(1, $creditos * 100);
+
         $busqueda = $request->get('busqueda');
-        if (Auth::User()->hasAnyPermission(['VIP','VIP_REPORTES','VIP_SOLO_LECTURA'])) {
-            $carrera = null;
-            if($request->has('generacion')){
-                //Substraemos los dos ultimos digitos del año de generacion
-                $generacion = substr($request->generacion,2,4);
-                $carrera = $request->get('carrera');
-                //Consulta para traer los creditos y su avance indibidual de cada uno
-                if($request->status=="todos")
-                {
-                    $reportes_data = DB::select('select alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control order by alumnos.nombre asc, alumnos.no_control asc, creditos.nombre asc');
-                    //dd($reportes_data);
-                    //Cosulta para traer la suma total de todos creditos
-                    $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control group by alumnos.no_control order by alumnos.nombre asc, alumnos.no_control asc');
-                }
-                else
-                {
-                    $reportes_data = DB::select('select alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control WHERE alumnos.status = "'.$request->status.'" order by alumnos.nombre asc, alumnos.no_control asc, creditos.nombre asc');
-                    //dd($reportes_data);
-                    //Cosulta para traer la suma total de todos creditos
-                    $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control WHERE alumnos.status = "'.$request->status.'" group by alumnos.no_control order by alumnos.nombre asc, alumnos.no_control asc');
+        $carreraSit = $request->get('carrera');
+        $generacion = $request->get('generacion');
+        $estadoFiltro = $request->get('status', 'todos');
+
+        $puedeVerTodas = Auth::User()->hasAnyPermission(['VIP', 'VIP_REPORTES', 'VIP_SOLO_LECTURA']);
+        $carreras = $puedeVerTodas
+            ? $this->carrerasSitVisibles()
+            : $this->carrerasSitVisibles(Area::CarrerasUsuario(Auth::User()->id)->pluck('id'));
+
+        $reportes_data = null;
+        $suma_creditos = null;
+        $resumen = null;
+
+        $carreraValida = $carreraSit !== null && $carreraSit !== ''
+            && $carreras->contains(fn ($carrera) => (string) $carrera->id === (string) $carreraSit);
+
+        if ($request->has('generacion') && $carreraValida) {
+            // Los alumnos salen exclusivamente de sit.alumnos
+            $alumnos = $this->alumnosReporte($carreraSit, $generacion, $busqueda);
+
+            $avance = $alumnos->isEmpty() ? collect() : DB::table('avance')
+                ->whereIn('no_control', $alumnos->pluck('no_control')->all())
+                ->select('no_control', 'id_credito', 'por_credito')
+                ->get()
+                ->groupBy('no_control');
+
+            $calculados = [];
+            foreach ($alumnos as $alumno) {
+                $porCredito = $avance->get($alumno->no_control, collect())->pluck('por_credito', 'id_credito');
+                $suma = 0;
+
+                foreach ($catalogoCreditos as $credito) {
+                    $suma += (int) min(100, max(0, (int) ($porCredito[$credito->id] ?? 0)));
                 }
 
+                $calculados[] = [
+                    'alumno' => $alumno,
+                    'porCredito' => $porCredito,
+                    'suma' => $suma,
+                    'estado' => $this->estadoReporte($alumno, $suma, $puntosTotales),
+                ];
             }
-            else
-            {
-                $reportes_data = null;
-                $suma_creditos = null;
+
+            if ($estadoFiltro !== 'todos') {
+                $calculados = array_values(array_filter($calculados, fn ($item) => $item['estado'] === $estadoFiltro));
             }
-        }
-        else
-        {
-            $carrera = null;
-            if($request->has('generacion')){
-                //Substraemos los dos ultimos digitos del año de generacion
-                $generacion = substr($request->generacion,2,4);
-                $carrera = $request->get('carrera');
-                //Consulta para traer los creditos y su avance indibidual de cada uno
-                if($request->status=="todos")
-                {
-                    $reportes_data = DB::select('select alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control order by alumnos.nombre asc, alumnos.no_control asc, creditos.nombre asc');
-                    //Cosulta para traer la suma total de todos creditos
-                    $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre, alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control group by alumnos.no_control order by alumnos.nombre asc, alumnos.no_control asc');
-                }
-                else
-                {
-                    $reportes_data = DB::select('select alumnos.nombre,alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control WHERE alumnos.status = "'.$request->status.'" order by alumnos.nombre asc, alumnos.no_control asc, creditos.nombre asc');
-                    //Cosulta para traer la suma total de todos creditos
-                    $suma_creditos = DB::select('select if(sum(case when por_credito > 100 then 100 else por_credito end) is null,0,sum(case when por_credito > 100 then 100 else por_credito end)) as credito_suma,alumnos.id as alumno_id ,alumnos.nombre, alumnos.status, alumnos.no_control, areas.nombre as carrera, if(avance.por_credito is null or avance.por_credito > 100, if( avance.por_credito > 100, 100, 0), avance.por_credito) as por_credito, creditos.nombre as nombre_credito from alumnos join creditos on ((alumnos.nombre like "%'.$busqueda.'%" or alumnos.no_control like "%'.$busqueda.'%") and (alumnos.no_control like "'.$generacion.'%" or alumnos.no_control like "_'.$generacion.'%")) and alumnos.carrera="'.$carrera.'" join areas on areas.id = alumnos.carrera left join avance on avance.id_credito = creditos.id and alumnos.no_control = avance.no_control WHERE alumnos.status = "'.$request->status.'" group by alumnos.no_control order by alumnos.nombre asc, alumnos.no_control asc');
+
+            $reportes_data = [];
+            $suma_creditos = [];
+            $resumen = ['total' => 0, 'liberados' => 0, 'enProceso' => 0, 'sinAvance' => 0, 'bajas' => 0, 'promedio' => 0];
+            $acumuladoPorcentaje = 0;
+
+            foreach ($calculados as $item) {
+                $alumno = $item['alumno'];
+                $porcentaje = min(100, (int) round($item['suma'] * 100 / $puntosTotales));
+
+                $resumen['total']++;
+                $acumuladoPorcentaje += $porcentaje;
+
+                if ($item['estado'] === 'baja') {
+                    $resumen['bajas']++;
+                } elseif ($item['suma'] >= $puntosTotales) {
+                    $resumen['liberados']++;
+                } elseif ($item['suma'] > 0) {
+                    $resumen['enProceso']++;
+                } else {
+                    $resumen['sinAvance']++;
                 }
 
+                $suma_creditos[] = (object) [
+                    'alumno_id' => $alumno->id,
+                    'nombre' => $alumno->nombreCompleto,
+                    'no_control' => $alumno->no_control,
+                    'carrera' => $alumno->carrera?->nombre,
+                    'status' => $item['estado'],
+                    'credito_suma' => $item['suma'],
+                ];
             }
-            else
-            {
-                $reportes_data = null;
-                $suma_creditos = null;
+
+            $resumen['promedio'] = $resumen['total'] > 0 ? (int) round($acumuladoPorcentaje / $resumen['total']) : 0;
+
+            $suma_creditos = $this->paginarReporte($suma_creditos, $request);
+
+            // El detalle por crédito solo se arma para la página visible
+            foreach ($suma_creditos as $fila) {
+                $porCredito = $avance->get($fila->no_control, collect())->pluck('por_credito', 'id_credito');
+
+                foreach ($catalogoCreditos as $credito) {
+                    $reportes_data[] = (object) [
+                        'nombre' => $fila->nombre,
+                        'status' => $fila->status,
+                        'no_control' => $fila->no_control,
+                        'carrera' => $fila->carrera,
+                        'por_credito' => (int) min(100, max(0, (int) ($porCredito[$credito->id] ?? 0))),
+                        'nombre_credito' => $credito->nombre,
+                    ];
+                }
             }
-            $carreras = Area::CarrerasUsuario(Auth::User()->id)->get();
         }
+
+        // Datos del alumno elegido en el buscador (fuente SIT) para reconstruir el filtro
+        $alumnoFiltro = null;
+        if ($request->filled('busqueda')) {
+            $sitAlumnoFiltro = SitAlumno::with('carrera')->where('no_control', $request->get('busqueda'))->first();
+            if ($sitAlumnoFiltro) {
+                $alumnoFiltro = [
+                    'no_control' => $sitAlumnoFiltro->no_control,
+                    'nombre' => $sitAlumnoFiltro->nombreCompleto,
+                    'carrera' => $sitAlumnoFiltro->carrera?->nombre ?? '',
+                ];
+            }
+        }
+
         return view('admin.verifica_evidencia.reportes')
-        ->with('reportes_data',$reportes_data)
-        ->with('creditos',$creditos)
-        ->with('suma_creditos',$suma_creditos)
-        ->with('carreras',$carreras)
-        ->with('carrera_seleccionada',$carrera)
+        ->with('reportes_data', $reportes_data)
+        ->with('creditos', $creditos)
+        ->with('suma_creditos', $suma_creditos)
+        ->with('resumen', $resumen)
+        ->with('carreras', $carreras)
+        ->with('carrera_seleccionada', $carreraSit)
         ->with('busqueda', $busqueda)
-        ->with('status',$request->status)
-        ->with('generacion',$request->generacion);
+        ->with('status', $request->get('status'))
+        ->with('generacion', $request->get('generacion'))
+        ->with('alumnoFiltro', $alumnoFiltro);
+    }
+
+    /** Alumnos del reporte: fuente única sit.alumnos (nombre desde sit.users, carrera desde sit.cat_carreras). */
+    private function alumnosReporte($carreraSit, $generacion, $busqueda)
+    {
+        $consulta = SitAlumno::query()
+            ->with(['user', 'carrera'])
+            ->where('carrera_id', $carreraSit);
+
+        if ($generacion !== null && (int) $generacion > 1) {
+            $consulta->where('anio_ingreso', (int) $generacion);
+        }
+
+        $texto = is_string($busqueda) ? trim($busqueda) : '';
+        if ($texto !== '') {
+            $consulta->where(function ($query) use ($texto) {
+                $query->where('no_control', 'like', "%{$texto}%")
+                    ->orWhereHas('user', function ($usuario) use ($texto) {
+                        $usuario->where('nombre', 'like', "%{$texto}%")
+                            ->orWhere('apellido_paterno', 'like', "%{$texto}%")
+                            ->orWhere('apellido_materno', 'like', "%{$texto}%");
+                    });
+            });
+        }
+
+        return $consulta->orderBy('no_control')->get();
+    }
+
+    /** Estado del reporte: baja por estatus académico; liberado o pendiente por créditos acumulados. */
+    private function estadoReporte($alumno, int $suma, int $puntosTotales)
+    {
+        if (Str::contains(Str::lower((string) $alumno->estatus), 'baja')) {
+            return 'baja';
+        }
+
+        return $suma >= $puntosTotales ? 'liberado' : 'pendiente';
+    }
+
+    private function paginarReporte(array $filas, Request $request)
+    {
+        $porPagina = 10;
+        $pagina = max(1, (int) $request->get('page', 1));
+
+        return new LengthAwarePaginator(
+            array_slice($filas, ($pagina - 1) * $porPagina, $porPagina),
+            count($filas),
+            $porPagina,
+            $pagina,
+            ['path' => route('verifica_evidencia.reportes'), 'query' => $request->query()]
+        );
     }
 
     public function verEvidencia($id){
@@ -407,8 +518,15 @@ class VerificaEvidenciaController extends Controller
             }
         }
 
-        if (!Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO'])) {
-            $query->where('carrera_id', Auth::User()->area);
+        $puedeVerTodas = Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_AVANCE_ALUMNO','VIP_REPORTES','VER_REPORTES_CARRERA']);
+
+        if (! $puedeVerTodas) {
+            // Se acota a las carreras SIT equivalentes al área del usuario
+            $carrerasPermitidas = $this->carrerasSitVisibles(Area::CarrerasUsuario(Auth::User()->id)->pluck('id'))->pluck('id');
+            $query->whereIn('carrera_id', $carrerasPermitidas->isEmpty() ? [-1] : $carrerasPermitidas->all());
+        } elseif ($request->filled('carrera')) {
+            // El filtro llega con el id del catálogo SIT
+            $query->where('carrera_id', $request->get('carrera'));
         }
 
         $lista = $query->orderBy('no_control')
@@ -423,6 +541,55 @@ class VerificaEvidenciaController extends Controller
             });
 
         return response()->json($lista);
+    }
+
+    /**
+     * Equivalencia entre creditos.areas y sit.cat_carreras.
+     * No existe columna de mapeo, por lo que se comparan los nombres normalizados
+     * (minúsculas y sin acentos) en lugar de asumir que los id coinciden.
+     */
+    private function normalizarCarrera($texto)
+    {
+        return Str::lower(Str::ascii(trim((string) $texto)));
+    }
+
+    /** Mapa área de créditos => carrera del SIT, calculado una vez por petición. */
+    private function mapaCarreras()
+    {
+        static $mapa = null;
+        if ($mapa !== null) {
+            return $mapa;
+        }
+
+        $mapa = [];
+        $carrerasSit = SitCarrera::all()->keyBy(fn ($carrera) => $this->normalizarCarrera($carrera->nombre));
+
+        foreach (Area::where('tipo', 'carrera')->get() as $area) {
+            $clave = $this->normalizarCarrera($area->nombre);
+            if ($carrerasSit->has($clave)) {
+                $mapa[$area->id] = $carrerasSit->get($clave)->id;
+            }
+        }
+
+        return $mapa;
+    }
+
+    /** Carreras del catálogo SIT, filtrando por áreas de créditos cuando se indica. */
+    private function carrerasSitVisibles($areasCredito = null)
+    {
+        $query = SitCarrera::query()->orderByDesc('activo')->orderBy('nombre');
+
+        if ($areasCredito !== null) {
+            $mapa = $this->mapaCarreras();
+            $ids = collect($areasCredito)
+                ->map(fn ($areaId) => $mapa[$areaId] ?? null)
+                ->filter()
+                ->values();
+
+            $query->whereIn('id', $ids->isEmpty() ? [-1] : $ids->all());
+        }
+
+        return $query->get();
     }
 
 }

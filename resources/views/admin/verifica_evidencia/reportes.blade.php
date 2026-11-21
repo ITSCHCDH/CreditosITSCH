@@ -3,206 +3,300 @@
 @section('title','Reportes')
 
 @section('ruta')
-    <label class="label label-success">Reportes</label>
+    <span class="d-inline-flex align-items-center gap-2"><i class="fa-solid fa-chart-pie" style="color:#2d6da3"></i> Reportes de avance</span>
+@endsection
+
+@section('links')
+<style>
+    .report-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06);padding:1.25rem;margin-bottom:1rem;text-align:left}
+    .report-card-head{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:1rem}
+    .report-card-head h2{margin:0;color:#102b4a;font-size:1.1rem;font-weight:700}
+    .report-card-head p{margin:.2rem 0 0;color:#6b7280;font-size:.85rem}
+    .report-icon{width:44px;height:44px;flex:0 0 auto;display:grid;place-items:center;border-radius:.8rem;color:#173c66;background:#edf3f8;font-size:1.05rem}
+    .report-filters .form-label{font-size:.82rem;font-weight:600;color:#334155;margin-bottom:.3rem}
+    .report-filters .form-select,.report-filters .form-control{min-height:46px;border-radius:.7rem}
+    .report-filters .cbx-combo{flex-wrap:nowrap;min-height:46px;padding:.2rem .3rem .2rem .65rem}
+    .report-filters .cbx-input{font-size:.9rem}
+    .report-filters .cbx-chip,.report-filters .cbx-chip-text{flex-wrap:nowrap}
+    .report-filters .cbx-chip-avatar{display:none}
+    .report-filters .cbx-hint{display:none}
+    .report-actions-buttons{display:flex;gap:.5rem}
+    .report-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.75rem}
+    .report-kpi{display:flex;flex-direction:column;gap:.15rem;padding:.9rem 1rem;border:1px solid #e7edf4;border-radius:.85rem;background:#f8fafc}
+    .report-kpi-value{font-size:1.45rem;font-weight:700;color:#102b4a;line-height:1.1}
+    .report-kpi-label{font-size:.78rem;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
+    .report-kpi.is-ok{background:#f1f8f4;border-color:#d6ecdd}
+    .report-kpi.is-warn{background:#fdf8ed;border-color:#f2e2bf}
+    .report-kpi.is-off{background:#f8f2f2;border-color:#eed9d9}
+    .report-student{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .5rem 1.1rem rgba(29,78,116,.07);padding:1.1rem 1.25rem;margin-bottom:.9rem;text-align:left}
+    .report-student-head{display:flex;align-items:center;gap:.85rem;flex-wrap:wrap}
+    .report-avatar{width:46px;height:46px;flex:0 0 auto;display:grid;place-items:center;border-radius:.8rem;color:#173c66;background:#e8eff6;font-size:1.15rem}
+    .report-student-id{min-width:0;flex:1 1 12rem}
+    .report-student-id h3{margin:0;font-size:1rem;font-weight:700;color:#102b4a;overflow:hidden;text-overflow:ellipsis}
+    .report-student-meta{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin-top:.25rem;font-size:.82rem;color:#64748b}
+    .report-badge{display:inline-flex;align-items:center;gap:.35rem;padding:.3rem .7rem;border-radius:999px;font-size:.78rem;font-weight:700}
+    .report-badge.is-ok{background:#e6f4ea;color:#1b7a3d}
+    .report-badge.is-pending{background:#fdf3e0;color:#9a6408}
+    .report-badge.is-off{background:#fdeceb;color:#b3261e}
+    .report-badge.is-neutral{background:#eef3f8;color:#173c66}
+    .report-progress-row{display:flex;align-items:center;gap:1rem;margin-top:1rem;flex-wrap:wrap}
+    .report-progress{flex:1 1 12rem;min-width:8rem}
+    .report-progress .progress{height:.7rem;border-radius:999px;background:#e9eef4}
+    .report-progress .progress-bar{border-radius:999px;background:linear-gradient(90deg,#173c66,#2d6da3)}
+    .report-progress-value{display:flex;align-items:baseline;gap:.5rem;white-space:nowrap}
+    .report-progress-value strong{font-size:1.05rem;color:#102b4a}
+    .report-progress-value span{font-size:.78rem;color:#64748b}
+    .report-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;padding-top:.9rem;border-top:1px solid #edf1f5}
+    .report-actions form{margin:0}
+    .report-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.5rem;padding:2.5rem 1.5rem}
+    .report-empty i{font-size:2rem;color:#94a3b8}
+    .report-empty h2{margin:0;font-size:1.05rem;color:#102b4a}
+    .report-empty p{margin:0;color:#64748b;font-size:.88rem;max-width:32rem}
+    .report-detail-item{display:flex;flex-direction:column;gap:.35rem;padding:.75rem 0;border-bottom:1px solid #edf1f5}
+    .report-detail-item:last-child{border-bottom:0}
+    .report-detail-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;font-size:.9rem;font-weight:600;color:#102b4a}
+    .report-pagination{padding:.9rem 1.25rem}
+    .report-pager{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+    .report-pager-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem .9rem;border:1px solid #d7dee8;border-radius:999px;background:#fff;color:#173c66;font-size:.85rem;font-weight:600;text-decoration:none;transition:background-color .15s ease,border-color .15s ease}
+    .report-pager-btn:hover,.report-pager-btn:focus-visible{background:#eef3f8;border-color:#b9c8d8;color:#102b4a}
+    .report-pager-btn.is-disabled{color:#94a3b8;background:#f8fafc;border-color:#e7edf4;pointer-events:none}
+    .report-pager-info{font-size:.82rem;color:#64748b}
+    @media(max-width:575.98px){.report-actions .btn{flex:1 1 auto}}
+</style>
 @endsection
 
 @section('contenido')
-		
-	<form action="{{ route('verifica_evidencia.reportes') }}" method="get">	
-		<div><h4>Filtros</h4></div>
-		<hr>
-		<div class="row ml-2">
-			<div class="col-sm-3">					
-				<div class="input-group mb-3">
-					<div class="input-group-prepend">
-						<span class="input-group-text bg-info">GeneraciÃ³n</span>
-					</div> 						
-					<select name='generacion' class='form-control' required placeholder='AÃ±o-GeneraciÃ³n' method='GET'>
-						@php
-							echo "<option value = 1>Todos</option>";
-							$anio_actual = (int)explode("-",Carbon\Carbon::now())[0];
-							for($anio = 2013; $anio <= $anio_actual; ++$anio){
-								if($anio==$generacion)
-								{
-									echo "<option value = $anio selected='selected'>$anio</option>";
-								}
-								else 
-								{
-									echo "<option value = $anio>$anio</option>";
-								}
-								
-							}
-						@endphp
-					</select>
-				</div>
-			</div>
-			<div class="col-sm-3">					
-				<div class="input-group mb-3">
-					<div class="input-group-prepend">
-						<span class="input-group-text bg-info">Carrera</span>
-					</div> 			   
-					<select class="form-control" required name="carrera" id="carrera">
-						@if (Auth::User()->hasAnyPermission(['VIP','VIP_REPORTES','VIP_SOLO_LECTURA']))
-							<option value="">Seleccione una carrera</option>
-						@endif
-						@foreach($carreras as $carrera)
-							@if($carrera_seleccionada == $carrera->id)
-								<option value="{{ $carrera->id }}" selected>{{ $carrera->nombre }}</option>
-							@else
-								<option value="{{ $carrera->id }}">{{ $carrera->nombre }}</option>
-							@endif
-						@endforeach
-					</select>
-				</div>
-			</div>
-			<div class="col-sm-2">
-				<div class="input-group mb-3">
-					<div class="input-group-prepend">
-						<span class="input-group-text bg-info">Status</span>
-					</div> 			   
-					<select class="form-control" name="status" id="status">											
-						<option value="todos" @if($status=='todos') selected='selected' @endif>Cualquier status</option>											
-						<option value="liberado" @if($status=='liberado') selected='selected' @endif>Liberados</option>							
-						<option value="pendiente" @if($status=='pendiente') selected='selected' @endif>Pendientes</option>	
-						<option value="baja" @if($status=='baja') selected='selected' @endif>Baja</option>									
-					</select>
-				</div>
-			</div>
-			<div class="col-sm-3">					
-				<div class="input-group mb-3">
-					<div class="input-group-prepend">
-						<span class="input-group-text bg-info">Control</span>
-					</div>					
-					<input type="text" name="busqueda" id="Control" class="form-control" placeholder="Nombre - No Control" value="{{ $busqueda }}">
-				</div>
-			</div>			
-			<div class="col-sm-1">				
-				<button type="submit" class="btn btn-secondary"><span class="glyphicon glyphicon-filter"></span> Filtrar</button>				
-			</div>
-		</div>	
-		<hr>
-	</form>
-	<br>
-	<br>
-	<div class="row ml-2">		
-		<div class="col-sm-12">
-			@if ($reportes_data != null)
-				@for ($alumno = 0, $alumno_index=0;  $alumno < count($suma_creditos); $alumno++)
-					<div class="row">				
-						<hr>
-						<h5><strong>Alumno:</strong>  {{ $suma_creditos[$alumno]->nombre }}</h5>
-						<p><strong>Numero de control:</strong> {{ $suma_creditos[$alumno]->no_control }}</p>
-						<p><strong>Status:</strong> {{ $suma_creditos[$alumno]->status }}</p>					
-						<p><strong>Completado</strong></p>
-						<div>							
-							<div style="width: {{ ($suma_creditos[$alumno]->credito_suma*100)/500 }}%; background-color:#27ce1e;"><p style="color: white">{{ ($suma_creditos[$alumno]->credito_suma*100)/500 }}%</p></div>
-						</div>	
-					</div>					
-					<div class="row">					
-						<div class="col-sm-4">
-							<button class="btn btn-info" id="{{ $suma_creditos[$alumno]->alumno_id }}" data-mdb-toggle="modal" data-mdb-target="#myModalDetalle{{ $suma_creditos[$alumno]->alumno_id }}"><i class='fas fa-eye'></i> MÃ¡s</button>
-						</div>
-						<div class="col-sm-2">
-							@if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
-								<form action="{{ route('verifica_evidencia.avance_alumno') }}" method="get">							
-									@php
-										$ruta_carrera = "desconocida";
-										if(isset($_GET['carrera'])){
-											$ruta_carrera=$_GET['carrera'];
-										}
-										$ruta_generacion = "desconocida";
-										if(isset($_GET['generacion'])){
-											$ruta_generacion = $_GET['generacion'];
-										}
-									@endphp
-									<input type="hidden" name="ruta_carrera" id="ruta_carrera" value="{{ $ruta_carrera }}">
-									<input type="hidden" name="ruta_generacion" id="ruta_generacion" value="{{ $ruta_generacion }}">
-									<input type="hidden" name="no_control" id="no_control" value="{{ $suma_creditos[$alumno]->no_control }}">
-									<button type="submit" class="btn btn-primary">Avance</button>									
-								</form>	
-							@endif
-						</div>
-						<div class="col-sm-2">
-							@if($suma_creditos[$alumno]->credito_suma=='500' && (Auth::User()->hasAnyPermission(['VIP','IMPRIMIR_CONSTANCIAS'])))
-								<form action="{{ route('constancias.imprimir') }}"  method="post">
-									{{ csrf_field() }}
-									<input type="hidden" name="no_control" value="{{  $reportes_data[$alumno_index]->no_control }}">
-									<input type="submit" name="" value="Constancia" class="btn btn-warning btn-sm">
-								</form>
-							@endif
-						</div>
-						<div class="col-sm-1"></div>
-					</div>						
-					<div style="margin-bottom: 200px"></div>
+@php
+    $paginado = $suma_creditos instanceof \Illuminate\Pagination\LengthAwarePaginator ? $suma_creditos : null;
+    $sinDatos = $paginado === null || $paginado->total() === 0;
+    $filtrado = request()->has('generacion') && request()->filled('carrera');
+    $puntosTotales = max(1, (int) $creditos * 100);
+    $detallePorAlumno = $reportes_data ? collect($reportes_data)->groupBy('no_control') : collect();
+    $r = $resumen ?? ['total' => 0, 'liberados' => 0, 'enProceso' => 0, 'sinAvance' => 0, 'bajas' => 0, 'promedio' => 0];
 
-					<!-- Modal -->
-					<div class="modal" id="myModalDetalle{{ $suma_creditos[$alumno]->alumno_id }}" tabindex="-1" aria-labelledby="Resumen del avance del alumno" aria-hidden="true">
-						<div class="modal-dialog modal-lg">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5><strong>Detalle del alumno:</strong>&nbsp{{$suma_creditos[$alumno]->nombre}}</h5>
-								<button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-							</div>
-							<div class="modal-body">
-								<ul class="list-group list-group-light" id="a{{ $suma_creditos[$alumno]->alumno_id }}" style="padding:0;">
-									@for ($alumno_data = 0; $alumno_data < $creditos; $alumno_data++,$alumno_index++)
-										<li class="list-group-item">
-											<div >
-												<h6>{{ $reportes_data[$alumno_index]->nombre_credito }}</h6>
-											</div>
-											<div>												
-												<div style="width: {{ $reportes_data[$alumno_index]->por_credito }}%; background-color:#27ce1e;"><p style="color: white;">{{ $reportes_data[$alumno_index]->por_credito }}%</p></div>
-											</div>
-										</li>
-										<div class="resetear"></div>
-									@endfor
-								</ul>	
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Cerrar</button>								
-							</div>
-						</div>
-						</div>
-					</div>
-				@endfor
-			@else	
-				@section('js')
-					<script>
-						if($("#Control").val().length > 0){  $("#alerta").modal("show");}
-					</script>
-				@endsection	
-			@endif
+    $estados = [
+        'liberado' => ['texto' => 'Liberado', 'clase' => 'is-ok', 'icono' => 'fa-circle-check'],
+        'pendiente' => ['texto' => 'Pendiente', 'clase' => 'is-pending', 'icono' => 'fa-clock'],
+        'baja' => ['texto' => 'Baja', 'clase' => 'is-off', 'icono' => 'fa-circle-xmark'],
+    ];
+@endphp
 
-			<!-- The Modal -->
-				<div class="modal" id="alerta">
-				  <div class="modal-dialog">
-				    <div class="modal-content">
+<article class="report-card">
+    <div class="report-card-head">
+        <span class="report-icon"><i class="fa-solid fa-filter" aria-hidden="true"></i></span>
+        <div>
+            <h2>Filtros</h2>
+            <p>Elige generación y carrera; el status y la búsqueda son opcionales.</p>
+        </div>
+    </div>
+    <form action="{{ route('verifica_evidencia.reportes') }}" method="get" class="report-filters">
+        <div class="row g-3 align-items-end">
+            <div class="col-sm-6 col-xl-2">
+                <label class="form-label" for="generacion">Generación</label>
+                <select name="generacion" id="generacion" class="form-select" required>
+                    <option value="1" @if((int) $generacion === 1) selected @endif>Todos</option>
+                    @for($anio = 2013; $anio <= now()->year; $anio++)
+                        <option value="{{ $anio }}" @if((int) $generacion === $anio) selected @endif>{{ $anio }}</option>
+                    @endfor
+                </select>
+            </div>
+            <div class="col-sm-6 col-xl-2">
+                <label class="form-label" for="carrera">Carrera</label>
+                <select class="form-select" required name="carrera" id="carrera">
+                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_REPORTES','VIP_SOLO_LECTURA']))
+                        <option value="">Seleccione una carrera</option>
+                    @endif
+                    @foreach($carreras as $carrera)
+                        <option value="{{ $carrera->id }}" title="{{ $carrera->nombre }}" @selected($carrera_seleccionada == $carrera->id)>{{ $carrera->nombre_corto ?: $carrera->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-sm-6 col-xl-2">
+                <label class="form-label" for="status">Status</label>
+                <select class="form-select" name="status" id="status">
+                    <option value="todos" @if($status=='todos') selected @endif>Cualquier status</option>
+                    <option value="liberado" @if($status=='liberado') selected @endif>Liberados</option>
+                    <option value="pendiente" @if($status=='pendiente') selected @endif>Pendientes</option>
+                    <option value="baja" @if($status=='baja') selected @endif>Baja</option>
+                </select>
+            </div>
+            <div class="col-sm-6 col-xl-4">
+                @include('template.partes.buscador_combobox', [
+                    'config' => [
+                        'id' => 'alumnoFiltro',
+                        'bare' => true,
+                        'required' => false,
+                        'show_submit' => false,
+                        'label' => 'Alumno',
+                        'placeholder' => 'Nombre o No. control',
+                        'field' => 'busqueda',
+                        'endpoint' => route('verifica_evidencia.alumnos_busqueda'),
+                        'query_param' => 'nombre',
+                        'params' => ['peticion' => '0', 'carrera' => (string) ($carrera_seleccionada ?? '')],
+                        'keys' => ['value' => 'no_control', 'label' => 'nombre', 'meta' => ''],
+                        'initial' => $alumnoFiltro ?? null,
+                    ],
+                ])
+            </div>
+            <div class="col-12 col-xl-2">
+                <div class="report-actions-buttons">
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 flex-grow-1"><i class="fa-solid fa-filter me-2" aria-hidden="true"></i>Filtrar</button>
+                    <a href="{{ route('verifica_evidencia.reportes') }}" class="btn btn-outline-secondary rounded-pill" title="Quitar filtros" aria-label="Quitar filtros"><i class="fa-solid fa-eraser" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </div>
+    </form>
+</article>
 
-				      <!-- Modal Header -->
-				      <div class="modal-header">
-				        <h4 class="modal-title">Mensaje</h4>
-				        <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
-				      </div>
+<script>
+    (function () {
+        const carrera = document.getElementById('carrera');
+        const combo = document.getElementById('alumnoFiltro_combo');
+        if (!carrera || !combo || typeof combo.cbxSetParams !== 'function') { return; }
+        const sync = function () { combo.cbxSetParams({ carrera: carrera.value || '' }); };
+        carrera.addEventListener('change', sync);
+        sync();
+    })();
+</script>
 
-				      <!-- Modal body -->
-				      <div class="modal-body">
-				        <strong>Alumno(s) no encontrado(s)!.</strong>
-				        <br>
-				        Nota:
-				        <br>
-				        Tus criterios de busqueda no generarÃ³n ningun resultado, te sugerimos modificarlos.
-				      </div>
+@if($sinDatos)
+    <article class="report-card">
+        <div class="report-empty">
+            <i class="fa-solid {{ $filtrado ? 'fa-circle-question' : 'fa-chart-simple' }}" aria-hidden="true"></i>
+            @if($filtrado)
+                <h2>Sin resultados</h2>
+                <p>Ningún alumno coincide con los criterios elegidos en generación, carrera, status o búsqueda. Ajusta los filtros e inténtalo de nuevo.</p>
+            @else
+                <h2>Selecciona los filtros para generar el reporte</h2>
+                <p>El avance se calcula por crédito: {{ $creditos }} créditos registrados, {{ $puntosTotales }} puntos posibles por alumno.</p>
+            @endif
+        </div>
+    </article>
+@else
+    <article class="report-card">
+        <div class="report-card-head">
+            <span class="report-icon"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i></span>
+            <div>
+                <h2>Resumen</h2>
+                <p>{{ $r['total'] }} {{ $r['total'] === 1 ? 'alumno' : 'alumnos' }} · avance promedio {{ $r['promedio'] }}% · fuente: sit.alumnos</p>
+            </div>
+        </div>
+        <div class="report-kpis">
+            <div class="report-kpi"><span class="report-kpi-value">{{ $r['total'] }}</span><span class="report-kpi-label">Alumnos</span></div>
+            <div class="report-kpi is-ok"><span class="report-kpi-value">{{ $r['liberados'] }}</span><span class="report-kpi-label">Liberados</span></div>
+            <div class="report-kpi is-warn"><span class="report-kpi-value">{{ $r['enProceso'] }}</span><span class="report-kpi-label">En proceso</span></div>
+            <div class="report-kpi"><span class="report-kpi-value">{{ $r['sinAvance'] }}</span><span class="report-kpi-label">Sin avance</span></div>
+            <div class="report-kpi is-off"><span class="report-kpi-value">{{ $r['bajas'] }}</span><span class="report-kpi-label">Baja</span></div>
+            <div class="report-kpi"><span class="report-kpi-value">{{ $r['promedio'] }}%</span><span class="report-kpi-label">Promedio</span></div>
+        </div>
+    </article>
 
-				      <!-- Modal footer -->
-				      <div class="modal-footer">
-				        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-				      </div>
+    <div class="report-list">
+        @foreach($paginado as $alumno)
+            @php
+                $puntos = (int) $alumno->credito_suma;
+                $porcentaje = min(100, (int) round($puntos * 100 / $puntosTotales));
+                $estado = $estados[strtolower((string) $alumno->status)] ?? ['texto' => ucfirst((string) $alumno->status), 'clase' => 'is-neutral', 'icono' => 'fa-circle-info'];
+                $detalle = $detallePorAlumno->get($alumno->no_control, collect());
+                $modalId = 'myModalDetalle'.$alumno->alumno_id;
+            @endphp
+            <article class="report-student">
+                <div class="report-student-head">
+                    <span class="report-avatar"><i class="fa-solid fa-user-graduate" aria-hidden="true"></i></span>
+                    <div class="report-student-id">
+                        <h3>{{ $alumno->nombre }}</h3>
+                        <div class="report-student-meta">
+                            <span class="report-badge is-neutral">{{ $alumno->no_control }}</span>
+                            @if(!empty($alumno->carrera))<span>{{ $alumno->carrera }}</span>@endif
+                        </div>
+                    </div>
+                    <span class="report-badge {{ $estado['clase'] }}"><i class="fa-solid {{ $estado['icono'] }}" aria-hidden="true"></i>{{ $estado['texto'] }}</span>
+                </div>
 
-				    </div>
-				  </div>
-				</div>
-			  <!-- End Modal -->
-		</div>
-		
-	</div>
+                <div class="report-progress-row">
+                    <div class="report-progress">
+                        <div class="progress" role="progressbar" aria-label="Avance de {{ $alumno->nombre }}" aria-valuenow="{{ $porcentaje }}" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar" style="width:{{ $porcentaje }}%"></div>
+                        </div>
+                    </div>
+                    <div class="report-progress-value"><strong>{{ $porcentaje }}%</strong><span>{{ $puntos }} / {{ $puntosTotales }} pts</span></div>
+                </div>
+
+                <div class="report-actions">
+                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" data-mdb-toggle="modal" data-mdb-target="#{{ $modalId }}"><i class="fa-solid fa-eye me-2" aria-hidden="true"></i>Ver detalle</button>
+
+                    @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
+                        <form action="{{ route('verifica_evidencia.avance_alumno') }}" method="get">
+                            <input type="hidden" name="ruta_carrera" value="{{ request()->query('carrera', 'desconocida') }}">
+                            <input type="hidden" name="ruta_generacion" value="{{ request()->query('generacion', 'desconocida') }}">
+                            <input type="hidden" name="no_control" value="{{ $alumno->no_control }}">
+                            <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3"><i class="fa-solid fa-chart-line me-2" aria-hidden="true"></i>Avance</button>
+                        </form>
+                    @endif
+
+                    @if($puntos >= $puntosTotales && Auth::User()->hasAnyPermission(['VIP','IMPRIMIR_CONSTANCIAS']))
+                        <form action="{{ route('constancias.imprimir') }}" method="post">
+                            @csrf
+                            <input type="hidden" name="no_control" value="{{ $alumno->no_control }}">
+                            <button type="submit" class="btn btn-warning btn-sm rounded-pill px-3"><i class="fa-solid fa-print me-2" aria-hidden="true"></i>Constancia</button>
+                        </form>
+                    @endif
+                </div>
+            </article>
+
+            <div class="modal fade" id="{{ $modalId }}" tabindex="-1" aria-labelledby="{{ $modalId }}Label" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title" id="{{ $modalId }}Label">Detalle del alumno</h5>
+                                <div class="text-muted small">{{ $alumno->nombre }} · {{ $alumno->no_control }}</div>
+                            </div>
+                            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            @if($detalle->isEmpty())
+                                <p class="text-muted mb-0">Este alumno no tiene créditos registrados en el reporte.</p>
+                            @else
+                                @foreach($detalle as $registro)
+                                    @php $porCredito = min(100, max(0, (int) $registro->por_credito)); @endphp
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-head"><span>{{ $registro->nombre_credito }}</span><span>{{ $porCredito }}%</span></div>
+                                        <div class="progress" role="progressbar" aria-label="{{ $registro->nombre_credito }}" aria-valuenow="{{ $porCredito }}" aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar" style="width:{{ $porCredito }}%"></div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary rounded-pill" data-mdb-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    @if($paginado->hasPages())
+        <div class="report-card report-pagination">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <span class="text-muted small">Mostrando {{ $paginado->firstItem() }}–{{ $paginado->lastItem() }} de {{ $paginado->total() }} alumnos</span>
+                <div class="report-pager">
+                    @if($paginado->onFirstPage())
+                        <span class="report-pager-btn is-disabled"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i> Anterior</span>
+                    @else
+                        <a class="report-pager-btn" href="{{ $paginado->previousPageUrl() }}"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i> Anterior</a>
+                    @endif
+                    <span class="report-pager-info">Página {{ $paginado->currentPage() }} de {{ $paginado->lastPage() }}</span>
+                    @if($paginado->hasMorePages())
+                        <a class="report-pager-btn" href="{{ $paginado->nextPageUrl() }}">Siguiente <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></a>
+                    @else
+                        <span class="report-pager-btn is-disabled">Siguiente <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+@endif
 @endsection
