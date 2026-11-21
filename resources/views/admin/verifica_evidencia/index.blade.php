@@ -2,12 +2,20 @@
 
 @section('title','Verificar evidencias')
 
+@section('ruta')
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="fa-solid fa-circle-check" style="color:#2d6da3"></i>
+        @if($actividades_link == 'true')
+            <a href="{{ route('actividades.index') }}" class="text-decoration-none">Actividades</a>
+            <span class="text-muted">/</span>
+        @endif
+        Verificar evidencias
+    </span>
+@endsection
+
 @section('links')
 <style>
-    .verification-breadcrumb,.verification-control,.verification-summary,.verification-table-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
-    .verification-breadcrumb{display:flex;align-items:center;gap:.65rem;min-height:64px;margin-bottom:.75rem;padding:.8rem 1rem;color:#64748b}
-    .verification-breadcrumb i{width:38px;height:38px;display:grid;place-items:center;border-radius:.7rem;color:#173c66;background:#edf3f8}
-    .verification-breadcrumb strong{color:#102b4a}
+    .verification-control,.verification-summary,.verification-table-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
     .verification-control{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1rem;padding:.9rem 1rem}
     .verification-control h1{margin:0;color:#102b4a;font-size:1.25rem;font-weight:700}
     .verification-control p{margin:.2rem 0 0;color:#6b7280;font-size:.88rem}
@@ -31,16 +39,6 @@
     $validadasCount = $evidencias_data->where('validado','true')->count();
     $pendientesCount = $total - $validadasCount;
 @endphp
-
-<div class="verification-breadcrumb">
-    <i class="fa-solid fa-circle-check"></i>
-    <div>
-        @if($actividades_link == 'true')
-            <a class="text-decoration-none" href="{{ route('actividades.index') }}">Actividades</a><span class="mx-2">/</span>
-        @endif
-        <strong>Verificar evidencias</strong>
-    </div>
-</div>
 
 <div class="verification-control">
     <div>

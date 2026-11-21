@@ -6,9 +6,12 @@
 	<link rel="stylesheet" type="text/css" href="{{ asset('cssGaleria/galeria.css') }}">
 @endsection
 @section('ruta')
-	<a href="{{ route('participantes.index') }}">Participantes</a>
-	/
-	<label class="label label-success">Evidencias</label>
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="fa-solid fa-images" style="color:#2d6da3"></i>
+        <a href="{{ route('participantes.index') }}" class="text-decoration-none">Participantes</a>
+        <span class="text-muted">/</span>
+        Evidencias
+    </span>
 @endsection
 
 @section('contenido')

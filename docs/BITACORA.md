@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 14:48 · **Entradas registradas:** 37 · **Último commit previo a esta sesión:** `91c6990` (2026-11-21 14:33).
+**Última entrada:** 2026-11-21 14:57 · **Entradas registradas:** 40 · **Último commit previo a esta sesión:** `f972756` (2026-11-21 14:49).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -37,6 +37,9 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 14:57 — Encabezado de página en avance del alumno
+- 2026-11-21 14:54 — Encabezado de página en verifica_evidencia
+- 2026-11-21 14:52 — Encabezado de página en participantes
 - 2026-11-21 14:48 — Filtros de evidencias con el buscador reutilizable
 - 2026-11-21 14:27 — UX de la galería de evidencias
 - 2026-11-21 14:15 — Filtros de reportes en cascada y sin campos obligatorios
@@ -121,7 +124,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 22 | 2026-11-21 11:49 – 14:48 |
+| Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
 | Trayectoria académica | `trayectoria` | 4 | 2026-11-20 18:59 – 19:09 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -150,6 +153,108 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 14:57] — Encabezado de página en avance del alumno
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Agregar la descripción de la página en la vista de avance del alumno.
+
+**Archivos modificados:**
+- `resources/views/admin/verifica_evidencia/avance_alumno.blade.php` (encabezado superior; el botón «Reportes» pasa a la cabecera de avance por créditos)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna.
+
+**Decisiones tomadas:**
+- Se agrega el encabezado con icono y «Avance del alumno» en `@section('ruta')`, igual que el resto del módulo.
+- Se retira la tarjeta `advance-breadcrumb` porque duplicaba el título, junto con su CSS.
+- El botón **«Reportes»** (que dependía de `ruta_data` con carrera y generación) se mueve a la cabecera de «Avance por créditos», junto a «Imprimir constancia», para no perder la vuelta al reporte con su contexto.
+- No se tocaron el buscador de alumno, la tarjeta del alumno ni la tabla de avance.
+
+**Pendientes / Deuda técnica:**
+- Validar el encabezado y el botón en la app autenticada; la captura es de una vista previa estática.
+- El enlace a reportes solo aparece cuando la vista llega con `ruta_data` (carrera y generación).
+
+**Tests ejecutados:**
+- ✅ 10 comprobaciones de render (encabezado, sin breadcrumb duplicado, buscador y tarjeta intactos, reportes con contexto, constancia y casos sin contexto).
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+
+**Referencias:**
+- `docs/img/avance-alumno-desktop.png`
+
+### [2026-11-21 14:54] — Encabezado de página en verifica_evidencia
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Agregar la descripción de la página en el módulo `verifica_evidencia`, como en Evidencias y Participantes.
+
+**Archivos modificados:**
+- `resources/views/admin/verifica_evidencia/index.blade.php` (encabezado con icono y breadcrumb; se retira la tarjeta de breadcrumb interna)
+- `resources/views/admin/verifica_evidencia/ver_evidencia.blade.php` (encabezado con icono y enlace de regreso; se retira la tarjeta interna)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna.
+
+**Decisiones tomadas:**
+- Se aplica la misma estructura de Evidencias y Participantes: icono, enlace a la sección anterior y nombre de la página en `@section('ruta')`.
+- El encabezado de `index` enlaza a Actividades solo cuando llega con `actividades_link = true`, igual que antes.
+- Se eliminan las tarjetas `verification-breadcrumb` y `evidence-view-breadcrumb` porque duplicaban el encabezado, junto con su CSS.
+- No se tocaron la tarjeta de control, el resumen, la tabla ni las acciones de validación.
+
+**Pendientes / Deuda técnica:**
+- `avance_alumno` conserva su tarjeta de breadcrumb porque incluye el botón contextual «Reportes» con carrera y generación.
+- `reportes` ya tenía encabezado propio desde su rediseño.
+- Validar los encabezados en la app autenticada; la captura es de una vista previa estática.
+
+**Tests ejecutados:**
+- ✅ 8 comprobaciones de render en ambas vistas (encabezado con icono, breadcrumb, sin tarjetas duplicadas y control/validación intactos).
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+
+**Referencias:**
+- `docs/img/verifica_evidencia-desktop.png`
+
+### [2026-11-21 14:52] — Encabezado de página en participantes
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Agregar la descripción de la página (icono y nombre) en la vista de agregar participantes, como ya la tiene Evidencias.
+
+**Archivos modificados:**
+- `resources/views/admin/participantes/index.blade.php` (encabezado superior con icono y breadcrumb; se retira la tarjeta de breadcrumb interna)
+- `resources/views/admin/participantes/evidencia.blade.php` (encabezado con icono y Font Awesome en lugar de la etiqueta legacy)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna.
+
+**Decisiones tomadas:**
+- `@section('ruta')` se llena con la misma estructura de Evidencias, reportes y avance: icono, enlace a la sección anterior y nombre de la página.
+- Se elimina la tarjeta `participant-breadcrumb` porque repetía la misma información y su CSS quedó sin uso.
+- La vista de evidencia de participantes cambia `label label-success` por el encabezado con icono, para dejar de usar estilos legacy.
+- No se tocó el contenido ni el comportamiento de las tarjetas de asignación y de la tabla.
+
+**Pendientes / Deuda técnica:**
+- Quedan seis vistas con `@section('ruta')` vacía y, por tanto, sin encabezado superior: `admin/actividades/index` y las cinco de `admin/mensajes` (bandeja, crear, enviados, receptores, vistos).
+- Validar el encabezado en la app autenticada; la captura es de una vista previa estática.
+
+**Tests ejecutados:**
+- ✅ 8 comprobaciones de render (encabezado con icono y enlace, sin breadcrumb duplicado, tarjetas y tabla intactas, vista de evidencia sin estilos legacy).
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+
+**Referencias:**
+- `docs/img/participantes-desktop.png`
 
 ### [2026-11-21 14:48] — Filtros de evidencias con el buscador reutilizable
 

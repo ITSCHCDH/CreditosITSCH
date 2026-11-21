@@ -4,10 +4,7 @@
 @section('links')
     <script type="text/javascript" src="{{ asset('plugins/jsCookie/js.cookie.js') }}"></script>
     <style>
-        .participant-breadcrumb,.participant-control-card,.participant-summary-card,.participant-table-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
-        .participant-breadcrumb{display:flex;align-items:center;gap:.65rem;min-height:64px;margin-bottom:.75rem;padding:.8rem 1rem;color:#64748b}
-        .participant-breadcrumb i{width:38px;height:38px;display:grid;place-items:center;border-radius:.7rem;color:#173c66;background:#edf3f8}
-        .participant-breadcrumb strong{color:#102b4a}
+        .participant-control-card,.participant-summary-card,.participant-table-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
         .participant-control-card{margin-bottom:1rem;padding:1.25rem}
         .participant-control-card h1{margin:0;color:#102b4a;font-size:1.25rem;font-weight:700}
         .participant-control-card p{margin:.2rem 0 0;color:#6b7280;font-size:.88rem}
@@ -23,15 +20,16 @@
         @media(max-width:767.98px){.participant-summary-card{grid-template-columns:1fr}.participant-summary-item{border-right:0;border-bottom:1px solid #edf1f5}.participant-summary-item:last-child{border-bottom:0}.participant-table-card-head{align-items:flex-start;flex-direction:column}}
     </style>
 @endsection
-@section('ruta')    
+@section('ruta')
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="fa-solid fa-users" style="color:#2d6da3"></i>
+        <a href="{{ route('actividades.index') }}" class="text-decoration-none">Actividades</a>
+        <span class="text-muted">/</span>
+        Participantes
+    </span>
 @endsection
 <!-- HTML index de los participantes -->
 @section('contenido')
-
-<div class="participant-breadcrumb">
-    <i class="fa-solid fa-users"></i>
-    <div><a class="text-decoration-none" href="{{ route('actividades.index') }}">Actividades</a><span class="mx-2">/</span><strong>Participantes</strong></div>
-</div>
 
 <div class="participant-control-card">
     <div class="d-flex align-items-center justify-content-between gap-3 mb-3">

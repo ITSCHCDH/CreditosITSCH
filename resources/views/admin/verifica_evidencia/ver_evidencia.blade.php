@@ -2,12 +2,18 @@
 
 @section('title','Ver evidencias')
 
+@section('ruta')
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="fa-solid fa-circle-check" style="color:#2d6da3"></i>
+        <a href="{{ route('verifica_evidencia.index') }}" class="text-decoration-none">Verificar evidencias</a>
+        <span class="text-muted">/</span>
+        Archivos
+    </span>
+@endsection
+
 @section('links')
 <style>
-    .evidence-view-breadcrumb,.evidence-view-control,.evidence-view-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
-    .evidence-view-breadcrumb{display:flex;align-items:center;gap:.65rem;min-height:64px;margin-bottom:.75rem;padding:.8rem 1rem;color:#64748b}
-    .evidence-view-breadcrumb i{width:38px;height:38px;display:grid;place-items:center;border-radius:.7rem;color:#173c66;background:#edf3f8}
-    .evidence-view-breadcrumb strong{color:#102b4a}
+    .evidence-view-control,.evidence-view-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
     .evidence-view-control{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem;padding:.9rem 1rem}
     .evidence-view-control h1{margin:0;color:#102b4a;font-size:1.25rem;font-weight:700}
     .evidence-view-control p{margin:.2rem 0 0;color:#6b7280;font-size:.88rem}
@@ -36,11 +42,6 @@
 @endsection
 
 @section('contenido')
-<div class="evidence-view-breadcrumb">
-    <i class="fa-solid fa-circle-check"></i>
-    <div><a class="text-decoration-none" href="{{ route('verifica_evidencia.index') }}">Verificar evidencias</a><span class="mx-2">/</span><strong>Archivos</strong></div>
-</div>
-
 <div class="evidence-view-control">
     <div><h1>Evidencias de la actividad</h1><p>Visualiza imágenes y PDF sin salir de la aplicación.</p></div>
     <div class="d-flex gap-2 flex-wrap">

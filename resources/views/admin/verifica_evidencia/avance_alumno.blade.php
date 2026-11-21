@@ -2,12 +2,16 @@
 
 @section('title','Avance de alumno')
 
+@section('ruta')
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="fa-solid fa-chart-line" style="color:#2d6da3"></i>
+        Avance del alumno
+    </span>
+@endsection
+
 @section('links')
 <style>
-    .advance-breadcrumb,.advance-info-card,.advance-progress-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
-    .advance-breadcrumb{display:flex;align-items:center;gap:.65rem;min-height:64px;margin-bottom:.75rem;padding:.8rem 1rem;color:#64748b}
-    .advance-breadcrumb i{width:38px;height:38px;display:grid;place-items:center;border-radius:.7rem;color:#173c66;background:#edf3f8}
-    .advance-breadcrumb strong{color:#102b4a}
+    .advance-info-card,.advance-progress-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
     .advance-info-card{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;padding:1.25rem}
     .advance-avatar{width:72px;height:72px;object-fit:cover;border-radius:1rem;background:#edf3f8}
     .advance-progress-card{overflow:hidden}
@@ -20,22 +24,6 @@
 @endsection
 
 @section('contenido')
-@if(count($ruta_data)>0)
-    <div class="advance-breadcrumb">
-        <i class="fa-solid fa-chart-line"></i>
-        <div>
-            <form action="{{ route('verifica_evidencia.reportes') }}" method="get" class="d-inline">
-                <input type="hidden" name="carrera" value="{{ $ruta_data[0] }}">
-                <input type="hidden" name="generacion" value="{{ $ruta_data[1] }}">
-                <button type="submit" class="btn btn-link p-0 text-decoration-none">Reportes</button>
-            </form>
-            <span class="mx-2">/</span><strong>Avance del alumno</strong>
-        </div>
-    </div>
-@else
-    <div class="advance-breadcrumb"><i class="fa-solid fa-chart-line"></i><div><strong>Avance del alumno</strong></div></div>
-@endif
-
 @php
     $primerAlumno = ($alumno_data !== null && count($alumno_data) > 0) ? $alumno_data[0] : null;
     $tempPorcentaje = 0;
@@ -84,13 +72,22 @@
 <article class="advance-progress-card">
     <div class="advance-progress-head">
         <h2>Avance por créditos</h2>
-        @if($liberado && Auth::User()->hasAnyPermission(['VIP','IMPRIMIR_CONSTANCIAS']))
-            <form action="{{ route('constancias.imprimir') }}" method="post" class="mb-0">
-                @csrf
-                @if($primerAlumno)<input type="hidden" name="no_control" value="{{ $primerAlumno->no_control }}">@endif
-                <button type="submit" class="btn btn-primary rounded-pill"><i class="fa-solid fa-print me-2"></i>Imprimir constancia</button>
-            </form>
-        @endif
+        <div class="d-flex flex-wrap gap-2">
+            @if(count($ruta_data)>0)
+                <form action="{{ route('verifica_evidencia.reportes') }}" method="get" class="mb-0">
+                    <input type="hidden" name="carrera" value="{{ $ruta_data[0] }}">
+                    <input type="hidden" name="generacion" value="{{ $ruta_data[1] }}">
+                    <button type="submit" class="btn btn-outline-secondary rounded-pill"><i class="fa-solid fa-arrow-left me-2"></i>Reportes</button>
+                </form>
+            @endif
+            @if($liberado && Auth::User()->hasAnyPermission(['VIP','IMPRIMIR_CONSTANCIAS']))
+                <form action="{{ route('constancias.imprimir') }}" method="post" class="mb-0">
+                    @csrf
+                    @if($primerAlumno)<input type="hidden" name="no_control" value="{{ $primerAlumno->no_control }}">@endif
+                    <button type="submit" class="btn btn-primary rounded-pill"><i class="fa-solid fa-print me-2"></i>Imprimir constancia</button>
+                </form>
+            @endif
+        </div>
     </div>
     <div class="table-responsive">
         <table class="table align-middle mb-0">
