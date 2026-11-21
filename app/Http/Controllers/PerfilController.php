@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Mail\mail_res_pass;
-use App\Models\Alumno;
+use App\Models\Sit\User as SitUser;
 use Carbon\Carbon;
 use App\User;
 use Alert;
@@ -32,48 +32,49 @@ class PerfilController extends Controller
 
     public function passwordResetLink(Request $request)
 	{	
-    	$email=User::where('email', $request->email)->first(); 
-		if(is_null($email))		{  
-			$emaila=Alumno::where('email', $request->email)->first(); 
-			if(is_null($emaila))
-			{
-				Alert::error("Error","Este usuario no esta registrado, te sugerimos verificarlo");
-				return view('auth.passwords.email');
-			}
-			else
-			{ 
-				//Generación de token y almacenado en la tabla password_resets
-				$token = Str::random(64);
-				DB::table('password_resets')->insert([
-					'email' => $request->email,
-					'token' => $token,
-					'created_at' => Carbon::now()
-				]);
-		
-				//Envío de email al usuario
-				Mail::to( $request->email)->send(new mail_res_pass($token));
-				//Retorno
-				Alert::success('Correcto','Te hemos enviado un email a '.$request->email.' con un enlace para realizar el cambio de contraseña. Recuerda que pueden pasar algunos minutos para que el correo llegue a tu bandeja de entrada');
-				return redirect('login');
-			}
-		}
-		else
-		{
-			//Generación de token y almacenado en la tabla password_resets
-			$token = Str::random(64);
-			DB::table('password_resets')->insert([
-				'email' => $request->email,
-				'token' => $token,
-				'created_at' => Carbon::now()
-			]);
+    	$request->validate([
+    		'email' => ['required', 'email'],
+    	]);
 
-			//Envío de email al usuario
-			Mail::to( $request->email)->send(new mail_res_pass($token));
-			//Retorno
-			Alert::success('Correcto','Te hemos enviado un email a '.$request->email.' con un enlace para realizar el cambio de contraseña. Recuerda que pueden pasar algunos minutos para que el correo llegue a tu bandeja de entrada');
-			return redirect('login');
-	
-		}
+    	$email = $request->email;
+
+    	$administrativo = User::where('email', $email)->first();
+    	if ($administrativo) {
+    		if ($administrativo->active !== 'true') {
+    			Alert::error('Error', 'Tu usuario se encuentra inactivo. Contacta al área de sistemas.');
+    			return back()->withInput();
+    		}
+
+    		$token = Str::random(64);
+    		DB::table('password_resets')->where('email', $email)->delete();
+    		DB::table('password_resets')->insert([
+    			'email' => $email,
+    			'token' => $token,
+    			'created_at' => Carbon::now(),
+    		]);
+
+    		Mail::to($email)->send(new mail_res_pass($token));
+    		Alert::success('Correcto', 'Te hemos enviado un enlace de recuperación a '.$email.'.');
+    		return redirect('login');
+    	}
+
+    	$sitUser = SitUser::where('email', $email)
+    		->where('activo', 1)
+    		->first();
+
+    	if ($sitUser && $sitUser->isAlumnoActivo()) {
+    		Alert::error(
+    			'Recuperación institucional',
+    			'Serás dirigido al portal institucional para recuperar tu contraseña.'
+    		);
+    		return redirect()->away('https://sit.cdhidalgo.tecnm.mx/auth/recuperar-password');
+    	}
+
+    	Alert::success(
+    		'Solicitud recibida',
+    		'Si el correo pertenece a una cuenta registrada, recibirás las instrucciones correspondientes.'
+    	);
+    	return redirect('login');
     }
 
 	public function passwordResetView($token)
@@ -107,7 +108,12 @@ class PerfilController extends Controller
 		}
 		else
 		{
-			if(strlen($request->newPass)<8 )
+			if(
+				strlen($request->newPass) < 8 ||
+				!preg_match('/[A-Z]/', $request->newPass) ||
+				!preg_match('/[0-9]/', $request->newPass) ||
+				!preg_match('/[^A-Za-z0-9]/', $request->newPass)
+			)
 			{
 				Alert::error("Error","La contraseña no reune los requisitos minimos de seguridad");
 				return view('auth.passwords.reset')				
@@ -115,10 +121,31 @@ class PerfilController extends Controller
 			}
 			else
 			{
-				$mail=DB::table('password_resets')->where('token',$request->token)->select('email')->first();
-				$user=$this->getUser($mail->email);				
-				$user->password=bcrypt($request->newPass);
+				$mail = DB::table('password_resets')
+					->where('token', $request->token)
+					->select('email', 'created_at')
+					->first();
+
+				if (is_null($mail)) {
+					Alert::error("Error","El enlace de recuperación no existe o ya fue utilizado.");
+					return redirect('login');
+				}
+
+				if (Carbon::parse($mail->created_at)->addHour()->isPast()) {
+					DB::table('password_resets')->where('token', $request->token)->delete();
+					Alert::error("Error","El enlace de recuperación ha expirado.");
+					return redirect('login');
+				}
+
+				$user = $this->getUser($mail->email);
+				if (is_null($user) || $user instanceof SitUser) {
+					Alert::error("Error","La contraseña institucional no puede restablecerse desde Créditos.");
+					return redirect('login');
+				}
+
+				$user->password = bcrypt($request->newPass);
 				$user->save();
+				DB::table('password_resets')->where('email', $mail->email)->delete();
 				Alert::success("Correcto","Contraseña reseteada correctamente");
 				return redirect()->route('login');
 			}
@@ -129,12 +156,9 @@ class PerfilController extends Controller
 	//Función que obtiene el usuario que desea cambiar su password
 	private function getUser($email)
 	{
-		$user= User::where('email',$email)->first();
-		if (is_null($user))
-		{
-			$user= Alumno::where('email',$email)->first();
-		}
-		return $user;
+		$user = User::where('email', $email)->first();
+
+		return $user ?: SitUser::where('email', $email)->first();
 	}
 
     public function passwordUpdate(PasswordResetRequest $request){

@@ -4,7 +4,9 @@ use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
+use App\Mail\mail_res_pass;
 
 beforeEach(function () {
     config()->set('database.connections.mysql', [
@@ -73,6 +75,12 @@ beforeEach(function () {
     DB::connection('sit')->statement('CREATE TABLE cat_plan_estudios (
         id INTEGER PRIMARY KEY,
         nombre VARCHAR NULL
+    )');
+
+    DB::connection('mysql')->statement('CREATE TABLE password_resets (
+        email VARCHAR,
+        token VARCHAR,
+        created_at DATETIME NULL
     )');
 
 });
@@ -208,4 +216,77 @@ it('muestra el formulario de login moderno sin selector de tipo', function () {
     $response->assertSee('Correo electrónico');
     $response->assertDontSee('Tipo de usuario');
     $response->assertDontSee('<select', false);
+});
+
+it('envia enlace local a un usuario administrativo', function () {
+    Mail::fake();
+
+    DB::connection('mysql')->table('users')->insert([
+        'name' => 'Administrador',
+        'email' => 'admin-reset@itsch.mx',
+        'password' => Hash::make('secreto'),
+        'area' => 1,
+        'active' => 'true',
+    ]);
+
+    $response = $this->post('/perfil/password_reset_link', [
+        'email' => 'admin-reset@itsch.mx',
+    ]);
+
+    $response->assertRedirect('/login');
+    $this->assertDatabaseHas('password_resets', [
+        'email' => 'admin-reset@itsch.mx',
+    ], 'mysql');
+    Mail::assertSent(mail_res_pass::class);
+});
+
+it('redirige al alumno activo al portal institucional de recuperacion', function () {
+    DB::connection('sit')->table('users')->insert([
+        'id' => 12,
+        'nombre' => 'Alumno',
+        'apellido_paterno' => 'Prueba',
+        'apellido_materno' => null,
+        'email' => 'alumno-reset@itsch.mx',
+        'password' => Hash::make('secreto'),
+        'activo' => 1,
+    ]);
+    DB::connection('sit')->table('alumnos')->insert([
+        'id' => 22,
+        'user_id' => 12,
+        'no_control' => 'S21010002',
+        'carrera_id' => 1,
+        'plan_estudio_id' => 1,
+    ]);
+
+    $response = $this->post('/perfil/password_reset_link', [
+        'email' => 'alumno-reset@itsch.mx',
+    ]);
+
+    $response->assertRedirect('https://sit.cdhidalgo.tecnm.mx/auth/recuperar-password');
+});
+
+it('restablece la contraseña de un usuario administrativo con contraseña segura', function () {
+    DB::connection('mysql')->table('users')->insert([
+        'id' => 5,
+        'name' => 'Administrador',
+        'email' => 'reset-ok@itsch.mx',
+        'password' => Hash::make('Anterior1!'),
+        'area' => 1,
+        'active' => 'true',
+    ]);
+    DB::connection('mysql')->table('password_resets')->insert([
+        'email' => 'reset-ok@itsch.mx',
+        'token' => 'token-valido',
+        'created_at' => now(),
+    ]);
+
+    $response = $this->post('/perfil/password_reset', [
+        'token' => 'token-valido',
+        'newPass' => 'NuevaClave1!',
+        'repNewPass' => 'NuevaClave1!',
+    ]);
+
+    $response->assertRedirect('/login');
+    $updated = DB::connection('mysql')->table('users')->where('email', 'reset-ok@itsch.mx')->first();
+    $this->assertTrue(Hash::check('NuevaClave1!', $updated->password));
 });

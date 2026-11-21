@@ -12,6 +12,39 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
+### [2026-11-21 11:27] — Recuperación de contraseña unificada
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** infraestructura
+- **Prompt/Tarea original:** Actualizar el módulo de recuperación de contraseña para reconocer alumnos de `sit` y administrativos de `creditos`.
+
+**Archivos modificados:**
+- `app/Http/Controllers/PerfilController.php` (detección administrativa/SIT, enlace institucional y bloqueo de escritura a SIT)
+- `resources/views/auth/passwords/email.blade.php` (interfaz MDB/Font Awesome moderna)
+- `resources/views/auth/passwords/reset.blade.php` (interfaz moderna y controles de contraseña)
+- `tests/Feature/Auth/UnifiedLoginTest.php` (casos administrativos y alumnos)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Búsqueda administrativa en `creditos.users`.
+- Búsqueda de alumno activo y perfil en `sit.users` y `sit.alumnos`.
+- Generación de token únicamente para usuarios administrativos en `creditos.password_resets`.
+
+**Decisiones tomadas:**
+- Los alumnos activos se redirigen a `https://sit.cdhidalgo.tecnm.mx/auth/recuperar-password`.
+- No se genera ni ejecuta actualización de contraseña contra `sit.users`.
+- El restablecimiento local requiere mayúscula, dígito y carácter especial.
+
+**Pendientes / Deuda técnica:**
+- Validar el correo institucional del portal SIT desde el entorno real.
+- Revisar expiración y limpieza automática de tokens locales.
+
+**Tests ejecutados:**
+- ✅ `php artisan test tests/Feature/Auth/UnifiedLoginTest.php` (10 passed, 34 assertions)
+
 ### [2026-11-20 19:40] — UX moderna del módulo de mensajes
 
 - **Estatus:** ✅ completado
