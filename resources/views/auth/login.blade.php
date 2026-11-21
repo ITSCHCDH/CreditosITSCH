@@ -32,8 +32,8 @@
         }
 
         .login-card {
-            width: min(100%, 980px);
-            min-height: 620px;
+            width: min(100%, 920px);
+            min-height: 580px;
             overflow: hidden;
             border: 0;
             border-radius: 1.5rem;
@@ -45,8 +45,8 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 620px;
-            padding: 3.25rem;
+            min-height: 580px;
+            padding: 2.5rem;
             color: #fff;
             background:
                 linear-gradient(145deg, rgba(23, 60, 102, 0.96), rgba(10, 34, 61, 0.98)),
@@ -88,10 +88,10 @@
         }
 
         .brand-copy h1 {
-            max-width: 8ch;
+            max-width: 11ch;
             margin: 0.75rem 0 1rem;
-            font-size: clamp(2.25rem, 4vw, 3.75rem);
-            line-height: 0.98;
+            font-size: clamp(1.65rem, 2.7vw, 2.25rem);
+            line-height: 1.12;
             font-weight: 700;
         }
 
@@ -105,8 +105,8 @@
         .login-form-panel {
             display: flex;
             align-items: center;
-            min-height: 620px;
-            padding: clamp(2rem, 6vw, 4.5rem);
+            min-height: 580px;
+            padding: clamp(2rem, 5vw, 3.5rem);
             background: #fff;
         }
 
@@ -115,14 +115,14 @@
         }
 
         .login-form h2 {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.35rem;
             color: var(--itsch-blue-dark);
-            font-size: clamp(1.75rem, 3vw, 2.25rem);
+            font-size: clamp(1.55rem, 2.2vw, 1.9rem);
             font-weight: 700;
         }
 
         .login-form .subtitle {
-            margin-bottom: 2.25rem;
+            margin-bottom: 1.75rem;
             color: #6b7280;
         }
 
@@ -161,10 +161,13 @@
         }
 
         .login-button {
-            min-height: 3.25rem;
+            min-height: 3.5rem;
             margin-top: 0.25rem;
             border-radius: 0.75rem;
             background: var(--itsch-blue);
+            color: #fff !important;
+            font-size: 1rem;
+            line-height: 1.2;
             box-shadow: 0 0.75rem 1.5rem rgba(23, 60, 102, 0.2);
             font-weight: 700;
             text-transform: none;
@@ -197,18 +200,20 @@
             }
 
             .login-brand {
-                min-height: 260px;
-                padding: 2rem;
+                min-height: 220px;
+                padding: 1.5rem;
             }
 
             .brand-logo {
-                width: 76px;
-                height: 76px;
+                width: 68px;
+                height: 68px;
             }
 
             .brand-copy h1 {
                 max-width: none;
-                font-size: 2.25rem;
+                margin: 0.5rem 0 0;
+                font-size: 1.5rem;
+                line-height: 1.12;
             }
 
             .brand-copy p {
@@ -216,8 +221,8 @@
             }
 
             .login-form-panel {
-                min-height: calc(100vh - 260px);
-                padding: 2.25rem 1.5rem;
+                min-height: calc(100vh - 220px);
+                padding: 1.75rem 1.25rem;
             }
         }
     </style>
