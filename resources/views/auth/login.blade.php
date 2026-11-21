@@ -1,141 +1,313 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>ITSCH</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión | ITSCH</title>
 
-        <!-- Font Awesome -->
-        <link
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        rel="stylesheet"
-        />
-        <!-- Google Fonts -->
-        <link
-        href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-        rel="stylesheet"
-        />
-        <!-- MDB -->
-        <link
-        href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.css"
-        rel="stylesheet"
-        />
-    </head>
-    <body>
-        @include('sweetalert::alert')
-        <section class="vh-100" style="background-color: #000000;">
-            <div class="container py-5 h-100">
-                <div class="row d-flex justify-content-center align-items-center h-100">
-                    <div class="col col-xl-10">
-                        <div class="card" style="border-radius: 1rem;">
-                            <div class="row g-0">
-                                <div class="col-md-6 col-lg-5 d-none d-md-block">
-                                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img1.webp"
-                                    alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem;" />
-                                </div>
-                                <div class="col-md-6 col-lg-7 d-flex align-items-center">
-                                    <div class="card-body p-4 p-lg-5 text-black">
+    <link href="https://cdn.jsdelivr.net/npm/mdb-ui-kit@9.3.0/css/mdb.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
 
-                                        <form method="POST" action="{{ route('login') }}" id="frm_login">
-                                            @csrf
+    <style>
+        :root {
+            --itsch-blue: #173c66;
+            --itsch-blue-dark: #102b4a;
+            --itsch-gold: #c79a2b;
+        }
 
-                                            <div class="d-flex align-items-center mb-3 pb-1">
-                                                <img src="{{ asset('images/itsch.jpg') }}" class="img-fluid ${3|rounded-top,rounded-right,rounded-bottom,rounded-left,rounded-circle,|}" alt="Logo ITSCH" style="width: 100px">
-                                                <span class="h1 fw-bold mb-0">ITSCH</span>
-                                            </div>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            font-family: "Roboto", "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(199, 154, 43, 0.13), transparent 26rem),
+                linear-gradient(135deg, #eef3f8 0%, #f8fafc 100%);
+        }
 
-                                            <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sistema de créditos complementarios del ITSCH</h5>
+        .login-page {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 1.25rem;
+        }
 
+        .login-card {
+            width: min(100%, 980px);
+            min-height: 620px;
+            overflow: hidden;
+            border: 0;
+            border-radius: 1.5rem;
+            box-shadow: 0 1.5rem 4rem rgba(16, 43, 74, 0.16);
+        }
 
-                                            <div class="mb-4">
-                                                <Label class="form-label" >Tipo de usuario</Label>
-                                                <select id="tipo-login" name="tipo-login" class="form-control form-control-lg" required>
-                                                    <option value="1" selected>Administrativo</option>
-                                                    <option value="0">Alumno</option>
-                                                </select>
-                                            </div>
+        .login-brand {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 620px;
+            padding: 3.25rem;
+            color: #fff;
+            background:
+                linear-gradient(145deg, rgba(23, 60, 102, 0.96), rgba(10, 34, 61, 0.98)),
+                var(--itsch-blue);
+        }
 
-                                            <div class="form-outline mb-4">
-                                                <input type="email" id="email" class="form-control form-control-lg"  name="email" required/>
-                                                <label class="form-label" for="email" id="user">Email address</label>
-                                            </div>
+        .login-brand::after {
+            content: "";
+            position: absolute;
+            right: -7rem;
+            bottom: -7rem;
+            width: 18rem;
+            height: 18rem;
+            border: 3.25rem solid rgba(255, 255, 255, 0.06);
+            border-radius: 50%;
+        }
 
-                                           <div class="row" >
-                                                <div class="col-sm-10">
-                                                    <div class="form-outline mb-4">
-                                                        <input type="password" id="password" class="form-control form-control-lg" name="password" required/>
-                                                        <label class="form-label" for="password" id="passwd">Password</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-2">
-                                                    <button type="button" class="btn btn-primary btn-lg" onclick="mostrarPassword()" title="Ver password"><i class="fa fa-eye-slash" id="icon1"></i></button>
-                                                </div>
-                                           </div>
+        .brand-logo {
+            width: 112px;
+            height: 112px;
+            object-fit: contain;
+            padding: 0.75rem;
+            border-radius: 1.25rem;
+            background: #fff;
+            box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.18);
+        }
 
-                                            <div class="pt-1 mb-4">
-                                                <button class="btn btn-dark btn-lg btn-block" type="submit">Login</button>
-                                            </div>
+        .brand-eyebrow {
+            color: #efd58a;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
 
-                                            <a class="small text-muted" href="{{ route('perfil.password_mail') }}" id="olvidaste">¿Olvidaste tu contraseña?</a>
+        .brand-copy {
+            position: relative;
+            z-index: 1;
+        }
 
-                                        </form>
+        .brand-copy h1 {
+            max-width: 8ch;
+            margin: 0.75rem 0 1rem;
+            font-size: clamp(2.25rem, 4vw, 3.75rem);
+            line-height: 0.98;
+            font-weight: 700;
+        }
 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        .brand-copy p {
+            max-width: 24rem;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.78);
+            line-height: 1.65;
+        }
+
+        .login-form-panel {
+            display: flex;
+            align-items: center;
+            min-height: 620px;
+            padding: clamp(2rem, 6vw, 4.5rem);
+            background: #fff;
+        }
+
+        .login-form {
+            width: 100%;
+        }
+
+        .login-form h2 {
+            margin-bottom: 0.5rem;
+            color: var(--itsch-blue-dark);
+            font-size: clamp(1.75rem, 3vw, 2.25rem);
+            font-weight: 700;
+        }
+
+        .login-form .subtitle {
+            margin-bottom: 2.25rem;
+            color: #6b7280;
+        }
+
+        .form-outline .form-control {
+            min-height: 3.5rem;
+            border-radius: 0.75rem;
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 0.75rem;
+            z-index: 3;
+            width: 2.75rem;
+            height: 2.75rem;
+            transform: translateY(-50%);
+            border: 0;
+            border-radius: 50%;
+            color: #64748b;
+            background: transparent;
+        }
+
+        .password-toggle:hover,
+        .password-toggle:focus-visible {
+            color: var(--itsch-blue);
+            background: #eef3f8;
+            outline: none;
+        }
+
+        .password-field .form-control {
+            padding-right: 3.75rem;
+        }
+
+        .login-button {
+            min-height: 3.25rem;
+            margin-top: 0.25rem;
+            border-radius: 0.75rem;
+            background: var(--itsch-blue);
+            box-shadow: 0 0.75rem 1.5rem rgba(23, 60, 102, 0.2);
+            font-weight: 700;
+            text-transform: none;
+        }
+
+        .login-button:hover,
+        .login-button:focus {
+            background: var(--itsch-blue-dark);
+        }
+
+        .recovery-link {
+            color: var(--itsch-blue);
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .recovery-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 767px) {
+            .login-page {
+                align-items: start;
+                padding: 0;
+            }
+
+            .login-card {
+                min-height: 100vh;
+                border-radius: 0;
+            }
+
+            .login-brand {
+                min-height: 260px;
+                padding: 2rem;
+            }
+
+            .brand-logo {
+                width: 76px;
+                height: 76px;
+            }
+
+            .brand-copy h1 {
+                max-width: none;
+                font-size: 2.25rem;
+            }
+
+            .brand-copy p {
+                display: none;
+            }
+
+            .login-form-panel {
+                min-height: calc(100vh - 260px);
+                padding: 2.25rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    @include('sweetalert::alert')
+
+    <main class="login-page">
+        <div class="card login-card">
+            <div class="row g-0 h-100">
+                <aside class="col-md-5 login-brand">
+                    <img src="{{ asset('images/itsch.jpg') }}" class="brand-logo" alt="Instituto Tecnológico Superior de Huetamo">
+
+                    <div class="brand-copy">
+                        <span class="brand-eyebrow">Instituto Tecnológico Superior de Huetamo</span>
+                        <h1>Tu trayectoria académica</h1>
+                        <p>Consulta tus actividades, avances y servicios institucionales desde un solo acceso.</p>
                     </div>
-                </div>
+                </aside>
+
+                <section class="col-md-7 login-form-panel" aria-labelledby="login-title">
+                    <form method="POST" action="{{ url('/login') }}" class="login-form" id="frm_login">
+                        @csrf
+
+                        <h2 id="login-title">Iniciar sesión</h2>
+                        <p class="subtitle">Ingresa con tu correo institucional o de cuenta.</p>
+
+                        @if ($errors->any())
+                            <div class="alert alert-danger" role="alert">
+                                {{ $errors->first() }}
+                            </div>
+                        @endif
+
+                        <div class="form-outline mb-4" data-mdb-input-init>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value="{{ old('email') }}"
+                                class="form-control form-control-lg @error('email') is-invalid @enderror"
+                                autocomplete="email"
+                                required
+                                autofocus
+                            >
+                            <label class="form-label" for="email">Correo electrónico</label>
+                        </div>
+
+                        <div class="form-outline password-field mb-4" data-mdb-input-init>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control form-control-lg @error('password') is-invalid @enderror"
+                                autocomplete="current-password"
+                                required
+                            >
+                            <label class="form-label" for="password">Contraseña</label>
+                            <button type="button" class="password-toggle" id="password-toggle" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                                <i class="fa-solid fa-eye-slash" id="password-icon" aria-hidden="true"></i>
+                            </button>
+                        </div>
+
+                        <button class="btn login-button w-100" type="submit">
+                            Entrar al sistema
+                        </button>
+
+                        <div class="text-center mt-4">
+                            <a class="recovery-link" href="{{ route('perfil.password_mail') }}">
+                                ¿Olvidaste tu contraseña?
+                            </a>
+                        </div>
+                    </form>
+                </section>
             </div>
-          </section>
+        </div>
+    </main>
 
-        <!-- MDB -->
-        <script
-        type="text/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.js"
-        ></script>
-        <!-- Scripts -->
-        <script src="{{ asset('js/app.js') }}"></script>
-        <script src="{{asset('plugins/vendorTem/jquery/jquery.min.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mdb-ui-kit@9.3.0/js/mdb.umd.min.js"></script>
+    <script>
+        const passwordInput = document.getElementById('password');
+        const passwordToggle = document.getElementById('password-toggle');
+        const passwordIcon = document.getElementById('password-icon');
 
-
-        <script type="text/javascript">
-            function comboTipo(){
-                $('#tipo-login').change(function(event){
-                    event.preventDefault();
-                    var tipo_val = $(this).val();
-                    if(tipo_val==0){
-                        $("#user").text("no_control@cdhidalgo.tecnm.mx");
-                        $('#frm_login').attr('action', "{{ route('alumnos.login') }}");
-                        $('#passwd').text('Password del SICE');
-                        $('#email').attr('name','email');
-                        $('#email').attr('type','text');
-                    }else{
-                        $("#user").text("Email address");
-                        $('#frm_login').attr('action', "{{ route('login') }}");
-                        $('#passwd').text('Password');
-                        $('#email').attr('name','email');
-                        $('#email').attr('type','email');
-                    }
-                });
-            }
-
-            $(document).ready(function(){
-                comboTipo();
-            });
-
-            function mostrarPassword(){
-                var cambio = document.getElementById("password");
-                if(cambio.type == "password"){
-                    cambio.type = "text";
-                    $('#icon1').removeClass('fa fa-eye-slash').addClass('fa fa-eye');
-                }else{
-                    cambio.type = "password";
-                    $('#icon1').removeClass('fa fa-eye').addClass('fa fa-eye-slash');
-                }
-            }
-        </script>
-
-    </body>
+        passwordToggle.addEventListener('click', function () {
+            const visible = passwordInput.type === 'text';
+            passwordInput.type = visible ? 'password' : 'text';
+            passwordIcon.className = visible ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+            passwordToggle.setAttribute('aria-label', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
+            passwordToggle.setAttribute('title', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
+        });
+    </script>
+</body>
 </html>

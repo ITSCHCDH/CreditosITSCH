@@ -47,15 +47,33 @@ Route::post('Import/alta', 'altaAlumnosController@altaAlumnos')->name('excel.alu
 Route::get('Import/altas','altaAlumnosController@index')->name('ImportExcel.altaAlumnos');
 
 Route::get('/', function () {
-    if(Auth::guard('web')->check()){
-        return redirect("home");
-    }else if(Auth::guard('alumno')->check()){
-        return redirect("alumnos/home");
+    if (Auth::guard('web')->check()) {
+        return redirect('/home');
     }
+
+    if (Auth::guard('alumno')->check()) {
+        return redirect('/alumnos/home');
+    }
+
     return view('auth.login');
 })->name('alumnos.login');
 
 Route::post('/alumnos/login', [App\Http\Controllers\Auth\LoginController::class, 'alumnoLogin'])->name('alumnos.login');
+
+Route::get('/login', function () {
+    if (Auth::guard('web')->check()) {
+        return redirect('/home');
+    }
+
+    if (Auth::guard('alumno')->check()) {
+        return redirect('/alumnos/home');
+    }
+
+    return view('auth.login');
+})->name('login');
+
+Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
 /* Agregamos la ruta al html para listar los resposables de una actividad
 +*/
@@ -317,6 +335,6 @@ Route::group(['prefix'=>'compartido', 'middleware' => ['auth', 'alumno']],functi
 });
 
 
-Auth::routes();
+Auth::routes(['login' => false, 'logout' => false]);
 
 

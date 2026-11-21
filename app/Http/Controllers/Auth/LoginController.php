@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use App\User;
+use App\Models\Sit\User as SitUser;
 use Alert;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -48,63 +50,69 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-        $this->validateLogin($request);
-        $user = User::where('email','=',$request->email)->get();
-        $active = false;
-        $existe = false;
-        if($user->count()>0){
-            $existe = true;
-            $active = $user[0]->active=='true'?true:false;
-        }
+        $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
 
-        // If the class is using the ThrottlesLogins trait, we can automatically throttle
-        // the login attempts for this application. We'll key this by the username and
-        // the IP address of the client making these requests into this application.
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
-
             return $this->sendLockoutResponse($request);
         }
 
-        if ($active){
-            if ($this->attemptLogin($request)) {
-                return $this->sendLoginResponse($request);
+        $email = (string) $request->input('email');
+        $password = (string) $request->input('password');
+
+        $administrativo = User::where('email', $email)->first();
+        if ($administrativo && $administrativo->active === 'true') {
+            if (Auth::guard('web')->attempt([
+                'email' => $email,
+                'password' => $password,
+                'active' => 'true',
+            ])) {
+                $request->session()->regenerate();
+                $this->clearLoginAttempts($request);
+
+                return redirect()->intended('/home');
             }
         }
 
-        // If the login attempt was unsuccessful we will increment the number of attempts
-        // to login and redirect the user back to the login form. Of course, when this
-        // user surpasses their maximum number of attempts they will get locked out.
+        $sitUser = SitUser::where('email', $email)->where('activo', 1)->first();
+        if ($sitUser && $sitUser->isAlumnoActivo()) {
+            if (Auth::guard('alumno')->attempt([
+                'email' => $email,
+                'password' => $password,
+                'activo' => 1,
+            ], false)) {
+                $request->session()->regenerate();
+                $this->clearLoginAttempts($request);
+
+                return redirect()->intended('alumnos/home');
+            }
+        }
 
         $this->incrementLoginAttempts($request);
-        if($existe && !$active){
-            Alert::error('Error','Tu usuario actualmente se encuentra inactivo.');
-            return redirect()
-                ->back()
-                ->withInput($request->only($this->username(), 'remember'))
-                ->withErrors(['active' => 'Tu usuario actualmente se encuentra inactivo.']);
-        }
-        Alert::error("Error","El usuario o la contraseña son incorrectos");
-        return $this->sendFailedLoginResponse($request);
+        Alert::error('Error', 'El usuario o la contraseña son incorrectos.');
+
+        return redirect()->back()
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => 'Credenciales inválidas.']);
     }
 
     public function alumnoLogin(Request $request)
     {
-        $this->validateLogin($request);
+        return $this->login($request);
+    }
 
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-            return $this->sendLockoutResponse($request);
-        }
+    public function logout(Request $request)
+    {
+        Auth::guard('web')->logout();
+        Auth::guard('alumno')->logout();
 
-        // Intentar autenticar con el guard 'alumno'
-        if (\Auth::guard('alumno')->attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect()->intended('alumnos/home');
-        }
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        $this->incrementLoginAttempts($request);
-        Alert::error("Error", "El usuario o la contraseña son incorrectos");
-        return redirect()->back()->withInput($request->only('email'));
+        return redirect('/');
     }
 
 

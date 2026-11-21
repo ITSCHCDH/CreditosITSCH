@@ -13,7 +13,7 @@
 	<div class="card mb-3" style="max-width: 1550px;">
 		<div class="row g-0">
 			<div class="col-md-2">
-				@if($alumno_data[0]->foto==null)
+				@if(($perfil[0]->foto ?? null)==null)
 					<img
 						src="{{ asset('images/user.png') }}"
 						alt="Imagen del alumno"
@@ -21,7 +21,7 @@
 					/>
 				@else
 					<img
-						src="{{ asset('storage/alumnos/img/'.$alumno_data[0]->foto) }}"
+						src="{{ asset('storage/alumnos/img/'.$perfil[0]->foto) }}"
 						alt="Imagen del alumno"
 						class="img-fluid rounded-start"
 					/>
@@ -41,18 +41,18 @@
 						<tbody>
 							<tr>
 								<td>
-									@if ($alumno_data!=null)
-									{{ $alumno_data[0]->nombre_alumno }}
+									@if ($perfil!=null)
+									{{ $perfil[0]->nombre_alumno }}
 									@endif
 								</td>
 								<td>
-									@if ($alumno_data!=null)
-									{{ $alumno_data[0]->no_control }}
+									@if ($perfil!=null)
+									{{ $perfil[0]->no_control }}
 									@endif	
 								</td>
 								<td>
-									@if ($alumno_data!=null)
-									{{ $alumno_data[0]->carrera }}
+									@if ($perfil!=null)
+									{{ $perfil[0]->carrera }}
 									@endif	
 								</td>
 							</tr>
