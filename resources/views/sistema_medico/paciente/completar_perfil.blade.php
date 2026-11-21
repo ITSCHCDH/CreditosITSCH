@@ -7,6 +7,9 @@
 @endsection
 
 @section('contenido')
+@php
+    $nombreUsuario = $usuario->name ?? ($usuario->nombreCompleto ?? 'Usuario');
+@endphp
     {{--Formulario para completar el perfil de paciente --}}
     <div class="container"> 
         <div class="row justify-content-center">
@@ -19,12 +22,12 @@
                         </button>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('paciente.store.perfil') }}" method="POST">
+                        <form action="{{ route(Auth::guard('alumno')->check() ? 'paciente.alumno.store.perfil' : 'paciente.store.perfil') }}" method="POST">
                             @csrf
                             <input type="hidden" name="user_id" value="{{ $usuario->id }}">
                             <div class="form-group">
                                 <label for="nombre">Nombre Completo:</label>
-                                <input type="text" class="form-control" id="nombre" name="nombre_completo" value="{{ $usuario->name ?? 'Sin nombre registrado' }}" readonly>   
+                                <input type="text" class="form-control" id="nombre" name="nombre_completo" value="{{ $nombreUsuario }}" readonly>   
                             </div>
                             <div class="form-group">
                                 <label for="edad">Edad:</label>

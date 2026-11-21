@@ -16,12 +16,12 @@
                         <h3>Programar Nueva Cita</h3>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('paciente.store.cita') }}" method="POST">
+                        <form action="{{ route(Auth::guard('alumno')->check() ? 'paciente.alumno.store.cita' : 'paciente.store.cita') }}" method="POST">
                             @csrf
                             <div class="form-group">
                                 <label for="paciente">Paciente:</label>
-                                <input type="text" class="form-control" id="paciente" name="paciente" value="{{ $usuario->name }}" readonly>
-                                <input type="hidden" name="paciente_id" value="{{ $usuario->id }}">                                   
+                                <input type="text" class="form-control" id="paciente" name="paciente" value="{{ $usuario->name ?? $usuario->nombreCompleto }}" readonly>
+                                <input type="hidden" name="paciente_id" value="{{ $paciente->id }}">
                             </div>
                             <div class="form-group">
                                 <label for="medico">Medico:</label>

@@ -7,30 +7,43 @@ use App\Models\Cita;
 use App\Models\Paciente;
 use App\User;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Auth;
 
 class PacienteController extends Controller
 {
     //Mostrar la vista para mis citas médicas
     public function index()
     {
-        //Consultamos las citas ordenadas por fecha y los pasamos a la vista       
-        $citas = Cita::where('paciente_id', auth()->user()->id)->orderBy('fecha_cita', 'asc')->get();
-        //Consultamos si este usuario ya es paciente, si no, lo redirigimos a completar su perfil
-        $usuario = auth()->user(); 
-        $esPaciente = Paciente::where('user_id', $usuario->id)->first();
-        if (!$esPaciente) {
-            //Redirigimos a la vista para completar el perfil de paciente y enviamos los datos del usuario
-            $paciente = Paciente::where('user_id', $usuario->id)->first(); 
-            return view('sistema_medico.paciente.completar_perfil', compact('usuario', 'paciente'));
-        }
-        return view('sistema_medico.paciente.mis_citas', compact('citas'));
+        $usuario = Auth::guard('alumno')->check()
+            ? Auth::guard('alumno')->user()
+            : Auth::guard('web')->user();
+
+        $paciente = $usuario
+            ? Paciente::where('user_id', $usuario->getAuthIdentifier())->first()
+            : null;
+
+        $citas = $paciente
+            ? Cita::where('paciente_id', $paciente->id)
+            ->orderBy('fecha_cita')
+            ->orderBy('hora_cita')
+            ->get()
+            : collect();
+
+        return view('sistema_medico.paciente.mis_citas', compact('citas', 'paciente'));
     }
 
     //Mostrar la vista para crear una nueva cita médica
     public function create()
     {
-        //Consultamos los datos del usuario logueado y los pasamos a la vista
-        $usuario = auth()->user();
+        $usuario = Auth::guard('alumno')->check()
+            ? Auth::guard('alumno')->user()
+            : Auth::guard('web')->user();
+        $paciente = $usuario
+            ? Paciente::where('user_id', $usuario->getAuthIdentifier())->first()
+            : null;
+        if (!$paciente) {
+            return redirect()->route('paciente.index.citas');
+        }
         //Consultamos los médicos disponibles para asignar la cita, estos son los que tienen asignado el permiso de VIP_MEDICO o VIP_PSICOLOGO
         $medicos = User::whereHas('roles.permissions', function ($query) {
             $query->whereIn('name', ['VIP_MEDICO', 'VIP_PSICOLOGO']);
@@ -51,7 +64,7 @@ class PacienteController extends Controller
             $user->tipo_profesional = $tipo;
             return $user;
         });  
-        return view('sistema_medico.paciente.create_cita', compact('usuario', 'medicos'));
+        return view('sistema_medico.paciente.create_cita', compact('usuario', 'medicos', 'paciente'));
     }
 
     //Guardar la nueva cita médica en la base de datos
@@ -82,13 +95,25 @@ class PacienteController extends Controller
         $cita->hora_cita = $request->input('hora_cita');
         $cita->medico_id = $request->input('medico_id');
         $cita->motivo_consulta = $request->input('motivo_consulta');
-        $cita->paciente_id = $request->input('paciente_id');
+        $usuario = Auth::guard('alumno')->check()
+            ? Auth::guard('alumno')->user()
+            : Auth::guard('web')->user();
+        $paciente = $usuario
+            ? Paciente::where('user_id', $usuario->getAuthIdentifier())->first()
+            : null;
+        if (!$paciente) {
+            Alert::error('Error', 'Primero debes completar tu perfil médico.');
+            return redirect()->route('paciente.index.citas');
+        }
+        $cita->paciente_id = $paciente->id;
         $cita->estado_cita = 'Pendiente';
         $cita->notas_adicionales = "Sin comentarios adicionales.";
         $cita->save();
         //Redirigir a la vista de citas médicas con un mensaje de éxito
         Alert::success('Correcto','La cita médica ha sido programada exitosamente!');
-        return redirect()->route('paciente.index.citas');
+        return redirect()->route(Auth::guard('alumno')->check()
+            ? 'paciente.alumno.index.citas'
+            : 'paciente.index.citas');
     }
 
     //Guardar el perfil de paciente en la base de datos
@@ -118,15 +143,20 @@ class PacienteController extends Controller
         );
         //Redirigir a la vista de citas médicas con un mensaje de éxito
         Alert::success('Correcto','El perfil de paciente ha sido completado exitosamente!');
-        return redirect()->route('paciente.index.citas');
+        return redirect()->route(Auth::guard('alumno')->check()
+            ? 'paciente.alumno.index.citas'
+            : 'paciente.index.citas');
     }
 
     //Mostrar la vista para editar el perfil de paciente
     public function editPerfil()
     {
-        //Consultamos los datos del usuario logueado y su perfil de paciente
-        $usuario = auth()->user();
-        $paciente = Paciente::where('user_id', $usuario->id)->first(); 
+        $usuario = Auth::guard('alumno')->check()
+            ? Auth::guard('alumno')->user()
+            : Auth::guard('web')->user();
+        $paciente = $usuario
+            ? Paciente::where('user_id', $usuario->getAuthIdentifier())->first()
+            : null;
         return view('sistema_medico.paciente.completar_perfil', compact('usuario', 'paciente'));
     }
 

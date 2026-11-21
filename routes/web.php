@@ -56,7 +56,7 @@ Route::get('/', function () {
     }
 
     return view('auth.login');
-})->name('alumnos.login');
+})->name('login.inicio');
 
 Route::post('/alumnos/login', [App\Http\Controllers\Auth\LoginController::class, 'alumnoLogin'])->name('alumnos.login');
 
@@ -327,6 +327,13 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
 
     //Rutas del sistema medico para alumnos
     Route::get('/sta/paciente/alumno/mis_citas',[PacienteController::class,'index'])->name('paciente.alumno.index.citas');
+    Route::get('/sta/paciente/alumno/create/cita',[PacienteController::class,'create'])->name('paciente.alumno.create.cita');
+    Route::post('/sta/paciente/alumno/store/cita',[PacienteController::class,'store'])->name('paciente.alumno.store.cita');
+    Route::get('/sta/paciente/alumno/editar/cita/{id}',[PacienteController::class,'edit'])->name('paciente.alumno.editar.cita');
+    Route::post('/sta/paciente/alumno/update/cita/{id}',[PacienteController::class,'update'])->name('paciente.alumno.update.cita');
+    Route::post('/sta/paciente/alumno/destroy/cita/{id}',[PacienteController::class,'destroy'])->name('paciente.alumno.destroy.cita');
+    Route::post('/sta/paciente/alumno/store/perfil',[PacienteController::class,'storePerfil'])->name('paciente.alumno.store.perfil');
+    Route::get('/sta/paciente/alumno/editar/perfil',[PacienteController::class,'editPerfil'])->name('paciente.alumno.editar.perfil');
 });
 
 //Rutas compartidas entre alumnos y usuarios

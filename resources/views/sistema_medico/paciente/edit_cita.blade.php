@@ -16,7 +16,7 @@
                         <h3>Editar Cita Médica</h3>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('paciente.update.cita', $cita->id) }}" method="POST">
+                        <form action="{{ route(Auth::guard('alumno')->check() ? 'paciente.alumno.update.cita' : 'paciente.update.cita', $cita->id) }}" method="POST">
                             @csrf
                             <div class="form-group">
                                 <label for="fecha">Fecha:</label>

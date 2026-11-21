@@ -1,200 +1,148 @@
 @extends('template.molde')
 
-@section('title','Avance alumnos')
+@section('title','Mi avance')
+
+@section('links')
+<style>
+    .student-dashboard { --student-blue:#173c66; --student-gold:#c79a2b; }
+    .student-hero {
+        display:flex; align-items:center; justify-content:space-between; gap:1.5rem;
+        padding:1.75rem; border:0; border-radius:1.25rem; color:#fff;
+        background:linear-gradient(135deg, #173c66 0%, #102b4a 100%);
+        box-shadow:0 1rem 2.5rem rgba(16,43,74,.16);
+    }
+    .student-identity { display:flex; align-items:center; gap:1rem; min-width:0; }
+    .student-avatar {
+        width:72px; height:72px; object-fit:cover; border:3px solid rgba(255,255,255,.75);
+        border-radius:1rem; background:#fff;
+    }
+    .student-hero h1 { margin:.15rem 0 .35rem; font-size:clamp(1.35rem,3vw,2rem); font-weight:700; }
+    .student-meta { color:rgba(255,255,255,.78); font-size:.95rem; }
+    .dashboard-action { border-radius:.75rem; white-space:nowrap; }
+    .summary-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; margin:1.25rem 0; }
+    .summary-card {
+        min-height:120px; padding:1.25rem; border:1px solid #e7edf4; border-radius:1rem;
+        background:#fff; box-shadow:0 .45rem 1.25rem rgba(29,78,116,.06);
+    }
+    .summary-card i { width:42px; height:42px; display:inline-grid; place-items:center; border-radius:.75rem;
+        color:#173c66; background:#edf3f8; }
+    .summary-card strong { display:block; margin-top:.75rem; color:#102b4a; font-size:1.5rem; }
+    .summary-card span { color:#6b7280; font-size:.88rem; }
+    .credit-card { border:1px solid #e7edf4; border-radius:1rem; background:#fff; overflow:hidden; margin-bottom:1rem; }
+    .credit-head { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1rem 1.25rem;
+        background:#f8fafc; border-bottom:1px solid #edf1f5; }
+    .credit-head h2 { margin:0; color:#102b4a; font-size:1.05rem; font-weight:700; }
+    .credit-bar { height:.75rem; overflow:hidden; border-radius:999px; background:#e9eef4; }
+    .credit-bar > div { height:100%; border-radius:999px; background:linear-gradient(90deg,#173c66,#2d6da3); }
+    .activity-row { display:grid; grid-template-columns:minmax(0,1fr) 100px; gap:1rem; align-items:center;
+        padding:.85rem 1.25rem; border-bottom:1px solid #f0f3f6; }
+    .activity-row:last-child { border-bottom:0; }
+    .activity-row span { color:#4b5563; }
+    .empty-state { padding:2.25rem 1rem; text-align:center; color:#6b7280; }
+    @media (max-width:767px) {
+        .student-hero { align-items:flex-start; flex-direction:column; }
+        .summary-grid { grid-template-columns:1fr; }
+        .activity-row { grid-template-columns:minmax(0,1fr) 72px; }
+    }
+</style>
+@endsection
 
 @section('ruta')
-    <label class="label label-success"><a href="{{ route('alumnos.home_avance')}}">Créditos</a>/Avance alumno</label> 
+<a class="text-decoration-none" href="{{ route('alumnos.home_avance') }}">Mi avance</a>
 @endsection
 
 @section('contenido')
-	
-	<a href="{{ route('alumnos.actividades') }}" class="btn btn-primary" title="Ver actividades asignadas"><i class="far fa-eye"></i> Actividades</a>
-	<hr>
-	<div class="card mb-3" style="max-width: 1550px;">
-		<div class="row g-0">
-			<div class="col-md-2">
-				@if(($perfil[0]->foto ?? null)==null)
-					<img
-						src="{{ asset('images/user.png') }}"
-						alt="Imagen del alumno"
-						class="img-fluid rounded-start"
-					/>
-				@else
-					<img
-						src="{{ asset('storage/alumnos/img/'.$perfil[0]->foto) }}"
-						alt="Imagen del alumno"
-						class="img-fluid rounded-start"
-					/>
-				@endif
-			</div>
-			<div class="col-md-10">
-				<div class="card-body">
-					<h5 class="card-title">Información del alumno</h5>				
-					<table class="table">
-						<thead>
-							<tr>
-								<th>Nombre</th>
-								<th>No. Control</th>
-								<th>Carrera</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>
-									@if ($perfil!=null)
-									{{ $perfil[0]->nombre_alumno }}
-									@endif
-								</td>
-								<td>
-									@if ($perfil!=null)
-									{{ $perfil[0]->no_control }}
-									@endif	
-								</td>
-								<td>
-									@if ($perfil!=null)
-									{{ $perfil[0]->carrera }}
-									@endif	
-								</td>
-							</tr>
-						</tbody>
-					</table>			
-				</div>
-			</div>
-		</div>
-	</div>
+@php
+    $perfilAlumno = $perfil[0] ?? null;
+    $totalCreditos = 0;
+    foreach ($creditos as $credito) {
+        $porcentaje = 0;
+        if ($avance) {
+            foreach ($alumno_data as $registro) {
+                if (($registro->nombre_credito ?? null) === $credito->nombre) {
+                    $porcentaje = max($porcentaje, min(100, (int) ($registro->por_credito ?? 0)));
+                }
+            }
+        }
+        $totalCreditos += $porcentaje >= 100 ? 1 : 0;
+    }
+    $porcentajeGeneral = $creditos->count() ? (int) (($totalCreditos / $creditos->count()) * 100) : 0;
+@endphp
 
-	
-	<div class="table-responsive">
-		<table class="table">
-			<!-- instancia al archivo table, dentro de este mismo direcctorio -->
-			<thead>
-				<th>Credito</th>
-				<th>Actividades</th>
-				<th>Porcentaje</th>
-			</thead>
-			<tbody>
-				@if($alumno_data!=null)
-					@php
-						$temp_porcentaje = 0;
-						$temp_suma = 0;
-						$y=0;
-					@endphp
-					@for ($x = 0; $x < count($creditos); $x++)
-						
-						@if ( $y < count($alumno_data) && $avance)
-							@if ($alumno_data[$y]->nombre_credito==$creditos[$x]->nombre)
-								@php
-									$temp_porcentaje = ($alumno_data[$y]->por_credito >100)?100:$alumno_data[$y]->por_credito;
-									$temp_suma += (int)$temp_porcentaje;
-								@endphp
-								<tr>
-									<td colspan="3" style="text-align:left; padding: 0;">
-										<div style="position: relative;">
-											<div style="background: #27ce1e; padding: 5; width: {{$temp_porcentaje}}%; height: 35px;max-width: 100%";>
-												<div style="position: absolute;">
-													<strong>{{ $alumno_data[$y]->nombre_credito }}</strong>
-												</div>
-												
-											</div>
-										</div>
-									</td>
-								</tr>
-								@for (; $y < count($alumno_data) && $alumno_data[$y]->nombre_credito==$creditos[$x]->nombre; $y++)
-									<tr>
-										<td></td>
-										<td>{{ $alumno_data[$y]->nombre_actividad }}</td>
-										<td>{{ $alumno_data[$y]->por_cred_actividad.'%' }}</td>
-									</tr>
-								@endfor
-								<tr>
-									<td></td>
-									<td></td>
-									<td ><strong>Total</strong></td>
-								</tr>
-								<tr>
-									<td></td>
-									<td></td>
-									<td>{{ $temp_porcentaje.'%' }}</td>
-								</tr>
-							@else
-								<tr>
-									<td colspan="3" style="text-align:left; padding: 0;">
-										<div style="position: relative;">
-											<div style="background: #27ce1e; padding: 5; width: 0%;height: 35px;max-width: 100%";>
-												<div style="position: absolute;">
-													<strong >{{ $creditos[$x]->nombre }}</strong>
-												</div>
-												
-											</div>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td>No actividades registradas</td>
-									<td>0%</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td></td>
-									<td ><strong>Total</strong></td>
-								</tr>
-								<tr>
-									<td></td>
-									<td></td>
-									<td>0%</td>
-								</tr>
-							@endif
-						@else
-							<tr>
-								<td colspan="3" style="text-align:left; padding: 0;">
-									<div style="position: relative;">
-										<div style="background: #27ce1e; padding: 5; width: 0%;height: 35px;max-width: 100%";>
-											<div style="position: absolute;">
-												<strong >{{ $creditos[$x]->nombre }}</strong>
-											</div>
-											
-										</div>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td></td>
-								<td>No actividades registradas</td>
-								<td>0%</td>
-							</tr>
-							<tr>
-								<td></td>
-								<td></td>
-								<td ><strong>Total</strong></td>
-							</tr>
-							<tr>
-								<td></td>
-								<td></td>
-								<td>0%</td>
-							</tr>
-						@endif
-					@endfor
-					@php
-						if($temp_suma>500)$temp_suma=500;
-						$temp_suma/=100;
-					@endphp
-					<tr>
-							<td></td>
-							<td></td>
-							<td><h5>Total de creditos</h5></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td></td>
-						<td><h5>{{ $temp_suma.' creditos' }}</h5></td>
-					</tr>
-				@endif
-			</tbody>
-		</table>
-	</div>
-	<hr>
-	@if($liberado)
-		<a href="{{ route('alumnos.constancias_imprimir') }}" class="btn btn-primary">Imprimir constancia</a>
-	@endif	
+<div class="student-dashboard">
+    <div class="student-hero">
+        <div class="student-identity">
+            <img class="student-avatar" src="{{ asset('images/user.png') }}" alt="Avatar del alumno">
+            <div>
+                <div class="student-meta">Bienvenido/a</div>
+                <h1>{{ $perfilAlumno->nombre_alumno ?? 'Alumno ITSCH' }}</h1>
+                <div class="student-meta">
+                    {{ $perfilAlumno->no_control ?? '' }}
+                    @if(!empty($perfilAlumno->carrera)) · {{ $perfilAlumno->carrera }} @endif
+                </div>
+            </div>
+        </div>
+        <a href="{{ route('alumnos.actividades') }}" class="btn btn-light dashboard-action">
+            <i class="fas fa-layer-group me-2"></i>Ver actividades
+        </a>
+    </div>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <i class="fas fa-award"></i>
+            <strong>{{ $porcentajeGeneral }}%</strong>
+            <span>Progreso general</span>
+        </div>
+        <div class="summary-card">
+            <i class="fas fa-check-circle"></i>
+            <strong>{{ $totalCreditos }}</strong>
+            <span>Créditos liberados</span>
+        </div>
+        <div class="summary-card">
+            <i class="fas fa-book-open"></i>
+            <strong>{{ $creditos->count() }}</strong>
+            <span>Tipos de crédito</span>
+        </div>
+    </div>
+
+    @foreach($creditos as $credito)
+        @php
+            $registros = $avance
+                ? collect($alumno_data)->where('nombre_credito', $credito->nombre)
+                : collect();
+            $porcentaje = $registros->max('por_credito') ?? 0;
+            $porcentaje = min(100, (int) $porcentaje);
+        @endphp
+        <article class="credit-card">
+            <div class="credit-head">
+                <h2>{{ $credito->nombre }}</h2>
+                <strong class="{{ $porcentaje >= 100 ? 'text-success' : 'text-primary' }}">{{ $porcentaje }}%</strong>
+            </div>
+            <div class="px-3 pt-3">
+                <div class="credit-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $porcentaje }}">
+                    <div style="width:{{ $porcentaje }}%"></div>
+                </div>
+            </div>
+            @if($registros->isNotEmpty())
+                @foreach($registros as $registro)
+                    <div class="activity-row">
+                        <span>{{ $registro->nombre_actividad }}</span>
+                        <strong class="text-end">{{ (int) $registro->por_cred_actividad }}%</strong>
+                    </div>
+                @endforeach
+            @else
+                <div class="empty-state">
+                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                    <div>No hay actividades registradas en este tipo de crédito.</div>
+                </div>
+            @endif
+        </article>
+    @endforeach
+
+    @if($liberado)
+        <a href="{{ route('alumnos.constancias_imprimir') }}" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-print me-2"></i>Imprimir constancia
+        </a>
+    @endif
+</div>
 @endsection

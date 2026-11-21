@@ -12,6 +12,103 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
+### [2026-11-20 19:15] — Corrección definitiva de la vista Mis citas
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** infraestructura
+- **Prompt/Tarea original:** Confirmar que la URL `alumnos/sta/paciente/alumno/mis_citas` renderice la vista moderna de Mis citas.
+
+**Archivos modificados:**
+- `app/Http/Controllers/PacienteController.php` (renderiza siempre la vista moderna de citas, con estado vacío si no existe perfil)
+- `routes/web.php` (eliminado el nombre duplicado `alumnos.login`)
+- `resources/views/sistema_medico/paciente/mis_citas.blade.php` (estado vacío diferenciado entre perfil incompleto y ausencia de citas)
+- `docs/BITACORA.md` (registro del incidente)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Decisiones tomadas:**
+- La URL específica del alumno ya no puede sustituir la vista de citas por el formulario antiguo.
+- Si falta el perfil médico se muestra un estado vacío con acceso directo a completar perfil.
+- Las rutas se mantienen compatibles para alumno y administrativo.
+
+**Pendientes / Deuda técnica:**
+- Completar el mapeo entre `sit.users` y `creditos.pacientes`.
+- Validar visualmente la vista moderna con datos reales de citas.
+
+### [2026-11-20 19:12] — Corrección de la vista Mis citas del alumno
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** infraestructura
+- **Prompt/Tarea original:** Investigar por qué la vista moderna de citas no aparecía al alumno y corregir la selección de perfil/paciente.
+
+**Archivos modificados:**
+- `app/Http/Controllers/PacienteController.php` (usa el guard activo y separa `user_id` de `paciente.id`)
+- `resources/views/sistema_medico/paciente/create_cita.blade.php` (envía el ID real del paciente)
+- `resources/views/sistema_medico/paciente/completar_perfil.blade.php` (nombre compatible con usuarios SIT y creditos)
+- `docs/BITACORA.md` (registro del incidente)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- `Pacientes` se consulta por `user_id` del guard activo.
+- Las citas se consultan por `paciente_id` real.
+
+**Decisiones tomadas:**
+- Ambos guards pueden usar el sistema médico, pero cada uno comparte el mismo modelo `pacientes`.
+- Si el alumno no tiene perfil médico, se muestra completar perfil y luego se vuelve a citas.
+- No se vuelve a usar el ID de usuario como `paciente_id`.
+
+**Pendientes / Deuda técnica:**
+- Revisar integración de perfiles SIT con la tabla `creditos.pacientes`.
+- Validar visualmente el flujo completo con datos reales.
+
+**Tests ejecutados:**
+- ✅ Sintaxis PHP/Blade de las vistas de citas.
+- ✅ Rutas de citas verificadas.
+
+### [2026-11-20 19:09] — Reingeniería frontend del área de alumno
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Modernizar las vistas de inicio/avance del alumno, ficha académica y mis citas médicas sin cambiar rutas ni controladores.
+
+**Archivos modificados:**
+- `resources/views/alumnos/avance.blade.php` (dashboard moderno con identidad, resumen y progreso por crédito)
+- `resources/views/alumnos/sta/ficha.blade.php` (ficha reorganizada en secciones responsive con formulario compatible)
+- `resources/views/sistema_medico/paciente/mis_citas.blade.php` (listado moderno de citas con estados vacíos y acciones accesibles)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna.
+
+**Decisiones tomadas:**
+- Se conservaron las rutas, nombres de variables y nombres de campos enviados por los formularios existentes.
+- Se utilizó Bootstrap/MDB ya cargado por el molde institucional.
+- Se añadieron estados vacíos, tarjetas, barras de progreso, jerarquía visual y mejoras responsive.
+- No se modificaron controladores ni rutas.
+
+**Pendientes / Deuda técnica:**
+- Validar visualmente en navegador las vistas con datos reales de Home, Ficha y citas.
+- Revisar alinear el flujo de citas con el usuario autenticado mediante guard `sit/alumno`.
+- Sustituir estilos CDN o locales dispersos por una capa común de diseño si se amplia el área de alumno.
+
+**Tests ejecutados:**
+- ✅ Sintaxis Blade/PHP de las tres vistas.
+- ✅ Rutas `alumnos/home` y `paciente.index.citas` verificadas.
+- ✅ `php artisan test tests/Feature/Auth/UnifiedLoginTest.php` (7 passed, 25 assertions)
+
+**Referencias:**
+- Prompt reingeniería de vistas del alumno
+- `resources/views/template/molde.blade.php`
+- `resources/views/template/partes/menu.blade.php`
+
 ### [2026-11-20 19:06] — Prevención de FK cruzada en la ficha académica
 
 - **Estatus:** ✅ completado
