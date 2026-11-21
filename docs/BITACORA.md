@@ -12,6 +12,39 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
+### [2026-11-20 19:40] — UX moderna del módulo de mensajes
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** infraestructura
+- **Prompt/Tarea original:** Modernizar las vistas de mensajes con MDB y Font Awesome y corregir el error DataTables por cantidad incorrecta de columnas.
+
+**Archivos modificados:**
+- `resources/views/admin/mensajes/bandeja.blade.php`
+- `resources/views/admin/mensajes/crear.blade.php`
+- `resources/views/admin/mensajes/ver.blade.php`
+- `resources/views/admin/mensajes/enviados.blade.php`
+- `resources/views/admin/mensajes/vistos.blade.php`
+- `resources/views/admin/mensajes/receptores.blade.php`
+- `resources/views/template/molde.blade.php` (estilos compartidos de mensajes)
+- `docs/BITACORA.md`
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna.
+
+**Decisiones tomadas:**
+- Se eliminó la inicialización DataTables conflictiva de bandeja y vistos.
+- Las tablas usan estructura HTML responsive estable con 5 y 4 columnas alineadas.
+- Se conserva SweetAlert y las rutas existentes de mensajes.
+- Se reutilizan MDB/Bootstrap y Font Awesome 7.3.1 locales.
+
+**Pendientes / Deuda técnica:**
+- Evaluar volver a activar DataTables con una configuración global solo después de estabilizar columnas y datos.
+- Validar el envío masivo de destinatarios en navegador.
+
 ### [2026-11-20 19:38] — Footer ampliado y redes del creador
 
 - **Estatus:** ✅ completado

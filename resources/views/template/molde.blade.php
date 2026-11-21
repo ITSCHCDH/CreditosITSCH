@@ -148,6 +148,74 @@
                 background: #fff;
                 transform: translateY(-2px);
             }
+            .messages-toolbar {
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+            .messages-toolbar h1 {
+                margin: 0;
+                color: #102b4a;
+                font-size: clamp(1.5rem, 3vw, 2.1rem);
+                font-weight: 700;
+            }
+            .messages-toolbar p {
+                margin: .35rem 0 0;
+                color: #6b7280;
+            }
+            .message-actions {
+                display: flex;
+                gap: .55rem;
+                flex-wrap: wrap;
+            }
+            .message-actions .btn {
+                border-radius: .75rem;
+            }
+            .message-panel {
+                border: 1px solid #e7edf4;
+                border-radius: 1.1rem;
+                background: #fff;
+                overflow: hidden;
+                box-shadow: 0 .55rem 1.5rem rgba(29, 78, 116, .07);
+            }
+            .message-panel table {
+                margin: 0;
+            }
+            .message-panel tbody tr.unread {
+                background: #f5f9fd;
+            }
+            .message-panel tbody tr.unread td {
+                font-weight: 600;
+                color: #102b4a;
+            }
+            .message-sender {
+                display: flex;
+                align-items: center;
+                gap: .65rem;
+            }
+            .message-avatar {
+                width: 38px;
+                height: 38px;
+                display: grid;
+                place-items: center;
+                flex: 0 0 auto;
+                border-radius: .7rem;
+                color: #173c66;
+                background: #edf3f8;
+            }
+            .message-status {
+                width: 9px;
+                height: 9px;
+                display: inline-block;
+                border-radius: 50%;
+                background: #cbd5e1;
+            }
+            .message-status.unread {
+                background: #2563a8;
+                box-shadow: 0 0 0 .18rem rgba(37, 99, 168, .12);
+            }
             @media (max-width: 767.98px) {
                 .system-footer-inner {
                     align-items: flex-start;
@@ -160,6 +228,17 @@
                 }
                 .footer-social {
                     width: 100%;
+                }
+                .messages-toolbar,
+                .message-actions {
+                    width: 100%;
+                }
+                .messages-toolbar {
+                    align-items: flex-start;
+                    flex-direction: column;
+                }
+                .message-actions .btn {
+                    flex: 1;
                 }
             }
         </style>

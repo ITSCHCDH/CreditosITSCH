@@ -1,67 +1,47 @@
 @extends('template.molde')
 
-@section('title','Mensajes Ver')
-@section('links')
-	<link rel="stylesheet" type="text/css" href="{{ asset('plugins/chosen/chosen.css') }}">
-	<link rel="stylesheet" href="{{ asset('plugins/Trumbowyg-master/dist/ui/trumbowyg.min.css') }}">
-    <script type="text/javascript" src="{{ asset('plugins/jsCookie/js.cookie.js') }}"></script>
-@endsection
-@section('ruta')
-	@if ($ruta)
-		<a href="{{ route('mensajes.index') }}">Mensajes</a>
-		/
-		<a href="{{  route('mensajes.enviados') }}">Mensajes Enviados</a>
-		/
-		<label class="label label-success">Ver Mensaje</label>
-	@else
-		<a href="{{ route('mensajes.index') }}">Mensajes</a>
-		/
-		<label class="label label-success">Ver Mensaje</label>
-	@endif
-	
-@endsection
-@section('contenido')
-    <div class="row">
-        <div class="col-sm-3"></div>
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label for="nombre">De</label>
-                <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Nombre de la actividad" required disabled value="{{ $mensaje->name }}">        
-            </div>
-            <div class="form-group">
-                <label for="asunto">Asunto</label>
-                <input type="text" name="asunto" id="asunto" class="form-control" placeholder="Nombre de la actividad" required disabled value="{{ $mensaje->notificacion }}">                
-            </div>
-            <div class="form-group">
-                <label for="nombre">Nombre de la actividad</label>                
-                <textarea class="form-control" style="text-align: left; font-size: large;" disabled id="textarea-mensaje">{{ $mensaje->mensaje }}</textarea>
-            </div>
-            <hr>
-            @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']) && $actividad_id != null)               
-                <a href="#" onclick="redireccionar({{$actividad_id}});" class="btn btn-success btn-sm"><i class='fas fa-person-booth' style='font-size:18px'></i> Participantes</a>               
-            @endif
-        </div>
-        <div class="col-sm-3"></div>
-    </div>
-	  
+@section('title','Ver mensaje')
 
-    @section('js')
-    	<script src="{{ asset('plugins/Trumbowyg-master/dist/trumbowyg.min.js') }}"></script>
-    	<script type="text/javascript">
-    		$("#textarea-mensaje").trumbowyg({
-    		    lang: 'es',
-    		    autogrow: true
-    		});
-    	</script>
-        <script>
-            function redireccionar(actividad_id){
-                Cookies.set('participantes_actividad',actividad_id,{ expires: 1});
-                window.location.href = "{{ route('participantes.index') }}";
-            }
-            $('#checkbox5').click(function(event){
-                var value = $(this).is(':checked');
-                $('#actividades-submit').submit();
-            });
-        </script>
-    @endsection
+@section('contenido')
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <article class="message-panel">
+            <div class="p-3 border-bottom d-flex align-items-center justify-content-between gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="message-avatar"><i class="fa-solid fa-envelope-open-text"></i></span>
+                    <div>
+                        <h1 class="h5 mb-1">{{ $mensaje->notificacion }}</h1>
+                        <div class="text-muted small">De: {{ $mensaje->name }}</div>
+                    </div>
+                </div>
+                @if($ruta)
+                    <a href="{{ route('mensajes.enviados') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
+                        <i class="fa-solid fa-arrow-left me-1"></i>Enviados
+                    </a>
+                @else
+                    <a href="{{ route('mensajes.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
+                        <i class="fa-solid fa-arrow-left me-1"></i>Bandeja
+                    </a>
+                @endif
+            </div>
+            <div class="p-4">
+                <div class="border rounded-3 p-3 bg-light" style="white-space:pre-line">{{ $mensaje->mensaje }}</div>
+                @if(Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA','VER_PARTICIPANTES']) && $actividad_id != null)
+                    <button type="button" class="btn btn-success rounded-pill mt-3" onclick="redireccionar({{ $actividad_id }});">
+                        <i class="fa-solid fa-users me-2"></i>Ver participantes
+                    </button>
+                @endif
+            </div>
+        </article>
+    </div>
+</div>
+@endsection
+
+@section('js')
+<script>
+function redireccionar(actividadId) {
+    Cookies.set('participantes_actividad', actividadId, {expires:1});
+    window.location.href = "{{ route('participantes.index') }}";
+}
+</script>
 @endsection
