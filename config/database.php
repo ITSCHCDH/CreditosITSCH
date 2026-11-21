@@ -53,6 +53,21 @@ return [
             'strict' => false,
             'engine' => null,
         ],   
+
+        'sit' => [
+            'driver' => 'mysql',
+            'host' => env('DB_SIT_HOST', '127.0.0.1'),
+            'port' => env('DB_SIT_PORT', '3306'),
+            'database' => env('DB_SIT_DATABASE', 'sit'),
+            'username' => env('DB_SIT_USERNAME', 'root'),
+            'password' => env('DB_SIT_PASSWORD', ''),
+            'unix_socket' => env('DB_SIT_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+        ],
         
         
         //Conexión a base de datos de prueba con mysql

@@ -12,6 +12,46 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
+### [2026-11-20 18:32] — Capa de modelos de solo lectura para SIT
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** infraestructura
+- **Prompt/Tarea original:** Crear la capa Eloquent read-only en `app/Models/Sit/`, proteger escrituras, configurar la conexión `sit` y agregar pruebas unitarias sin modificar controladores ni rutas.
+
+**Archivos modificados:**
+- `config/database.php` (agregada conexión `sit` con variables `DB_SIT_*`)
+- `app/Traits/SitReadOnlyModel.php` (creado)
+- `app/Models/Sit/*.php` (creados 20 modelos de lectura)
+- `tests/Pest.php` (creado)
+- `tests/Unit/Sit/ReadOnlyModelsTest.php` (creado)
+- `composer.json` y `composer.lock` (Pest y plugin Laravel instalados)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; todos los modelos apuntan a la conexión `sit` y están protegidos contra escritura.
+
+**Decisiones tomadas:**
+- Se mantuvo intacta la conexión principal `creditos`.
+- Cada modelo `Sit\*` usa `protected $connection = 'sit'`, tabla explícita y casts con sintaxis `casts(): array`.
+- La protección bloquea métodos de instancia, métodos estáticos de creación/inserción y eventos Eloquent de escritura.
+- Los tests de relaciones no ejecutan consultas a la base `sit`.
+
+**Pendientes / Deuda técnica:**
+- Falta verificar la conexión real `sit` en el entorno de staging o producción.
+- Falta seed de datos institucionales para pruebas de integración.
+- Se debe evaluar en una tarea posterior si otros modelos requieren relaciones adicionales.
+
+**Tests ejecutados:**
+- ✅ `php artisan test tests/Unit/Sit/ReadOnlyModelsTest.php` (5 passed, 26 assertions)
+
+**Referencias:**
+- Prompt Fase 1
+- `docs/db/sit.sql`
+- ADR pendiente: identidad y autenticación de alumnos
+
 ## 2026-11-20 — Inventario inicial del sistema
 
 ### Contexto

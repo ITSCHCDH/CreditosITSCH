@@ -26,14 +26,16 @@
         "symfony/mailgun-mailer": "^8.0"
     },
     "require-dev": {
-        "spatie/laravel-ignition": "^2.0",
         "composer/composer": "^2.1",
+        "filp/whoops": "~2.0",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
-        "filp/whoops": "~2.0",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.0",
-        "phpunit/phpunit": "^12.0"
+        "pestphp/pest": "*",
+        "pestphp/pest-plugin-laravel": "*",
+        "phpunit/phpunit": "^12.0",
+        "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
         "classmap": [
@@ -69,7 +71,10 @@
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     },
     "repositories": {
     },
