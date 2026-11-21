@@ -9,6 +9,8 @@ use App\Models\Motivoreprobacion;
 use App\Models\AsignacionTutores;
 use App\Models\Grupo;
 use App\Models\GpoTutorias;
+use App\Models\Sit\Alumno as SitAlumno;
+use App\Services\Sit\CarrerasSitService;
 use App\User;
 
 
@@ -23,82 +25,81 @@ class STAController extends Controller
 
     public function indexProfesores()
     {
-        //Verificamos si el usuario tiene permiso para ver la vista de profesores
-        if(Auth::User()->hasAnyPermission(['VIP_STA','STA_DEP_TUTORIA'])){  
-            $carreras = DB::connection('contEsc')->table('carreras')
-            ->where('car_Status','VIGENTE')
-            ->get();             
-        }else if(Auth::User()->hasAnyPermission(['STA_PROFESOR'])){
-            $carreras = DB::connection('contEsc')->table('carreras')           
-            ->where('car_Clave',Auth::User()->area)
-            ->get(); 
-        }       
-        return view('sta.profesores.index',compact('carreras')); 
+        $carreras = CarrerasSitService::opcionesPorArea();
+
+        // Un profesor solo puede consultar su propia carrera
+        if (Auth::User()->hasAnyPermission(['STA_PROFESOR'])
+            && ! Auth::User()->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA'])) {
+            $carreras = $carreras->where('car_Clave', (int) Auth::User()->area)->values();
+        }
+
+        return view('sta.profesores.index', compact('carreras')); 
     }
 
     public function findProfesores(Request $request)
     {
-        $carrera=$request->carrera;
-        //Llamado a función para obtener el departamento de adscripción
-        $dpto=$this->obtDpto($carrera);
-        //Verificamos que el usuario tenga permiso para ver todos los profesores
-        if(Auth::User()->hasAnyPermission(['VIP_STA','STA_DEP_TUTORIA'])){ 
-            $profesores = DB::connection('contEsc')->table('carreras as c')
-            ->select('d.dep_Clave','ca.cat_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
-            ->join('planesestudios as p','c.car_Clave','=','p.car_Clave')
-            ->join('reticula as r','p.pes_Clave','=','r.pes_Clave')
-            ->join('departamentos as d','r.dep_Clave','=','d.dep_Clave') 
-            ->join('catedraticos as ca','ca.dep_Clave','=','d.dep_Clave')  
-            ->where('d.dep_Clave',$dpto->dep_Clave)
-            ->where('c.car_Status','VIGENTE')
-            ->where('ca.cat_Status','VI')
-            ->groupBy('ca.cat_Clave','d.dep_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
-            ->orderBy('ca.cat_Nombre','desc')
-            ->get();
-        }else if(Auth::User()->hasAnyPermission(['STA_PROFESOR'])){ 
-            $cat_Clave=$this->obtCatClave();     
-            $profesores = DB::connection('contEsc')->table('carreras as c')
-            ->select('d.dep_Clave','ca.cat_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
-            ->join('planesestudios as p','c.car_Clave','=','p.car_Clave')
-            ->join('reticula as r','p.pes_Clave','=','r.pes_Clave')
-            ->join('departamentos as d','r.dep_Clave','=','d.dep_Clave') 
-            ->join('catedraticos as ca','ca.dep_Clave','=','d.dep_Clave')            
-            ->where('ca.cat_Clave', $cat_Clave)
-            ->groupBy('ca.cat_Clave','d.dep_Clave','ca.cat_Nombre','ca.cat_ApePat','ca.cat_ApeMat')
-            ->get();
-        }   
-        return response()->json($profesores);       
+        $carreraSit = CarrerasSitService::deArea((int) $request->carrera);
+
+        $consulta = DB::connection('sit')->table('catedraticos as c')
+            ->join('users as u', 'u.id', '=', 'c.user_id')
+            ->where('c.activo', 1)
+            ->select(
+                'c.id as cat_Clave',
+                'u.nombre as cat_Nombre',
+                'u.apellido_paterno as cat_ApePat',
+                'u.apellido_materno as cat_ApeMat'
+            );
+
+        if (Auth::User()->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA'])) {
+            $departamentos = $this->departamentosDeCarrera($carreraSit);
+            if ($departamentos->isNotEmpty()) {
+                $consulta->whereIn('c.departamento_adscripcion', $departamentos);
+            }
+        } else {
+            $consulta->where('c.id', $this->obtCatClave());
+        }
+
+        return response()->json($consulta->orderBy('u.apellido_paterno')->get());       
     }
 
+    /** Departamentos responsables de las materias del plan de una carrera. */
+    private function departamentosDeCarrera(?int $carreraSit)
+    {
+        if (! $carreraSit) {
+            return collect();
+        }
+
+        return DB::connection('sit')->table('plan_materias')
+            ->join('cat_materias', 'cat_materias.id', '=', 'plan_materias.materia_id')
+            ->join('cat_plan_estudios', 'cat_plan_estudios.id', '=', 'plan_materias.plan_estudio_id')
+            ->join('cat_departamentos_academicos as d', 'd.id', '=', 'cat_materias.departamento_responsable_id')
+            ->where('cat_plan_estudios.carrera_id', $carreraSit)
+            ->distinct()
+            ->pluck('d.nombre');
+    }
+
+    /** Catedrático de SIT que corresponde al usuario autenticado (por nombre). */
     public function obtCatClave()
     {
-        $catClave = 0;
-        // Obtener el nombre del usuario autenticado y procesarlo
-        $userName = Auth::User()->name;
-        $userName = strtolower($this->quitarCaracteres($userName));  // Minúsculas y sin caracteres especiales
-        
-        // Obtener la lista de catedráticos con nombres y apellidos en una sola consulta
-        $catedraticos = DB::connection('contEsc')->table('catedraticos')
-            ->select('cat_Clave', 'cat_Nombre', 'cat_ApePat', 'cat_ApeMat')
+        $userName = strtolower($this->quitarCaracteres(Auth::User()->name));
+
+        $catedraticos = DB::connection('sit')->table('catedraticos as c')
+            ->join('users as u', 'u.id', '=', 'c.user_id')
+            ->where('c.activo', 1)
+            ->select('c.id as cat_Clave', 'u.nombre as cat_Nombre', 'u.apellido_paterno as cat_ApePat', 'u.apellido_materno as cat_ApeMat')
             ->get();
-    
-        // Iterar sobre los catedráticos y comparar nombres procesados
+
         foreach ($catedraticos as $catedratico) {
-            // Procesar el nombre completo del catedrático
             $catNombre = strtolower($this->quitarCaracteres("{$catedratico->cat_Nombre} {$catedratico->cat_ApePat} {$catedratico->cat_ApeMat}"));
-            
-            // Verificar la similitud entre el nombre del usuario y el nombre del catedrático
+
             similar_text($userName, $catNombre, $similarity);
-            $threshold = 85; // Umbral de similitud mínimo requerido
-            if ($similarity >= $threshold) {
-                $catClave = $catedratico->cat_Clave;
-                break;  // Salir del bucle cuando se encuentre una coincidencia
+            if ($similarity >= 85) {
+                return $catedratico->cat_Clave;
             }
         }
-    
-        return $catClave;
+
+        return 0;
     }
-    
 
     //Función para quitar caracteres especiales a una cadena
     function quitarCaracteres($cadena){
@@ -127,66 +128,74 @@ class STAController extends Controller
 
     public function findMaterias(Request $request)
     {          
-        //Obtener las materias del profesor seleccionada
-        $materias=DB::connection('contEsc')->table('reticula')
-        ->join('grupossemestre','reticula.ret_Clave','=','grupossemestre.ret_Clave')
-        ->where('grupossemestre.cat_Clave',$request->profesor)
-        ->select('reticula.ret_NomCompleto','reticula.ret_NumUnidades','grupossemestre.ret_Clave','grupossemestre.gse_Anio','grupossemestre.gse_Observaciones','grupossemestre.gse_Clave')
-        ->orderBy('reticula.ret_NomCompleto','asc')
-        ->get();
+        //Materias (grupos) que imparte el profesor en SIT
+        $materias = DB::connection('sit')->table('grupos')
+            ->join('cat_materias as m', 'm.id', '=', 'grupos.materia_id')
+            ->leftJoin('cat_periodos_escolares as p', 'p.id', '=', 'grupos.periodo_id')
+            ->where('grupos.catedratico_id', $request->profesor)
+            ->select(
+                'm.nombre as ret_NomCompleto',
+                'm.num_temas as ret_NumUnidades',
+                'm.id as ret_Clave',
+                'p.nombre as gse_Anio',
+                'grupos.clave_grupo as gse_Observaciones',
+                'grupos.id as gse_Clave'
+            )
+            ->orderBy('m.nombre', 'asc')
+            ->get();
 
-        //Verificamos si el profesor tiene materias asignadas y si no tiene le asignamos un mensaje de error 500 
         if($materias->isEmpty()){
             $materias = array(
                 'error' => '500',
                 'message' => 'El profesor no tiene materias asignadas'
             );
         }       
-      
+
         return response()->json($materias);
-    }
-
-
-    //Funcion para obtener la clave del departamento al que pertenece el profesor
-    function obtDpto($carrera)
-    {
-        $dpto = DB::connection('contEsc')->table('carreras as c')
-        ->select('d.dep_Clave')
-        ->join('planesestudios as p','c.car_Clave','=','p.car_Clave')
-        ->join('reticula as r','p.pes_Clave','=','r.pes_Clave')
-        ->join('departamentos as d','r.dep_Clave','=','d.dep_Clave') 
-        ->join('catedraticos as ca','ca.dep_Clave','=','d.dep_Clave')  
-        ->where('c.car_Clave',$carrera)
-        ->first();
-        return $dpto;
     }
 
     public function findUnits(Request $request)
     {    
-        $units=DB::connection('contEsc')->table('reticula')        
-        ->where('ret_Clave', $request->materia)
-        ->first();        
+        $units = DB::connection('sit')->table('cat_materias')
+            ->where('id', $request->materia)
+            ->select('nombre as ret_NomCompleto', 'num_temas as ret_NumUnidades')
+            ->first();
+
         return response()->json($units);            
     }
 
     public function findListaCali(Request $request)
     {
-        $listaCali=DB::connection('contEsc')->table('listassemestre')
-        ->join('alumnos','listassemestre.alu_NumControl','=','alumnos.alu_NumControl') 
-        ->join('listassemestrecom','listassemestre.lse_Clave','=','listassemestrecom.lse_clave')
-        ->join('planesestudios','alumnos.pes_Clave','=','planesestudios.pes_Clave')
-        ->join('reticula','planesestudios.pes_Clave','=','reticula.pes_Clave')
-        ->where('reticula.ret_Clave',$request->materia)
-        ->where('listassemestrecom.lsc_NumUnidad',$request->unidad)
-        ->where('listassemestre.gse_Clave',$request->grupo) 
-        ->select('listassemestre.gse_Clave','listassemestre.lse_Clave','alumnos.alu_NumControl','alumnos.alu_Nombre','alumnos.alu_ApePaterno','alumnos.alu_ApeMaterno','listassemestrecom.lsc_Calificacion')  
-        ->orderBy('alumnos.alu_Nombre','asc')
-        ->get();   
-        $coment=Motivoreprobacion::select('no_control','motivos','comentario')
-        ->where('grup_cla',$request->materia)
-        ->where('num_tema',$request->unidad)
-        ->get();
-        return response()->json( ['listaCali'=>$listaCali,'coment'=>$coment]);
+        // Calificaciones por unidad de un grupo de SIT
+        $listaCali = DB::connection('sit')->table('listas')
+            ->join('grupos', 'grupos.id', '=', 'listas.grupo_id')
+            ->join('alumnos', 'alumnos.id', '=', 'listas.alumno_id')
+            ->join('users', 'users.id', '=', 'alumnos.user_id')
+            ->join('lista_unidades', 'lista_unidades.lista_id', '=', 'listas.id')
+            ->where('grupos.id', $request->grupo)
+            ->where('grupos.materia_id', $request->materia)
+            ->where('lista_unidades.numero_unidad', $request->unidad)
+            ->orderByDesc('lista_unidades.oportunidad')
+            ->select(
+                'grupos.id as gse_Clave',
+                'listas.id as lse_Clave',
+                'alumnos.no_control as alu_NumControl',
+                'users.nombre as alu_Nombre',
+                'users.apellido_paterno as alu_ApePaterno',
+                'users.apellido_materno as alu_ApeMaterno',
+                'lista_unidades.calificacion as lsc_Calificacion'
+            )
+            ->get()
+            ->unique(fn ($fila) => $fila->lse_Clave)
+            ->sortBy('alu_ApePaterno')
+            ->values();
+
+        $coment = Motivoreprobacion::select('no_control','motivos','comentario')
+            ->where('grup_cla', $request->materia)
+            ->where('num_tema', $request->unidad)
+            ->get();
+
+        return response()->json(['listaCali' => $listaCali, 'coment' => $coment]);
     }
 
     public function saveComent(Request $request)
@@ -209,14 +218,8 @@ class STAController extends Controller
         ->get()
         ->keyBy('id'); // Para acceso rápido
 
-       
-        // Obtener las carreras vigentes (desde SQL Server)
-        $carreras = DB::connection('contEsc')
-        ->table('carreras')
-        ->where('car_Status', 'VIGENTE')
-        ->orderBy('car_Nombre', 'asc')
-        ->get()
-        ->keyBy('car_Clave'); // Organiza por clave
+        // Carreras equivalentes en SIT, con la clave de área que guardan las tablas propias
+        $carreras = CarrerasSitService::opcionesPorArea()->keyBy('car_Clave');
 
         // Obtener los grupos y asignaciones de tutores (desde MySQL)
         $gruTutorias = Grupo::select('grupos.gpo_Nombre', 'at.*')
@@ -224,19 +227,11 @@ class STAController extends Controller
         ->orderBy('grupos.gpo_Nombre', 'asc')
         ->get();
 
-        // Obtener todas las claves de carrera para hacer una sola consulta a SQL Server
-        $carClaves = $gruTutorias->pluck('car_Clave')->unique()->toArray();
-
-        // Obtener los nombres de las carreras desde SQL Server en un solo paso
-        $carrerasSQL = DB::connection('contEsc')
-        ->table('carreras')
-        ->whereIn('car_Clave', $carClaves)
-        ->get()
-        ->keyBy('car_Clave'); // Organiza por clave
-
         // Agregar el nombre de la carrera a cada grupo
         foreach ($gruTutorias as $gru) {
-        $gru->car_Nombre = $carrerasSQL[$gru->car_Clave]->car_Nombre ?? 'Desconocido';
+            $gru->car_Nombre = isset($carreras[$gru->car_Clave])
+                ? $carreras[$gru->car_Clave]->car_Nombre
+                : 'Desconocido';
         }
 
         // Agregar el nombre del profesor a cada grupo
@@ -248,8 +243,6 @@ class STAController extends Controller
 
         // Retornar la vista con los datos
         return view('sta.tutorias.index', compact('profesores', 'carreras', 'gruTutorias'));
-
-
     }
 
     public function indexTutores()
@@ -267,15 +260,11 @@ class STAController extends Controller
         // Extraer las claves necesarias
         $tutClaves = $grupos->pluck('tut_Clave')->toArray();
         $gpoIds = $grupos->pluck('gpo_Id')->toArray();
-        $carClaves = $grupos->pluck('car_Clave')->toArray();
     
-        // Consultar los tutores, grupos y carreras en bloque
+        // Consultar los tutores y grupos en bloque
         $tutores = User::whereIn('id', $tutClaves)->get()->keyBy('id');
         $gruposInfo = Grupo::whereIn('id', $gpoIds)->get()->keyBy('id');
-        $carreras = DB::connection('contEsc')->table('carreras')
-            ->whereIn('car_Clave', $carClaves)
-            ->get()
-            ->keyBy('car_Clave');
+        $carreras = CarrerasSitService::opcionesPorArea()->keyBy('car_Clave');
     
         // Iterar sobre los grupos y agregar la información correspondiente
         foreach ($grupos as $gru) {
@@ -308,22 +297,37 @@ class STAController extends Controller
         //Obtenemos el año actual
         $anio = date('Y');
         //Seleccionamos todos los alumnos de los ultimos 7 años para llenar el select de alumnos
-        $alumnos = DB::connection('contEsc')->table('alumnos')
-        ->where('alu_AnioIngreso','>=',$anio-7)
-        ->select('alu_NumControl','alu_Nombre','alu_ApePaterno','alu_ApeMaterno')
-        ->get();       
-       
+        $alumnos = DB::connection('sit')->table('alumnos')
+            ->join('users', 'users.id', '=', 'alumnos.user_id')
+            ->where('alumnos.anio_ingreso', '>=', $anio - 7)
+            ->select(
+                'alumnos.no_control as alu_NumControl',
+                'users.nombre as alu_Nombre',
+                'users.apellido_paterno as alu_ApePaterno',
+                'users.apellido_materno as alu_ApeMaterno'
+            )
+            ->orderBy('users.apellido_paterno')
+            ->get();
+
         // Obtén todos los alumnos del grupo en una sola consulta
         $alumnosGrupo = GpoTutorias::where('gpo_Nombre', $gpo_Nombre)->get();
 
         // Obtén los números de control de los alumnos del grupo
         $noControles = $alumnosGrupo->pluck('no_Control')->toArray();
 
-        // Consulta todos los datos de los alumnos correspondientes a los números de control en una sola consulta
-        $alumnosDatos = DB::connection('contEsc')->table('alumnos')
-            ->whereIn('alu_NumControl', $noControles)
+        // Consulta todos los datos de los alumnos correspondientes en una sola consulta
+        $alumnosDatos = DB::connection('sit')->table('alumnos')
+            ->join('users', 'users.id', '=', 'alumnos.user_id')
+            ->whereIn('alumnos.no_control', $noControles)
+            ->select(
+                'alumnos.no_control',
+                'alumnos.estatus',
+                'users.nombre',
+                'users.apellido_paterno',
+                'users.apellido_materno'
+            )
             ->get()
-            ->keyBy('alu_NumControl');
+            ->keyBy('no_control');
 
         // Consulta las fichas de los alumnos en una sola consulta
         $fichas = DB::table('alumnos')
@@ -333,11 +337,10 @@ class STAController extends Controller
 
         // Itera sobre los alumnos del grupo y agrega los datos correspondientes
         foreach ($alumnosGrupo as $alumno) {
-            // Verifica si el alumno existe en la base de datos contEsc
             if (isset($alumnosDatos[$alumno->no_Control])) {
                 $alumnoTem = $alumnosDatos[$alumno->no_Control];
-                $alumno->alu_Nombre = strtoupper($alumnoTem->alu_Nombre) . ' ' . strtoupper($alumnoTem->alu_ApePaterno) . ' ' . strtoupper($alumnoTem->alu_ApeMaterno);
-                $alumno->status = $alumnoTem->alu_StatusAct;
+                $alumno->alu_Nombre = strtoupper($alumnoTem->nombre) . ' ' . strtoupper($alumnoTem->apellido_paterno) . ' ' . strtoupper($alumnoTem->apellido_materno);
+                $alumno->status = $alumnoTem->estatus;
             } else {
                 $alumno->alu_Nombre = 'EL ALUMNO NO EXISTE, VERIFICA SU NUMERO DE CONTROL!';
             }
@@ -370,10 +373,7 @@ class STAController extends Controller
         // Obtener los datos de los tutores, grupos y carreras en una sola consulta
         $tutores = User::whereIn('id', $tutClaves)->get()->keyBy('id');
         $grupos = Grupo::whereIn('id', $gpoIds)->get()->keyBy('id');
-        $carreras = DB::connection('contEsc')->table('carreras')
-            ->whereIn('car_Clave', $carClaves)
-            ->get()
-            ->keyBy('car_Clave');
+        $carreras = CarrerasSitService::opcionesPorArea()->keyBy('car_Clave');
     
         // Iterar sobre el grupo y agregar los datos del tutor, grupo y carrera
         foreach ($grupo as $gru) {
@@ -402,21 +402,18 @@ class STAController extends Controller
     {
         try
         {
-            //Verificamos que el numero de control exista en la base de datos de control escolar
-            $alumno = DB::connection('contEsc')->table('alumnos')
-            ->where('alu_NumControl',$request->no_Control)
-            ->first();
-            if($alumno==null)
-                return response()->json(['message' => 'El alumno con numero de control: '. $request->no_Control .', no existe en la base de datos de control escolar'], 500);
-            else{
-                //Guardamos el numero de control y grupo en la tabla gpoTutorias            
-                GpoTutorias::updateOrCreate(
-                    ['no_Control' => $request->no_Control],
-                    ['gpo_Nombre' => $request->gpo_Nombre]
-                );
-                //Retornamos status 200 y el mensaje de que se guardo correctamente
-                return response()->json(['message' => 'Correcto'], 200);  
-            }        
+            //Verificamos que el numero de control exista en SIT
+            $existe = SitAlumno::where('no_control', $request->no_Control)->exists();
+            if(! $existe)
+                return response()->json(['message' => 'El alumno con numero de control: '. $request->no_Control .', no existe en la base de datos de SIT'], 500);
+
+            //Guardamos el numero de control y grupo en la tabla gpoTutorias            
+            GpoTutorias::updateOrCreate(
+                ['no_Control' => $request->no_Control],
+                ['gpo_Nombre' => $request->gpo_Nombre]
+            );
+            //Retornamos status 200 y el mensaje de que se guardo correctamente
+            return response()->json(['message' => 'Correcto'], 200);  
         }
         catch(\Exception $e)
         {
@@ -449,36 +446,44 @@ class STAController extends Controller
         $alumnosGrupo = GpoTutorias::where('gpo_Nombre', $grupo[0]->gpo_Nombre)->get();
     
         // Obtener todos los alumnos y sus datos en una sola consulta
-        $noControles = $alumnosGrupo->pluck('no_Control'); // Recolectar los no_Control de los alumnos
-        $alumnosTem = DB::connection('contEsc')->table('alumnos')
-            ->whereIn('alu_NumControl', $noControles)
+        $noControles = $alumnosGrupo->pluck('no_Control');
+        $alumnosTem = DB::connection('sit')->table('alumnos')
+            ->join('users', 'users.id', '=', 'alumnos.user_id')
+            ->whereIn('alumnos.no_control', $noControles)
+            ->select('alumnos.no_control', 'alumnos.estatus', 'users.nombre', 'users.apellido_paterno', 'users.apellido_materno')
             ->get()
-            ->keyBy('alu_NumControl'); // Indexar por número de control para acceso rápido
-    
+            ->keyBy('no_control');
+
         // Verificar y asignar datos del alumno en el grupo
         foreach($alumnosGrupo as $alumno) {
             if (isset($alumnosTem[$alumno->no_Control])) {
                 $alumnoTem = $alumnosTem[$alumno->no_Control];
-                $alumno->alu_Nombre = strtoupper($alumnoTem->alu_Nombre) . ' ' . strtoupper($alumnoTem->alu_ApePaterno) . ' ' . strtoupper($alumnoTem->alu_ApeMaterno);
-                $alumno->status = $alumnoTem->alu_StatusAct;
+                $alumno->alu_Nombre = strtoupper($alumnoTem->nombre) . ' ' . strtoupper($alumnoTem->apellido_paterno) . ' ' . strtoupper($alumnoTem->apellido_materno);
+                $alumno->status = $alumnoTem->estatus;
             } else {
                 $alumno->alu_Nombre = 'EL ALUMNO NO EXISTE, VERIFICA SU NUMERO DE CONTROL!';
             }
         }
     
         // Obtener todas las materias y calificaciones de los alumnos en una sola consulta
-        $materias = DB::connection('contEsc')->table('listassemestre')
-            ->join('grupossemestre', 'listassemestre.gse_Clave', '=', 'grupossemestre.gse_Clave')
-            ->join('reticula', 'grupossemestre.ret_Clave', '=', 'reticula.ret_Clave')
-            ->join('listassemestrecom', 'listassemestre.lse_Clave', '=', 'listassemestrecom.lse_clave')
-            ->whereIn('listassemestre.alu_NumControl', $noControles)
-            ->select('listassemestre.alu_NumControl', 'reticula.ret_NomCorto', 'listassemestrecom.lsc_NumUnidad', 'listassemestrecom.lsc_Calificacion')
+        $materias = DB::connection('sit')->table('listas')
+            ->join('grupos', 'grupos.id', '=', 'listas.grupo_id')
+            ->join('cat_materias', 'cat_materias.id', '=', 'grupos.materia_id')
+            ->join('lista_unidades', 'lista_unidades.lista_id', '=', 'listas.id')
+            ->join('alumnos', 'alumnos.id', '=', 'listas.alumno_id')
+            ->whereIn('alumnos.no_control', $noControles)
+            ->select(
+                'alumnos.no_control as alu_NumControl',
+                'cat_materias.nombre_corto as ret_NomCorto',
+                'lista_unidades.numero_unidad as lsc_NumUnidad',
+                'lista_unidades.calificacion as lsc_Calificacion'
+            )
             ->get()
-            ->groupBy('alu_NumControl'); // Agrupar materias por número de control
-    
+            ->groupBy('alu_NumControl');
+
         // Asignar materias a cada alumno
         foreach($alumnosGrupo as $alumno) {
-            $alumno->materias = $materias->get($alumno->no_Control, collect()); // Si no hay materias, asigna una colección vacía
+            $alumno->materias = $materias->get($alumno->no_Control, collect());
         }
     
         return view('sta.tutores.analisis', compact('grupo', 'alumnosGrupo'));

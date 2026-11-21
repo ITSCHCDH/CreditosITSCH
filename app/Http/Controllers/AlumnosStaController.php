@@ -18,6 +18,40 @@ use App\Models\Sit\Alumno as SitAlumno;
 
 class AlumnosStaController extends Controller
 {
+   /**
+    * Datos equivalentes a los que antes se leían de la conexión anterior:
+    * alumno, su carrera y los datos de dirección/salud, ahora desde SIT.
+    */
+   private function datosSitAlumno($nc): array
+   {
+      $alumno = SitAlumno::with(['user', 'carrera', 'alumnoComplemento', 'alumnoDatoMedico'])
+         ->where('no_control', $nc)
+         ->first();
+
+      $complemento = $alumno?->alumnoComplemento;
+      $datoMedico = $alumno?->alumnoDatoMedico;
+
+      $alu1 = (object) [
+         'alu_NumControl' => $alumno?->no_control ?? $nc,
+         'car_Clave' => $alumno?->carrera_id,
+      ];
+
+      $car = (object) [
+         'car_Clave' => $alumno?->carrera_id,
+         'car_Nombre' => $alumno?->carrera?->nombre,
+         'car_NombreCorto' => $alumno?->carrera?->nombre_corto,
+      ];
+
+      $alu2 = (object) [
+         'alc_Direccion' => $complemento?->direccion,
+         'alc_Colonia' => $complemento?->colonia,
+         'alc_CodPostal' => $complemento?->cp,
+         'alc_TipoSangre' => $datoMedico?->tipo_sangre,
+      ];
+
+      return [$alu1, $car, $alu2];
+   }
+
    public function ficha()
    {    
       $sitUser = Auth::guard('alumno')->user();
@@ -203,7 +237,7 @@ class AlumnosStaController extends Controller
    public function editDatSalud($nc)
    {
       $alu = Alumno::where('no_control',$nc)->first();
-      $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
+      $alu1 = $this->datosSitAlumno($nc)[0];
       $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
       $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
       return view('alumnos.sta.dsalud', compact('alu1', 'alu', 'clinicos','alumno_data'));
@@ -297,7 +331,7 @@ class AlumnosStaController extends Controller
             }
             $clinicos->save();
             $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();     
-            $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
+            $alu1 = $this->datosSitAlumno($nc)[0];
             $fam = Datos_familiares::where('id_alu', $alu->id)->first();
             if ($fam == null) {
                 $fam = new Datos_familiares();
@@ -355,7 +389,7 @@ class AlumnosStaController extends Controller
             $fam->save();
             
             
-            $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
+            $alu1 = $this->datosSitAlumno($nc)[0];
             $soc = Social::where('id_alu', $alu->id)->first();
             if ($soc == null) {
                 $soc = new Social();
@@ -403,7 +437,7 @@ class AlumnosStaController extends Controller
             $soc->miedo = $request->alu_miedo;
             $soc->save();
 
-            $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
+            $alu1 = $this->datosSitAlumno($nc)[0];
             $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();          
             return view('alumnos.sta.autorizar', compact('alu1', 'alu','alumno_data'));
         }
@@ -428,9 +462,7 @@ class AlumnosStaController extends Controller
         try
         {
             $alu = Alumno::where('no_control',$nc)->first();
-            $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
-            $car = DB::connection('contEsc')->table('carreras')->where('car_Clave', $alu1->car_Clave)->first();
-            $alu2 = DB::connection('contEsc')->table('alumcom')->where('alu_NumControl', $alu1->alu_NumControl)->first();
+            [$alu1, $car, $alu2] = $this->datosSitAlumno($nc);
     
             $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
     

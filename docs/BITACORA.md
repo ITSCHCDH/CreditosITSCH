@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 15:11 · **Entradas registradas:** 42 · **Último commit previo a esta sesión:** `cee9d6a` (2026-11-21 14:59).
+**Última entrada:** 2026-11-21 15:18 · **Entradas registradas:** 43 · **Último commit previo a esta sesión:** `13eec8b` (2026-11-21 15:13).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -20,12 +20,13 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 | Galería de evidencias | ✅ 7 pruebas del endpoint, 13 de render y 19 de DOM |
 | Buscadores en evidencias | ✅ 10 pruebas de endpoints, 11 de render y 14 de integración |
 | Jefes de carrera sobre SIT | ✅ 28 pruebas con datos reales, 12 de render y 8 de regresión |
+| STA completo sobre SIT | ✅ 24 pruebas de integración y 0 referencias a `contEsc` |
 
 ### Riesgos abiertos
 
 | # | Riesgo | Evidencia | Prioridad |
 |---|---|---|---|
-| 1 | Identidad académica aún duplicada: 13 controladores usan `App\Models\Alumno` (11) o la conexión `contEsc` (4) | `app/Http/Controllers/*` | Alta |
+| 1 | Identidad académica aún duplicada: 11 controladores usan `App\Models\Alumno` para datos que ya existen en SIT; la conexión `contEsc` ya se eliminó | `app/Http/Controllers/*` | Alta |
 | 2 | SQL crudo con concatenación de `$busqueda` en `VerificaEvidenciaController::avanceAlumno()` (8 consultas); el reporte ya migró a SIT | Inyección SQL latente | Alta |
 | 3 | Sin clave puente estable entre `sit.alumnos` y las tablas auxiliares de `creditos` (`personales`, `padres`, `direcciones`, `historiales_clinicos`); `id_alu` sobrevive sin FK | Verificación 2026-11-21 12:56 | Alta |
 | 4 | Contraseña de prueba `Prueba123!` documentada y `PruebaActividadesSeeder` versionado | Entrada 2026-11-21 12:10 | Media |
@@ -38,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 15:18 — STA completo sobre SIT y conexión contEsc eliminada
 - 2026-11-21 15:11 — Jefes de carrera migrado de contEsc a SIT
 - 2026-11-21 14:57 — Encabezado de página en avance del alumno
 - 2026-11-21 14:54 — Encabezado de página en verifica_evidencia
@@ -127,7 +129,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 6 | 2026-11-20 18:59 – 2026-11-21 15:11 |
+| Trayectoria académica | `trayectoria` | 7 | 2026-11-20 18:59 – 2026-11-21 15:18 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -155,6 +157,50 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 15:18] — STA completo sobre SIT y conexión contEsc eliminada
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Convertir las consultas restantes de STA a `sit` y desaparecer la conexión `contEsc`.
+
+**Archivos modificados:**
+- `app/Http/Controllers/STAController.php` (Profesor, Tutor y Departamento de tutorías reescritos sobre SIT)
+- `app/Http/Controllers/GruposController.php` (carreras y nombres de carrera desde SIT)
+- `app/Http/Controllers/AlumnosStaController.php` (identidad y datos de dirección/salud desde SIT)
+- `app/Services/Sit/CarrerasSitService.php` (`opcionesPorArea()` y `nombreDeArea()`)
+- `config/database.php` (se eliminan las conexiones `contEsc` y `contEscMy`)
+
+**Mapeo adicional (contEsc → SIT):**
+
+| contEsc | SIT |
+|---|---|
+| `reticula` (materias del plan) | `plan_materias` + `cat_materias` |
+| `departamentos` | `cat_departamentos_academicos` + `catedraticos.departamento_adscripcion` |
+| `grupossemestre` (grupos) | `grupos` (`clave_grupo`, `materia_id`, `catedratico_id`, `periodo_id`) |
+| `listassemestre` / `listassemestrecom` (parciales) | `listas` / `lista_unidades` |
+| `alumcom` (dirección y salud) | `alumno_complementos` / `alumno_datos_medicos` |
+
+**Decisiones tomadas:**
+- Los profesores de una carrera se obtienen de los departamentos responsables de las materias de su plan (`plan_materias` → `cat_materias.departamento_responsable_id`), no de `catedraticos.carrera_id`, que casi siempre está vacío en SIT.
+- Para un usuario `STA_PROFESOR` se conserva la coincidencia por nombre contra `sit.users` + `catedraticos`, porque no hay correo compartido entre `creditos.users` y `sit.users`.
+- Las tablas propias (`grupos.id_Carrera`, `asignaciones_tutores.car_Clave`) guardan el id de área de créditos; se traducen a la carrera SIT con `CarrerasSitService::opcionesPorArea()`.
+- Las calificaciones por unidad se deduplican por lista tomando la última oportunidad y se ordenan por apellido.
+- Se eliminaron también `contEscMy` y las variables `DB_*_SECOND`, que solo existían para esa conexión.
+
+**Pendientes / Deuda técnica:**
+- El módulo de tutores sigue operando sobre las tablas propias (`grupos`, `asignaciones_tutores`, `gpo_tutorias`); queda decidir si migran a SIT.
+- Los semáforos médico y psicológico siguen sin fuente en SIT.
+- Validar los flujos en la app autenticada; las pruebas fueron sobre los controladores con datos reales.
+
+**Tests ejecutados:**
+- ✅ 24 comprobaciones de integración STA (carreras, profesores por departamento, materias, unidades, calificaciones por unidad, tutorías, alta de alumno con rollback, grupos y datos de alumno).
+- ✅ `grep contEsc` en `app`, `config`, `resources`, `routes`, `database` y `tests`: **0 coincidencias**.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+
+**Referencias:**
+- `app/Services/Sit/CarrerasSitService.php`
 
 ### [2026-11-21 15:11] — Jefes de carrera migrado de contEsc a SIT
 

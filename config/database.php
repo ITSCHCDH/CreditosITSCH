@@ -70,36 +70,6 @@ return [
         ],
         
         
-        //Conexión a base de datos de prueba con mysql
-       'contEscMy' => [
-            'driver' => 'mysql',           
-            'host' => env('DB_HOST_SECOND', ''),
-            'port' => env('DB_PORT_SECOND', ''),
-            'database' => env('DB_DATABASE_SECOND', ''),
-            'username' => env('DB_USERNAME_SECOND', ''),
-            'password' => env('DB_PASSWORD_SECOND', ''),
-            'unix_socket' => env('DB_SOCKET_SECOND', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
-            'strict' => false,
-            'engine' => null,            
-        ],
-
-      
-       //Conexión a base de datos con sqlserver
-       'contEsc' => [
-            'driver' => 'sqlsrv',
-            'host' => env('DB_HOST_SECOND', 'forge'),
-            'port' => env('DB_PORT_SECOND', 'forge'),
-            'database' => env('DB_DATABASE_SECOND', 'forge'),
-            'username' => env('DB_USERNAME_SECOND', 'forge'),
-            'password' => env('DB_PASSWORD_SECOND', ''),
-            'charset' => 'utf8',            
-            'prefix' => '',
-            'encrypt' => 'no',  
-            'trust_server_certificate' => 'no',  
-        ],
 
         
         'pgsql' => [

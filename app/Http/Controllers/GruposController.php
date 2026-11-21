@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Grupo;
 use Illuminate\Support\Facades\DB;
 use App\Models\AsignacionTutores;
+use App\Services\Sit\CarrerasSitService;
 use Alert;
 use PDF;
 
@@ -30,15 +31,11 @@ class GruposController extends Controller
     {
         //Obtenemos los grupos de la base de datos
         $grupos = Grupo::all();
-        //Obtenemos las carreras de la base de datos
-        $carreras = DB::connection('contEsc')->table('carreras')
-        ->where('car_Status','VIGENTE')
-        ->get();        
+        //Obtenemos las carreras equivalentes en SIT
+        $carreras = CarrerasSitService::opcionesPorArea();        
         //Agregamos el nombre de la carrera a cada grupo
         foreach ($grupos as $grupo) {
-            $grupo->gpo_Carrera = DB::connection('contEsc')->table('carreras')
-            ->where('car_Clave',$grupo->id_Carrera)
-            ->first()->car_Nombre;
+            $grupo->gpo_Carrera = CarrerasSitService::nombreDeArea($grupo->id_Carrera);
         }
         //Retornamos la vista de grupos con los grupos obtenidos
         return view('sta.tutorias.grupos',compact('grupos','carreras'));
@@ -185,9 +182,7 @@ class GruposController extends Controller
         ->where('asignaciones_tutores.id',$id)
         ->first();         
         //Obtenemos el nombre de la carrera y se lo asignamos a la variable
-        $data->car_Nombre = DB::connection('contEsc')->table('carreras')
-        ->where('car_Clave',$data->car_Clave)
-        ->first()->car_Nombre;  
+        $data->car_Nombre = CarrerasSitService::nombreDeArea($data->car_Clave);
         //Abrimos el editor de PDF y le enviamos la vista que diseñamos para la impresión              
         return PDF::loadView('sta.tutorias.asigTutPDF', compact('data'))
         ->setPaper('letter', 'portrait')
@@ -205,9 +200,7 @@ class GruposController extends Controller
         ->where('asignaciones_tutores.id',$id)
         ->first();         
         //Obtenemos el nombre de la carrera y se lo asignamos a la variable
-        $data->car_Nombre = DB::connection('contEsc')->table('carreras')
-        ->where('car_Clave',$data->car_Clave)
-        ->first()->car_Nombre;  
+        $data->car_Nombre = CarrerasSitService::nombreDeArea($data->car_Clave);
         //Abrimos el editor de PDF y le enviamos la vista que diseñamos para la impresión              
         return PDF::loadView('sta.tutorias.libTutPDF', compact('data'))
         ->setPaper('letter', 'portrait')

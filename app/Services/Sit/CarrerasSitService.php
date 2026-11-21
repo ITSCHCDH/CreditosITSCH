@@ -79,4 +79,42 @@ class CarrerasSitService
 
         return $query->get();
     }
+
+    /**
+     * Carreras con la clave de área de créditos, que es la que guardan las
+     * tablas propias (grupos.id_Carrera, asignaciones_tutores.car_Clave).
+     */
+    public static function opcionesPorArea(bool $soloActivas = true): Collection
+    {
+        $mapa = self::mapaAreaCarrera();
+        if ($mapa === []) {
+            return collect();
+        }
+
+        $carreras = Carrera::whereIn('id', array_values($mapa))
+            ->when($soloActivas, fn ($query) => $query->where('activo', 1))
+            ->get()
+            ->keyBy('id');
+
+        return collect($mapa)
+            ->map(fn ($carreraId, $areaId) => isset($carreras[$carreraId])
+                ? (object) [
+                    'car_Clave' => (int) $areaId,
+                    'car_Nombre' => $carreras[$carreraId]->nombre,
+                ]
+                : null)
+            ->filter()
+            ->sortBy('car_Nombre')
+            ->values();
+    }
+
+    public static function nombreDeArea($areaId, string $porDefecto = 'Desconocido'): string
+    {
+        $carreraId = self::deArea((int) $areaId);
+        if ($carreraId === null) {
+            return $porDefecto;
+        }
+
+        return Carrera::find($carreraId)?->nombre ?? $porDefecto;
+    }
 }
