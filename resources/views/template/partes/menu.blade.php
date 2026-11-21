@@ -4,13 +4,14 @@
         padding: .55rem 1.25rem;
         background: linear-gradient(135deg, #102b4a 0%, #173c66 72%, #1f4f7d 100%) !important;
         box-shadow: 0 .5rem 1.5rem rgba(16, 43, 74, .22);
+        font-family: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
     }
     .system-navbar .navbar-brand {
         display: flex;
         align-items: center;
         gap: .65rem;
         margin-right: 1.25rem;
-        font-weight: 700;
+        font-weight: 600;
         letter-spacing: .02em;
     }
     .system-navbar .brand-mark {
@@ -30,7 +31,9 @@
         padding: .55rem .75rem !important;
         border-radius: .65rem;
         color: rgba(255, 255, 255, .86) !important;
-        font-weight: 500;
+        font-size: .95rem;
+        font-weight: 300;
+        letter-spacing: .015em;
         transition: .18s ease;
     }
     .system-navbar .nav-link i {
@@ -43,6 +46,7 @@
     .system-navbar .nav-item.show > .nav-link {
         color: #fff !important;
         background: rgba(255, 255, 255, .12);
+        font-weight: 400;
     }
     .system-navbar .dropdown-menu {
         min-width: 245px;
@@ -59,6 +63,9 @@
         padding: .65rem .75rem;
         border-radius: .55rem;
         color: #334155;
+        font-size: .93rem;
+        font-weight: 300;
+        letter-spacing: .01em;
     }
     .system-navbar .dropdown-item i {
         width: 20px;
@@ -69,6 +76,7 @@
     .system-navbar .dropdown-item:focus {
         color: #102b4a;
         background: #edf3f8;
+        font-weight: 400;
     }
     .system-navbar .dropdown-divider {
         margin: .35rem .35rem;
@@ -86,6 +94,17 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+    /* Bootstrap 5.3 ya no colorea el icono con .navbar-dark */
+    .system-navbar .navbar-toggler {
+        color: rgba(255, 255, 255, .92);
+        border-color: rgba(255, 255, 255, .25);
+    }
+    .system-navbar .navbar-toggler:focus {
+        box-shadow: 0 0 0 .15rem rgba(255, 255, 255, .25);
+    }
+    .system-navbar .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
     .system-navbar .logout-item,
     .system-navbar .logout-item i {
         color: #b42318;
@@ -93,9 +112,15 @@
     @media (max-width: 991.98px) {
         .system-navbar { padding: .6rem 1rem; }
         .system-navbar .container-fluid {
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .system-navbar .navbar-toggler {
+            margin-left: auto;
         }
         .system-navbar .navbar-collapse {
+            flex-basis: 100%;
+            width: 100%;
             margin-top: .75rem;
             padding: .75rem;
             border-radius: .85rem;

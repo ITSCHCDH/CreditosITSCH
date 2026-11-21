@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 16:28 · **Entradas registradas:** 54 · **Último commit previo a esta sesión:** `f4517e7` (2026-11-21 16:27).
+**Última entrada:** 2026-11-21 16:43 · **Entradas registradas:** 55 · **Último commit previo a esta sesión:** `9a87826` (2026-11-21 16:29).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 16:43 — Menú: tipografía delgada y menú móvil corregido
 - 2026-11-21 16:28 — UX del Departamento de tutorías
 - 2026-11-21 16:26 — UX de la vista Tutor
 - 2026-11-21 16:21 — Profesores: buscador reutilizable y filtro corregido
@@ -141,7 +142,7 @@ Notas de implementación:
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
 | Trayectoria académica | `trayectoria` | 18 | 2026-11-20 18:59 – 2026-11-21 16:28 |
-| Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
+| Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
 ## Trazabilidad con Git
@@ -168,6 +169,40 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 16:43] — Menú: tipografía delgada y menú móvil corregido
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** infraestructura
+- **Prompt/Tarea original:** Mejorar el menú del sistema con una tipografía más fina (delgada).
+
+**Archivos modificados:**
+- `resources/views/template/partes/menu.blade.php` (tipografía y navegación móvil)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna.
+
+**Decisiones tomadas:**
+- Los enlaces del menú y los ítems del desplegable pasan a **Roboto Light (300)** con `letter-spacing` ligero; al pasar el cursor o estar activos suben a 400 para conservar la jerarquía.
+- La marca conserva peso 600 y se declara explícitamente la familia Roboto en el navbar, para que el peso 300 no dependa de la fuente por defecto.
+- Se corrige el menú móvil: el contenedor ahora envuelve (`flex-wrap: wrap`) con el botón a la derecha y el panel a ancho completo; antes el panel quedaba comprimido al lado de la marca.
+- Se pinta el icono del botón hamburguesa en blanco: Bootstrap 5.3 ya no colorea el toggler con `.navbar-dark`, por lo que quedaba invisible sobre el fondo oscuro.
+
+**Pendientes / Deuda técnica:**
+- Ninguno relacionado.
+
+**Tests ejecutados:**
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Capturas de escritorio y móvil (menú cerrado y abierto) revisadas.
+
+**Referencias:**
+- `docs/img/menu-desktop.png`
+- `docs/img/menu-movil.png`
+- `docs/img/menu-movil-cerrado.png`
 
 ### [2026-11-21 16:28] — UX del Departamento de tutorías
 
