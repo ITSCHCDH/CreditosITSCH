@@ -10,6 +10,7 @@ use App\Models\Actividad_Evidencia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Alert;
 use App\Http\Controllers\Utilities\HttpCode;
 use Exception;
@@ -19,7 +20,7 @@ class EvidenciasController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:VIP_SOLO_LECTURA|VIP|VER_EVIDENCIA')->only(['index','show']);
+        $this->middleware('permission:VIP_SOLO_LECTURA|VIP|VER_EVIDENCIA')->only(['index','show','buscarActividades']);
         $this->middleware('permission:VIP|CREAR_EVIDENCIA')->only('create','store');
     }
     /**
@@ -172,28 +173,71 @@ class EvidenciasController extends Controller
 
     public function peticionAjax(Request $request){
         //Consultamos todos los responsables asignados a una activdad
-        $responsables = null;
-        if(Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA')){
-            $responsables = DB::table('actividad_evidencia as ae')
+        return response()->json($this->responsablesDeActividad($request->get('id')));
+    }
+
+    /** Responsables para el combobox: mismo criterio de permisos que peticionAjax. */
+    public function buscarResponsables(Request $request){
+        $texto = Str::lower(trim((string) $request->get('nombre')));
+
+        $responsables = $this->responsablesDeActividad($request->get('actividad_id'))
+            ->filter(function ($responsable) use ($texto) {
+                return $texto === '' || Str::contains(Str::lower((string) $responsable->name), $texto);
+            })
+            ->take(20)
+            ->values();
+
+        return response()->json($responsables);
+    }
+
+    /** Actividades para el combobox: misma consulta que index(). */
+    public function buscarActividades(Request $request){
+        $texto = trim((string) $request->get('nombre'));
+
+        if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA')) {
+            $consulta = Actividad::select('nombre','id');
+            if ($texto !== '') {
+                $consulta->where('nombre','like',"%{$texto}%");
+            }
+        } else {
+            $consulta = DB::table('users as u')
+                ->join('actividad_evidencia as ae',function($join){
+                    $join->on('ae.user_id','=','u.id');
+                })
+                ->join('actividad as a','a.id','=','ae.actividad_id')
+                ->where('u.id','=',Auth::guard('web')->User()->id)
+                ->orwhere('a.id_user','=',Auth::User()->id)
+                ->select('a.nombre','a.id');
+            if ($texto !== '') {
+                $consulta->where('a.nombre','like',"%{$texto}%");
+            }
+        }
+
+        return response()->json($consulta->orderBy('nombre')->limit(20)->get());
+    }
+
+    private function responsablesDeActividad($actividadId)
+    {
+        if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA')) {
+            return DB::table('actividad_evidencia as ae')
                 ->join('users as u','u.id','ae.user_id')
-                ->where('ae.actividad_id','=',$request->get('id'))
+                ->where('ae.actividad_id','=',$actividadId)
                 ->select('u.id','u.name')
                 ->orderBy('u.name')
                 ->get();
-        }else{
-            $actividad = Actividad::find($request->get('id'));
-            if($actividad->id_user==Auth::User()->id){
-                $responsables = DB::table('actividad_evidencia as ae')
-                    ->join('users as u','u.id','ae.user_id')
-                    ->where('ae.actividad_id','=',$request->get('id'))
-                    ->select('u.id','u.name')
-                    ->orderBy('u.name')
-                    ->get();
-            }else{
-                $responsables = User::where('id','=',Auth::User()->id)->select('id','name')->get();
-            }
         }
-        return response()->json($responsables);
+
+        $actividad = Actividad::find($actividadId);
+        if ($actividad && $actividad->id_user == Auth::User()->id) {
+            return DB::table('actividad_evidencia as ae')
+                ->join('users as u','u.id','ae.user_id')
+                ->where('ae.actividad_id','=',$actividadId)
+                ->select('u.id','u.name')
+                ->orderBy('u.name')
+                ->get();
+        }
+
+        return User::where('id','=',Auth::User()->id)->select('id','name')->get();
     }
 
     public function peticionGaleria(Request $request){

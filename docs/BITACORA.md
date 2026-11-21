@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 14:27 · **Entradas registradas:** 36 · **Último commit previo a esta sesión:** `3be46fb` (2026-11-21 14:19).
+**Última entrada:** 2026-11-21 14:48 · **Entradas registradas:** 37 · **Último commit previo a esta sesión:** `91c6990` (2026-11-21 14:33).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -18,6 +18,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 | Buscador de alumnos (`template.partes.buscador_combobox`) | ✅ 43 + 17 pruebas de interacción, 12 + 38 + 12 de render, capturas en 3 anchos |
 | Reporte de avance sobre `sit.alumnos` | ✅ 21 + 12 pruebas con datos reales, 10 + 10 de render, 8 de sincronización; 1.11 s en el peor caso |
 | Galería de evidencias | ✅ 7 pruebas del endpoint, 13 de render y 19 de DOM |
+| Buscadores en evidencias | ✅ 10 pruebas de endpoints, 11 de render y 14 de integración |
 
 ### Riesgos abiertos
 
@@ -36,6 +37,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 14:48 — Filtros de evidencias con el buscador reutilizable
 - 2026-11-21 14:27 — UX de la galería de evidencias
 - 2026-11-21 14:15 — Filtros de reportes en cascada y sin campos obligatorios
 - 2026-11-21 13:38 — Filtro de carreras unificado con el catálogo del SIT
@@ -98,8 +100,9 @@ Notas de implementación:
 - El CSS viaja en `@push('styles')` + `@once`; el molde lo renderiza en el `head` mediante `@stack('styles')`, y se emite una sola vez aunque haya varias instancias.
 - Cada instancia usa ids con prefijo (`{id}_combo`, `{id}_input`, `{id}_value`…) y su propio JavaScript con guard `cbxReady`, por lo que pueden convivir varias en una página.
 - El endpoint debe responder JSON con una lista de objetos; `keys` mapea qué campo es el valor, la etiqueta y el metadato. Con `meta => ''` el chip muestra solo valor y etiqueta.
-- Opciones de integración: `bare => true` renderiza solo el control (sin card ni formulario propios, para formularios existentes), `required => false` permite enviar sin selección y `show_submit => false` oculta el botón propio.
+- Opciones de integración: `bare => true` renderiza solo el control (sin card ni formulario propios, para formularios existentes), `required => false` permite enviar sin selección, `show_submit => false` oculta el botón propio y `show_value => false` evita mostrar el id interno en el chip.
 - El control expone `combo.cbxSetParams({ ... })` para actualizar en caliente los parámetros del endpoint; la vista de reportes lo usa para acoplar la carrera elegida a la búsqueda.
+- También expone `combo.cbxSetSelection({ value, label, meta })` y `combo.cbxReset()`, y emite `change` en su input oculto al seleccionar o limpiar, para que la vista anfitriona reaccione sin acoplarse al componente.
 
 **Para registrar una entrada nueva:**
 
@@ -118,7 +121,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 21 | 2026-11-21 11:49 – 14:27 |
+| Créditos complementarios | `créditos` | 22 | 2026-11-21 11:49 – 14:48 |
 | Trayectoria académica | `trayectoria` | 4 | 2026-11-20 18:59 – 19:09 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -147,6 +150,51 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 14:48] — Filtros de evidencias con el buscador reutilizable
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Reemplazar los selects de actividad y responsable por el buscador creado para búsquedas, sin cambiar la lógica del sistema.
+
+**Archivos modificados:**
+- `resources/views/admin/evidencias/index.blade.php` (buscadores en lugar de selects, con los selects originales ocultos)
+- `app/Http/Controllers/EvidenciasController.php` (`buscarActividades()`, `buscarResponsables()` y extracción de `responsablesDeActividad()`)
+- `routes/web.php` (rutas `evidencias.actividades_busqueda` y `evidencias.responsables_busqueda`)
+- `resources/views/template/partes/buscador_combobox.blade.php` (evento `change`, `cbxSetSelection`, `cbxReset` y opción `show_value`)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna nueva: `buscarActividades()` reutiliza la consulta de `index()` y `buscarResponsables()` la de `peticionAjax()`, ahora extraída a `responsablesDeActividad()`.
+
+**Decisiones tomadas:**
+- Los dos `select` originales se conservan **ocultos** como fuente de verdad; los buscadores escriben en ellos y disparan los mismos eventos, por lo que la galería, las cookies y los permisos no cambian.
+- Puente bidireccional: del buscador al select con el evento `change`, y del select al buscador con un `MutationObserver` que reacciona cuando se recargan los responsables y cuando se aplican las cookies.
+- Cambiar de actividad actualiza los parámetros del buscador de responsables y limpia su selección.
+- «Todos los responsables» se representa dejando el buscador vacío, que el puente traduce a `nulo` en el select oculto.
+- El componente ahora emite `change` en su input oculto y expone `cbxSetSelection()` y `cbxReset()`, útiles para cualquier vista anfitriona.
+- Se añadió `show_value => false` para que el chip no muestre el id interno (actividad/responsable), solo la etiqueta.
+- La vista oculta el hint del componente porque se duplicaba; los errores de búsqueda siguen visibles en el panel.
+- Hubo que regenerar la caché de rutas (`route:clear` y `route:cache`) para que las rutas nuevas existieran.
+
+**Pendientes / Deuda técnica:**
+- Validar en navegador con datos reales; la prueba de integración usa jQuery real y AJAX simulado.
+- El buscador de responsables no devuelve resultados hasta elegir una actividad.
+- Para usuarios sin privilegios, el endpoint de responsables sigue devolviendo solo su propio usuario, igual que antes.
+
+**Tests ejecutados:**
+- ✅ 10 comprobaciones de los endpoints de búsqueda (actividades, responsables, filtros, vacíos y contrato de `peticionAjax`).
+- ✅ 11 comprobaciones de render (selects ocultos, buscadores, endpoints, puente y Observador).
+- ✅ 14 comprobaciones de integración con jQuery real (selección, AJAX de la lógica original, galería, cookies y flujo inverso).
+- ✅ `php artisan view:cache`, `route:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Capturas a 1280 px y 500 px.
+
+**Referencias:**
+- `docs/img/evidencias-desktop.png`
+- `docs/img/evidencias-movil.png`
 
 ### [2026-11-21 14:27] — UX de la galería de evidencias
 

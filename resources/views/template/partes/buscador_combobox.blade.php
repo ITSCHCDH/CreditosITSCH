@@ -47,6 +47,7 @@
         'submit_label' => 'Consultar',
         'submit_icon' => 'fa-solid fa-chart-line',
         'show_submit' => true,
+        'show_value' => true,
         'bare' => false,
         'required' => true,
         'min_chars' => 2,
@@ -101,6 +102,7 @@
         'minChars' => $minChars,
         'limit' => $limit,
         'required' => (bool) $options['required'],
+        'showValue' => (bool) $options['show_value'],
         'messages' => $messages,
     ];
 @endphp
@@ -124,6 +126,7 @@
     .cbx-chip-text{display:flex;flex:1 1 auto;flex-wrap:wrap;align-items:baseline;gap:.45rem;min-width:0;line-height:1.25}
     .cbx-chip-label{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:#102b4a}
     .cbx-chip-meta{font-size:.78rem;color:#64748b}
+    .cbx-chip-meta[hidden]{display:none!important}
     .cbx-actions{display:flex;align-items:center;gap:.2rem;margin-left:auto;flex:0 0 auto}
     .cbx-icon-btn{width:34px;height:34px;display:grid;place-items:center;border:0;border-radius:.6rem;background:transparent;color:#64748b;cursor:pointer;transition:background-color .15s ease,color .15s ease}
     .cbx-icon-btn:hover,.cbx-icon-btn:focus-visible{background:#eef3f8;color:#173c66}
@@ -224,6 +227,7 @@
         const minChars = config.minChars;
         const limit = config.limit;
         const required = config.required !== false;
+        const showValue = config.showValue !== false;
 
         let matches = [];
         let activeIndex = -1;
@@ -237,6 +241,23 @@
 
         combo.cbxSetParams = function (extra) {
             liveParams = Object.assign(liveParams, extra || {});
+        };
+
+        /** Permite fijar la selección desde el anfitrión (por ejemplo, al cambiar otro filtro). */
+        combo.cbxSetSelection = function (item) {
+            if (!item || normalize(item.value) === '') {
+                clearSelection(false);
+                return;
+            }
+            const fila = {};
+            fila[keys.value] = item.value;
+            fila[keys.label] = item.label || item.value;
+            fila[keys.meta] = item.meta || '';
+            setSelection(fila);
+        };
+
+        combo.cbxReset = function () {
+            clearSelection(false);
         };
 
         function setHint(message, state) {
@@ -357,8 +378,10 @@
             setSubmitEnabled(true);
             chipLabel.textContent = label;
             chipLabel.title = label;
-            chipMeta.textContent = meta !== '' ? value + ' · ' + meta : value;
-            chipMeta.title = chipMeta.textContent;
+            const metaTexto = showValue ? (meta !== '' ? value + ' · ' + meta : value) : meta;
+            chipMeta.textContent = metaTexto;
+            chipMeta.title = metaTexto;
+            chipMeta.hidden = metaTexto === '';
             chip.hidden = false;
             input.hidden = true;
             input.value = '';
@@ -366,6 +389,7 @@
             matches = [];
             closePanel();
             setHint(messages.selected_state, 'ok');
+            hiddenControl.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
         function clearSelection(focusInput) {
@@ -380,6 +404,7 @@
             activeIndex = -1;
             closePanel();
             if (focusInput) { input.focus(); }
+            hiddenControl.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
         function choose(index) {

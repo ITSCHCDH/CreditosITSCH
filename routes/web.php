@@ -210,6 +210,8 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('evidencias/galeria', [EvidenciasController::class, 'peticionGaleria'])->name('evidencias.galeria');
     Route::get('evidencias/peticion',[EvidenciasController::class, 'peticionAjax'])->name('evidencias.peticion');
     Route::get('evidencias/eliminar',[EvidenciasController::class, 'peticionEliminar'])->name('evidencias.eliminar');
+    Route::get('evidencias/actividades/busqueda',[EvidenciasController::class, 'buscarActividades'])->name('evidencias.actividades_busqueda');
+    Route::get('evidencias/responsables/busqueda',[EvidenciasController::class, 'buscarResponsables'])->name('evidencias.responsables_busqueda');
     /****Rutas para el controlador de evidencias*****/
     Route::resource('evidencias','EvidenciasController');
 

@@ -25,6 +25,8 @@
         .evi-icon{width:44px;height:44px;flex:0 0 auto;display:grid;place-items:center;border-radius:.8rem;color:#173c66;background:#edf3f8;font-size:1.05rem}
         .evi-filters .form-label{font-size:.82rem;font-weight:600;color:#334155;margin-bottom:.3rem}
         .evi-filters .form-select{min-height:46px;border-radius:.7rem}
+        .evi-filters .cbx-combo{min-height:46px}
+        .evi-filters .cbx-hint{display:none}
         .evi-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(8rem,1fr));gap:.75rem;margin-top:1rem}
         .evi-stat{display:flex;flex-direction:column;gap:.15rem;padding:.75rem .9rem;border:1px solid #e7edf4;border-radius:.85rem;background:#f8fafc}
         .evi-stat-value{font-size:1.3rem;font-weight:700;color:#102b4a;line-height:1.1}
@@ -72,25 +74,59 @@
             </div>
         </div>
         <div class="evi-filters">
+            {{-- Los selects originales se conservan ocultos como fuente de verdad para la lógica existente --}}
+            <div class="d-none">
+                <select name="actividades_id" id="actividades_id">
+                    <option value="">Seleccione una actividad</option>
+                    @foreach ($actividades as $act)
+                        <option value="{{ $act->id }}">{{ $act->nombre }}</option>
+                    @endforeach
+                </select>
+                <select name="responsables_id" id="responsables_id">
+                    @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VIP_EVIDENCIA'))
+                        <option value="nulo">Todos los responsables</option>
+                    @else
+                        <option value="{{ Auth::User()->id }}">{{ Auth::User()->name }}</option>
+                    @endif
+                </select>
+            </div>
             <div class="row g-3 align-items-end">
                 <div class="col-sm-6 col-xl-5">
-                    <label class="form-label" for="actividades_id">Actividad</label>
-                    <select name="actividades_id" id="actividades_id" class="form-select" required>
-                        <option value="" selected>Seleccione una actividad</option>
-                        @foreach ($actividades as $act)
-                            <option value="{{ $act->id }}">{{ $act->nombre }}</option>
-                        @endforeach
-                    </select>
+                    @include('template.partes.buscador_combobox', [
+                        'config' => [
+                            'id' => 'actividad',
+                            'bare' => true,
+                            'required' => false,
+                            'show_submit' => false,
+                            'label' => 'Actividad',
+                            'placeholder' => 'Buscar actividad…',
+                            'field' => 'actividad_id',
+                            'endpoint' => route('evidencias.actividades_busqueda'),
+                            'query_param' => 'nombre',
+                            'min_chars' => 1,
+                            'show_value' => false,
+                            'keys' => ['value' => 'id', 'label' => 'nombre', 'meta' => ''],
+                        ],
+                    ])
                 </div>
                 <div class="col-sm-6 col-xl-5">
-                    <label class="form-label" for="responsables_id">Responsable</label>
-                    <select class="form-select" required name="responsables_id" id="responsables_id">
-                        @if (Auth::User()->can('VIP') || Auth::User()->can('VIP_SOLO_LECTURA') || Auth::User()->can('VIP_EVIDENCIA'))
-                            <option value="nulo">Todos los responsables</option>
-                        @else
-                            <option value="{{ Auth::User()->id }}">{{ Auth::User()->name }}</option>
-                        @endif
-                    </select>
+                    @include('template.partes.buscador_combobox', [
+                        'config' => [
+                            'id' => 'responsable',
+                            'bare' => true,
+                            'required' => false,
+                            'show_submit' => false,
+                            'label' => 'Responsable',
+                            'placeholder' => 'Todos los responsables',
+                            'field' => 'responsable_id',
+                            'endpoint' => route('evidencias.responsables_busqueda'),
+                            'query_param' => 'nombre',
+                            'params' => ['actividad_id' => ''],
+                            'min_chars' => 1,
+                            'show_value' => false,
+                            'keys' => ['value' => 'id', 'label' => 'name', 'meta' => ''],
+                        ],
+                    ])
                 </div>
                 @if (Auth::User()->can('VIP') || Auth::User()->can('CREAR_EVIDENCIA'))
                     <div class="col-12 col-xl-2">
@@ -588,5 +624,71 @@
             cookiesEvidencia();
             actualizarBotonNueva();
         });
+    </script>
+
+    {{-- Puente entre los buscadores y los selects originales: la lógica de la vista no cambia. --}}
+    <script type="text/javascript">
+        (function () {
+            const actividadSelect = document.getElementById('actividades_id');
+            const responsableSelect = document.getElementById('responsables_id');
+            const actividadCombo = document.getElementById('actividad_combo');
+            const responsableCombo = document.getElementById('responsable_combo');
+            const actividadValue = document.getElementById('actividad_value');
+            const responsableValue = document.getElementById('responsable_value');
+
+            if (!actividadSelect || !responsableSelect || !actividadCombo || !responsableCombo || !actividadValue || !responsableValue) {
+                return;
+            }
+
+            function textoSeleccionado(select) {
+                const opcion = select.options[select.selectedIndex];
+                return opcion ? opcion.text : '';
+            }
+
+            function sincronizarActividad() {
+                const valor = actividadSelect.value || '';
+                responsableCombo.cbxSetParams({ actividad_id: valor });
+                if (valor === '') {
+                    actividadCombo.cbxReset();
+                    return;
+                }
+                actividadCombo.cbxSetSelection({ value: valor, label: textoSeleccionado(actividadSelect) });
+            }
+
+            function sincronizarResponsable() {
+                const valor = responsableSelect.value || '';
+                if (valor === '' || valor === 'nulo') {
+                    responsableCombo.cbxReset();
+                    return;
+                }
+                responsableCombo.cbxSetSelection({ value: valor, label: textoSeleccionado(responsableSelect) });
+            }
+
+            actividadValue.addEventListener('change', function () {
+                const valor = this.value || '';
+                if (actividadSelect.value === valor) { return; }
+
+                responsableCombo.cbxSetParams({ actividad_id: valor });
+                responsableCombo.cbxReset();
+                actividadSelect.value = valor;
+                $(actividadSelect).trigger('change');
+                if (typeof actualizarBotonNueva === 'function') { actualizarBotonNueva(); }
+            });
+
+            responsableValue.addEventListener('change', function () {
+                const valor = this.value || 'nulo';
+                if (responsableSelect.value === valor) { return; }
+
+                responsableSelect.value = valor;
+                $(responsableSelect).trigger('change');
+            });
+
+            new MutationObserver(sincronizarResponsable).observe(responsableSelect, { childList: true });
+
+            $(document).ready(function () {
+                sincronizarActividad();
+                sincronizarResponsable();
+            });
+        })();
     </script>
 @endsection
