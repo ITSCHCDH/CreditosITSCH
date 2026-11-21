@@ -13,7 +13,7 @@ use App\Models\Actividad_Evidencia;
 use App\Models\Actividad;
 use App\Models\Area;
 use App\Models\Sit\Alumno as SitAlumno;
-use App\Models\Sit\Carrera as SitCarrera;
+use App\Services\Sit\CarrerasSitService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 use Alert;
@@ -316,8 +316,8 @@ class VerificaEvidenciaController extends Controller
 
         $puedeVerTodas = Auth::User()->hasAnyPermission(['VIP', 'VIP_REPORTES', 'VIP_SOLO_LECTURA']);
         $carrerasPermitidas = $puedeVerTodas
-            ? $this->carrerasSitVisibles()
-            : $this->carrerasSitVisibles(Area::CarrerasUsuario(Auth::User()->id)->pluck('id'));
+            ? CarrerasSitService::visibles()
+            : CarrerasSitService::visibles(Area::CarrerasUsuario(Auth::User()->id)->pluck('id'));
 
         $reportes_data = null;
         $suma_creditos = null;
@@ -565,7 +565,7 @@ class VerificaEvidenciaController extends Controller
 
         if (! $puedeVerTodas) {
             // Se acota a las carreras SIT equivalentes al área del usuario
-            $carrerasPermitidas = $this->carrerasSitVisibles(Area::CarrerasUsuario(Auth::User()->id)->pluck('id'))->pluck('id');
+            $carrerasPermitidas = CarrerasSitService::visibles(Area::CarrerasUsuario(Auth::User()->id)->pluck('id'))->pluck('id');
             $query->whereIn('carrera_id', $carrerasPermitidas->isEmpty() ? [-1] : $carrerasPermitidas->all());
         } elseif ($request->filled('carrera')) {
             // El filtro llega con el id del catálogo SIT
@@ -589,55 +589,6 @@ class VerificaEvidenciaController extends Controller
             });
 
         return response()->json($lista);
-    }
-
-    /**
-     * Equivalencia entre creditos.areas y sit.cat_carreras.
-     * No existe columna de mapeo, por lo que se comparan los nombres normalizados
-     * (minúsculas y sin acentos) en lugar de asumir que los id coinciden.
-     */
-    private function normalizarCarrera($texto)
-    {
-        return Str::lower(Str::ascii(trim((string) $texto)));
-    }
-
-    /** Mapa área de créditos => carrera del SIT, calculado una vez por petición. */
-    private function mapaCarreras()
-    {
-        static $mapa = null;
-        if ($mapa !== null) {
-            return $mapa;
-        }
-
-        $mapa = [];
-        $carrerasSit = SitCarrera::all()->keyBy(fn ($carrera) => $this->normalizarCarrera($carrera->nombre));
-
-        foreach (Area::where('tipo', 'carrera')->get() as $area) {
-            $clave = $this->normalizarCarrera($area->nombre);
-            if ($carrerasSit->has($clave)) {
-                $mapa[$area->id] = $carrerasSit->get($clave)->id;
-            }
-        }
-
-        return $mapa;
-    }
-
-    /** Carreras del catálogo SIT, filtrando por áreas de créditos cuando se indica. */
-    private function carrerasSitVisibles($areasCredito = null)
-    {
-        $query = SitCarrera::query()->orderByDesc('activo')->orderBy('nombre');
-
-        if ($areasCredito !== null) {
-            $mapa = $this->mapaCarreras();
-            $ids = collect($areasCredito)
-                ->map(fn ($areaId) => $mapa[$areaId] ?? null)
-                ->filter()
-                ->values();
-
-            $query->whereIn('id', $ids->isEmpty() ? [-1] : $ids->all());
-        }
-
-        return $query->get();
     }
 
 }

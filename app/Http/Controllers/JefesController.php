@@ -3,278 +3,274 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
-use App\Models\Historial_clinico;
-use App\Models\Datos_familiares;
-use App\Models\Motivoreprobacion;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Alumno;
+use App\Models\Datos_familiares;
 use App\Models\Direccion;
 use App\Models\Familiar;
-use App\Models\Personales;
+use App\Models\Historial_clinico;
+use App\Models\Motivoreprobacion;
 use App\Models\Padres;
+use App\Models\Personales;
 use App\Models\Social;
-use App\Models\Historial_Medico;
+use App\Models\Sit\Alumno as SitAlumno;
+use App\Services\Sit\CarrerasSitService;
 use Alert;
 
 class JefesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-     public function __construct()
-     {
-         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_COR_CARRERA')->only(['index']);
-         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_TUTOR|STA_COR_CARRERA')->only(['generacion','diagnostico','calSemaforos','ficha','storeAlumnoObs']);            
-     }      
+    public function __construct()
+    {
+        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_COR_CARRERA')->only(['index']);
+        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_TUTOR|STA_COR_CARRERA')->only(['generacion','diagnostico','calSemaforos','ficha','storeAlumnoObs']);
+    }
 
     public function index()
-    {       
-        //Verificamos si el usuario tiene permiso VIP_STA para darle acceso a todas las carreras si no, lo limitamos solo a su carrera
-        if(Auth::User()->hasAnyPermission(['VIP_STA','STA_DEP_TUTORIA'])){       
-            $carreras = DB::connection('contEsc')->table('carreras')->where('car_Status','VIGENTE')->get();
+    {
+        $usuario = Auth::User();
+        $todas = $usuario->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA']);
+
+        return view('sta/analisis_alumnos/index', [
+            'grupo' => '',
+            'carreras' => $this->carrerasParaVista($todas ? null : collect([$usuario->area])),
+            'generaciones' => $this->generacionesParaVista(),
+            'generacion' => '',
+            'carrera' => '',
+        ]);
+    }
+
+    public function generacion(Request $request)
+    {
+        $usuario = Auth::User();
+        $todas = $usuario->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA']);
+        $carreras = CarrerasSitService::visibles($todas ? null : collect([$usuario->area]), true);
+
+        $carrera = $carreras->firstWhere('id', (int) $request->carrera);
+        if (! $carrera) {
+            Alert::warning('No tienes acceso a la carrera seleccionada')->showConfirmButton('Ok', '#3085d6');
+            return redirect()->back();
         }
-        else{
-            $carreras = DB::connection('contEsc')->table('carreras')->where('car_Clave',auth()->user()->area)->get();
-        }           
-       
-        $grupo="";
-        $generacion="";
-        $carrera="";      
-        $generaciones = DB::connection('contEsc')->table('alumnos')
-        ->select("alumnos.Alu_AnioIngreso")
-        ->where('alumnos.Alu_AnioIngreso', '!=', 0)
-        ->whereNotNull('alumnos.Alu_AnioIngreso')
-        ->orderBy('Alu_AnioIngreso', 'desc')
-        ->distinct()
-        ->get();
-       
-        return view('sta/analisis_alumnos/index')
-        ->with('grupo',$grupo)
-        ->with('carreras',$carreras)
-        ->with('generaciones',$generaciones)
-        ->with('generacion',$generacion)
-        ->with('carrera',$carrera);
+
+        // Alumnos del SIT: identidad en sit.users, carrera en sit.cat_carreras
+        $grupo = SitAlumno::query()
+            ->join('users as u', 'u.id', '=', 'alumnos.user_id')
+            ->where('alumnos.carrera_id', $carrera->id)
+            ->where('alumnos.anio_ingreso', (int) $request->generacion)
+            ->orderBy('u.apellido_paterno')
+            ->orderBy('u.apellido_materno')
+            ->orderBy('u.nombre')
+            ->select(
+                'alumnos.no_control as control',
+                'u.apellido_paterno as aPaterno',
+                'u.apellido_materno as aMaterno',
+                'u.nombre as nombre',
+                'alumnos.semestre_actual as semestre',
+                'alumnos.estatus as estatus'
+            )
+            ->get()
+            ->map(fn ($fila) => (object) [
+                'control' => $fila->control,
+                'aPaterno' => $fila->aPaterno,
+                'aMaterno' => $fila->aMaterno,
+                'nombre' => $fila->nombre,
+                'semestre' => $fila->semestre,
+                'status' => self::estatusCorto($fila->estatus),
+            ]);
+
+        if ($grupo->isEmpty()) {
+            Alert::warning('No hay alumnos registrados en esta generación')->showConfirmButton('Ok', '#3085d6');
+            return redirect()->back();
+        }
+
+        // La ficha académica sigue viviendo en creditos mientras termina la migración
+        $fichas = Alumno::whereIn('no_control', $grupo->pluck('control'))
+            ->select('no_control', 'ficha')
+            ->get()
+            ->keyBy('no_control');
+
+        foreach ($grupo as $alu) {
+            $alu->ficha = optional($fichas->get($alu->control))->ficha ?? 0;
+            $alu->semaforos = self::calSemaforos($alu->control);
+        }
+
+        return view('sta.analisis_alumnos.index', [
+            'grupo' => $grupo,
+            'carreras' => $this->carrerasParaVista($todas ? null : collect([$usuario->area])),
+            'generaciones' => $this->generacionesParaVista(),
+            'generacion' => $request->generacion,
+            'carrera' => $request->carrera,
+        ]);
     }
-
-   public function generacion(Request $request)
-{ 
-    // Obtener el grupo de alumnos basado en carrera y año de ingreso
-    $grupo = DB::connection('contEsc')->table('alumnos')
-        ->select(
-            "alu_NumControl AS control",
-            "alu_ApePaterno AS aPaterno",
-            "alu_ApeMaterno AS aMaterno",
-            "alu_Nombre AS nombre",
-            "alu_SemestreAct AS semestre",
-            'alu_StatusAct AS status'
-        )
-        ->where('alumnos.car_Clave', '=', $request->carrera)
-        ->where('alumnos.Alu_AnioIngreso', '=', $request->generacion)
-        ->orderBy('alumnos.alu_ApePaterno', 'asc')
-        ->get();
-
-    // Si no hay alumnos, enviar advertencia y retornar
-    if ($grupo->isEmpty()) {
-        Alert::warning('No hay alumnos registrados en esta generación')->showConfirmButton('Ok', '#3085d6');
-        return redirect()->back();
-    }
-
-    // Obtener las fichas de los alumnos en una sola consulta usando la tabla Alumno
-    $fichas = Alumno::whereIn('no_control', $grupo->pluck('control'))
-        ->select('no_control', 'ficha')
-        ->get()
-        ->keyBy('no_control'); // Estructuramos por no_control para fácil acceso
-
-    // Iterar sobre el grupo y asignar las fichas y semáforos correspondientes
-    foreach ($grupo as $alu) {
-        // Asignar ficha si existe, de lo contrario, asignar 0
-        $alu->ficha = $fichas->get($alu->control)->ficha ?? 0;
-
-        // Calcular semáforos
-        $alu->semaforos = self::calSemaforos($alu->control);
-    }
-
-    // Obtener el usuario actual y determinar permisos
-    $usuario = Auth::User();
-    $hasVipOrTutoriaPermission = $usuario->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA']);
-
-    // Optimización: Obtener carreras basado en los permisos del usuario
-    $carrerasQuery = DB::connection('contEsc')->table('carreras')->where('car_Status', 'VIGENTE');
-    if (!$hasVipOrTutoriaPermission) {
-        $carrerasQuery->where('car_Clave', $usuario->area);
-    }
-    $carreras = $carrerasQuery->get();
-
-    // Optimización: Obtener generaciones únicas
-    $generaciones = DB::connection('contEsc')->table('alumnos')
-        ->select("Alu_AnioIngreso")
-        ->where('Alu_AnioIngreso', '!=', 0)
-        ->whereNotNull('Alu_AnioIngreso')
-        ->distinct()
-        ->orderBy('Alu_AnioIngreso', 'desc')
-        ->get(); 
-
-    // Retornar la vista con los datos procesados
-    return view('sta.analisis_alumnos.index', compact('grupo', 'carreras', 'generaciones'))
-        ->with('generacion', $request->generacion)
-        ->with('carrera', $request->carrera);
-}
-
-    
 
     public function diagnostico($nc)
-    {		
-        $buscarAlumno = DB::connection('contEsc')->table('alumnos')
-        ->join('carreras','carreras.car_Clave', '=','alumnos.car_Clave')
-        ->select("alumnos.alu_NumControl",'alumnos.alu_StatusAct',"alumnos.alu_Nombre","alumnos.alu_ApePaterno","alumnos.alu_ApeMaterno","alumnos.alu_SemestreAct","carreras.car_Nombre","alumnos.alu_Sexo")
-        ->where("alu_NumControl","=",$nc)
-        ->first(); 
-       
-        //Consultamos las observaciones de cada alumno y las agregamos a $buscarAlumno
-        $obs=DB::table('alumnos')->where('no_control',$nc)->select('observaciones')->first();
-        if(is_null($obs))
-            $buscarAlumno->observaciones = "Sin observaciones";
-        else
-            $buscarAlumno->observaciones =$obs->observaciones;
-            
-        if($buscarAlumno->alu_Sexo == "F"){
-            $buscarAlumno->alu_Sexo = "Femenino";
-        }else{
-            $buscarAlumno->alu_Sexo = " Masculino";
+    {
+        $alumno = SitAlumno::with(['user', 'carrera'])->where('no_control', $nc)->first();
+
+        if (! $alumno) {
+            Alert::error('Error', 'El alumno no existe en SIT');
+            return redirect()->route('analisis.index');
         }
 
-        //Obtenemos el semaforo academico correspondiente para este alumno
-        $buscarAlumno->semaforos = self::calSemaforos($buscarAlumno->alu_NumControl); 
+        $buscarAlumno = (object) [
+            'alu_NumControl' => $alumno->no_control,
+            'alu_StatusAct' => self::estatusCorto($alumno->estatus),
+            'alu_Nombre' => $alumno->user?->nombre,
+            'alu_ApePaterno' => $alumno->user?->apellido_paterno,
+            'alu_ApeMaterno' => $alumno->user?->apellido_materno,
+            'alu_SemestreAct' => $alumno->semestre_actual,
+            'car_Nombre' => $alumno->carrera?->nombre,
+            'alu_Sexo' => $alumno->genero === 'F' ? 'Femenino' : 'Masculino',
+            'observaciones' => $alumno->observaciones ?: 'Sin observaciones',
+        ];
 
-        $GetGrupos = DB::connection('contEsc')->table('alumnos')
-        ->join('listassemestre','listassemestre.alu_NumControl','=','alumnos.alu_NumControl')
-        ->join('grupossemestre','grupossemestre.gse_Clave','=','listassemestre.gse_Clave')
-        ->select("grupossemestre.gse_Observaciones")
-        ->where("alumnos.alu_NumControl","=",$nc)
-        ->DISTINCT()
-        ->get();
+        $buscarAlumno->semaforos = self::calSemaforos($alumno->no_control);
 
-        if(sizeof($GetGrupos)>0){
-            $variablegrupo = 'Grupos : ';
-        }else{
-            $variablegrupo = '';
+        // Grupos en los que está inscrito el alumno
+        $GetGrupos = DB::connection('sit')->table('listas')
+            ->join('grupos', 'grupos.id', '=', 'listas.grupo_id')
+            ->where('listas.alumno_id', $alumno->id)
+            ->select('grupos.clave_grupo as gse_Observaciones')
+            ->distinct()
+            ->orderBy('grupos.clave_grupo')
+            ->get();
+
+        // Calificaciones parciales por unidad: listas + lista_unidades + grupos
+        $calificaciones = DB::connection('sit')->table('listas')
+            ->join('grupos', 'grupos.id', '=', 'listas.grupo_id')
+            ->join('cat_materias', 'cat_materias.id', '=', 'grupos.materia_id')
+            ->join('catedraticos', 'catedraticos.id', '=', 'listas.catedratico_id')
+            ->join('users as docente', 'docente.id', '=', 'catedraticos.user_id')
+            ->join('lista_unidades', 'lista_unidades.lista_id', '=', 'listas.id')
+            ->where('listas.alumno_id', $alumno->id)
+            ->orderBy('listas.id')
+            ->orderBy('lista_unidades.numero_unidad')
+            ->orderByDesc('lista_unidades.oportunidad')
+            ->orderByDesc('lista_unidades.id')
+            ->select(
+                DB::raw("CONCAT_WS(' ', docente.nombre, docente.apellido_paterno, docente.apellido_materno) as profesor"),
+                'cat_materias.nombre as ret_NomCompleto',
+                'cat_materias.num_temas as ret_NumUnidades',
+                'lista_unidades.calificacion as lsc_Calificacion',
+                'lista_unidades.numero_unidad as lsc_NumUnidad',
+                'lista_unidades.corte as lsc_Corte',
+                'listas.id as lse_clave'
+            )
+            ->get();
+
+        // Una sola fila por unidad (la última oportunidad capturada)
+        $unicaPorUnidad = [];
+        foreach ($calificaciones as $fila) {
+            $clave = $fila->lse_clave.'|'.$fila->lsc_NumUnidad;
+            if (! isset($unicaPorUnidad[$clave])) {
+                $unicaPorUnidad[$clave] = $fila;
+            }
         }
+        $calificaciones = collect(array_values($unicaPorUnidad))
+            ->sortBy([['lse_clave', 'asc'], ['lsc_NumUnidad', 'asc']])
+            ->values();
 
-        $GetTablaCalificaciones = DB::connection('contEsc')->table('listassemestre')
-        ->join('listassemestrecom','listassemestrecom.lse_Clave','=','listassemestre.lse_Clave')        
-        ->join('grupossemestre','listassemestre.gse_Clave','=','grupossemestre.gse_Clave')
-        ->join('reticula','reticula.ret_Clave','=','grupossemestre.ret_Clave')
-        ->join('catedraticos','catedraticos.cat_Clave','=','grupossemestre.cat_Clave')
-        ->select (DB::raw("CONCAT(catedraticos.cat_Nombre,' ',catedraticos.cat_ApePat,' ',catedraticos.cat_ApeMat) as profesor"),'reticula.ret_NomCompleto','listassemestrecom.lsc_Calificacion','reticula.ret_NumUnidades','listassemestrecom.lsc_NumUnidad','listassemestrecom.lsc_Corte','listassemestrecom.lse_clave')
-        ->where('listassemestre.alu_NumControl','=',$nc)
-        ->DISTINCT()
-        ->get();
+        $GetMaxUnidad = $calificaciones->pluck('lsc_NumUnidad')
+            ->unique()
+            ->sort()
+            ->values()
+            ->map(fn ($unidad) => (object) ['lsc_NumUnidad' => (int) $unidad]);
 
-        $GetMaxUnidad = DB::connection('contEsc')->table('listassemestre')
-        ->join('listassemestrecom','listassemestrecom.lse_Clave','=','listassemestre.lse_Clave')
-        ->join('grupossemestre','listassemestre.gse_Clave','=','grupossemestre.gse_Clave')
-        ->join('reticula','reticula.ret_Clave','=','grupossemestre.ret_Clave')
-        ->select ('listassemestrecom.lsc_NumUnidad')
-        ->where('listassemestre.alu_NumControl','=',$nc)
-        ->DISTINCT()
-        ->get(); 
-
-        if(sizeof($GetMaxUnidad)>0){
+        $variablegrupo = $GetGrupos->isNotEmpty() ? 'Grupos : ' : '';
+        if ($calificaciones->isNotEmpty()) {
             $variableCalificaciones = 'Calificaciones Parciales';
             $unidadesvariable = 'Materias';
-        }else{
+        } else {
             $variableCalificaciones = 'Sin calificaciones parciales';
             $unidadesvariable = 'Sin materias asignadas';
         }
 
+        // Kardex: calificaciones finales por materia
+        $GetCardex = DB::connection('sit')->table('kardex')
+            ->join('cat_materias', 'cat_materias.id', '=', 'kardex.materia_id')
+            ->leftJoin('cat_periodos_escolares as periodo', 'periodo.id', '=', 'kardex.periodo_id')
+            ->where('kardex.alumno_id', $alumno->id)
+            ->orderBy('kardex.semestre')
+            ->select(
+                DB::raw('periodo.nombre as cdx_AnioXPrime'),
+                'cat_materias.nombre as ret_NomCompleto',
+                'kardex.calificacion_final as cdx_Calif',
+                'kardex.semestre as cdx_SemXPrime',
+                DB::raw('COALESCE(kardex.opcion_acreditacion_numerico, kardex.ultima_opcion) as cdx_UltOpcAcred')
+            )
+            ->get();
 
-        $GetCardex = DB::connection('contEsc')->table('cardex')
-        ->join('reticula','cardex.ret_Clave','=','reticula.ret_Clave')
-        ->select ('cardex.cdx_AnioXPrime','reticula.ret_NomCompleto','cardex.cdx_Calif','cardex.cdx_SemXPrime','cardex.cdx_UltOpcAcred')
-        ->where('cardex.alu_NumControl','=',$nc)
-        ->orderBy('cardex.cdx_SemXPrime', 'asc')
-        ->get();      
+        $comentarios = Motivoreprobacion::where('no_control', $nc)->get();
 
-       
-        $comentarios = Motivoreprobacion::select('*')              
-        ->where('no_control','=',$nc)
-        ->get(); 
-
-
-        //Guardar las calificaciones en forma de arreglos
-        $temp="";
-        $con=0;
-        $materias=[];         
-       
-        foreach($GetTablaCalificaciones as $calificaciones)
-        {            
-            if($temp!=$calificaciones->lse_clave)
-            {
-                $temp=$calificaciones->lse_clave;
-                $con++;                               
+        // Agrupar calificaciones por materia (mismo criterio que la vista)
+        $temp = '';
+        $con = 0;
+        $materias = [];
+        foreach ($calificaciones as $calificacion) {
+            if ($temp != $calificacion->lse_clave) {
+                $temp = $calificacion->lse_clave;
+                $con++;
             }
-            //Agregamos los comentarios a cada calificación
-            $calificaciones->comentario = "";
-            $calificaciones->motivo = 0;
-            foreach($comentarios as $comentario){
-                if($calificaciones->lse_clave == $comentario->lse_clave && $calificaciones->lsc_NumUnidad == $comentario->num_tema){
-                    $calificaciones->comentario = $comentario->comentario;
-                    $calificaciones->motivo = $comentario->motivos;
+            $calificacion->comentario = '';
+            $calificacion->motivo = 0;
+            foreach ($comentarios as $comentario) {
+                if ((int) $comentario->num_tema === (int) $calificacion->lsc_NumUnidad
+                    && ($comentario->materia === $calificacion->ret_NomCompleto || $comentario->lse_clave == $calificacion->lse_clave)) {
+                    $calificacion->comentario = $comentario->comentario;
+                    $calificacion->motivo = $comentario->motivos;
                 }
             }
-            $materias[$con][]=$calificaciones;                                                
-        }                
-        return view('sta.analisis_alumnos.diagnostico')        
-        -> with ('alumnos',$buscarAlumno)
-        -> with ('grupos',$GetGrupos)       
-        -> with ('unidades',$GetMaxUnidad)
-        -> with ('calificacionesvariable',$variableCalificaciones)
-        -> with ('unidadesvariable',$unidadesvariable)
-        -> with ('variablegrupo',$variablegrupo)
-        -> with ('cardex',$GetCardex)       
-        -> with('materias',$materias);				      
+            $materias[$con][] = $calificacion;
+        }
+
+        return view('sta.analisis_alumnos.diagnostico')
+            ->with('alumnos', $buscarAlumno)
+            ->with('grupos', $GetGrupos)
+            ->with('unidades', $GetMaxUnidad)
+            ->with('calificacionesvariable', $variableCalificaciones)
+            ->with('unidadesvariable', $unidadesvariable)
+            ->with('variablegrupo', $variablegrupo)
+            ->with('cardex', $GetCardex)
+            ->with('materias', $materias);
     }
 
-    public static function calSemaforos($nc) {
-        
-        $indicesAcad = DB::connection('contEsc')->table("cardex")
-        ->select(
-            'alumnos.alu_StatusAct',
-            DB::raw('SUM(CASE WHEN cdx_UltOpcAcred = 2 THEN 1 ELSE 0 END) AS nivelacionesOrdinario'),
-            DB::raw('SUM(CASE WHEN cdx_UltOpcAcred = 3 THEN 1 ELSE 0 END) AS repeticiones'),
-            DB::raw('SUM(CASE WHEN cdx_UltOpcAcred = 4 THEN 1 ELSE 0 END) AS nivelacionesRepe'),
-            DB::raw('SUM(CASE WHEN cdx_UltOpcAcred = 5 THEN 1 ELSE 0 END) AS especiales'),
-            DB::raw('SUM(CASE WHEN cdx_UltOpcAcred = 6 THEN 1 ELSE 0 END) AS nivelacionesEspecial')
-        )
-        ->join('alumnos', 'alumnos.alu_NumControl', '=', 'cardex.alu_NumControl')
-        ->where('cardex.alu_NumControl', '=', $nc)
-        ->groupBy('alumnos.alu_StatusAct')
-        ->first(); 
-        //Declaramos un arreglo para guardar los semaforos
+    /**
+     * Semáforos del alumno. Los indicadores académicos salen de sit.kardex
+     * (opcion_acreditacion_numerico) y el servicio social de las materias con
+     * concepto 'servicio_social'.
+     */
+    public static function calSemaforos($nc)
+    {
+        $alumno = SitAlumno::where('no_control', $nc)->first();
         $semaforos = [];
+        $status = $alumno ? self::estatusCorto($alumno->estatus) : null;
 
-        // Revisamos que las nivelaciónes no sean nulas        
-        if ($indicesAcad !== null && property_exists($indicesAcad, 'nivelacionesOrdinario')) {
-            // El objeto $indicesAcad no es nulo y tiene la propiedad 'nivelacionesOrdinario'
-            // Calculamos el total de nivelaciones
-            $nivelaciones = $indicesAcad->nivelacionesOrdinario + $indicesAcad->nivelacionesRepe + $indicesAcad->nivelacionesEspecial;
+        $indicesAcad = $alumno ? DB::connection('sit')->table('kardex')
+            ->where('alumno_id', $alumno->id)
+            ->select(
+                DB::raw('SUM(CASE WHEN opcion_acreditacion_numerico = 2 THEN 1 ELSE 0 END) AS nivelacionesOrdinario'),
+                DB::raw('SUM(CASE WHEN opcion_acreditacion_numerico = 3 THEN 1 ELSE 0 END) AS repeticiones'),
+                DB::raw('SUM(CASE WHEN opcion_acreditacion_numerico = 4 THEN 1 ELSE 0 END) AS nivelacionesRepe'),
+                DB::raw('SUM(CASE WHEN opcion_acreditacion_numerico = 5 THEN 1 ELSE 0 END) AS especiales'),
+                DB::raw('SUM(CASE WHEN opcion_acreditacion_numerico = 6 THEN 1 ELSE 0 END) AS nivelacionesEspecial')
+            )
+            ->first() : null;
 
-            // Calculamos el semáforo académico
+        if ($indicesAcad !== null && $indicesAcad->nivelacionesOrdinario !== null) {
+            $nivelaciones = (int) $indicesAcad->nivelacionesOrdinario
+                + (int) $indicesAcad->nivelacionesRepe
+                + (int) $indicesAcad->nivelacionesEspecial;
+
             switch (true) {
-                case $indicesAcad->alu_StatusAct == 'BD':
+                case $status === 'BD':
                     $semaforos['semaforoAcad'] = 'CirculoNegro';
                     $semaforos['titleAcad'] = 'Ya no es posible realizar acciones de seguimiento con este alumno';
                     break;
-                case $indicesAcad->especiales > 0 || $nivelaciones >= 10 || $indicesAcad->repeticiones > 2 || $indicesAcad->alu_StatusAct == 'BT':
+                case (int) $indicesAcad->especiales > 0 || $nivelaciones >= 10 || (int) $indicesAcad->repeticiones > 2 || $status === 'BT':
                     $semaforos['semaforoAcad'] = 'CirculoRojo';
                     $semaforos['titleAcad'] = 'El alumno tiene problemas académicos graves, urgente dar seguimiento';
                     break;
-                case ($indicesAcad->repeticiones <= 2 && ($nivelaciones >= 3 && $nivelaciones < 10)):
+                case ((int) $indicesAcad->repeticiones <= 2 && ($nivelaciones >= 3 && $nivelaciones < 10)):
                     $semaforos['semaforoAcad'] = 'CirculoNaranja';
                     $semaforos['titleAcad'] = 'El alumno tiene problemas académicos moderados, se recomienda dar seguimiento';
                     break;
@@ -291,193 +287,181 @@ class JefesController extends Controller
                     $semaforos['titleAcad'] = 'No se pudo calcular el semáforo académico';
                     break;
             }
-        } 
-        else 
-        {
-            // El objeto $indicesAcad es nulo o no tiene la propiedad 'nivelacionesOrdinario'
-            $semaforos['semaforoAcad'] = 'CirculoNegro'; 
+        } else {
+            $semaforos['semaforoAcad'] = 'CirculoNegro';
             $semaforos['titleAcad'] = 'Este alumno aún no tiene indicadores académicos registrados';
         }
-       
-        $semPsico=5;
 
-        // Calculamos el semáforo psicológico
-        switch ($semPsico) {
-            case 1:
-                $semaforos['semaforoPsico'] = 'CirculoVerde';
-                break;
-            case 2:
-                $semaforos['semaforoPsico'] = 'CirculoAmarillo';
-                break;
-            case 3:
-                $semaforos['semaforoPsico'] = 'CirculoNaranja';
-                break;
-            case 4:
-                $semaforos['semaforoPsico'] = 'CirculoRojo';
-                break;
-            default:
-                $semaforos['semaforoPsico'] = 'CirculoNegro';
-        }
+        // Los semáforos médico y psicológico aún no tienen fuente en SIT
+        $semaforos['semaforoPsico'] = 'CirculoNegro';
+        $semaforos['semaforoMedico'] = 'CirculoNegro';
 
-        //Consultamos el tipo de semaforo correspondiente al área médica de la tabla historiales_medicos
-        $semMedico= 5;
+        // Servicio social: materias con concepto 'servicio_social' en el kardex
+        $ssExists = $alumno && DB::connection('sit')->table('kardex')
+            ->join('cat_materias', 'cat_materias.id', '=', 'kardex.materia_id')
+            ->where('kardex.alumno_id', $alumno->id)
+            ->where('cat_materias.concepto', 'servicio_social')
+            ->exists();
 
-        // Calculamos el semáforo médico
-        switch ($semMedico) {
-            case 1:
-                $semaforos['semaforoMedico'] = 'CirculoVerde';
-                break;
-            case 2:
-                $semaforos['semaforoMedico'] = 'CirculoAmarillo';
-                break;
-            case 3:
-                $semaforos['semaforoMedico'] = 'CirculoNaranja';
-                break;
-            case 4:
-                $semaforos['semaforoMedico'] = 'CirculoRojo';
-                break;
-            default:
-                $semaforos['semaforoMedico'] = 'CirculoNegro';
-        }     
-                   
-        //Verificamos si el alumno ya tiene registrado el servicio social en cardex
-        $listaDeClaves = [720,790,791,792,793,794,838]; // Lista de valores a verificar
-        $ssExists = DB::connection('contEsc')->table('cardex')
-        ->where('cardex.alu_NumControl', '=', $nc)
-        ->whereIn('cardex.ret_Clave', $listaDeClaves)
-        ->exists(); // Devuelve true o false  
-       
-        //cambiamos el semaforo si el alumno ya tiene registrado el servicio social
-        if($ssExists)
-        { 
+        if ($ssExists) {
             $semaforos['semaforoServicio'] = 'CirculoVerde';
             $semaforos['titleSS'] = 'El servicio social ya fue registrado';
+            return $semaforos;
         }
-        else
-        {
-            $status= DB::connection('contEsc')->table('alumnos')
-            ->select('alumnos.alu_NumControl','alumnos.alu_SemestreAct','alumnos.alu_StatusAct','planesestudios.pes_CredTot','alumnos.alu_CreditosAcum','alumnos.alu_Inscrito')        
-            ->join('planesestudios','planesestudios.pes_Clave','=','alumnos.pes_Clave')                
-            ->where('alumnos.alu_NumControl','=',$nc)->first(); 
 
-            //Verificamos si la variable es nula y en caso afirmativo enviamos el semaforo negro
-            if($status==null)
-            {
-                $semaforos['semaforoServicio'] = 'CirculoNegro';
-                $semaforos['titleSS'] = 'Este alumno no tiene registros de servicio social';
-            }
-            else
-            {
-                if($status->alu_StatusAct=='BT'||$status->alu_StatusAct=='BD')
-                {
-                    $semaforos['semaforoServicio'] = 'CirculoNegro';
-                    $semaforos['titleSS'] = 'El status del alumno es baja, consultar con servicios escolares';
-                }
-                else
-                {
-                    //Calculamos el avance en creditos acumulados
-                    $credAcum=($status->alu_CreditosAcum*100)/$status->pes_CredTot; 
-
-                    if($status->alu_SemestreAct<=7)
-                    { 
-                        $semaforos['semaforoServicio'] = 'CirculoAzul';
-                        $semaforos['titleSS'] = 'Este alumno aún no reune los requicitos para tramitar servicio social';
-                    }
-                    else if($status->alu_SemestreAct==8 && $credAcum>=80)
-                    {
-                        $semaforos['semaforoServicio'] = 'CirculoNaranja';
-                        $semaforos['titleSS'] = 'Verificar que el alumno este realizando servicio social';
-                    }
-                    else if($status->alu_SemestreAct>=9)
-                    {
-                        $semaforos['semaforoServicio'] = 'CirculoRojo';
-                        $semaforos['titleSS'] = 'Servicio social retrasado, urgente dar seguimiento';
-                    }  
-                    else
-                    {
-                        $semaforos['semaforoServicio'] = 'CirculoNegro';
-                        $semaforos['titleSS'] = 'Este alumno no tiene registros de servicio social';
-                    }
-                }               
-            }           
+        $plan = $alumno?->planEstudio;
+        if (! $alumno || ! $plan) {
+            $semaforos['semaforoServicio'] = 'CirculoNegro';
+            $semaforos['titleSS'] = 'Este alumno no tiene registros de servicio social';
+            return $semaforos;
         }
+
+        if ($status === 'BT' || $status === 'BD') {
+            $semaforos['semaforoServicio'] = 'CirculoNegro';
+            $semaforos['titleSS'] = 'El status del alumno es baja, consultar con servicios escolares';
+            return $semaforos;
+        }
+
+        $creditosAcumulados = (int) DB::connection('sit')->table('kardex')
+            ->where('alumno_id', $alumno->id)
+            ->where('acreditada', 1)
+            ->sum('creditos_materia');
+        $creditosTotales = max(1, (int) $plan->creditos_totales);
+        $credAvance = ($creditosAcumulados * 100) / $creditosTotales;
+        $semestre = (int) $alumno->semestre_actual;
+
+        if ($semestre <= 7) {
+            $semaforos['semaforoServicio'] = 'CirculoAzul';
+            $semaforos['titleSS'] = 'Este alumno aún no reune los requisitos para tramitar servicio social';
+        } elseif ($semestre == 8 && $credAvance >= 80) {
+            $semaforos['semaforoServicio'] = 'CirculoNaranja';
+            $semaforos['titleSS'] = 'Verificar que el alumno este realizando servicio social';
+        } elseif ($semestre >= 9) {
+            $semaforos['semaforoServicio'] = 'CirculoRojo';
+            $semaforos['titleSS'] = 'Servicio social retrasado, urgente dar seguimiento';
+        } else {
+            $semaforos['semaforoServicio'] = 'CirculoNegro';
+            $semaforos['titleSS'] = 'Este alumno no tiene registros de servicio social';
+        }
+
         return $semaforos;
     }
 
     public function ficha($nc, $usr)
-    { 
+    {
         try {
-            $alu = Alumno::where('no_control',$nc)->first(); 
-            $alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first(); 
-            $car = DB::connection('contEsc')->table('carreras')->where('car_Clave', $alu1->car_Clave)->first();
-            $alu2 = DB::connection('contEsc')->table('alumcom')->where('alu_NumControl', $alu1->alu_NumControl)->first();
-    
-            $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
-    
-            $padres = Padres::where('id_alu', $alu->id)
-            ->whereIn('parentesco', ['Padre', 'Madre'])
-            ->get(); 
+            $alumnoSit = SitAlumno::with(['user', 'carrera'])->where('no_control', $nc)->first();
+            if (! $alumnoSit) {
+                Alert::error('Error', 'El alumno no existe en SIT');
+                return $usr == 1 ? redirect()->route('analisis.index') : back();
+            }
 
-            if ($padres->count() == 2) { 
-                $direccion = Direccion::where('id_alu', $alu->id)->first();  
+            $alu1 = (object) [
+                'alu_NumControl' => $alumnoSit->no_control,
+                'alu_Nombre' => $alumnoSit->user?->nombre,
+                'alu_ApePaterno' => $alumnoSit->user?->apellido_paterno,
+                'alu_ApeMaterno' => $alumnoSit->user?->apellido_materno,
+                'alu_Sexo' => $alumnoSit->genero,
+            ];
+            $car = (object) ['car_NombreCorto' => $alumnoSit->carrera?->nombre_corto ?: $alumnoSit->carrera?->nombre];
+            $alu2 = (object) ['alc_FechaNac' => $alumnoSit->fecha_nacimiento];
+
+            // Los datos socioeconómicos siguen en creditos y se enlazan por el id local
+            $alu = Alumno::where('no_control', $nc)->first();
+            $idAlu = $alu?->id;
+
+            $clinicos = $idAlu ? Historial_clinico::where('id_alu', $idAlu)->first() : null;
+            $padres = $idAlu
+                ? Padres::where('id_alu', $idAlu)->whereIn('parentesco', ['Padre', 'Madre'])->get()
+                : collect();
+
+            if ($padres->count() == 2) {
+                $direccion = Direccion::where('id_alu', $idAlu)->first();
                 $direccionP = Direccion::where('id_fam', $padres[0]->id)->first();
-                $direccionM = Direccion::where('id_fam', $padres[1]->id)->first();  
-        
-                $familiares = Familiar::where('id_alu', $alu->id)->get(); 
-        
-                $person = Personales::where('id_alu', $alu->id)->first(); 
-                $fam = Datos_familiares::where('id_alu', $alu->id)->first(); 
-                $soc = Social::where('id_alu', $alu->id)->first(); 
-            
-                return view('sta.analisis_alumnos.ficha', compact('familiares', 'alu1', 'alu2', 'car','padres', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));
-            }    
-            else
-            { 
-                
-                if($usr==1)
-                {
-                    Alert::error('Error', 'Este alumno no ha llenado su ficha académica');
-                    return redirect()->route('analisis.index');
-                }
-                else
-                {
-                    Alert::error('Error', 'Este alumno no ha llenado su ficha académica');
-                    return back();
-                }
-                
-            }                         
-        
-        } catch (\Exception $e) {
-            Alert::error('Error', 'A ocurrido un error: ',$e);
+                $direccionM = Direccion::where('id_fam', $padres[1]->id)->first();
+                $familiares = Familiar::where('id_alu', $idAlu)->get();
+                $person = Personales::where('id_alu', $idAlu)->first();
+                $fam = Datos_familiares::where('id_alu', $idAlu)->first();
+                $soc = Social::where('id_alu', $idAlu)->first();
+
+                return view('sta.analisis_alumnos.ficha', compact('familiares', 'alu1', 'alu2', 'car', 'padres', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu', 'clinicos', 'person', 'fam'));
+            }
+
+            Alert::error('Error', 'Este alumno no ha llenado su ficha académica');
+            return $usr == 1 ? redirect()->route('analisis.index') : back();
+        } catch (\Throwable $e) {
+            report($e);
+            Alert::error('Error', 'Ocurrió un error al cargar la ficha: '.$e->getMessage());
             return back();
-        }      
+        }
     }
-    //Funcion para guardar las observaciones del alumno
+
+    /** Observaciones del alumno: ahora se guardan en sit.alumnos. */
     public function storeAlumnoObs(Request $request)
     {
-        $noControl = trim($request->no_Control);       
+        $noControl = trim((string) $request->no_Control);
+
         try {
-            $alumno = Alumno::where('no_control', $noControl)->firstOrFail();
-            $alumno->observaciones = $request->observaciones;
-            $alumno->save();
-            
+            $existe = DB::connection('sit')->table('alumnos')->where('no_control', $noControl)->exists();
+
+            if (! $existe) {
+                return response()->json([
+                    'mensaje' => 'No se encontró el alumno '.$noControl.' en la base de datos de SIT',
+                    'status' => 404,
+                ], 404);
+            }
+
+            DB::connection('sit')->table('alumnos')
+                ->where('no_control', $noControl)
+                ->update([
+                    'observaciones' => $request->observaciones,
+                    'updated_at' => now(),
+                ]);
+
             return response()->json([
-                'mensaje' => 'Observaciones guardadas correctamente', 
-                'status' => 200, 
-                'noControl' => $noControl
-            ], 200); // ← Agrega el código HTTP aquí
-            
-        } catch (ModelNotFoundException $e) {
+                'mensaje' => 'Observaciones guardadas correctamente',
+                'status' => 200,
+                'noControl' => $noControl,
+            ], 200);
+        } catch (\Throwable $e) {
             return response()->json([
-                'mensaje' => 'No se encontró el registro del alumno: '.$noControl.', es probable que no esté registrado en la base de datos de creditos, infórmalo al administrador de sistemas', 
-                'status' => 404
-            ], 404); // ← Código HTTP 404
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'mensaje' => 'Error al guardar las observaciones: '.$e->getMessage(), 
-                'status' => 500
-            ], 500); // ← Código HTTP 500
+                'mensaje' => 'Error al guardar las observaciones: '.$e->getMessage(),
+                'status' => 500,
+            ], 500);
         }
+    }
+
+    /** Catálogo de carreras con los nombres que espera la vista. */
+    private function carrerasParaVista($areasCredito = null)
+    {
+        return CarrerasSitService::visibles($areasCredito, true)
+            ->map(fn ($carrera) => (object) [
+                'car_Clave' => $carrera->id,
+                'car_Nombre' => $carrera->nombre,
+            ]);
+    }
+
+    /** Generaciones disponibles según sit.alumnos.anio_ingreso. */
+    private function generacionesParaVista()
+    {
+        return SitAlumno::query()
+            ->select('anio_ingreso')
+            ->where('anio_ingreso', '>', 0)
+            ->whereNotNull('anio_ingreso')
+            ->distinct()
+            ->orderByDesc('anio_ingreso')
+            ->pluck('anio_ingreso')
+            ->map(fn ($anio) => (object) ['Alu_AnioIngreso' => (int) $anio]);
+    }
+
+    /** Equivalencia entre el estatus de SIT y las claves que usa la vista. */
+    private static function estatusCorto(?string $estatus): string
+    {
+        return match ($estatus) {
+            'Baja definitiva' => 'BD',
+            'Baja temporal' => 'BT',
+            'Egresado', 'Titulado' => 'EG',
+            default => 'VI',
+        };
     }
 }

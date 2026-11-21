@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 14:57 · **Entradas registradas:** 40 · **Último commit previo a esta sesión:** `f972756` (2026-11-21 14:49).
+**Última entrada:** 2026-11-21 15:11 · **Entradas registradas:** 42 · **Último commit previo a esta sesión:** `cee9d6a` (2026-11-21 14:59).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -19,6 +19,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 | Reporte de avance sobre `sit.alumnos` | ✅ 21 + 12 pruebas con datos reales, 10 + 10 de render, 8 de sincronización; 1.11 s en el peor caso |
 | Galería de evidencias | ✅ 7 pruebas del endpoint, 13 de render y 19 de DOM |
 | Buscadores en evidencias | ✅ 10 pruebas de endpoints, 11 de render y 14 de integración |
+| Jefes de carrera sobre SIT | ✅ 28 pruebas con datos reales, 12 de render y 8 de regresión |
 
 ### Riesgos abiertos
 
@@ -37,6 +38,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 15:11 — Jefes de carrera migrado de contEsc a SIT
 - 2026-11-21 14:57 — Encabezado de página en avance del alumno
 - 2026-11-21 14:54 — Encabezado de página en verifica_evidencia
 - 2026-11-21 14:52 — Encabezado de página en participantes
@@ -125,7 +127,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 4 | 2026-11-20 18:59 – 19:09 |
+| Trayectoria académica | `trayectoria` | 6 | 2026-11-20 18:59 – 2026-11-21 15:11 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -153,6 +155,93 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 15:11] — Jefes de carrera migrado de contEsc a SIT
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Migrar el módulo STA de la conexión `contEsc` (control escolar anterior) a la base nueva `sit`, empezando por el menú Jefes de carrera.
+
+**Archivos modificados:**
+- `app/Http/Controllers/JefesController.php` (reescrito sobre SIT; ya no usa `contEsc`)
+- `app/Http/Controllers/VerificaEvidenciaController.php` (usa el servicio de carreras y elimina los helpers duplicados)
+- `app/Services/Sit/CarrerasSitService.php` (nuevo: equivalencia área de créditos ↔ carrera SIT)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Mapeo aplicado (contEsc → SIT):**
+
+| contEsc | SIT |
+|---|---|
+| `carreras` (`car_Clave`, `car_Status`, `car_Nombre`) | `cat_carreras` (`id`, `activo`, `nombre`) |
+| `alumnos` (`alu_NumControl`, `alu_Nombre`, `alu_Ape*`, `alu_SemestreAct`, `alu_StatusAct`, `alu_Sexo`, `Alu_AnioIngreso`) | `alumnos` (`no_control`, `semestre_actual`, `estatus`, `genero`, `anio_ingreso`) + `users` |
+| `planesestudios` (`pes_CredTot`) | `cat_plan_estudios` (`creditos_totales`) |
+| `cardex` (`cdx_Calif`, `cdx_SemXPrime`, `cdx_AnioXPrime`, `cdx_UltOpcAcred`) | `kardex` (`calificacion_final`, `semestre`, `periodo_id`, `opcion_acreditacion_numerico`) + `cat_materias` + `cat_periodos_escolares` |
+| `listassemestre` / `listassemestrecom` | `listas` / `lista_unidades` |
+| `grupossemestre` | `grupos` (`clave_grupo`, `materia_id`, `catedratico_id`) |
+| `reticula` (`ret_NomCompleto`, `ret_NumUnidades`) | `cat_materias` (`nombre`, `num_temas`) |
+| `catedraticos` (`cat_Nombre`, `cat_Ape*`) | `catedraticos` + `users` |
+
+**Decisiones tomadas:**
+- Las carreras del filtro salen de `cat_carreras`; para Jefes se consideran solo las activas (equivalente a `car_Status = 'VIGENTE'`) y para el reporte se mantienen todas.
+- El estatus académico se traduce a las claves de la vista: Baja definitiva → `BD`, Baja temporal → `BT`, Egresado/Titulado → `EG`, resto → `VI`.
+- El semáforo académico cuenta `opcion_acreditacion_numerico` (2 a 6), conservando los mismos números que usaba `cdx_UltOpcAcred`.
+- El servicio social se detecta por `cat_materias.concepto = 'servicio_social'` en el kardex, en lugar de la lista de claves fija (720, 790…), que en SIT apunta a otras materias.
+- Los créditos acumulados se suman desde `kardex.creditos_materia` con `acreditada = 1`, comparados contra `cat_plan_estudios.creditos_totales`.
+- Las calificaciones parciales se deduplican por unidad tomando la última oportunidad, para que la vista siga mostrando una celda por unidad.
+- Las observaciones del alumno se leen y escriben en `sit.alumnos.observaciones` (excepción deliberada a la política de solo lectura de SIT, a registrar en su ADR).
+- La ficha toma la identidad de SIT y conserva las tablas socioeconómicas de `creditos` enlazadas por `no_control`.
+
+**Pendientes / Deuda técnica:**
+- `STAController` sigue con 18 consultas a `contEsc` (Profesor, Tutor y Departamento de tutorías); es el siguiente bloque a migrar.
+- Los semáforos médico y psicológico no tienen fuente en SIT: se muestran en negro.
+- `creditos.motivosreprobacion` está vacía; los comentarios se emparejan por materia y número de tema porque `lse_clave` ya no coincide.
+- La ficha socioeconómica seguirá vacía mientras `creditos.alumnos` no tenga registros.
+
+**Tests ejecutados:**
+- ✅ 28 comprobaciones con datos reales de SIT (catálogo, generaciones, listado de 102 alumnos, diagnóstico con kardex y parciales, semáforos y observaciones con rollback).
+- ✅ 12 comprobaciones de render en las dos vistas del módulo.
+- ✅ 8 comprobaciones de regresión del reporte y del buscador, que comparten el servicio de carreras.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ `grep contEsc` en `JefesController`: 0 ocurrencias.
+
+**Referencias:**
+- `docs/img/sta-jefes-desktop.png`
+
+### [2026-11-21 15:03] — Diagnóstico de conexión del módulo STA
+
+- **Estatus:** ✅ completado (diagnóstico; sin cambios de código)
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Probar el módulo STA empezando por el menú «Jefes de carrera» y reportar los problemas de conexión encontrados.
+
+**Hallazgos:**
+- La conexión `contEsc` (SQL Server) no puede abrirse: **PHP solo tiene los drivers `mysql` y `sqlite`**; no están instalados `pdo_sqlsrv`, `sqlsrv` ni ODBC.
+- El PHP del entorno es **8.5.3 ZTS (thread-safe)**. Los drivers de Microsoft se publican para builds **NTS**, así que no basta con copiar el DLL: se requiere otro build de PHP (y probablemente una versión soportada por el driver).
+- Faltan las variables `DB_HOST_SECOND`, `DB_PORT_SECOND`, `DB_DATABASE_SECOND`, `DB_USERNAME_SECOND` y `DB_PASSWORD_SECOND`. La configuración cae en los valores por defecto `forge`, y `.env` solo define `DB_SECOND_*` (que usa la conexión `sit`).
+- No hay un SQL Server local: el puerto 1433 está cerrado y no existen servicios de SQL Server en la máquina.
+- La conexión de respaldo `contEscMy` (MySQL) tampoco está configurada y no existe una base equivalente en MySQL (solo `creditos` y `sit`).
+
+**Impacto:**
+- Los cuatro ítems del menú STA fallan con `QueryException: could not find driver`: Jefes de carrera (`analisis.index`), Profesor, Tutor y Departamento de tutorías.
+- `JefesController::index()`, `generacion()`, `diagnostico()`, `calSemaforos()` y los índices de `STAController` lanzan la excepción sin capturarla (HTTP 500).
+- `JefesController::ficha()` la oculta con un `catch` genérico y muestra «A ocurrido un error», sin indicar la causa.
+- `storeAlumnoObs()` responde 404 porque escribe observaciones en `creditos.alumnos`, que está vacía.
+
+**Recomendaciones:**
+- Opción A: instalar `pdo_sqlsrv` en un build de PHP NTS compatible y definir las variables `DB_*_SECOND` con el servidor real de control escolar.
+- Opción B: migrar el módulo STA a `sit` (como ya se hizo en reportes) o a una réplica MySQL, y apuntar `contEsc`/`contEscMy` a esa base.
+- Mientras no haya conexión, mejorar el manejo del error en `ficha()` y mostrar un mensaje que distinga «sin conexión» de «sin ficha».
+
+**Pendientes / Deuda técnica:**
+- El módulo STA depende de 35 consultas a `contEsc` (`JefesController` 17 y `STAController` 18) y no usa `sit` en ninguna.
+- Decidir si `contEsc` seguirá siendo SQL Server o si el módulo migra a SIT.
+
+**Tests ejecutados:**
+- ✅ 4 comprobaciones de conexión (MySQL por defecto y `sit` funcionan; `contEsc` y `contEscMy` fallan).
+- ✅ 7 acciones probadas: `index`, `generacion`, `diagnostico`, `ficha`, `calSemaforos`, `storeAlumnoObs` y los tres índices de `STAController`.
 
 ### [2026-11-21 14:57] — Encabezado de página en avance del alumno
 
