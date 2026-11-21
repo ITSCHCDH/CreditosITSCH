@@ -12,6 +12,23 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
+### [2026-11-21 12:45] — UX de avance con buscador integrado
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-frontend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Modernizar el avance de alumno y agregar un buscador con coincidencias por nombre o número de control.
+
+**Archivos modificados:**
+- `app/Http/Controllers/VerificaEvidenciaController.php` (búsqueda desde `sit.alumnos`)
+- `resources/views/admin/verifica_evidencia/avance_alumno.blade.php`
+
+**Decisiones tomadas:**
+- Se muestran máximo cinco coincidencias.
+- El buscador consulta nombre, apellido y número de control.
+- La selección llena el número de control oculto para consultar el avance.
+- Los datos se presentan mediante cards MDB/Font Awesome.
+
 ### [2026-11-21 12:39] — Validación inline desde la evidencia
 
 - **Estatus:** ✅ completado

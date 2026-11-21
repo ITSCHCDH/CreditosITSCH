@@ -1,445 +1,184 @@
 @extends('template.molde')
 
-@section('title','Avance alumnos')
+@section('title','Avance de alumno')
 
 @section('links')
-	<link rel="stylesheet" href="{{ asset('cssAutocompletar/autocompletar.css') }}" />
-@endsection
-
-@section('ruta')
-
-    @if (count($ruta_data)>0)
-    	<div>
-			<form action="{{ route('verifica_evidencia.reportes') }}" method="get" id="ruta_input" style="float: left; margin-right: 5px;">
-				<input type="hidden" name="carrera" value="{{ $ruta_data[0] }}">
-				<input type="hidden" name="generacion" value="{{ $ruta_data[1] }}">
-				<a href="#" onclick="document.getElementById('ruta_input').submit()">Reportes</a>
-			</form>
-    		/
-    		<label class="label label-success">Avance alumno</label>
-    	</div>
-    @else
-    	<label class="label label-success">Avance alumno</label>
-    @endif
+<style>
+    .advance-breadcrumb,.advance-search-card,.advance-info-card,.advance-progress-card{border:1px solid #e7edf4;border-radius:1rem;background:#fff;box-shadow:0 .75rem 1.5rem rgba(29,78,116,.10),0 .18rem .45rem rgba(16,43,74,.06)}
+    .advance-breadcrumb{display:flex;align-items:center;gap:.65rem;min-height:64px;margin-bottom:.75rem;padding:.8rem 1rem;color:#64748b}
+    .advance-breadcrumb i{width:38px;height:38px;display:grid;place-items:center;border-radius:.7rem;color:#173c66;background:#edf3f8}
+    .advance-breadcrumb strong{color:#102b4a}
+    .advance-search-card{margin-bottom:1rem;padding:1.25rem}
+    .advance-search-card h1{margin:0;color:#102b4a;font-size:1.25rem;font-weight:700}
+    .advance-search-card p{margin:.2rem 0 1rem;color:#6b7280;font-size:.88rem}
+    .advance-search-card .form-control,.advance-search-card .form-select{min-height:48px;border-radius:.75rem}
+    .advance-info-card{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;padding:1.25rem}
+    .advance-avatar{width:72px;height:72px;object-fit:cover;border-radius:1rem;background:#edf3f8}
+    .advance-progress-card{overflow:hidden}
+    .advance-progress-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid #edf1f5;background:#f8fafc}
+    .advance-progress-head h2{margin:0;color:#102b4a;font-size:1.05rem}
+    .credit-progress{height:.75rem;border-radius:999px;background:#e9eef4;overflow:hidden}
+    .credit-progress>div{height:100%;border-radius:999px;background:linear-gradient(90deg,#173c66,#2d6da3)}
+    @media(max-width:767.98px){.advance-info-card{align-items:flex-start;flex-direction:column}.advance-progress-head{align-items:flex-start;flex-direction:column}}
+</style>
 @endsection
 
 @section('contenido')
-	<!-- Input text donde se podra buscar a los participantes por nombre -->
-	<div class="row">
-		<div class="col-sm-3"></div>
-		<div class="col-sm-3"></div>
-		<div class="col-sm-3 autocomplete">
-			<label for="alumno_nombre">Alumno</label>
-			<input id="alumno_nombre" type="text" placeholder="Nombre" class="form-control">
-		</div>
-		<div class="col-sm-3">
-			<form action="{{ route('verifica_evidencia.avance_alumno') }}" method="get">
-				<label for="no_control">Número de control</label>
-				<div class="md-form input-group mb-3">
-					<input type="text" class="form-control" name="no_control" id="no_control" required placeholder="Número de control" aria-label="Número de control" aria-describedby="MaterialButton-addon2">
-					<div class="input-group-append">
-					  	<button class="btn btn-md btn-secondary m-0 px-3" type="submit" id="Buscar" title="Buscar"><i class="fas fa-search" style="font-size: 14px"></i></button>
-					</div>
-				</div>
-			</form>
-		</div>
-	</div>
+@if(count($ruta_data)>0)
+    <div class="advance-breadcrumb">
+        <i class="fa-solid fa-chart-line"></i>
+        <div>
+            <form action="{{ route('verifica_evidencia.reportes') }}" method="get" class="d-inline">
+                <input type="hidden" name="carrera" value="{{ $ruta_data[0] }}">
+                <input type="hidden" name="generacion" value="{{ $ruta_data[1] }}">
+                <button type="submit" class="btn btn-link p-0 text-decoration-none">Reportes</button>
+            </form>
+            <span class="mx-2">/</span><strong>Avance del alumno</strong>
+        </div>
+    </div>
+@else
+    <div class="advance-breadcrumb"><i class="fa-solid fa-chart-line"></i><div><strong>Avance del alumno</strong></div></div>
+@endif
 
+<article class="advance-search-card">
+    <h1>Buscar alumno</h1>
+    <p>Escribe un nombre o número de control. Se muestran hasta cinco coincidencias.</p>
+    <form action="{{ route('verifica_evidencia.avance_alumno') }}" method="get" id="studentAdvanceSearch">
+        <input type="hidden" name="no_control" id="student_no_control">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label" for="student_search">Nombre o número de control</label>
+                <input type="search" id="student_search" class="form-control" placeholder="Ej. Juan Pérez o 00030068" autocomplete="off">
+                <div id="student_search_status" class="small text-muted mt-2"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="student_select">Coincidencias</label>
+                <select id="student_select" class="form-select">
+                    <option value="">Escribe para buscar</option>
+                </select>
+            </div>
+            <div class="col-12 d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary rounded-pill px-4" id="student_search_submit" disabled><i class="fa-solid fa-magnifying-glass me-2"></i>Consultar avance</button>
+            </div>
+        </div>
+    </form>
+</article>
 
-	<div class="resetear"></div>
-	<br><br>
-	<div class="alert-danger" style="padding: 20px; display: none;" id="mensaje-error">
-		<p style="font-size: 0.9vw;"><strong>No se encuentran asignados los jefes de crédito para poder llenar los campos de la constancia.</strong></p>
-	</div>
-	<div class="card mb-3" style="max-width: 1550px;">
-		<div class="row g-0">
-			<div class="col-md-1">
-				@if(empty($alumno_data[0]->foto))
-					<img
-						src="{{ asset('images/user.png') }}"
-						alt="Imagen del alumno"
-						class="img-fluid rounded-start"
-					/>
-				@else
-					<img
-						src="{{ asset('storage/alumnos/img/'.$alumno_data[0]->foto) }}"
-						alt="Imagen del alumno"
-						class="img-fluid rounded-start"
-					/>
-				@endif
-			</div>
-			<div class="col-md-11">
-				<div class="card-body">
-					<h5 class="card-title">Información del alumno</h5>
-					<table class="table">
-						<thead>
-							<tr>
-								<th>Nombre</th>
-								<th>No. Control</th>
-								<th>Carrera</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>
-									@if ($alumno_data!=null)
-									{{ $alumno_data[0]->nombre_alumno }}
-									@endif
-								</td>
-								<td>
-									@if ($alumno_data!=null)
-									{{ $alumno_data[0]->no_control }}
-									@endif
-								</td>
-								<td>
-									@if ($alumno_data!=null)
-									{{ $alumno_data[0]->carrera }}
-									@endif
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="container-fluid ">
-		<br><br>
-		<table class="table ">
-			<thead>
-				<th>Credito</th>
-				<th>Actividades</th>
-				<th>Porcentaje</th>
-			</thead>
-			<tbody>
-				@php
-					$temp_porcentaje = 0;
-					$suma_creditos = 0;
-					$y=0;
-				@endphp
-				@if($alumno_data!=null)
-					@for ($x = 0; $x < count($creditos); $x++)
-						@if ( $y < count($alumno_data) && $avance)
-							@if ($alumno_data[$y]->nombre_credito==$creditos[$x]->nombre)
-								@php
-									$temp_porcentaje = ($alumno_data[$y]->por_credito >100)?100:$alumno_data[$y]->por_credito;
-									$suma_creditos += (int)$temp_porcentaje;
-								@endphp
-								<tr>
-									<td colspan="3" style="text-align:left; padding: 0;">
-										<div style="position: relative;">
-											<div style="background: #27ce1e; padding: 2; width: {{$temp_porcentaje}}%; height: 20px;max-width: 100%;";>
-												<div style="position: absolute;">
-													<strong>{{ $alumno_data[$y]->nombre_credito }}</strong>
-												</div>
-											</div>
-										</div>
-									</td>
-								</tr>
-								@for (; $y < count($alumno_data) && $alumno_data[$y]->nombre_credito==$creditos[$x]->nombre; $y++)
-									<tr>
-										<td></td>
-										<td>{{ $alumno_data[$y]->nombre_actividad }}</td>
-										<td>{{ $alumno_data[$y]->por_cred_actividad.'%' }}</td>
-									</tr>
-								@endfor
-								<tr>
-									<td></td>
-									<td></td>
-									<td ><strong>Total</strong></td>
-								</tr>
-								<tr>
-									<td></td>
-									<td></td>
-									<td>{{ $temp_porcentaje.'%' }}</td>
-								</tr>
-							@else
-								<tr>
-									<td colspan="3" style="text-align:left; padding: 0;">
-										<div style="position: relative;">
-											<div style="background: #27ce1e; padding: 2; width: 0%;height: 20px;max-width: 100%";>
-												<div style="position: absolute;">
-													<strong >{{ $creditos[$x]->nombre }}</strong>
-												</div>
+@php
+    $primerAlumno = ($alumno_data !== null && count($alumno_data) > 0) ? $alumno_data[0] : null;
+    $tempPorcentaje = 0;
+    $sumaCreditos = 0;
+@endphp
 
-											</div>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td>Actividades registradas</td>
-									<td>0%</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td></td>
-									<td ><strong>Total</strong></td>
-								</tr>
-								<tr>
-									<td></td>
-									<td></td>
-									<td>0%</td>
-								</tr>
-							@endif
-						@else
-							<tr>
-								<td colspan="3" style="text-align:left; padding: 0;">
-									<div style="position: relative;">
-										<div style="background: #27ce1e; padding: 2; width: 0%;height: 20px;max-width: 100%";>
-											<div style="position: absolute;">
-												<strong >{{ $creditos[$x]->nombre }}</strong>
-											</div>
+@if($primerAlumno)
+    <article class="advance-info-card">
+        <img class="advance-avatar" src="{{ !empty($primerAlumno->foto) ? asset('storage/alumnos/img/'.$primerAlumno->foto) : asset('images/user.png') }}" alt="Alumno">
+        <div>
+            <span class="text-muted small">Alumno seleccionado</span>
+            <h2 class="h5 mb-1">{{ $primerAlumno->nombre_alumno }}</h2>
+            <div class="text-muted"><strong>{{ $primerAlumno->no_control }}</strong>@if(!empty($primerAlumno->carrera)) · {{ $primerAlumno->carrera }}@endif</div>
+        </div>
+    </article>
+@endif
 
-										</div>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td></td>
-								<td>Actividades registradas</td>
-								<td>0%</td>
-							</tr>
-							<tr>
-								<td></td>
-								<td></td>
-								<td ><strong>Total</strong></td>
-							</tr>
-							<tr>
-								<td></td>
-								<td></td>
-								<td>0%</td>
-							</tr>
-						@endif
-					@endfor
-					@php
-						if($suma_creditos>500)$suma_creditos=500;
-						$suma_creditos/=100;
-					@endphp
-					<tr>
-							<td></td>
-							<td></td>
-							<td><strong>Total de creditos</strong></td>
-					</tr>
-					<tr>
-						<td colspan="3" style="background-color:#426986; color:white; text-align: right;"><h3>{{ $suma_creditos.' creditos' }}</h3></td>
-					</tr>
-				@endif
-			</tbody>
-		</table>
-		@php
-			$mostrarMensaje = 0;
-		@endphp
-		@if($liberado && (Auth::User()->hasAnyPermission(['VIP','IMPRIMIR_CONSTANCIAS'])))
-			<form action="{{ route('constancias.imprimir') }}" style="padding: 10px;" method="post">
-				{{ csrf_field() }}
-				<input type="hidden" name="no_control" value="{{ $alumno_data[0]->no_control }}">
-				<input type="submit" name="" value="Imprimir constancia" class="btn btn-primary">
-			</form>
-		@elseif($suma_creditos == 5)
-			@php
-				$mostrarMensaje = 1;
-			@endphp
-		@endif
-	</div>
-	
-	@section('js')
-		<script type="text/javascript">
-			var alumnoNombreInput = document.getElementById("alumno_nombre");
-			var alumnoNoControlInput = document.getElementById("no_control");
-			var busquedaTimeout = null;
-			var posicionActual = -1;
+<article class="advance-progress-card">
+    <div class="advance-progress-head">
+        <h2>Avance por créditos</h2>
+        @if($liberado && Auth::User()->hasAnyPermission(['VIP','IMPRIMIR_CONSTANCIAS']))
+            <form action="{{ route('constancias.imprimir') }}" method="post" class="mb-0">
+                @csrf
+                @if($primerAlumno)<input type="hidden" name="no_control" value="{{ $primerAlumno->no_control }}">@endif
+                <button type="submit" class="btn btn-primary rounded-pill"><i class="fa-solid fa-print me-2"></i>Imprimir constancia</button>
+            </form>
+        @endif
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead class="table-light"><tr><th>Crédito</th><th>Actividades</th><th class="text-end">Porcentaje</th></tr></thead>
+            <tbody>
+                @foreach($creditos as $credito)
+                    @php
+                        $registros = $avance ? collect($alumno_data)->where('nombre_credito',$credito->nombre) : collect();
+                        $porcentaje = $registros->max('por_credito') ?? 0;
+                        $porcentaje = min(100,(int)$porcentaje);
+                        $sumaCreditos += $porcentaje;
+                    @endphp
+                    <tr>
+                        <td style="min-width:220px">
+                            <strong>{{ $credito->nombre }}</strong>
+                            <div class="credit-progress mt-2"><div style="width:{{ $porcentaje }}%"></div></div>
+                        </td>
+                        <td>
+                            @if($registros->isNotEmpty())
+                                @foreach($registros as $registro)
+                                    <div>{{ $registro->nombre_actividad }} <span class="text-muted">({{ $registro->por_cred_actividad }}%)</span></div>
+                                @endforeach
+                            @else
+                                <span class="text-muted">Sin actividades registradas</span>
+                            @endif
+                        </td>
+                        <td class="text-end"><strong>{{ $porcentaje }}%</strong></td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</article>
+@endsection
 
-			function limpiarListaResultados(){
-				let listaItems = document.getElementsByClassName("autocomplete-items");
-				for(var x = 0; x < listaItems.length; x++){
-					listaItems[x].parentNode.removeChild(listaItems[x]);
-				}
-			}
+@section('js')
+<script>
+    (function(){
+        const searchInput = document.getElementById('student_search');
+        const select = document.getElementById('student_select');
+        const hiddenControl = document.getElementById('student_no_control');
+        const submit = document.getElementById('student_search_submit');
+        const status = document.getElementById('student_search_status');
+        let timeout = null;
 
-			function removerResultadosDandoClicEnDocumento(clickedElement){
-				let listaItems = document.getElementsByClassName("autocomplete-items");
-				for(var x = 0; x < listaItems.length; x++){
-					if (clickedElement == listaItems[x] && clickedElement == entrada) {
-						continue;
-					}
-					listaItems[x].parentNode.removeChild(listaItems[x]);
-				}
-			}
+        function resetMatches(message){
+            select.innerHTML = '<option value="">'+(message || 'Sin coincidencias')+'</option>';
+            hiddenControl.value = '';
+            submit.disabled = true;
+            status.textContent = message || '';
+        }
 
-			function getDatosPorNombreAjax(busqueda) {
-				if(!busqueda)
-					return false;
+        searchInput.addEventListener('input', function(){
+            const query = this.value.trim();
+            clearTimeout(timeout);
+            hiddenControl.value = '';
+            submit.disabled = true;
+            if(query.length < 2){
+                resetMatches('Escribe al menos 2 caracteres');
+                return;
+            }
+            timeout = setTimeout(function(){
+                status.textContent = 'Buscando...';
+                fetch("{{ route('verifica_evidencia.alumnos_busqueda') }}?peticion=0&nombre="+encodeURIComponent(query), {
+                    headers:{'Accept':'application/json'}
+                }).then(r=>r.json()).then(rows=>{
+                    if(!rows.length){
+                        resetMatches('Sin coincidencias');
+                        return;
+                    }
+                    select.innerHTML = '<option value="">Selecciona una coincidencia</option>';
+                    rows.slice(0,5).forEach(function(row){
+                        const option=document.createElement('option');
+                        option.value=row.no_control;
+                        option.textContent=row.nombre+' — '+row.no_control+(row.carrera?' · '+row.carrera:'');
+                        select.appendChild(option);
+                    });
+                    status.textContent = rows.length+' coincidencia'+(rows.length===1?'':'s')+' encontrada'+(rows.length===1?'':'s');
+                }).catch(function(){
+                    resetMatches('No fue posible completar la búsqueda');
+                });
+            },300);
+        });
 
-				var participantes_arr = [];
-				var divPadre = document.createElement("div");
-				divPadre.setAttribute("id","div-autocomplete-list");
-				divPadre.setAttribute("class","autocomplete-items");
-
-				$.ajax({
-					type: "GET",
-					url: "{{ route('verifica_evidencia.alumnos_busqueda') }}",
-					dataType: "json",
-					data:{
-						nombre: busqueda,
-						peticion: 0
-					},
-					success: function(response){
-						let busqueda_actual = $("#alumno_nombre").val();
-						if (busqueda_actual != busqueda) {
-							limpiarListaResultados();
-							return;
-						}
-
-						participantes_arr = [];
-						for(var x=0; x<response.length; x++){
-							participantes_arr.push(response[x]);
-						}
-						limpiarListaResultados();
-						alumnoNombreInput.parentNode.appendChild(divPadre);
-						for(var x=0; x<participantes_arr.length; x++){
-							let divHijo = document.createElement("div");
-							divHijo.innerHTML = "<p><strong>"+ucwords(participantes_arr[x]['nombre'])+"</strong> &rarr; "+participantes_arr[x]['no_control']+"</p>";
-							divHijo.innerHTML += "<input type = 'hidden' value='"+participantes_arr[x]['nombre']+"'>";
-							divHijo.innerHTML += "<input type = 'hidden' value='"+participantes_arr[x]['no_control']+"'>";
-
-							divHijo.addEventListener("click", function(event){
-								event.preventDefault();
-								let temp = document.getElementById("alumno_nombre");
-								temp.value = this.getElementsByTagName("input")[0].value;
-								let temp2 = document.getElementById("no_control");
-								temp2.value = this.getElementsByTagName("input")[1].value;
-								limpiarListaResultados();
-							});
-
-							divPadre.appendChild(divHijo);
-						}
-					}, error: function(response){
-						console.log("Error :(");
-						console.log(response);
-					}
-				});
-
-			}
-
-			function getDatosPorNombre() {
-				limpiarListaResultados();
-
-				if (busquedaTimeout != null) {
-					clearTimeout(busquedaTimeout);
-				}
-
-				busquedaTimeout = setTimeout(function() {
-					let busqueda = $("#alumno_nombre").val();
-					getDatosPorNombreAjax(busqueda);
-				}, 400);
-
-			}
-
-			function addActive(current){
-				if(current == null) return false;
-				removeActive(current);
-				if(posicionActual >= current.length) posicionActual=0;
-				if(posicionActual < 0) posicionActual = current.length-1;
-				current[posicionActual].classList.add("autocomplete-active");
-				scrollToElement(posicionActual);
-			}
-
-
-			function isOverflownY(element) {
-			  return element.scrollHeight > element.clientHeight;
-			}
-
-			function scrollToElement(targetPosition) {
-				let scrollable = document.getElementById('div-autocomplete-list');
-				const firstPixelPosition = Math.floor(scrollable.childNodes[0].getBoundingClientRect().top);
-				const targetPixelPosition = Math.floor(scrollable.childNodes[targetPosition].getBoundingClientRect().top);
-				const marginSize = 4 * 32;
-
-				if (isOverflownY(scrollable)) {
-					if (targetPosition >= 0 && targetPosition <= 4) {
-						scrollable.scrollTop = 0;
-					} else {
-						let scrollToTarget = targetPixelPosition - firstPixelPosition - marginSize;
-						scrollable.scrollTop = scrollToTarget;
-					}
-				}
-			}
-
-			function removeActive(current){
-				for(var x = 0; x<current.length; x++){
-					current[x].classList.remove("autocomplete-active");
-				}
-			}
-
-			function scrollList() {
-				var lista_participantes = document.getElementById("div-autocomplete-list");
-				if(lista_participantes) lista_participantes = lista_participantes.getElementsByTagName("div");
-				if(event.keyCode == 40){
-					++posicionActual;
-					addActive(lista_participantes);
-				}else if(event.keyCode == 38){
-					--posicionActual;
-					addActive(lista_participantes);
-				}else if(event.keyCode == 13 && posicionActual >= 0){
-					this.value = lista_participantes[posicionActual].getElementsByTagName("input")[0].value;
-					var temp = document.getElementById("no_control");
-					temp.value = lista_participantes[posicionActual].getElementsByTagName("input")[1].value;
-					limpiarListaResultados();
-				}
-			}
-
-			function busquedaPorNoControl(entrada){
-				event.preventDefault();
-				alumnoNombreInput.value="";
-
-				var valor = entrada.value;
-				if(!valor || valor.length < 8 || valor.length > 10) {
-					return false;
-				}
-
-				$.ajax({
-					type: "GET",
-					url: "{{ route('verifica_evidencia.alumnos_busqueda') }}",
-					dataType: "json",
-					data:{
-						no_control: valor,
-						peticion: 1
-					},
-					success: function(response){
-						if(response.length>0){
-							alumnoNombreInput.value = response[0]['nombre'];
-						}
-					},error: function(response){
-						console.log("Error :(");
-						console.log(response);
-					}
-				});
-			}
-
-			function agregarEventosAElementos() {
-				alumnoNombreInput.addEventListener("input", getDatosPorNombre);
-				document.addEventListener("click",removerResultadosDandoClicEnDocumento);
-
-				alumnoNoControlInput.addEventListener("input", function(event){
-					busquedaPorNoControl(alumnoNoControlInput);
-				});
-
-				alumnoNoControlInput.addEventListener("click", function(event){
-					busquedaPorNoControl(alumnoNoControlInput);
-				});
-
-				alumnoNombreInput.addEventListener("keydown", scrollList);
-			}
-
-			$(document).ready(function(){
-				agregarEventosAElementos();
-				var mostrarMensaje = "{{ $mostrarMensaje }}";
-				if(mostrarMensaje == 1){
-					$('#mensaje-error').css('display','block');
-				}
-			});
-
-		</script>
-	@endsection
+        select.addEventListener('change', function(){
+            hiddenControl.value = this.value;
+            submit.disabled = !this.value;
+        });
+    })();
+</script>
 @endsection

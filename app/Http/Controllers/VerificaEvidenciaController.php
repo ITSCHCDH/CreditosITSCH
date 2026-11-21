@@ -12,6 +12,7 @@ use App\Models\Participante;
 use App\Models\Actividad_Evidencia;
 use App\Models\Actividad;
 use App\Models\Area;
+use App\Models\Sit\Alumno as SitAlumno;
 use Alert;
 
 class VerificaEvidenciaController extends Controller
@@ -198,23 +199,22 @@ class VerificaEvidenciaController extends Controller
         //Traemos todos los creditos existentes
         $creditos = Credito::select('nombre')->orderBy('nombre')->get();
     	if($request->has('no_control')){
-            //Verificamos que el numero de control exista
-    		$alumno = DB::table('alumnos')->where('no_control','=',$request->get('no_control'))->get();
-    		if($alumno->count() == 0){
+            $sitAlumno = SitAlumno::with(['user','carrera'])
+                ->where('no_control', $request->get('no_control'))
+                ->first();
+
+    		if(!$sitAlumno){
     			Alert::error('Error','El numero de control no exite');
     			return redirect()->route('verifica_evidencia.avance_alumno');
 
     		}else{
-                if(!Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO']) && $alumno[0]->carrera!=Auth::User()->area){
+                if(!Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO']) && $sitAlumno->carrera_id != Auth::User()->area){
                     Alert::error('Error','No puedes consultar avances de alumnos de otras carreras');
                     return redirect()->route('verifica_evidencia.avance_alumno');
                 }
             }
-            //Consulta para obterner el avance del alumno
-    		$alumno_data = DB::table('alumnos as alu')->join('participantes as p', function($join) use ($request){
-    			$join->on('p.no_control','=','alu.no_control');
-    			$join->where('alu.no_control','=',$request->get('no_control'));
-    		})->join('actividad_evidencia as ae',function($join){
+            $alumno_data = DB::table('participantes as p')
+            ->join('actividad_evidencia as ae',function($join){
                 $join->on('ae.id','=','p.id_evidencia');
                 $join->where('ae.validado','=','true');
             })->join('evidencia as e',function($join){
@@ -224,17 +224,32 @@ class VerificaEvidenciaController extends Controller
             ->join('avance as av',function($join) use ($request){
     			$join->on('av.id_credito','=','c.id');
     			$join->where('av.no_control','=',$request->get('no_control'));
-            })->join('areas','alu.carrera','=','areas.id')
+            })
             ->where(function($query){
                 $query->where('p.evidencia_validada','=','na')->orwhere('p.evidencia_validada','=','si');
-            })->where('ae.validado','=','true')
-            ->select('alu.no_control','alu.nombre as nombre_alumno','areas.nombre as carrera','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')->orderBy('nombre_credito')->groupBy('nombre_actividad')->get();
+            })->where('p.no_control','=',$request->get('no_control'))
+            ->where('ae.validado','=','true')
+            ->select('p.no_control','c.nombre as nombre_credito','a.nombre as nombre_actividad','a.por_cred_actividad','av.por_credito')
+            ->orderBy('nombre_credito')
+            ->groupBy('nombre_actividad')
+            ->get()
+            ->map(function ($row) use ($sitAlumno) {
+                $row->nombre_alumno = $sitAlumno->nombreCompleto;
+                $row->carrera = $sitAlumno->carrera?->nombre;
+                $row->foto = null;
+                return $row;
+            });
             $liberado = $this->verificarProgreso($request->get('no_control'));
             //Validamos que el alumnos tenga algun avance
     		if($alumno_data->count()==0){
                 //SI no tiene avance solo retornamos los datos del alumno los datos del alumno
                 $avance = false;
-                $alumno_data= DB::table('alumnos as alu')->join('areas as a','a.id','=','alu.carrera')->select('alu.nombre as nombre_alumno','a.nombre as carrera','alu.no_control','alu.foto')->where('alu.no_control','=',$request->get('no_control'))->get();
+                $alumno_data = collect([(object) [
+                    'nombre_alumno' => $sitAlumno->nombreCompleto,
+                    'carrera' => $sitAlumno->carrera?->nombre,
+                    'no_control' => $sitAlumno->no_control,
+                    'foto' => null,
+                ]]);
             }
         }
     	return view('admin.verifica_evidencia.avance_alumno')
@@ -246,10 +261,8 @@ class VerificaEvidenciaController extends Controller
     }
 
     public function verificarProgreso($no_control) {
-        $alumno = Alumno::where('no_control', '=', $no_control)->get();
-
+        $alumno = SitAlumno::where('no_control', $no_control)->first();
         if (!$alumno) return false;
-        $alumno = $alumno[0];
 
         $avance_data = DB::table('participantes as p')
         ->join('actividad_evidencia as ae', 'ae.id', '=', 'p.id_evidencia')
@@ -283,13 +296,6 @@ class VerificaEvidenciaController extends Controller
                 ++$creditos_liberados;
         }
 
-        if ($creditos_liberados >= 5 && $alumno->status === 'pendiente') {
-            $alumno->status = 'Liberado';
-            $alumno->save();
-        } else if ($alumno->status === 'Liberado') {
-            $alumno->status = 'pendiente';
-            $alumno->save();
-        }
         return $creditos_liberados >= 5;
     }
 
@@ -383,27 +389,40 @@ class VerificaEvidenciaController extends Controller
     }
 
     public function alumnosBusqueda(Request $request){
-        if (Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO'])) {
-            if($request->peticion == 0){
-                $lista_alumnos = Alumno::select('nombre','no_control')->where('nombre','like',"%$request->nombre%")->orderBy('nombre');
-            }else{
-                $lista_alumnos = Alumno::select('nombre')->where('no_control','=',$request->no_control);
-            }
-        }else{
-            if($request->peticion == 0){
-                $lista_alumnos = Alumno::select('nombre','no_control')->where([
-                    ['nombre','like',"%$request->nombre%"],
-                    ['carrera','=',Auth::User()->area]
-                ])->orderBy('nombre');
-            }else{
-                $lista_alumnos = Alumno::select('nombre')->where([
-                    ['no_control','=',$request->no_control],
-                    ['carrera','=',Auth::User()->area]
-                ]);
+        $query = SitAlumno::with(['user','carrera']);
+
+        if ((int) $request->peticion === 1) {
+            $query->where('no_control', $request->no_control);
+        } else {
+            $search = trim((string) $request->nombre);
+            if ($search !== '') {
+                $query->where(function ($alumnoQuery) use ($search) {
+                    $alumnoQuery->where('no_control', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery->where('nombre', 'like', "%{$search}%")
+                                ->orWhere('apellido_paterno', 'like', "%{$search}%")
+                                ->orWhere('apellido_materno', 'like', "%{$search}%");
+                        });
+                });
             }
         }
-        $lista_alumnos = $lista_alumnos->limit(100)->get();
-        return response()->json($lista_alumnos);
+
+        if (!Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO'])) {
+            $query->where('carrera_id', Auth::User()->area);
+        }
+
+        $lista = $query->orderBy('no_control')
+            ->limit(5)
+            ->get()
+            ->map(function ($alumno) {
+                return [
+                    'nombre' => $alumno->nombreCompleto,
+                    'no_control' => $alumno->no_control,
+                    'carrera' => $alumno->carrera?->nombre,
+                ];
+            });
+
+        return response()->json($lista);
     }
 
 }
