@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 16:05 · **Entradas registradas:** 50 · **Último commit previo a esta sesión:** `f77e014` (2026-11-21 16:02).
+**Última entrada:** 2026-11-21 16:09 · **Entradas registradas:** 51 · **Último commit previo a esta sesión:** `524ff6e` (2026-11-21 16:07).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-21 16:09 — Retícula completa de unidades en Calificaciones Parciales
 - 2026-11-21 16:05 — Calificaciones parciales: todas las materias del alumno
 - 2026-11-21 16:01 — Orden ascendente por apellidos garantizado
 - 2026-11-21 15:47 — Orden por apellidos en Análisis de alumnos
@@ -136,7 +137,7 @@ Notas de implementación:
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
 | Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
-| Trayectoria académica | `trayectoria` | 14 | 2026-11-20 18:59 – 2026-11-21 16:05 |
+| Trayectoria académica | `trayectoria` | 15 | 2026-11-20 18:59 – 2026-11-21 16:09 |
 | Infraestructura | `infraestructura` | 11 | 2026-11-20 18:32 – 2026-11-21 13:18 |
 | Tutorías | — | 0 | Sin entradas registradas |
 
@@ -164,6 +165,40 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-21 16:09] — Retícula completa de unidades en Calificaciones Parciales
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Mostrar todas las unidades de cada materia y marcar con «-» las que no están capturadas, para que el jefe vea cuántas faltan.
+
+**Archivos modificados:**
+- `app/Http/Controllers/JefesController.php` (columnas de unidades según `num_temas`)
+- `resources/views/sta/analisis_alumnos/diagnostico.blade.php` (celdas sin capturar y unidades inexistentes)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna consulta nueva: se usa `cat_materias.num_temas` que ya venía en el `select`.
+
+**Decisiones tomadas:**
+- Las columnas ahora son `1..N`, donde N es el mayor `num_temas` entre las materias del alumno (y el mayor número capturado, si lo hubiera).
+- Una unidad de la materia sin calificación capturada se muestra con «-» y tooltip «Unidad sin capturar».
+- Una columna que la materia no tiene (porque otra materia del alumno tiene más unidades) se marca con un punto tenue y tooltip «La materia no tiene esta unidad», para no confundirla con una captura pendiente.
+- El conteo «X de Y unidades capturadas» ahora solo cuenta unidades con `corte` capturado.
+
+**Pendientes / Deuda técnica:**
+- En móvil la tabla de parciales se desplaza horizontalmente al haber hasta siete columnas.
+
+**Tests ejecutados:**
+- ✅ 8 comprobaciones: columnas hasta el máximo de temas, una columna por unidad, celdas sin capturar, marcas de unidad inexistente, calificaciones visibles, avance por materia, encabezado y seis materias.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura de la retícula revisada.
+
+**Referencias:**
+- `docs/img/sta-diagnostico-reticula.png`
 
 ### [2026-11-21 16:05] — Calificaciones parciales: todas las materias del alumno
 

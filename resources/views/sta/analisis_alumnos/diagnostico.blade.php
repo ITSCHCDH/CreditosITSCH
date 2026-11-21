@@ -43,6 +43,7 @@
     .diag-nota--amarillo{background:#fdf8dd;color:#8a6d05}
     .diag-nota--verde{background:#e7f5ec;color:#1b7a43}
     .diag-nota--vacia{background:#f1f5f9;color:#94a3b8;font-weight:600}
+    .diag-nota--na{background:transparent;color:#cbd5e1;font-weight:600}
     .diag-semestre td{padding:0!important;border-bottom:0!important}
     .diag-semestre div{margin:1rem 0 .35rem;padding:.5rem .85rem;border-radius:.6rem;background:#edf3f8;color:#173c66;font-weight:700;font-size:.86rem;text-transform:uppercase;letter-spacing:.03em}
     .diag-empty{padding:2.5rem 1rem;text-align:center;color:#64748b;font-size:.9rem}
@@ -174,8 +175,8 @@
                 <div class="diag-card-head">
                     <h2><i class="fa-solid fa-pen-to-square me-2"></i>{{ $calificacionesvariable }}</h2>
                     <span class="text-muted small">
-                        {{ count($unidades) }} {{ count($unidades) === 1 ? 'unidad' : 'unidades' }}
-                        · {{ count($materias) }} {{ count($materias) === 1 ? 'materia' : 'materias' }}
+                        {{ count($materias) }} {{ count($materias) === 1 ? 'materia' : 'materias' }}
+                        · hasta {{ count($unidades) }} {{ count($unidades) === 1 ? 'unidad' : 'unidades' }}
                     </span>
                 </div>
 
@@ -193,7 +194,7 @@
                             <tbody>
                                 @foreach ($materias as $calif)
                                     @php
-                                        $capturadas = collect($calif)->filter(fn ($fila) => $fila->lsc_NumUnidad !== null)->count();
+                                        $capturadas = collect($calif)->filter(fn ($fila) => $fila->lsc_NumUnidad !== null && ! empty($fila->lsc_Corte))->count();
                                         $totalUnidades = (int) ($calif[0]->ret_NumUnidades ?? 0);
                                     @endphp
                                     <tr>
@@ -212,9 +213,13 @@
                                                 $calificacion = $registro?->lsc_Calificacion;
                                                 $corte = $registro?->lsc_Corte;
                                             @endphp
-                                            @if ($registro === null || ! $corte)
+                                            @if ($totalUnidades > 0 && $uni->lsc_NumUnidad > $totalUnidades)
                                                 <td class="text-center">
-                                                    <span class="diag-nota diag-nota--vacia" data-mdb-toggle="tooltip" title="El profesor no ha capturado la calificación">—</span>
+                                                    <span class="diag-nota diag-nota--na" data-mdb-toggle="tooltip" title="La materia no tiene esta unidad">·</span>
+                                                </td>
+                                            @elseif ($registro === null || ! $corte)
+                                                <td class="text-center">
+                                                    <span class="diag-nota diag-nota--vacia" data-mdb-toggle="tooltip" title="Unidad sin capturar">-</span>
                                                 </td>
                                             @elseif ($calificacion < 70)
                                                 @php

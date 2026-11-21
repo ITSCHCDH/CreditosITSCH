@@ -174,12 +174,15 @@ class JefesController extends Controller
             ->sortBy([['lse_clave', 'asc'], ['lsc_NumUnidad', 'asc']])
             ->values();
 
-        $GetMaxUnidad = $calificaciones->pluck('lsc_NumUnidad')
-            ->filter(fn ($unidad) => $unidad !== null)
-            ->unique()
-            ->sort()
-            ->values()
-            ->map(fn ($unidad) => (object) ['lsc_NumUnidad' => (int) $unidad]);
+        // Columnas: todas las unidades de la materia con más temas del alumno
+        // (para las demás, las unidades que no existen se marcan aparte).
+        $maxUnidades = max(
+            (int) $calificaciones->max('ret_NumUnidades'),
+            (int) $calificaciones->max('lsc_NumUnidad')
+        );
+        $GetMaxUnidad = $maxUnidades > 0
+            ? collect(range(1, $maxUnidades))->map(fn ($unidad) => (object) ['lsc_NumUnidad' => $unidad])
+            : collect();
 
         $variablegrupo = $GetGrupos->isNotEmpty() ? 'Grupos : ' : '';
         if ($calificaciones->isNotEmpty()) {
