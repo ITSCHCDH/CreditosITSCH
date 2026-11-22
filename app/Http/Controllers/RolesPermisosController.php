@@ -21,16 +21,37 @@ class RolesPermisosController extends Controller
         $this->middleware('permission:VIP|ASIGNAR_REMOVER_PERMISOS_A_ROLES')->only(['rolesAsignarPermiso','rolesAsignarPermisosVista']);
     }
     public function index(){
-        $roles = Role::all();
-    	return view('admin.roles.index')
-        ->with('roles',$roles);
+        $roles = Role::withCount(['permissions','users'])->orderBy('name','ASC')->get();
+        $totalRoles = $roles->count();
+        $totalPermisos = Permission::count();
+        $totalAsignaciones = $roles->sum('permissions_count');
+        $usuariosConRol = User::whereHas('roles')->count();
+
+        return view('admin.roles.index')
+        ->with('roles',$roles)
+        ->with('totalRoles',$totalRoles)
+        ->with('totalPermisos',$totalPermisos)
+        ->with('totalAsignaciones',$totalAsignaciones)
+        ->with('usuariosConRol',$usuariosConRol);
     }
     public function crearRole(){
-    	return view('admin.roles.roles_crear');
+        $permisos = Permission::orderBy('name','ASC')->get();
+        return view('admin.roles.roles_crear')
+        ->with('permisos',$permisos);
     }
     public function guardarRole(Request $request){
-    	$role = Role::create(['name' => $request->get('name')]);
-    	return redirect()->route('roles.index');
+        $request->validate([
+            'name' => ['required','string','max:100','unique:roles,name'],
+        ]);
+
+        $role = Role::create(['name' => $request->get('name')]);
+
+        if (Auth::User()->hasAnyPermission(['VIP','ASIGNAR_REMOVER_PERMISOS_A_ROLES']) && $request->has('permisos')) {
+            $role->syncPermissions($request->input('permisos', []));
+        }
+
+        Alert::success('Correcto','El rol '.$role->name.' se ha registrado correctamente');
+        return redirect()->route('roles.index');
     }
     public function rolesAsignarPermisosVista($id){
     	$permisos = Permission::leftjoin('role_has_permissions as r',function($join) use($id){

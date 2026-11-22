@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-22 12:06 · **Entradas registradas:** 63 · **Último commit previo a esta sesión:** `f1ecf44` (2026-11-22 12:03).
+**Última entrada:** 2026-11-22 12:08 · **Entradas registradas:** 64 · **Último commit previo a esta sesión:** `f19fb8a` (2026-11-22 12:07).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-22 12:08 — UX de Roles y permisos: listado y alta con tarjetas
 - 2026-11-22 12:06 — UX de Usuarios: listado y alta con tarjetas
 - 2026-11-22 12:03 — UX de Créditos / Altas con áreas de SIT
 - 2026-11-22 11:59 — UX de Créditos con MDB, Font Awesome y tarjetas
@@ -148,7 +149,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 32 | 2026-11-21 11:49 – 2026-11-22 12:06 |
+| Créditos complementarios | `créditos` | 33 | 2026-11-21 11:49 – 2026-11-22 12:08 |
 | Trayectoria académica | `trayectoria` | 19 | 2026-11-20 18:59 – 2026-11-21 16:44 |
 | Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -177,6 +178,45 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-22 12:08] — UX de Roles y permisos: listado y alta con tarjetas
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la UX de `admin/roles_permisos/index` y `create` con MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/roles/index.blade.php` (rediseño)
+- `resources/views/admin/roles/roles_crear.blade.php` (alta con tarjetas)
+- `app/Http/Controllers/RolesPermisosController.php` (`index`, `crearRole`, `guardarRole`)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- El listado usa `Role::withCount(['permissions','users'])` y totales de permisos, asignaciones y usuarios con rol.
+- El alta carga todos los permisos ordenados y, si el usuario puede asignarlos, los sincroniza con el rol nuevo.
+
+**Decisiones tomadas:**
+- Listado con cuatro tarjetas KPI (roles, permisos, asignaciones y usuarios con rol) y tarjeta de tabla.
+- La tabla muestra el conteo de permisos y usuarios por rol, con accesos directos para verlos, y acciones de asignar permisos, editar y eliminar.
+- El alta se divide en «Datos del rol» y «Permisos iniciales» (opcional, solo con `ASIGNAR_REMOVER_PERMISOS_A_ROLES`).
+- Los 65 permisos se agrupan por módulo, con buscador, contador y botones «Visibles»/«Ninguno».
+- Se agregó validación de nombre único y mensaje de éxito al crear el rol.
+
+**Pendientes / Deuda técnica:**
+- La vista de asignar permisos por rol (`roles_asignar_permisos_vista`) no se rediseñó en este cambio.
+- La agrupación por último segmento del nombre puede juntar permisos de módulos distintos (p. ej. «ALUMNO» y «ALUMNOS»).
+
+**Tests ejecutados:**
+- ✅ 18 comprobaciones: conteos por rol, KPIs, tabla, DataTables, botón de alta, tarjetas del alta, 65 permisos, contador/buscador, alta con permisos, rechazo de duplicado y rollback.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Capturas revisadas.
+
+**Referencias:**
+- `docs/img/roles-desktop.png`
+- `docs/img/roles-create-desktop.png`
 
 ### [2026-11-22 12:06] — UX de Usuarios: listado y alta con tarjetas
 
