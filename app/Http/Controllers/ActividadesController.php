@@ -9,6 +9,7 @@ use App\Http\Controllers\Utilities\DataTableAttr;
 use App\Http\Controllers\Utilities\DataTableHelper;
 use App\Http\Controllers\Utilities\HttpCode;
 use App\Models\Actividad_Evidencia;
+use App\Services\Sit\CarrerasSitService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -168,9 +169,10 @@ class ActividadesController extends Controller
             $creditos = Credito::where('vigente','=','true')->orderBy('nombre','asc')->get();
 
         }else{
+            $areaSit = CarrerasSitService::deArea(Auth::User()->area);
             $creditos = Credito::leftjoin('creditos_areas as ca','ca.credito_id','=','creditos.id')
                 ->where([
-                    ['ca.credito_area','=',Auth::User()->area],
+                    ['ca.credito_area','=',$areaSit ?? -1],
                     ['creditos.vigente','=','true']
                 ])
                 ->select('creditos.id', 'creditos.nombre')
@@ -205,13 +207,14 @@ class ActividadesController extends Controller
         $act->id_user = Auth::User()->id;
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act->nombre)->get();
         if(!Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])){
+            $areaSit = CarrerasSitService::deArea(Auth::User()->area);
             $areas_del_credito = DB::table('creditos as c')->join('creditos_areas as ca', function($join) use($request){
                 $join->on('c.id','=','ca.credito_id');
                 $join->where('c.id','=',$request->id_actividad); // id_actividad hace referencia a credito_id, lo sé mal diseño de la DB
             })->select('ca.credito_area as area_id')->get();
             $tiene_permitido = false;
             foreach ($areas_del_credito as $area) {
-                if($area->area_id == Auth::User()->area){
+                if($area->area_id == $areaSit){
                     $tiene_permitido = true;
                 }
             }

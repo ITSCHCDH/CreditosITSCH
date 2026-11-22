@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Credito; //Es el nombre del modelo con el que va a trabajar el controlador
-use App\Models\Area;
 use App\Models\CreditoArea;
+use App\Services\Sit\CarrerasSitService;
 use App\User;
 use DB;
 use Alert;
@@ -38,7 +38,7 @@ class CreditosController extends Controller
     public function create()
     {
         //Ponemos el codigo de la vista que se llamara para las altas de los creditos
-        $areas = Area::orderby('nombre','ASC')->get();
+        $areas = CarrerasSitService::visibles(null, true);
         $usuarios = User::where('active','=','true')->get();
         return view('admin.creditos.create')
         ->with('areas',$areas)
@@ -50,7 +50,15 @@ class CreditosController extends Controller
     {
        
         //Recibimos los datos de la vista de altas y en este metodo es donde registramos los datos a la BD
+        $request->validate([
+            'nombre' => ['required','string','max:70'],
+            'credito_jefe' => ['required','integer','exists:users,id'],
+            'areas' => ['required','array','min:1'],
+            'vigente' => ['nullable','in:true,false'],
+        ]);
+
         $credito = new Credito($request->all());
+        $credito->vigente = $request->input('vigente', 'true');
         //Comando para guardar el registro
         $credito->save();
         for($x=0; $x<count($request->areas); $x++){
@@ -67,11 +75,16 @@ class CreditosController extends Controller
   
     public function edit($id)
     {
-        //Codigo de modificaciones
-        $areas = DB::table('areas as a')->leftjoin('creditos_areas as ca', function($join) use($id){
-            $join->on('ca.credito_area','=','a.id');
-            $join->where('ca.credito_id','=',$id);
-        })->select('a.nombre','a.id','ca.credito_id')->orderBy('nombre','ASC')->get();
+        //Codigo de modificaciones: carreras activas de SIT y cuáles ya están ligadas
+        $seleccionadas = CreditoArea::where('credito_id','=',$id)->pluck('credito_area')->all();
+        $areas = CarrerasSitService::visibles(null, true)->map(function ($carrera) use ($id, $seleccionadas) {
+            return (object) [
+                'id' => $carrera->id,
+                'nombre' => $carrera->nombre,
+                'credito_id' => in_array($carrera->id, $seleccionadas) ? $id : null,
+            ];
+        });
+
         $credito=Credito::find($id);//Busca el registro
         if($credito==null){
             Alert::error('Error','El credito no existe');
@@ -87,12 +100,19 @@ class CreditosController extends Controller
   
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'nombre' => ['required','string','max:70'],
+            'credito_jefe' => ['required','integer','exists:users,id'],
+            'areas' => ['required','array','min:1'],
+            'vigente' => ['nullable','in:true,false'],
+        ]);
+
         CreditoArea::where('credito_id','=',$id)->delete();
         //Ejecuta la modificacion
         $credito= Credito::find($id);
         $credito->nombre=$request->nombre;
         $credito->credito_jefe = $request->credito_jefe;
-        $credito->vigente = $request->vigente;
+        $credito->vigente = $request->input('vigente', $credito->vigente);
         $credito->save();
         for($x=0; $x<count($request->areas); $x++){
             $credito_area = new CreditoArea();

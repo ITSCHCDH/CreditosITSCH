@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-22 11:59 · **Entradas registradas:** 61 · **Último commit previo a esta sesión:** `ba0951f` (2026-11-22 11:46).
+**Última entrada:** 2026-11-22 12:03 · **Entradas registradas:** 62 · **Último commit previo a esta sesión:** `cdc575e` (2026-11-22 11:59).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-22 12:03 — UX de Créditos / Altas con áreas de SIT
 - 2026-11-22 11:59 — UX de Créditos con MDB, Font Awesome y tarjetas
 - 2026-11-22 11:44 — Pie de página de la constancia alineado a la izquierda
 - 2026-11-22 11:37 — Plan de estudios de constancias desde SIT
@@ -146,7 +147,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 30 | 2026-11-21 11:49 – 2026-11-22 11:59 |
+| Créditos complementarios | `créditos` | 31 | 2026-11-21 11:49 – 2026-11-22 12:03 |
 | Trayectoria académica | `trayectoria` | 19 | 2026-11-20 18:59 – 2026-11-21 16:44 |
 | Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -175,6 +176,45 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-22 12:03] — UX de Créditos / Altas con áreas de SIT
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la UX de `admin/creditos/create` con MDB, Font Awesome y cards, y conectar las áreas con la tabla de áreas de SIT.
+
+**Archivos modificados:**
+- `resources/views/admin/creditos/create.blade.php` (rediseño con tarjetas)
+- `app/Http/Controllers/CreditosController.php` (`create`, `edit`, `store`, `update`)
+- `app/Http/Controllers/ActividadesController.php` (permiso por área SIT)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- El alta y la edición listan las carreras activas de `sit.cat_carreras` mediante `CarrerasSitService`.
+- `creditos_areas.credito_area` ahora guarda el id de SIT de la carrera.
+- `ActividadesController` compara el área del usuario con su equivalente SIT (`CarrerasSitService::deArea`).
+
+**Decisiones tomadas:**
+- La tabla `cat_areas_conocimiento` de SIT está vacía, así que las «áreas» del crédito se toman de las carreras activas de SIT (`cat_carreras`), igual que en constancias.
+- `creditos_areas` estaba vacía y no tenía llave foránea, por lo que el cambio de ids no requiere migración de datos.
+- Las áreas se eligen con checkboxes en tarjeta (buscador, contador y botones «Todas»/«Ninguna») en lugar del `select multiple` con Chosen.
+- Se agregó la vigencia como switch y validación de servidor (nombre, jefe y al menos un área); el alta y la edición muestran los errores.
+- El permiso de áreas en actividades ahora resuelve el área del usuario a SIT antes de comparar.
+
+**Pendientes / Deuda técnica:**
+- La pantalla de edición conserva el `select multiple`; puede recibir el mismo tratamiento de checkboxes.
+- `create` valida en cliente con `swal` además de la validación de servidor.
+
+**Tests ejecutados:**
+- ✅ 16 comprobaciones: carreras desde SIT, un checkbox por carrera, ids de SIT, tarjetas, buscador y contador, botones, jefe/vigencia, validación cliente, alta con relaciones SIT, rechazo sin áreas, edición preseleccionada y permiso de actividades por área, con rollback.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura revisada.
+
+**Referencias:**
+- `docs/img/creditos-create-desktop.png`
 
 ### [2026-11-22 11:59] — UX de Créditos con MDB, Font Awesome y tarjetas
 
