@@ -427,10 +427,15 @@ class STAController extends Controller
         foreach ($alumnosGrupo as $alumno) {
             if (isset($alumnosDatos[$alumno->no_Control])) {
                 $alumnoTem = $alumnosDatos[$alumno->no_Control];
-                $alumno->alu_Nombre = strtoupper($alumnoTem->nombre) . ' ' . strtoupper($alumnoTem->apellido_paterno) . ' ' . strtoupper($alumnoTem->apellido_materno);
+                $alumno->alu_Nombre = strtoupper($alumnoTem->nombre);
+                $alumno->alu_ApePaterno = strtoupper($alumnoTem->apellido_paterno);
+                $alumno->alu_ApeMaterno = strtoupper($alumnoTem->apellido_materno);
                 $alumno->status = $alumnoTem->estatus;
             } else {
                 $alumno->alu_Nombre = 'EL ALUMNO NO EXISTE, VERIFICA SU NUMERO DE CONTROL!';
+                $alumno->alu_ApePaterno = '';
+                $alumno->alu_ApeMaterno = '';
+                $alumno->status = 'NA';
             }
 
             // Asigna la ficha correspondiente, o 0 si no existe
@@ -441,8 +446,9 @@ class STAController extends Controller
             }
         }      
       
-        foreach ($alumnosGrupo as $row) {             
-            $row->semaforos = JefesController::calSemaforos($row->no_Control);            
+        $jefes = app(JefesController::class);
+        foreach ($alumnosGrupo as $row) {
+            $row->semaforos = $jefes->calSemaforos($row->no_Control);
         }    
              
         return view('sta.tutores.showGrupo',compact('grupo','alumnos','alumnosGrupo'));
