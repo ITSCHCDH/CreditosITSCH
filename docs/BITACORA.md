@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-22 12:09 · **Entradas registradas:** 65 · **Último commit previo a esta sesión:** `08240aa` (2026-11-22 12:08).
+**Última entrada:** 2026-11-22 12:11 · **Entradas registradas:** 66 · **Último commit previo a esta sesión:** `5bc032b` (2026-11-22 12:09).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-22 12:11 — UX de Editar rol con tarjetas
 - 2026-11-22 12:09 — UX de Asignar permisos a un rol
 - 2026-11-22 12:08 — UX de Roles y permisos: listado y alta con tarjetas
 - 2026-11-22 12:06 — UX de Usuarios: listado y alta con tarjetas
@@ -150,7 +151,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 34 | 2026-11-21 11:49 – 2026-11-22 12:09 |
+| Créditos complementarios | `créditos` | 35 | 2026-11-21 11:49 – 2026-11-22 12:11 |
 | Trayectoria académica | `trayectoria` | 19 | 2026-11-20 18:59 – 2026-11-21 16:44 |
 | Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -179,6 +180,42 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-22 12:11] — UX de Editar rol con tarjetas
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la UX de la vista de editar roles con MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/roles/role_editar.blade.php` (rediseño)
+- `app/Http/Controllers/RolesPermisosController.php` (`editarRole` y `actualizarRole`)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- `editarRole` calcula permisos asignados, total de permisos y usuarios con el rol.
+- `actualizarRole` valida nombre obligatorio, máximo 100 y único (excluyendo el rol actual).
+
+**Decisiones tomadas:**
+- La edición se divide en «Datos del rol» (nombre) y «Resumen» (id, permisos, usuarios y última actualización).
+- El resumen incluye accesos a «Ver permisos» y «Asignar permisos» (este último según permisos del usuario).
+- Se conservan la ruta `roles.role_actualizar`, el campo `name`, el `csrf` y el flujo de redirección al listado.
+- Se muestra aviso de validación y mensaje de éxito al actualizar.
+
+**Pendientes / Deuda técnica:**
+- `roles_asignar_usuarios.blade.php` está vacía y no se usa (preexistente).
+- Sigue sin commitear el cambio de footer en `template/molde.blade.php` (Creditsch → STA), ajeno a esta tarea.
+
+**Tests ejecutados:**
+- ✅ 11 comprobaciones: rol cargado, nombre precargado, tarjetas, conteos, enlaces, botones, actualización de nombre, rechazo de duplicado/vacío y rollback.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura revisada.
+
+**Referencias:**
+- `docs/img/roles-editar.png`
 
 ### [2026-11-22 12:09] — UX de Asignar permisos a un rol
 

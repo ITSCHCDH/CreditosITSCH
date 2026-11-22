@@ -84,14 +84,27 @@ class RolesPermisosController extends Controller
     }
     public function editarRole($id){
         $role = Role::findById($id);
+        $totalPermisos = Permission::count();
+        $asignados = $role->permissions()->count();
+        $usuarios = $role->users()->count();
+
         return view('admin.roles.role_editar')
-        ->with('role',$role);
+        ->with('role',$role)
+        ->with('totalPermisos',$totalPermisos)
+        ->with('asignados',$asignados)
+        ->with('usuarios',$usuarios);
     }
 
     public function actualizarRole(Request $request, $id){
+        $request->validate([
+            'name' => ['required','string','max:100','unique:roles,name,'.$id],
+        ]);
+
         $role = Role::findById($id);
         $role->name = $request->name;
         $role->save();
+
+        Alert::success('Correcto','El rol '.$role->name.' se ha actualizado correctamente');
         return redirect()->route('roles.index');
     }
 
