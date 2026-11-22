@@ -9,7 +9,8 @@
 @endsection
 
 @section('contenido')
-    <form action="{{ route('alumnos.sta.autorizar.guargar', $alu->no_control) }}" method="get">
+    <form action="{{ route('alumnos.sta.autorizar.guargar', $alu->no_control) }}" method="post">
+        @csrf
         <div class="row">
             <div class="col-md-1"></div>
             <div class="col-md-10">

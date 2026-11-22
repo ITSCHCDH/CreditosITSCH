@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Grupo;
 use Illuminate\Support\Facades\DB;
 use App\Models\AsignacionTutores;
+use App\Models\Sit\Carrera;
 use App\Services\Sit\CarrerasSitService;
 use Alert;
 use PDF;
@@ -46,6 +47,11 @@ class GruposController extends Controller
     { 
         try
         {
+            $request->validate([
+                'gpo_Nombre' => ['required','string','max:10'],
+                'gpo_Semestre' => ['nullable','string','max:15'],
+                'id_Carrera' => ['required','integer'],
+            ]);
              //Verificamos si el grupo existe y solo si no, lo damos de alta
             $grupoExiste=Grupo::where([
                 ['gpo_Nombre','=',$request->gpo_Nombre],
@@ -60,6 +66,10 @@ class GruposController extends Controller
             //Creamos el grupo
             $grupo = new Grupo();
             $grupo->gpo_Nombre = $request->gpo_Nombre;
+            if (! Carrera::where('activo',1)->whereKey($request->id_Carrera)->exists()) {
+                Alert::error('Error','La carrera SIT no existe');
+                return redirect()->back();
+            }
             $grupo->id_Carrera = $request->id_Carrera;
             $grupo->gpo_Status = 0;
             $grupo->gpo_Semestre= $request->gpo_Semestre;
@@ -100,10 +110,19 @@ class GruposController extends Controller
     public function updateGrupo(Request $request, $id)
     {   try
         {
+            $request->validate([
+                'gpo_Nombre' => ['required','string','max:10'],
+                'gpo_Semestre' => ['nullable','string','max:15'],
+                'id_Carrera' => ['required','integer'],
+            ]);
             //Obtenemos el grupo a modificar
             $grupo = Grupo::find($id); 
             //Actualizamos el grupo
             $grupo->gpo_Nombre = $request->gpo_Nombre;
+            if (! Carrera::where('activo',1)->whereKey($request->id_Carrera)->exists()) {
+                Alert::error('Error','La carrera SIT no existe');
+                return redirect()->back();
+            }
             $grupo->id_Carrera = $request->id_Carrera;
             $grupo->gpo_Status = $request->gpo_Status;
             $grupo->gpo_Semestre= $request->gpo_Semestre;
@@ -123,6 +142,15 @@ class GruposController extends Controller
     //Funcion para guardar los grupos de tutorias
     public function saveGrupoTut(Request $request)
     {    
+        $request->validate([
+            'gpo_Id' => ['required','integer','exists:grupos,id'],
+            'tut_Clave' => ['required','integer','exists:users,id'],
+            'car_Clave' => ['required','integer'],
+        ]);
+        if (! Carrera::where('activo',1)->whereKey($request->car_Clave)->exists()) {
+            Alert::error('Error','La carrera SIT no existe');
+            return redirect()->back();
+        }
         //Obtetemos el año actual
         $año = date("Y");   
         //Guarda el grupo si no existe en la tabla de grupos

@@ -5,6 +5,8 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Sit\Carrera;
 
 class User extends Authenticatable
 {
@@ -19,7 +21,7 @@ class User extends Authenticatable
     
     protected $table ="users";
     protected $fillable = [
-        'name', 'email', 'password','area','active','tutor'
+        'name', 'email', 'password','area','sit_carrera_id','active','tutor'
     ];
 
     /**
@@ -42,5 +44,10 @@ class User extends Authenticatable
     public function scopeSearch($query,$valor)
     {
         return $query->where('name','LIKE',"%$valor%");
+    }
+
+    public function sitCarrera(): BelongsTo
+    {
+        return $this->belongsTo(Carrera::class, 'sit_carrera_id', 'id');
     }
 }

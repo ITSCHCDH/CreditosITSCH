@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Actividad;
 use App\Models\Credito;
+use App\Models\Sit\Carrera;
 use App\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -41,8 +42,16 @@ class PruebaActividadesSeeder extends Seeder
             return;
         }
 
-        $areas = DB::table('areas')->where('tipo', 'carrera')->pluck('id');
-        $areaId = $areas->isNotEmpty() ? $areas->first() : 1;
+        $carreraId = Carrera::where('activo', 1)->orderBy('id')->value('id');
+        $areaId = DB::table('areas')->where('tipo', 'otro')->orderBy('id')->value('id');
+        if (! $areaId) {
+            $areaId = DB::table('areas')->insertGetId([
+                'nombre' => 'Administrativo',
+                'tipo' => 'otro',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         for ($index = 1; $index <= 10; $index++) {
             $user = User::updateOrCreate(
@@ -51,6 +60,7 @@ class PruebaActividadesSeeder extends Seeder
                     'name' => "Responsable de Prueba {$index}",
                     'password' => Hash::make('Prueba123!'),
                     'area' => $areaId,
+                    'sit_carrera_id' => $carreraId,
                     'active' => 'true',
                     'tutor' => 0,
                 ]

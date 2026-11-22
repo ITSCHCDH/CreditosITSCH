@@ -313,7 +313,9 @@ class VerificaEvidenciaController extends Controller
         $puedeVerTodas = Auth::User()->hasAnyPermission(['VIP', 'VIP_REPORTES', 'VIP_SOLO_LECTURA']);
         $carrerasPermitidas = $puedeVerTodas
             ? CarrerasSitService::visibles()
-            : CarrerasSitService::visibles(Area::CarrerasUsuario(Auth::User()->id)->pluck('id'));
+            : (Auth::User()->sit_carrera_id
+                ? collect([CarrerasSitService::visibles()->firstWhere('id', (int) Auth::User()->sit_carrera_id)])->filter()
+                : collect());
 
         $reportes_data = null;
         $suma_creditos = null;
@@ -565,7 +567,9 @@ class VerificaEvidenciaController extends Controller
 
         if (! $puedeVerTodas) {
             // Se acota a las carreras SIT equivalentes al área del usuario
-            $carrerasPermitidas = CarrerasSitService::visibles(Area::CarrerasUsuario(Auth::User()->id)->pluck('id'))->pluck('id');
+            $carrerasPermitidas = Auth::User()->sit_carrera_id
+                ? collect([(int) Auth::User()->sit_carrera_id])
+                : collect();
             $query->whereIn('carrera_id', $carrerasPermitidas->isEmpty() ? [-1] : $carrerasPermitidas->all());
         } elseif ($request->filled('carrera')) {
             // El filtro llega con el id del catálogo SIT

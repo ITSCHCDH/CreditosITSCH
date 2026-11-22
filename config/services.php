@@ -35,4 +35,20 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    /*
+    |-------------------------------------------------------------------------- 
+    | Sistema institucional de control escolar (SIT)
+    |-------------------------------------------------------------------------- 
+    |
+    | Estas URLs solamente crean enlaces a SIT. Ningún modelo o formulario
+    | de este módulo escribe en la base institucional.
+    */
+    'sit' => [
+        'url' => rtrim((string) env('SIT_PORTAL_URL', env('SIT_URL', 'https://sit.cdhidalgo.tecnm.mx')), '/'),
+        'perfil_url' => rtrim((string) env('SIT_PERFIL_URL', 'https://sit.cdhidalgo.tecnm.mx/mi-perfil'), '/'),
+        'base_url' => rtrim((string) env('SIT_PORTAL_URL', env('SIT_URL', env('APP_URL', ''))), '/'),
+        'alumno_url' => env('SIT_ALUMNO_URL', ''),
+        'alumno_profile_url_template' => env('SIT_ALUMNO_PROFILE_URL_TEMPLATE', ''),
+    ],
+
 ];

@@ -136,6 +136,15 @@
                                     @endif
                                 </select>
                             </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="sit_carrera_id">Carrera SIT</label>
+                                <select id="sit_carrera_id" name="sit_carrera_id" class="form-select">
+                                    <option value="">Sin carrera</option>
+                                    @foreach ($carreras as $carrera)
+                                        <option value="{{ $carrera->id }}" @selected(old('sit_carrera_id') == $carrera->id)>{{ $carrera->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
                             <div class="col-12 col-md-6">
                                 <label class="form-label" for="active">Estado</label>

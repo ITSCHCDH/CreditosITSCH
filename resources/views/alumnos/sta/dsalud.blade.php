@@ -9,7 +9,12 @@
 @endsection
 
 @section('contenido')
-    <form action="{{ route('alumnos.sta.updtDatSalud', $alu->no_control) }}" method="get">
+    <div class="alert alert-info">
+        ¿Necesitas corregir estos datos? Actualízalos directamente en el sistema SIT:
+        <a href="{{ config('services.sit.perfil_url') }}" target="_blank" rel="noopener noreferrer">Actualizar información en SIT</a>
+    </div>
+    <form>
+        @csrf
         <div class="row">
             <div class="col-md-1"></div>
             <div class="col-md-10">

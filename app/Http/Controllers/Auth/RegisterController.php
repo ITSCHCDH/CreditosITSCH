@@ -6,6 +6,8 @@ use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use App\Models\Area;
+use App\Models\Sit\Carrera;
 
 class RegisterController extends Controller
 {
@@ -52,7 +54,8 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'area'=>'required|string|max:255',
+            'area'=>'required|integer',
+            'sit_carrera_id'=>'nullable|integer',
 
         ]);
     }
@@ -65,12 +68,17 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $area = Area::where('tipo','otro')->orderBy('id')->first();
+        if (! $area) {
+            $area = Area::create(['nombre'=>'Administrativo','tipo'=>'otro']);
+        }
 
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
-            'area' => $data['area'],
+            'area' => $data['area'] ?? $area->id,
+            'sit_carrera_id' => $data['sit_carrera_id'] ?? null,
         ]);
     }
 
@@ -81,15 +89,10 @@ class RegisterController extends Controller
      */
     public function showRegistrationForm()
     {
-        $carreras = [
-            ['carrera' => 'Ing. en Sistemas Computacionales','valor' => 'Sistemas'],
-            ['carrera' => 'Ing. en Nanotecnología', 'valor' => 'Nanotecnología'],
-            ['carrera' => 'Ing. en Mecatrónica','valor' => 'Mecatrónica'],
-            ['carrera' => 'Ing. en Bioquímica','valor' => 'Bioquímica'],
-            ['carrera' => 'Ing. en Tecnologías de la Información y Comunicaciones','valor' =>"TIC's"],
-            ['carrera' => 'Gestión Empresarial','valor' => 'Gestión Empresarial'],
-            ['carrera' => 'Ing. Industrial', 'valor' => 'Industrial']
-        ];
-        return view('auth.register')->with('carreras',$carreras);
+        $areas = Area::where('tipo', 'otro')->orderBy('nombre')->get();
+        $carreras = Carrera::where('activo',1)->orderBy('nombre')->get()
+            ->map(fn ($carrera) => ['carrera' => $carrera->nombre, 'valor' => $carrera->id])
+            ->all();
+        return view('auth.register')->with('areas',$areas)->with('carreras',$carreras);
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\AlumnoCreditosPerfil;
 use App\Models\Avance;
 use App\Models\Participante;
@@ -78,6 +79,13 @@ class Alumno extends Model
     public function alumnoDatoMedico(): HasOne
     {
         return $this->hasOne(AlumnoDatoMedico::class, 'alumno_id');
+    }
+
+    public function discapacidades(): BelongsToMany
+    {
+        return $this->belongsToMany(Discapacidad::class, 'alumno_discapacidades', 'alumno_id', 'discapacidad_id')
+            ->withPivot(['observaciones'])
+            ->withTimestamps();
     }
 
     public function semaforoAlumno(): HasOne

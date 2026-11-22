@@ -27,6 +27,7 @@ class UserRequest extends FormRequest
             'name' => 'min:1|max:100|required|regex:/^[a-zA-ZñÑáÁéÉíÍóÓúÚ][ñÑa-zA-Z áÁéÉíÍóÓúÚ]+$/',
             'email' =>  'email|required',
             'area' => 'required',
+            'sit_carrera_id' => 'nullable|integer',
             'active' => 'required',
             'password' => 'required|min:4|max:60',
             'password_confirmation' => 'required_with:password|same:password|min:4|max:60|required'

@@ -64,7 +64,14 @@
         <span class="badge rounded-pill px-3 py-2 bg-light text-dark">Actualización del perfil</span>
     </div>
 
-    <form action="{{ route('alumnos.sta.ficha.guargar', $alu->no_control) }}" method="get" id="fr">
+    @if (! empty($sitUrl))
+        <div class="alert alert-info d-flex align-items-center justify-content-between" role="alert">
+            <span><i class="fas fa-lock me-2"></i>Los datos institucionales se muestran como solo lectura.</span>
+            <a class="btn btn-sm btn-outline-primary" href="{{ $sitUrl }}" target="_blank" rel="noopener noreferrer">¿Necesitas corregir estos datos? Actualízalos directamente en el sistema SIT</a>
+        </div>
+    @endif
+    <form action="{{ route('alumnos.sta.ficha.guargar', $alu->no_control) }}" method="post" id="fr">
+        @csrf
         <div class="profile-sections">
             <section class="profile-section">
                 <div class="profile-section-head"><i class="fas fa-user"></i><h2>Datos personales</h2></div>
@@ -77,11 +84,11 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label" for="lug">Lugar de nacimiento</label>
-                            <input id="lug" name="lug" type="text" class="form-control" value="{{ $alu->lug_pro }}" required>
+                            <input id="lug" type="text" class="form-control" value="{{ $alu->lug_pro }}" readonly>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="est_civ">Estado civil</label>
-                            <select id="est_civ" name="est_civ" class="form-select" required>
+                            <select id="est_civ" class="form-select" disabled>
                                 @foreach(['Soltero','Casado','Separado','Divorciado','Viudo','Unión Libre'] as $estadoCivil)
                                     <option value="{{ $estadoCivil }}" @selected($alu->est_civ == $estadoCivil)>{{ $estadoCivil }}</option>
                                 @endforeach
@@ -89,7 +96,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" for="grupo">Grupo</label>
-                            <input id="grupo" name="grupo" maxlength="6" type="text" class="form-control" value="{{ $alu->grupo }}" required>
+                            <input id="grupo" maxlength="6" type="text" class="form-control" value="{{ $alu->grupo }}" readonly>
                         </div>
                     </div>
                 </div>
@@ -101,15 +108,15 @@
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label" for="estatura">Estatura (cm)</label>
-                            <input id="estatura" name="estatura" type="number" min="0" class="form-control" value="{{ $clinicos->estatura }}" step="0.1" required>
+                            <input id="estatura" type="number" min="0" class="form-control" value="{{ $clinicos->estatura }}" step="0.1" readonly>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label" for="peso">Peso (kg)</label>
-                            <input id="peso" name="peso" type="number" min="0" class="form-control" value="{{ $clinicos->peso }}" step="1" required>
+                            <input id="peso" type="number" min="0" class="form-control" value="{{ $clinicos->peso }}" step="1" readonly>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label" for="sangre">Tipo de sangre</label>
-                            <select id="sangre" name="sangre" class="form-select" required>
+                            <select id="sangre" class="form-select" disabled>
                                 <option value="">Seleccione</option>
                                 @foreach(['A+','A-','B+','B-','AB+','AB-','O+','O-'] as $tipoSangre)
                                     <option value="{{ $tipoSangre }}" @selected($clinicos->sangre == $tipoSangre)>{{ $tipoSangre }}</option>
@@ -118,7 +125,7 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label" for="tel">Teléfono</label>
-                            <input type="text" id="tel" name="tel" class="form-control" value="{{ $alu->tel }}">
+                            <input type="text" id="tel" class="form-control" value="{{ $alu->tel }}" readonly>
                         </div>
                     </div>
                 </div>
@@ -128,11 +135,11 @@
                 <div class="profile-section-head"><i class="fas fa-house"></i><h2>Domicilio y situación</h2></div>
                 <div class="profile-section-body">
                     <div class="row g-3">
-                        <div class="col-md-4"><label class="form-label" for="estado">Estado</label><input required type="text" id="estado" name="estado" class="form-control" value="{{ $direccion->estado }}"></div>
-                        <div class="col-md-4"><label class="form-label" for="municipio">Municipio</label><input required type="text" id="municipio" name="municipio" class="form-control" value="{{ $direccion->municipio }}"></div>
-                        <div class="col-md-4"><label class="form-label" for="cp">Código postal</label><input required type="number" id="cp" name="cp" class="form-control" value="{{ $direccion->cp }}"></div>
-                        <div class="col-md-8"><label class="form-label" for="direccion">Calle y número</label><input required type="text" id="direccion" name="direccion" class="form-control" value="{{ $direccion->direccion }}"></div>
-                        <div class="col-md-4"><label class="form-label" for="colonia">Colonia</label><input required type="text" id="colonia" name="colonia" class="form-control" value="{{ $direccion->colonia }}"></div>
+                        <div class="col-md-4"><label class="form-label" for="estado">Estado</label><input type="text" id="estado" class="form-control" value="{{ $direccion->estado }}" readonly></div>
+                        <div class="col-md-4"><label class="form-label" for="municipio">Municipio</label><input type="text" id="municipio" class="form-control" value="{{ $direccion->municipio }}" readonly></div>
+                        <div class="col-md-4"><label class="form-label" for="cp">Código postal</label><input type="number" id="cp" class="form-control" value="{{ $direccion->cp }}" readonly></div>
+                        <div class="col-md-8"><label class="form-label" for="direccion">Calle y número</label><input type="text" id="direccion" class="form-control" value="{{ $direccion->direccion }}" readonly></div>
+                        <div class="col-md-4"><label class="form-label" for="colonia">Colonia</label><input type="text" id="colonia" class="form-control" value="{{ $direccion->colonia }}" readonly></div>
                     </div>
                     <hr>
                     <div class="row g-3">
@@ -164,7 +171,7 @@
                 <div class="profile-section-head"><i class="fas fa-address-card"></i><h2>Contacto e identificación</h2></div>
                 <div class="profile-section-body">
                     <div class="row g-3">
-                        <div class="col-md-6"><label class="form-label" for="emailPer">Correo personal</label><input type="email" id="emailPer" name="emailPer" class="form-control" value="{{ $alu->emailPer }}"></div>
+                        <div class="col-md-6"><label class="form-label" for="emailPer">Correo personal</label><input type="email" id="emailPer" class="form-control" value="{{ $alu->emailPer }}" readonly></div>
                         <div class="col-md-6"><label class="form-label" for="email">Correo institucional</label><input type="email" id="email" name="email" class="form-control" value="{{ $alu->email }}" readonly></div>
                         <div class="col-md-6"><label class="form-label" for="num_person">Número de dependientes</label><input type="number" name="num_person" id="num_person" class="form-control" value="{{ $person->num_person }}" required></div>
                         <div class="col-md-6"><label class="form-label" for="parentesco">Parentesco de contacto</label><input type="text" name="parentesco" id="parentesco" class="form-control" value="{{ $person->parentesco }}" required></div>

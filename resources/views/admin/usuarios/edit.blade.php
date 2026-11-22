@@ -15,6 +15,16 @@
       <label class="form-label" for="nombre">Nombre</label>
     </div>
     <br>
+    <div class="form-group">
+      <label for="sit_carrera_id" class="control-label">Carrera SIT</label>
+      <select id="sit_carrera_id" class="form-control" name="sit_carrera_id">
+        <option value="">Sin carrera</option>
+        @foreach($carreras as $carrera)
+          <option value="{{ $carrera->id }}" @selected((int)$user->sit_carrera_id === (int)$carrera->id)>{{ $carrera->nombre }}</option>
+        @endforeach
+      </select>
+    </div>
+    <br>
 
     <div class="form-outline">
       <input type="email" id="email" name="email" class="form-control form-control-lg" value="{{ $user->email }}" required />

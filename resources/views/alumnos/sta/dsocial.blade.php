@@ -9,7 +9,8 @@
 @endsection
 
 @section('contenido')
-    <form action="{{ route('alumnos.sta.dsociales.guargar', $alu->no_control) }}" method="get">
+    <form action="{{ route('alumnos.sta.dsociales.guargar', $alu->no_control) }}" method="post">
+        @csrf
         <div class="row">
             <div class="col-md-1"></div>
             <div class="col-md-10">
@@ -456,7 +457,7 @@
                                     </div>
                                     <hr>
                                     <div class="panel-footer center">
-                                        <a href="{{ url('/alumnos/updtDatSalud',$alu->no_control) }}" type="button" class="previous btn btn-default">Anterior</a>
+                                        <a href="{{ route('alumnos.sta.ficha') }}" type="button" class="previous btn btn-default">Anterior</a>
                                         <input type="submit" value="Siguiente" class="btn btn-info">
                                     </div>
                                 </div>

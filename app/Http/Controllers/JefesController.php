@@ -17,10 +17,11 @@ use App\Models\Social;
 use App\Models\Sit\Alumno as SitAlumno;
 use App\Services\Sit\CarrerasSitService;
 use Alert;
+use App\Services\Sta\FichaAlumnoService;
 
 class JefesController extends Controller
 {
-    public function __construct()
+    public function __construct(private FichaAlumnoService $fichaAlumno)
     {
         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_COR_CARRERA')->only(['index']);
         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_TUTOR|STA_COR_CARRERA')->only(['generacion','diagnostico','calSemaforos','ficha','storeAlumnoObs']);
@@ -231,6 +232,7 @@ class JefesController extends Controller
 
         return view('sta.analisis_alumnos.diagnostico')
             ->with('alumnos', $buscarAlumno)
+            ->with('sitUrl', (string) config('services.sit.perfil_url'))
             ->with('grupos', $GetGrupos)
             ->with('unidades', $GetMaxUnidad)
             ->with('calificacionesvariable', $variableCalificaciones)
@@ -356,11 +358,14 @@ class JefesController extends Controller
     public function ficha($nc, $usr)
     {
         try {
-            $alumnoSit = SitAlumno::with(['user', 'carrera'])->where('no_control', $nc)->first();
-            if (! $alumnoSit) {
+            $ficha = $this->fichaAlumno->obtener($nc);
+            if (! $ficha) {
                 Alert::error('Error', 'El alumno no existe en SIT');
                 return $usr == 1 ? redirect()->route('analisis.index') : back();
             }
+            $alumnoSit = $ficha['sit']['alumno'];
+            $historico = $ficha['historico_legacy'];
+            $sitUrl = $ficha['url'];
 
             $alu1 = (object) [
                 'alu_NumControl' => $alumnoSit->no_control,
@@ -370,7 +375,13 @@ class JefesController extends Controller
                 'alu_Sexo' => $alumnoSit->genero,
             ];
             $car = (object) ['car_NombreCorto' => $alumnoSit->carrera?->nombre_corto ?: $alumnoSit->carrera?->nombre];
-            $alu2 = (object) ['alc_FechaNac' => $alumnoSit->fecha_nacimiento];
+            $alu2 = (object) [
+                'alc_FechaNac' => $alumnoSit->fecha_nacimiento,
+                'alc_Direccion' => $ficha['complemento']?->direccion,
+                'alc_Colonia' => $ficha['complemento']?->colonia,
+                'alc_CodPostal' => $ficha['complemento']?->cp,
+                'alc_TipoSangre' => $ficha['dato_medico']?->tipo_sangre,
+            ];
 
             $perfil = AlumnoCreditosPerfil::where('no_control', $nc)->first();
             $alu = (object) [
@@ -380,29 +391,20 @@ class JefesController extends Controller
             ];
             $idAlu = $alumnoSit->id;
 
-            $clinicos = Historial_clinico::where('no_control', $nc)->first()
-                ?? ($idAlu ? Historial_clinico::where('id_alu', $idAlu)->first() : null);
-            $padres = $idAlu
-                ? Padres::where('no_control', $nc)->whereIn('parentesco', ['Padre', 'Madre'])->get()
-                : collect();
-            if ($padres->isEmpty() && $idAlu) {
-                $padres = Padres::where('id_alu', $idAlu)->whereIn('parentesco', ['Padre', 'Madre'])->get();
-            }
+            $clinicos = $historico['clinicos'];
+            $padres = $historico['padres'];
 
             if ($padres->count() == 2) {
-                $direccion = Direccion::where('id_alu', $idAlu)->first();
-                $direccionP = Direccion::where('id_fam', $padres[0]->id)->first();
-                $direccionM = Direccion::where('id_fam', $padres[1]->id)->first();
-                $familiares = Familiar::where('no_control', $nc)->get();
-                if ($familiares->isEmpty()) $familiares = Familiar::where('id_alu', $idAlu)->get();
-                $person = Personales::where('no_control', $nc)->first()
-                    ?? Personales::where('id_alu', $idAlu)->first();
-                $fam = Datos_familiares::where('no_control', $nc)->first()
-                    ?? Datos_familiares::where('id_alu', $idAlu)->first();
-                $soc = Social::where('no_control', $nc)->first()
-                    ?? Social::where('id_alu', $idAlu)->first();
+                $direccion = $historico['direccion'];
+                $direccionP = $historico['direccion_padre'];
+                $direccionM = $historico['direccion_madre'];
+                $familiares = $historico['familiares'];
+                $person = $historico['personales'];
+                $fam = $historico['datos_familiares'];
+                $soc = $historico['social'];
+                $discapacidades = $ficha['discapacidades'];
 
-                return view('sta.analisis_alumnos.ficha', compact('familiares', 'alu1', 'alu2', 'car', 'padres', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu', 'clinicos', 'person', 'fam'));
+                return view('sta.analisis_alumnos.ficha', compact('familiares', 'alu1', 'alu2', 'car', 'padres', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu', 'clinicos', 'person', 'fam', 'sitUrl', 'discapacidades'));
             }
 
             Alert::error('Error', 'Este alumno no ha llenado su ficha académica');

@@ -265,6 +265,122 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 
 <!-- Las entradas van aquí, más recientes arriba -->
 
+### [2026-11-22 13:42] — Tarea 8 Fase 6: Ficha STA institucional
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** trayectoria
+- **Prompt/Tarea original:** Implementar completamente la ficha STA sobre SIT, separar datos institucionales de solo lectura del histórico local, añadir enlaces al sistema institucional y verificar que no existan escrituras activas contra SIT.
+
+**Archivos modificados:**
+- `config/services.php` (URLs SIT configurables)
+- `app/Models/Sit/Estado.php` (creado)
+- `app/Models/Sit/Discapacidad.php` (creado)
+- `app/Models/Sit/AlumnoDiscapacidad.php` (creado)
+- `app/Models/Sit/AlumnoComplemento.php` (relaciones estado y municipio)
+- `app/Models/Sit/Alumno.php` (relación discapacidades)
+- `app/Models/Sit/Municipio.php` (relaciones estado y complementos)
+- `app/Services/FichaAlumnoService.php` (creado; integra SIT, créditos, histórico legacy y URL SIT)
+- `app/Http/Controllers/AlumnosStaController.php` (usa servicio para ficha/PDF y conserva escrituras solo locales)
+- `app/Http/Controllers/JefesController.php` (usa servicio en ficha y diagnóstico)
+- `routes/web.php` (rutas STA de escritura migradas a POST y ruta de ficha corregida)
+- `resources/views/alumnos/sta/ficha.blade.php` (aviso de solo lectura y enlace SIT)
+- `resources/views/alumnos/sta/dsalud.blade.php` (POST + CSRF)
+- `resources/views/alumnos/sta/dfamiliares.blade.php` (POST + CSRF)
+- `resources/views/alumnos/sta/dsocial.blade.php` (POST + CSRF)
+- `resources/views/alumnos/sta/autorizar.blade.php` (POST + CSRF)
+- `resources/views/sta/analisis_alumnos/ficha.blade.php` (consulta institucional de solo lectura y enlace SIT)
+- `resources/views/sta/analisis_alumnos/diagnostico.blade.php` (aviso de solo lectura y enlace SIT)
+- `tests/Feature/Sta/FichaStaTarea8Test.php` (creado)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Lecturas de `sit.alumnos`, complementos, datos médicos, estados, municipios y discapacidades vía modelos con conexión `sit`.
+- Histórico STA consultado en `creditos` mediante `no_control` e `id_alu`; no hay joins ni escrituras entre bases.
+- Ficha completada y observaciones continúan en `creditos.alumno_creditos_perfil`.
+
+**Decisiones tomadas:**
+- SIT será consultado exclusivamente mediante modelos con conexión `sit` y el guard de solo lectura.
+- El histórico STA y las observaciones propias seguirán residiendo en `creditos`.
+- Las operaciones STA que guardan histórico usan POST; ningún controlador escribe en un modelo o tabla SIT.
+- Las vistas distinguen datos institucionales de solo lectura y ofrecen enlace configurable al perfil SIT.
+
+**Pendientes / Deuda técnica:**
+- Configurar `SIT_URL`, `SIT_ALUMNO_URL` o `SIT_ALUMNO_PROFILE_URL_TEMPLATE` en el entorno cuando el sitio institucional tenga una URL distinta.
+- Validación visual autenticada de los enlaces y formularios POST.
+- Mantener las vistas en modo lectura cuando el usuario no tenga permisos locales de edición.
+
+**Tests ejecutados:**
+- ✅ `php artisan test` (31 passed, 140 assertions)
+- ✅ `php artisan route:cache` (Routes cached successfully)
+- ✅ `php artisan view:cache` (Blade templates cached successfully)
+- ✅ Verificación de código: sin escrituras contra `sit` en controladores.
+
+**Referencias:**
+- Tarea 8 (Fase 6 - Ficha STA).
+
+### [2026-11-22 13:26] — Tarea 7 Fase 5: catálogo institucional de carreras
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Implementar `sit.cat_carreras` como única fuente activa de carreras, migrar FKs y columnas propias al id SIT, crear mapeo idempotente con coincidencia normalizada/manual y retirar carreras legacy de `creditos.areas` sin huérfanos.
+
+**Archivos modificados:**
+- `database/migrations/2026_11_22_132600_migrate_career_catalog_to_sit.php` (creada y ejecutada en `creditos`)
+- `app/Console/Commands/MigrarCarrerasSit.php` (creado; modo normalizado/parcial/manual, dry-run y cleanup)
+- `app/Models/Area.php` (áreas administrativas; alcance de carreras legacy retirado)
+- `app/User.php` (nuevo `sit_carrera_id`)
+- `app/Http/Controllers/AreasController.php` (alta/consulta limitada a áreas tipo=`otro`)
+- `app/Http/Controllers/Auth/RegisterController.php` (registro usa carrera SIT y área administrativa)
+- `app/Http/Controllers/UsersController.php` (alta, edición y `sit_carrera_id`)
+- `app/Http/Requests/UserRequest.php` (validación de `sit_carrera_id`)
+- `app/Http/Controllers/ConstanciasController.php` (constancia lee la carrera SIT directa del alumno)
+- `app/Http/Controllers/GruposController.php` (grupos/asignaciones usan ids SIT)
+- `app/Http/Controllers/VerificaEvidenciaController.php` (alcance por `users.sit_carrera_id`)
+- `app/Services/Sit/CarrerasSitService.php` (catálogo SIT activo y fallback seguro)
+- `resources/views/admin/areas/crear.blade.php` (solo áreas tipo=`otro`)
+- `resources/views/admin/usuarios/registrar.blade.php` (selector Carrera SIT)
+- `resources/views/admin/usuarios/edit.blade.php` (selector Carrera SIT)
+- `tests/Feature/CatalogoCarrerasSitTest.php` (creado)
+- `docs/BITACORA.md` (cerrado)
+
+**Archivos eliminados:**
+- Ninguna área carrera eliminada manualmente fuera de la migración/cleanup verificable.
+
+**Consultas SQL nuevas o modificadas:**
+- `users.sit_carrera_id` agregado a `creditos.users`.
+- `constancia.carrera`, `creditos_areas.credito_area`, `grupos.id_Carrera` y `asignaciones_tutores.car_Clave` migrados a ids de `sit.cat_carreras`.
+- Las filas de `creditos.users.area` se movieron a un área tipo=`otro`; `sit_carrera_id` conserva la carrera institucional.
+- Se eliminó la FK de constancia hacia `creditos.areas` en la tarea anterior y esta tarea dejó `constancia.carrera` como id SIT sin FK cruzada.
+- `areas tipo=carrera` eliminadas solo después de verificar que no quedan referencias huérfanas.
+
+**Decisiones tomadas:**
+- `sit.cat_carreras` es la fuente activa mediante `App\Models\Sit\Carrera` y `CarrerasSitService`.
+- `creditos.areas.tipo='otro'` es el único tipo conservado; las carreras ya no viven en áreas locales.
+- El comando acepta coincidencia exacta y parcial normalizada; `--manual="area_id=sit_id,..."` permite resolver ambigüedades.
+- El comando es transaccional e idempotente; `--dry-run` no escribe y `--cleanup` elimina áreas carrera solo si no quedan huérfanos.
+- SIT no recibe ninguna escritura.
+
+**Pendientes / Deuda técnica:**
+- Validar visualmente los selects de usuarios y tutorías con datos reales de producción.
+- Revisar si existen filas locales sin coincidencia parcial; el command las reporta antes de la migración.
+- Conservar el fallback de áreas legacy únicamente como respaldo cuando SIT no entregue catálogo; no es fuente activa.
+
+**Tests ejecutados:**
+- ✅ `php artisan migrate --database=creditos --path=database/migrations/2026_11_22_132600_migrate_career_catalog_to_sit.php --force`
+- ✅ `php artisan creditos:migrar-carreras-sit --dry-run`
+- ✅ `php artisan creditos:migrar-carreras-sit --manual="1=3,2=8,3=9,4=2,5=7,6=5,7=6" --cleanup`
+- ✅ Verificación real: `sit_carrera_id=yes`, 0 áreas carrera, 6 áreas tipo=`otro`.
+- ✅ `php artisan test` (28 passed, 124 assertions)
+- ✅ `php artisan route:cache`
+- ✅ `php artisan view:cache`
+
+**Referencias:**
+- Tarea 7 (Fase 5 - Catálogo de Carreras).
+
 ### [2026-11-22 12:39] — Fase 2, Tarea 3: satélite local y limpieza de altas
 
 - **Estatus:** ✅ completado

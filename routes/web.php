@@ -256,7 +256,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('/sta/analisis',[JefesController::class,'index'])->name('analisis.index');
     Route::post('/sta/analisis/generación',[JefesController::class,'generacion'])->name('analisis.generacion');
     Route::get('/sta/analisis/alumno/{nc}',[JefesController::class,'diagnostico'])->name('analisis.alumno'); 
-    Route::get('/sta/analisis/ficha/{nc},/{usr}',[JefesController::class,'ficha'])->name('analisis.ficha'); 
+    Route::get('/sta/analisis/ficha/{nc}/{usr}',[JefesController::class,'ficha'])->name('analisis.ficha'); 
     Route::get('/sta/pdf/{nc}', [AlumnosStaController::class,'pdf'])->name('analisis.sta.pdf');      
 
     //Rutas profesores
@@ -325,12 +325,11 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::get('constancias/imprimir','AlumnosRutasController@imprimir')->name('alumnos.constancias_imprimir');
     //Rutas STA alumnos
     Route::get('/ficha',[AlumnosStaController::class,'ficha'])->name('alumnos.sta.ficha');    
-    Route::get('/ficha/guardar/{nc}',[AlumnosStaController::class,'guardarDatFam'])->name('alumnos.sta.ficha.guargar');
+    Route::post('/ficha/guardar/{nc}',[AlumnosStaController::class,'guardarDatFam'])->name('alumnos.sta.ficha.guargar');
     Route::get('/editDatSalud/{nc}',[AlumnosStaController::class,'editDatSalud'])->name('alumnos.sta.editDatSalud');
-    Route::get('/updtDatSalud/{nc}',[AlumnosStaController::class,'updtDatSalud'])->name('alumnos.sta.updtDatSalud');
-    Route::get('/dfamiliares/guardar/{nc}',[AlumnosStaController::class,'updtDatFam'])->name('alumnos.sta.dfamiliares.guargar');
-    Route::get('/dsociales/guardar/{nc}',[AlumnosStaController::class,'updtDatSoc'])->name('alumnos.sta.dsociales.guargar');
-    Route::get('/autorizar/guardar/{nc}',[AlumnosStaController::class,'autorizar'])->name('alumnos.sta.autorizar.guargar');
+    Route::post('/dfamiliares/guardar/{nc}',[AlumnosStaController::class,'updtDatFam'])->name('alumnos.sta.dfamiliares.guargar');
+    Route::post('/dsociales/guardar/{nc}',[AlumnosStaController::class,'updtDatSoc'])->name('alumnos.sta.dsociales.guargar');
+    Route::post('/autorizar/guardar/{nc}',[AlumnosStaController::class,'autorizar'])->name('alumnos.sta.autorizar.guargar');
     Route::get('/pdf/{nc}', [AlumnosStaController::class,'pdf'])->name('alumnos.sta.pdf');    
 
     //Rutas del sistema medico para alumnos

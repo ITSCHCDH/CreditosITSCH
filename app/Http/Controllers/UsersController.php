@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\Models\Area;
+use App\Models\Sit\Carrera;
 use Spatie\Permission\Models\Role;
 use DB;
 use Alert;
@@ -46,10 +47,12 @@ class UsersController extends Controller
     }
     public function create(){
         if (Auth::User()->can('VIP')) {
-            $areas = Area::orderBy('nombre','ASC')->get();
+            $areas = Area::where('tipo','otro')->orderBy('nombre','ASC')->get();
+            $carreras = Carrera::where('activo',1)->orderBy('nombre')->get();
             $roles = Role::all();
             return view('admin.usuarios.registrar')
             ->with('areas',$areas)
+            ->with('carreras',$carreras)
             ->with('roles',$roles);
         }else{
             $permisos = Auth::User()->getPermissionsViaRoles();
@@ -83,9 +86,11 @@ class UsersController extends Controller
                 $join->on('users.id','=','model.model_id');
                 $join->where('users.id','=',$id);
             })->whereIn("roles.name",$arreglo_roles)->select('users.name as user_name','roles.name','roles.id as id')->get();
-            $areas = Area::where('id','=',Auth::User()->area)->orderBy('nombre','ASC')->get();
+            $areas = Area::where('tipo','otro')->orderBy('nombre','ASC')->get();
+            $carreras = Carrera::where('activo',1)->orderBy('nombre')->get();
             return view('admin.usuarios.registrar')
             ->with('areas',$areas)
+            ->with('carreras',$carreras)
             ->with('roles',$roles);
         }
     }
@@ -98,6 +103,7 @@ class UsersController extends Controller
         }
     	$user->password = bcrypt($request->password);
         $user->tutor=$request->tutor;
+        $user->sit_carrera_id = $request->filled('sit_carrera_id') ? $request->sit_carrera_id : null;
         $user->save();
         if($request->has('roles_id')){
             $user->syncRoles($request->roles_id);
@@ -113,9 +119,11 @@ class UsersController extends Controller
             ->with("error","El usuario no existe");
         }
         if (Auth::User()->can('VIP')) {
-            $areas = Area::orderBy('nombre','ASC')->get();
+            $areas = Area::where('tipo','otro')->orderBy('nombre','ASC')->get();
+            $carreras = Carrera::where('activo',1)->orderBy('nombre')->get();
             return view('admin.usuarios.edit')
             ->with('areas',$areas)
+            ->with('carreras',$carreras)
             ->with('user',$user);
         }else{
             if($user->area!=Auth::User()->area){
@@ -126,9 +134,11 @@ class UsersController extends Controller
                 Alert::error('Error','No le puedes hacer modificaciones al administrador');
                 return redirect()->back();
             }
-            $areas = Area::where('id','=',Auth::User()->area)->orderBy('nombre','ASC')->get();
+            $areas = Area::where('tipo','otro')->orderBy('nombre','ASC')->get();
+            $carreras = Carrera::where('activo',1)->orderBy('nombre')->get();
             return view('admin.usuarios.edit')
             ->with('areas',$areas)
+            ->with('carreras',$carreras)
             ->with('user',$user);
         }
 
@@ -143,6 +153,7 @@ class UsersController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->area = $request->area;
+        $user->sit_carrera_id = $request->filled('sit_carrera_id') ? $request->sit_carrera_id : null;
         $user->active = $request->active;
         $user->tutor=$request->tutor;
         $correo_duplicado = User::where('email','=',$request->email)->get()->count() > 1;

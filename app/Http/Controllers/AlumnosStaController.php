@@ -15,9 +15,14 @@ use Illuminate\Console\View\Components\Alert;
 use Illuminate\Http\Request;
 use App\Models\Sit\Alumno as SitAlumno;
 use App\Models\AlumnoCreditosPerfil;
+use App\Services\Sta\FichaAlumnoService;
 
 class AlumnosStaController extends Controller
 {
+   public function __construct(private FichaAlumnoService $fichaAlumno)
+   {
+   }
+
    private function perfil(string $nc): ?AlumnoCreditosPerfil
    {
       return AlumnoCreditosPerfil::where('no_control', $nc)->first();
@@ -69,6 +74,9 @@ class AlumnosStaController extends Controller
          Alert::error('Error', 'No se encontró el perfil académico del alumno.');
          return redirect()->route('login');
       }
+
+      $fichaAlumno = $this->fichaAlumno->obtener($sitAlumno->no_control);
+      $sitUrl = $fichaAlumno['url'] ?? null;
 
       $no_cont = $sitAlumno->no_control;
       $alu1 = (object) [
@@ -161,102 +169,20 @@ class AlumnosStaController extends Controller
       $alumno_data = collect([(object) [
          'alumno_id' => $sitAlumno->id,
       ]]);
-      return view('alumnos.sta.ficha',compact('alu2', 'alu1', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'alu', 'car', 'clinicos', 'person','alumno_data'));
+      return view('alumnos.sta.ficha',compact('alu2', 'alu1', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'alu', 'car', 'clinicos', 'person','alumno_data','sitUrl'));
             
    }
 
    public function guardarDatFam(Request $request, $nc)
    {
-      $sit = SitAlumno::with(['user','carrera','alumnoComplemento','alumnoDatoMedico'])->where('no_control',$nc)->firstOrFail();
-      $alu = (object) [
-         'id' => $sit->id,
-         'no_control' => $sit->no_control,
-         'emailPer' => null,
-         'tel' => $sit->user?->celular,
-         'est_civ' => null,
-         'lug_pro' => null,
-         'grupo' => null,
-      ];
-      $clinicos = Historial_clinico::where('no_control',$nc)->first() ?? Historial_clinico::where('id_alu',$sit->id)->first();
-      $person = Personales::where('no_control',$nc)->first() ?? Personales::where('id_alu',$sit->id)->first();
-      $dPad = Padres::where('no_control',$nc)->where('parentesco','Padre')->first() ?? Padres::where('id_alu',$sit->id)->where('parentesco','Padre')->first();
-      $dMad = Padres::where('no_control',$nc)->where('parentesco','Madre')->first() ?? Padres::where('id_alu',$sit->id)->where('parentesco','Madre')->first();
-      $direccion = Direccion::where('id_alu',$sit->id)->first();
-      $direccionP = Direccion::where('id_fam', $dPad->id)->first();
-      $direccionM = Direccion::where('id_fam', $dMad->id)->first();
-      foreach ([
-         'clinicos' => $clinicos, 'person' => $person, 'dPad' => $dPad, 'dMad' => $dMad,
-      ] as $name => $model) {
-         if (! $model) return redirect()->back()->withErrors('Completa primero la ficha del alumno.');
-      }
-
-      $dPad->nombre = $request->nomPa;
-      $dPad->edad = $request->EdadPa;
-      $dPad->tel = $request->TelPa;
-      $dPad->profesion = $request->ProfPa;
-      if ($request->trPad == 'No') {
-          $dPad->ocupacion = $request->trPad;
-      } else {
-          $dPad->ocupacion = $request->trabPatext;
-      }
-      $dPad->save();
-
-      $dMad->nombre = $request->nomMa;
-      $dMad->edad = $request->EdadMa;
-      $dMad->tel = $request->TelMa;
-      $dMad->profesion = $request->ProfMa;
-      if ($request->trMad == 'No') {
-          $dMad->ocupacion = $request->trMad;
-      } else {
-          $dMad->ocupacion = $request->trabMtext;
-      }
-      $dMad->save();
-
-      $direccion->direccion = $request->direccion;
-      $direccion->cp = $request->cp;
-      $direccion->colonia = $request->colonia;
-      $direccion->estado = $request->estado;
-      $direccion->municipio = $request->municipio;
-      $direccion->save();
-
-      $direccionP->direccion = $request->direccionP;
-      $direccionP->cp = $request->cpP;
-      $direccionP->colonia = $request->coloniaP;
-      $direccionP->estado = $request->estadoP;
-      $direccionP->municipio = $request->municipioP;
-      $direccionP->save();
-
-      $direccionM->direccion = $request->direccionM;
-      $direccionM->cp = $request->cpM;
-      $direccionM->colonia = $request->coloniaM;
-      $direccionM->estado = $request->estadoM;
-      $direccionM->municipio = $request->municipioM;
-      $direccionM->save();
-
-      $clinicos->sangre = $request->sangre;
-      $clinicos->estatura = $request->estatura;
-      $clinicos->peso = $request->peso;
-      $clinicos->save();
-
-      if ($request->trAlu == 'No') {
-          $person->trab = $request->trAlu;
-      } else {
-          $person->trab = $request->trabajo;
-      }
-      if ($request->casa == 'Otro') {
-          $person->casa = $request->casatipo;
-      } else {
-          $person->casa = $request->casa;
-      }
-      $person->num_person = $request->num_person;
-      $person->parentesco = $request->parentesco;
-      $person->save();
-      
-      return redirect()->route('alumnos.sta.editDatSalud', $alu->no_control);
+      return redirect()->away(config('services.sit.perfil_url'))
+         ->with('info', 'Los datos personales, domicilio y salud se actualizan directamente en SIT.');
    }
 
    public function editDatSalud($nc)
    {
+      return redirect()->away(config('services.sit.perfil_url'))
+         ->with('info', 'Los datos médicos se actualizan directamente en el sistema SIT.');
       $sit = SitAlumno::with(['user','carrera','alumnoComplemento','alumnoDatoMedico'])->where('no_control',$nc)->firstOrFail();
       $alu = (object) ['id' => $sit->id, 'no_control' => $sit->no_control];
       $alu1 = $this->datosSitAlumno($nc)[0];
@@ -268,6 +194,8 @@ class AlumnosStaController extends Controller
 
    public function updtDatSalud(Request $request, $nc)
    {
+      return redirect()->away(config('services.sit.perfil_url'))
+        ->with('info', 'La captura de salud pertenece al sistema institucional SIT.');
         try
         {
             $sit = SitAlumno::where('no_control',$nc)->firstOrFail();
@@ -513,7 +441,9 @@ class AlumnosStaController extends Controller
     {
         try
         {
-            $sit = SitAlumno::with(['user','carrera','alumnoComplemento','alumnoDatoMedico'])->where('no_control',$nc)->firstOrFail();
+            $ficha = $this->fichaAlumno->obtener($nc);
+            abort_if(! $ficha, 404);
+            $sit = $ficha['sit']['alumno'];
             $alu = (object) [
                'id' => $sit->id,
                'no_control' => $sit->no_control,
@@ -521,28 +451,23 @@ class AlumnosStaController extends Controller
             ];
             [$alu1, $car, $alu2] = $this->datosSitAlumno($nc);
     
-            $clinicos = Historial_clinico::where('no_control',$nc)->first()
-               ?? Historial_clinico::where('id_alu',$sit->id)->first();
+            $historico = $ficha['historico_legacy'];
+            $clinicos = $historico['clinicos'];
     
-            $dPad = Padres::where('no_control',$nc)->where('parentesco','Padre')->first()
-               ?? Padres::where('id_alu',$sit->id)->where('parentesco','Padre')->first();
-            $dMad = Padres::where('no_control',$nc)->where('parentesco','Madre')->first()
-               ?? Padres::where('id_alu',$sit->id)->where('parentesco','Madre')->first();
-            $direccion = Direccion::where('id_alu', $alu->id)->first();
-            $direccionP = Direccion::where('id_fam', $dPad->id)->first();
-            $direccionM = Direccion::where('id_fam', $dMad->id)->first();
+            $dPad = $historico['padre'];
+            $dMad = $historico['madre'];
+            $direccion = $historico['direccion'];
+            $direccionP = $historico['direccion_padre'];
+            $direccionM = $historico['direccion_madre'];
     
-            $familiares = Familiar::where('no_control',$nc)->get();
-            if ($familiares->isEmpty()) $familiares = Familiar::where('id_alu',$sit->id)->get();
+            $familiares = $historico['familiares'];
     
-            $person = Personales::where('no_control',$nc)->first()
-               ?? Personales::where('id_alu',$sit->id)->first();
-            $fam = Datos_familiares::where('no_control',$nc)->first()
-               ?? Datos_familiares::where('id_alu',$sit->id)->first();
-            $soc = Social::where('no_control',$nc)->first()
-               ?? Social::where('id_alu',$sit->id)->first();
+            $person = $historico['personales'];
+            $fam = $historico['datos_familiares'];
+            $soc = $historico['social'];
            
-            $pdf = PDF::setOptions(['defaultFont' => 'sans-serif'])->loadView('alumnos.sta.pdf', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));       
+            $sitUrl = $ficha['url'];
+            $pdf = PDF::setOptions(['defaultFont' => 'sans-serif'])->loadView('alumnos.sta.pdf', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam', 'sitUrl'));
             return $pdf->stream($alu->no_cont . ".pdf");    
         }
         catch(\Illuminate\Database\QueryException $e)

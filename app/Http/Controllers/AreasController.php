@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Area;
 use App\Models\Sit\Alumno as SitAlumno;
-use App\Services\Sit\CarrerasSitService;
 use App\User;
 use Alert;
 
@@ -19,7 +18,7 @@ class AreasController extends Controller
 		$this->middleware('permission:VIP|MODIFICAR_AREAS|SOLO_LECTURA')->only(['editar','actualizar']);
 	}
     public function inicio(){
-    	$areas = Area::all();
+    	$areas = Area::where('tipo','otro')->get();
     	return view('admin.areas.index')->with('areas',$areas);
     }
 
@@ -28,7 +27,7 @@ class AreasController extends Controller
     }
 
     public function guardar(Request $request){
-
+        $request->merge(['tipo' => 'otro']);
     	$nombre_ya_existe = Area::where('nombre','=',$request->nombre)->get()->count() > 0? true: false;
     	if($nombre_ya_existe){
     		Alert::error('Error','Una area ya existe con este nombre');
@@ -72,11 +71,8 @@ class AreasController extends Controller
     		Alert::error('Error','El area no existe');
     		return redirect()->back();
     	}
-    	$tiene_usuarios = User::where('area','=',$id)->get()->count() > 0? true: false;
-        $carreraSitId = CarrerasSitService::deArea((int) $id);
-        $tiene_alumnos = $carreraSitId !== null
-            && SitAlumno::where('carrera_id', $carreraSitId)->exists();
-    	if($tiene_alumnos || $tiene_usuarios){
+    	$tiene_usuarios = User::where('area','=',$id)->exists();
+    	if($tiene_usuarios){
     		Alert::error('Error','No se puede eliminar debido a claves foraneas');
     		return redirect()->route('areas.inicio');
     	}

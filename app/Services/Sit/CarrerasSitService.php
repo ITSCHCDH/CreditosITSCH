@@ -2,17 +2,12 @@
 
 namespace App\Services\Sit;
 
-use App\Models\Area;
 use App\Models\Sit\Carrera;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
- * Equivalencia entre creditos.areas y sit.cat_carreras.
- *
- * No existe una columna de mapeo entre ambos catálogos: se comparan los
- * nombres normalizados (minúsculas y sin acentos). Es el puente temporal
- * mientras el sistema termina de depender solo de SIT.
+ * Catálogo institucional de carreras proveniente de SIT.
  */
 class CarrerasSitService
 {
@@ -24,35 +19,17 @@ class CarrerasSitService
     /** @return array<int,int> [area_id => carrera_id de SIT] */
     public static function mapaAreaCarrera(): array
     {
-        static $mapa = null;
-
-        if ($mapa !== null) {
-            return $mapa;
-        }
-
-        $mapa = [];
-        $carrerasSit = Carrera::all()->keyBy(fn ($carrera) => self::normalizar($carrera->nombre));
-
-        foreach (Area::where('tipo', 'carrera')->get() as $area) {
-            $clave = self::normalizar($area->nombre);
-            if ($carrerasSit->has($clave)) {
-                $mapa[$area->id] = $carrerasSit->get($clave)->id;
-            }
-        }
-
-        return $mapa;
+        return [];
     }
 
     public static function deArea($areaId): ?int
     {
-        return self::mapaAreaCarrera()[$areaId] ?? null;
+        return null;
     }
 
     public static function areaDeCarrera($carreraId): ?int
     {
-        $area = array_search($carreraId, self::mapaAreaCarrera(), true);
-
-        return $area === false ? null : (int) $area;
+        return (int) $carreraId ?: null;
     }
 
     /**
@@ -68,9 +45,8 @@ class CarrerasSitService
         }
 
         if ($areasCredito !== null) {
-            $mapa = self::mapaAreaCarrera();
             $ids = collect($areasCredito)
-                ->map(fn ($areaId) => $mapa[$areaId] ?? null)
+                ->map(fn ($carreraId) => (int) $carreraId)
                 ->filter()
                 ->values();
 
@@ -86,30 +62,26 @@ class CarrerasSitService
      */
     public static function opcionesPorArea(bool $soloActivas = true): Collection
     {
-        $mapa = self::mapaAreaCarrera();
-        if ($mapa === []) {
-            return collect();
+        $query = Carrera::query()->orderBy('nombre');
+        if ($soloActivas) {
+            $query->where('activo', 1);
         }
 
-        $carreras = Carrera::whereIn('id', array_values($mapa))
-            ->when($soloActivas, fn ($query) => $query->where('activo', 1))
-            ->get()
-            ->keyBy('id');
-
-        return collect($mapa)
-            ->map(fn ($carreraId, $areaId) => isset($carreras[$carreraId])
-                ? (object) [
-                    'car_Clave' => (int) $areaId,
-                    'car_Nombre' => $carreras[$carreraId]->nombre,
-                ]
-                : null)
-            ->filter()
-            ->sortBy('car_Nombre')
+        return $query->get()
+            ->map(fn ($carrera) => (object) [
+                'car_Clave' => (int) $carrera->id,
+                'car_Nombre' => $carrera->nombre,
+            ])
             ->values();
     }
 
     public static function nombreDeArea($areaId, string $porDefecto = 'Desconocido'): string
     {
+        $directa = Carrera::find((int) $areaId);
+        if ($directa) {
+            return $directa->nombre;
+        }
+
         $carreraId = self::deArea((int) $areaId);
         if ($carreraId === null) {
             return $porDefecto;

@@ -169,7 +169,7 @@ class ActividadesController extends Controller
             $creditos = Credito::where('vigente','=','true')->orderBy('nombre','asc')->get();
 
         }else{
-            $areaSit = CarrerasSitService::deArea(Auth::User()->area);
+            $areaSit = Auth::User()->sit_carrera_id;
             $creditos = Credito::leftjoin('creditos_areas as ca','ca.credito_id','=','creditos.id')
                 ->where([
                     ['ca.credito_area','=',$areaSit ?? -1],
@@ -207,7 +207,7 @@ class ActividadesController extends Controller
         $act->id_user = Auth::User()->id;
         $actividad_con_mismo_nombre = Actividad::where('nombre','=',$act->nombre)->get();
         if(!Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD'])){
-            $areaSit = CarrerasSitService::deArea(Auth::User()->area);
+            $areaSit = Auth::User()->sit_carrera_id;
             $areas_del_credito = DB::table('creditos as c')->join('creditos_areas as ca', function($join) use($request){
                 $join->on('c.id','=','ca.credito_id');
                 $join->where('c.id','=',$request->id_actividad); // id_actividad hace referencia a credito_id, lo sé mal diseño de la DB

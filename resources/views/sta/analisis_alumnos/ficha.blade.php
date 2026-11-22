@@ -7,6 +7,12 @@
 @endsection
 
 @section('contenido')
+        @if (! empty($sitUrl))
+            <div class="alert alert-info d-flex align-items-center justify-content-between">
+                <span><i class="fas fa-lock me-2"></i>Datos institucionales: consulta de solo lectura.</span>
+                <a class="btn btn-sm btn-outline-primary" href="{{ $sitUrl }}" target="_blank" rel="noopener">Abrir ficha en SIT</a>
+            </div>
+        @endif
         <?php
             $anios = \Carbon\Carbon::parse($alu2->alc_FechaNac)->age;
             $enfermedades = "";

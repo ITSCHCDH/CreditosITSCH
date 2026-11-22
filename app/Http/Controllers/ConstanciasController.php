@@ -150,10 +150,9 @@ class ConstanciasController extends Controller
         $datos_globales = ConstanciaComplemento::all();
         $jefe_depto = DB::table('constancia_complemento  as cc')->join('users as u','u.id','=','cc.jefe_depto')->select('u.name','cc.jefe_depto_enunciado','cc.profesion_jefe_depto')->get();
         $certificador = DB::table('constancia_complemento as cc')->join('users as u','u.id','=','cc.certificador')->select('u.name','cc.profesion_certificador','cc.certificador_enunciado')->get();
-        $areaAlumno = CarrerasSitService::areaDeCarrera($sitAlumno->carrera_id);
-        $jefe_division = $areaAlumno
+        $jefe_division = $sitAlumno->carrera_id
             ? DB::table('constancia as c')->join('users as u','u.id','=','c.jefe_division')
-                ->where('c.carrera', $areaAlumno)
+                ->where('c.carrera', $sitAlumno->carrera_id)
                 ->select('u.name','c.division_enunciado','c.profesion_jefe_division','c.plan_de_estudios')
                 ->get()
             : collect();

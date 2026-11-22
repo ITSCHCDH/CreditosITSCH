@@ -91,6 +91,13 @@
 
     <input type="hidden" name="no_Control" id="no_Control" value="{{ $alumnos->alu_NumControl }}">
 
+    @if (! empty($sitUrl))
+        <div class="alert alert-info d-flex align-items-center justify-content-between mb-3">
+            <span><i class="fas fa-lock me-2"></i>Identidad y kardex consultados desde SIT; la siguiente información es de solo lectura.</span>
+            <a class="btn btn-sm btn-outline-primary" href="{{ $sitUrl }}" target="_blank" rel="noopener">Abrir ficha en SIT</a>
+        </div>
+    @endif
+
     <div class="row g-3">
         {{-- Identidad del alumno --}}
         <div class="col-12 col-xl-4">
