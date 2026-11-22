@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Avance;
-use App\Models\Alumno;
+use App\Models\AlumnoCreditosPerfil;
+use App\Services\Creditos\AvanceCreditosService;
 use App\Models\Credito;
 use App\Models\Participante;
 use App\Models\Actividad_Evidencia;
@@ -172,16 +173,7 @@ class VerificaEvidenciaController extends Controller
 
 
     public function liberar($no_control){
-        $avance = Avance::where('no_control','=',$no_control)->get();
-        $creditos = 0;
-        for($i = 0; $i<count($avance); ++$i){
-            if($avance[$i]->por_credito >= 100) ++$creditos;
-        }
-        if($creditos >= 5){
-            $alumno = Alumno::where('no_control','=',$no_control)->get()[0];
-            $alumno->status = "Liberado";
-            $alumno->save();
-        }
+        app(AvanceCreditosService::class)->sincronizar($no_control);
     }
 
     public function visualizar($imagen){
@@ -237,9 +229,11 @@ class VerificaEvidenciaController extends Controller
             ->groupBy('nombre_actividad')
             ->get()
             ->map(function ($row) use ($sitAlumno) {
+                $perfil = AlumnoCreditosPerfil::obtenerOCrear($sitAlumno->no_control);
                 $row->nombre_alumno = $sitAlumno->nombreCompleto;
                 $row->carrera = $sitAlumno->carrera?->nombre;
-                $row->foto = null;
+                $row->foto = $perfil->foto;
+                $row->estatus_creditos = $perfil->estatus_creditos;
                 return $row;
             });
             $liberado = $this->verificarProgreso($request->get('no_control'));
@@ -247,11 +241,13 @@ class VerificaEvidenciaController extends Controller
     		if($alumno_data->count()==0){
                 //SI no tiene avance solo retornamos los datos del alumno los datos del alumno
                 $avance = false;
+                $perfil = AlumnoCreditosPerfil::obtenerOCrear($sitAlumno->no_control);
                 $alumno_data = collect([(object) [
                     'nombre_alumno' => $sitAlumno->nombreCompleto,
                     'carrera' => $sitAlumno->carrera?->nombre,
                     'no_control' => $sitAlumno->no_control,
-                    'foto' => null,
+                    'foto' => $perfil->foto,
+                    'estatus_creditos' => $perfil->estatus_creditos,
                 ]]);
             }
         }
@@ -299,7 +295,7 @@ class VerificaEvidenciaController extends Controller
                 ++$creditos_liberados;
         }
 
-        return $creditos_liberados >= 5;
+        return app(AvanceCreditosService::class)->estaLiberado($no_control);
     }
 
     public function reportes(Request $request){
@@ -369,6 +365,7 @@ class VerificaEvidenciaController extends Controller
 
             $calculados = [];
             foreach ($alumnos as $alumno) {
+                $perfil = app(AvanceCreditosService::class)->sincronizar($alumno->no_control);
                 $porCredito = $avance->get($alumno->no_control, collect())->pluck('por_credito', 'id_credito');
                 $suma = 0;
 
@@ -380,6 +377,7 @@ class VerificaEvidenciaController extends Controller
                     'alumno' => $alumno,
                     'porCredito' => $porCredito,
                     'suma' => $suma,
+                    'perfil' => $perfil,
                     'estado' => $this->estadoReporte($alumno, $suma, $puntosTotales),
                 ];
             }
@@ -415,6 +413,8 @@ class VerificaEvidenciaController extends Controller
                     'nombre' => $alumno->nombreCompleto,
                     'no_control' => $alumno->no_control,
                     'carrera' => $alumno->carrera?->nombre,
+                    'foto' => $item['perfil']->foto,
+                    'estatus_creditos' => $item['perfil']->estatus_creditos,
                     'status' => $item['estado'],
                     'credito_suma' => $item['suma'],
                 ];
@@ -561,7 +561,7 @@ class VerificaEvidenciaController extends Controller
             }
         }
 
-        $puedeVerTodas = Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_AVANCE_ALUMNO','VIP_REPORTES','VER_REPORTES_CARRERA']);
+        $puedeVerTodas = Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO']);
 
         if (! $puedeVerTodas) {
             // Se acota a las carreras SIT equivalentes al área del usuario
@@ -578,7 +578,7 @@ class VerificaEvidenciaController extends Controller
         }
 
         $lista = $query->orderBy('no_control')
-            ->limit(5)
+            ->limit(100)
             ->get()
             ->map(function ($alumno) {
                 return [

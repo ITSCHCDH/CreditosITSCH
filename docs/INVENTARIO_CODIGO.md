@@ -1,15 +1,24 @@
 # Inventario de codigo y base de datos
 
-> Fecha del inventario: 2026-11-20
+> Fecha del inventario: 2026-11-22
 > Alcance: rutas web/API, modelos Eloquent, codigo bajo `app/` y rutas, y comparacion de SQL.
 
 ## Resumen ejecutivo
 - Rutas: 210
-- Modelos Eloquent: 28
+- Modelos Eloquent: 29 (incluye el perfil propio `AlumnoCreditosPerfil`; excluye el modelo legacy `Alumno`)
 - Tablas en `creditos.sql`: 38
 - Tablas en `sit.sql`: 83
 - Tablas solo en `creditos.sql`: 28
-- Campos solo en `creditos.alumnos`: 26
+- Corte final: `creditos.alumnos` queda fuera de la aplicación y se elimina por la migración `2026_11_22_999999_drop_legacy_alumnos_table.php`, protegida por la existencia de `alumno_creditos_perfil`
+
+## Corte final de identidad de alumnos (2026-11-22)
+
+- Fuente institucional única: `App\Models\Sit\Alumno`, conexión `sit`, clave operativa `no_control`.
+- Perfil y datos propios del módulo: `creditos.alumno_creditos_perfil` y modelos locales enlazados mediante `no_control`.
+- Relación cruzada disponible en SIT: `App\Models\Sit\Alumno::perfilCreditos()`.
+- Relaciones locales útiles: `Avance::alumno()`, `Participante::alumno()` y perfiles familiares/médicos sociales usan `no_control` hacia `Sit\Alumno`.
+- Eliminados: `app/Models/Alumno.php`, el factory legacy `database/factories/AlumnosFactory.php` y el seeder legacy `database/seeds/GenerarAlumnos.php`.
+- Consulta prohibida: no crear, leer ni escribir `creditos.alumnos`; la migración final solo actúa sobre `creditos` y exige el guard `alumno_creditos_perfil`.
 
 ## 1. Rutas web
 ### `/`
@@ -1709,13 +1718,12 @@
 - Casts: `(no definido)`
 - Relaciones: participantes: hasMany, evidencias: hasMany
 
-### `Alumno` ⚠️ usa `creditos.alumnos`
-- Archivo: `app/Models/Alumno.php`
-- Tabla: `alumnos`
-- Conexion: `default`
-- Fillable/guarded: `['no_control','password','nombre','carrera','status','foto','observaciones','email','ficha','nombre_i','a_pat','a_mat','creditos','fec_nac','lug_pro','curp','sexo','est_civ','tel','tel_emer','beca','grupo','nom_ficha','generacion']`
-- Casts: `(no definido)`
-- Relaciones: participantes: hasMany, avances: hasMany
+### `Alumno` — legado eliminado
+- Archivo retirado: `app/Models/Alumno.php`
+- Reemplazo obligatorio: `App\Models\Sit\Alumno` con conexión `sit`
+- Clave operativa: `no_control`
+- Perfil propio: `App\Models\AlumnoCreditosPerfil`
+- Estado: `creditos.alumnos` eliminado por la migración del corte final
 
 ### `Area`
 - Archivo: `app/Models/Area.php`

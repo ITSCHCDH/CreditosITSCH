@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Mail\mail_res_pass;
-use App\Models\Sit\User as SitUser;
 use Carbon\Carbon;
 use App\User;
 use Alert;
@@ -56,18 +55,6 @@ class PerfilController extends Controller
     		Mail::to($email)->send(new mail_res_pass($token));
     		Alert::success('Correcto', 'Te hemos enviado un enlace de recuperación a '.$email.'.');
     		return redirect('login');
-    	}
-
-    	$sitUser = SitUser::where('email', $email)
-    		->where('activo', 1)
-    		->first();
-
-    	if ($sitUser && $sitUser->isAlumnoActivo()) {
-    		Alert::error(
-    			'Recuperación institucional',
-    			'Serás dirigido al portal institucional para recuperar tu contraseña.'
-    		);
-    		return redirect()->away('https://sit.cdhidalgo.tecnm.mx/auth/recuperar-password');
     	}
 
     	Alert::success(
@@ -137,8 +124,8 @@ class PerfilController extends Controller
 					return redirect('login');
 				}
 
-				$user = $this->getUser($mail->email);
-				if (is_null($user) || $user instanceof SitUser) {
+				$user = User::where('email', $mail->email)->first();
+				if (is_null($user)) {
 					Alert::error("Error","La contraseña institucional no puede restablecerse desde Créditos.");
 					return redirect('login');
 				}
@@ -151,14 +138,6 @@ class PerfilController extends Controller
 			}
 		}
 		
-	}
-
-	//Función que obtiene el usuario que desea cambiar su password
-	private function getUser($email)
-	{
-		$user = User::where('email', $email)->first();
-
-		return $user ?: SitUser::where('email', $email)->first();
 	}
 
     public function passwordUpdate(PasswordResetRequest $request){

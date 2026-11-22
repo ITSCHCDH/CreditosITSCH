@@ -285,12 +285,7 @@
                                 @if (Auth::User()->hasAnyPermission(['VIP','VER_ALUMNOS','VIP_SOLO_LECTURA']))
                                     <li><a class="dropdown-item" href="{{ route('alumnos.index') }}"><i class="fa-solid fa-user-graduate"></i>Alumnos</a></li>
                                 @endif
-                                @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA']))
-                                    <li><a class="dropdown-item" href="{{ route('ImportExcel.index') }}"><i class="fa-solid fa-key"></i>Modificar contraseñas</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('ImportExcel.altaAlumnos') }}"><i class="fa-solid fa-file-excel"></i>Insertar alumnos</a></li>
-                                @endif
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS','VER_AREAS','VER_ALUMNOS']))
-                                    <li><a class="dropdown-item" href="{{ route('alumnos.bajas.view') }}"><i class="fa-solid fa-user-minus"></i>Bajas de alumnos</a></li>
                                 @endif
                                 <li><hr class="dropdown-divider"></li>
                                 @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_USUARIOS']))

@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Area;
+use App\Models\Sit\Alumno as SitAlumno;
+use App\Services\Sit\CarrerasSitService;
 use App\User;
-use App\Models\ALumno;
 use Alert;
 
 class AreasController extends Controller
@@ -72,7 +73,9 @@ class AreasController extends Controller
     		return redirect()->back();
     	}
     	$tiene_usuarios = User::where('area','=',$id)->get()->count() > 0? true: false;
-    	$tiene_alumnos = Alumno::where('carrera','=',$id)->get()->count() > 0?true: false;
+        $carreraSitId = CarrerasSitService::deArea((int) $id);
+        $tiene_alumnos = $carreraSitId !== null
+            && SitAlumno::where('carrera_id', $carreraSitId)->exists();
     	if($tiene_alumnos || $tiene_usuarios){
     		Alert::error('Error','No se puede eliminar debido a claves foraneas');
     		return redirect()->route('areas.inicio');

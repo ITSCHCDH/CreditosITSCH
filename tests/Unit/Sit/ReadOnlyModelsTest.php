@@ -47,7 +47,10 @@ it('expone correctamente las relaciones de Alumno', function () {
         ->and($alumno->semaforoAlumno())->toBeInstanceOf(HasOne::class)
         ->and($alumno->kardex())->toBeInstanceOf(HasMany::class)
         ->and($alumno->listas())->toBeInstanceOf(HasMany::class)
-        ->and($alumno->bajas())->toBeInstanceOf(HasMany::class);
+        ->and($alumno->bajas())->toBeInstanceOf(HasMany::class)
+        ->and($alumno->perfilCreditos())->toBeInstanceOf(HasOne::class)
+        ->and($alumno->avances())->toBeInstanceOf(HasMany::class)
+        ->and($alumno->participantes())->toBeInstanceOf(HasMany::class);
 });
 
 it('expone correctamente las relaciones de User', function () {

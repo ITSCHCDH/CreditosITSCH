@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Sit\Alumno as SitAlumno;
 
 class Participante extends Model
 {
@@ -14,7 +15,16 @@ class Participante extends Model
     //Relacion de la tabla alumno(uno)-participante(muchos)
     public function alumno()
     {
-        return $this->belongsTo('App\Alumno');
+        return $this->belongsTo(SitAlumno::class, 'no_control', 'no_control');
+    }
+
+    public function perfilCreditos()
+    {
+        return $this->belongsTo(
+            \App\Models\AlumnoCreditosPerfil::class,
+            'no_control',
+            'no_control'
+        );
     }
 
     //Relacion de la tabla evidencia(uno)-participante(muchos)

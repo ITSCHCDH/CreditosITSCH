@@ -8,7 +8,8 @@ use App\Models\Cita;
 use App\Models\Paciente;
 use App\Models\Historial_Medico;
 use App\Models\HistorialClinico;
-use App\Models\Alumno;
+use App\Models\Sit\Alumno as SitAlumno;
+use App\Models\AlumnoCreditosPerfil;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class SistemaMedicoController extends Controller
@@ -85,13 +86,15 @@ class SistemaMedicoController extends Controller
         $paciente= Paciente::where('id',$cita->paciente_id)->first(); 
         //Verificamos si es alumno y consultamos su nombre de la tabla pacientes de lo contrario consultamos el nombre de la tabla usuarios y lo agregamos a $paciente
         if($paciente->tipo=='Alumno'){
-            $usuarioPaciente=Alumno::where('id',$paciente->user_id)->first();
-            $paciente->nombre = $usuarioPaciente->nombre;
+            $sitAlumno = SitAlumno::with('user')->where('no_control', $paciente->no_control)->first();
+            $paciente->nombre = $sitAlumno?->user?->nombreCompleto
+                ?: $sitAlumno?->user?->name;
         }else{
             $usuarioPaciente= User::where('id',$paciente->user_id)->first();
             $paciente->nombre = $usuarioPaciente->name;
         }        
-        $dat_medicos=Alumno::where('id',$paciente->id)->first(['sem_med', 'observaciones_med']);
+        $dat_medicos = AlumnoCreditosPerfil::where('no_control', $paciente->no_control)
+            ->first(['sem_med', 'observaciones_med']);
         return view('sistema_medico.medico.semaforo', compact('cita', 'medico', 'paciente', 'dat_medicos'));
     }
 
@@ -101,11 +104,14 @@ class SistemaMedicoController extends Controller
         $cita = Cita::findOrFail($cita_id);
         $paciente= Paciente::where('id',$cita->paciente_id)->first();         
         if($paciente->tipo=='Alumno'){           
-            //Guardamos el semaforo en la tabla de alumnos
-            $alumno= Alumno::where('id',$paciente->id)->first();
-            $alumno->sem_med = $request->input('semaforo');            
-            $alumno->observaciones_med = $alumno->observaciones_med + $request->input('observaciones_med');
-            $alumno->save();
+            $perfil = AlumnoCreditosPerfil::obtenerOCrear($paciente->no_control);
+            $perfil->sem_med = $request->input('semaforo');
+            $nuevaObservacion = trim((string) $request->input('observaciones_med'));
+            $observacionesPrevias = trim((string) ($perfil->observaciones_med ?? ''));
+            $perfil->observaciones_med = $observacionesPrevias === ''
+                ? $nuevaObservacion
+                : $observacionesPrevias."\n".$nuevaObservacion;
+            $perfil->save();
             //Redirigir a la vista de citas médicas con un mensaje de éxito
             Alert::success('Correcto','El semáforo ha sido guardado exitosamente!');
             return redirect()->route('medico.index'); 

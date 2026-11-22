@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\AlumnoCreditosPerfil;
+use App\Models\Avance;
+use App\Models\Participante;
 
 class Alumno extends Model
 {
@@ -95,5 +98,20 @@ class Alumno extends Model
     public function bajas(): HasMany
     {
         return $this->hasMany(BajaAlumno::class, 'alumno_id');
+    }
+
+    public function perfilCreditos(): HasOne
+    {
+        return $this->hasOne(AlumnoCreditosPerfil::class, 'no_control', 'no_control');
+    }
+
+    public function avances(): HasMany
+    {
+        return $this->hasMany(Avance::class, 'no_control', 'no_control');
+    }
+
+    public function participantes(): HasMany
+    {
+        return $this->hasMany(Participante::class, 'no_control', 'no_control');
     }
 }

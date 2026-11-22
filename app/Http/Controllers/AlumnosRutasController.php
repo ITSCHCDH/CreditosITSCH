@@ -11,7 +11,10 @@ use App\Models\Actividad;
 use App\User;
 use App\Models\Actividad_Evidencia;
 use App\Models\Evidencia;
-use App\Models\ALumno;
+use App\Models\AlumnoCreditosPerfil;
+use App\Services\Sit\AlumnoContextService;
+use App\Services\Creditos\AvanceCreditosService;
+use App\Services\Sit\CarrerasSitService;
 use App\Models\ConstanciaComplemento;
 use App\Models\Folio;
 use App\Models\Participante;
@@ -31,10 +34,7 @@ class AlumnosRutasController extends Controller
         $liberado = false;
         $creditos = Credito::select('nombre')->orderBy('nombre')->get();
 
-        $sitUser = Auth::guard('alumno')->user();
-        $sitAlumno = $sitUser
-            ? SitAlumno::with('carrera')->where('user_id', $sitUser->getAuthIdentifier())->first()
-            : null;
+        $sitAlumno = app(AlumnoContextService::class)->actual();
 
         if (!$sitAlumno) {
             Auth::guard('alumno')->logout();
@@ -71,12 +71,14 @@ class AlumnosRutasController extends Controller
             $avance = false;
         }
 
+        $perfilLocal = AlumnoCreditosPerfil::obtenerOCrear($noControl);
         $perfil = collect([(object) [
             'alumno_id' => $sitAlumno->id,
-            'nombre_alumno' => $sitUser->nombreCompleto,
+            'nombre_alumno' => $sitAlumno->nombreCompleto,
             'carrera' => $sitAlumno->carrera?->nombre,
             'no_control' => $sitAlumno->no_control,
-            'foto' => null,
+            'foto' => $perfilLocal->foto,
+            'estatus_creditos' => $perfilLocal->estatus_creditos,
         ]]);
 
       return view('alumnos.avance')
@@ -88,11 +90,12 @@ class AlumnosRutasController extends Controller
     }
 
     public function imprimir(){
-        $existe_alumno = Alumno::where('no_control','=',Auth::User()->no_control)->get()->count()>0? true: false;
-        if(!$existe_alumno){
+        $sitAlumno = app(AlumnoContextService::class)->actual();
+        if(!$sitAlumno){
             Alert::error('Error','El número de control no existe.');
             return redirect()->back();
         }
+        $noControl = $sitAlumno->no_control;
         $meses = [
             'enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'
         ];
@@ -112,28 +115,40 @@ class AlumnosRutasController extends Controller
         $datos_globales = ConstanciaComplemento::all();
         $jefe_depto = DB::table('constancia_complemento  as cc')->join('users as u','u.id','=','cc.jefe_depto')->select('u.name','cc.jefe_depto_enunciado','cc.profesion_jefe_depto')->get();
         $certificador = DB::table('constancia_complemento as cc')->join('users as u','u.id','=','cc.certificador')->select('u.name','cc.profesion_certificador','cc.certificador_enunciado')->get();
-        $jefe_division = DB::table('alumnos as alu')->join('constancia as c', function($join){
-            $join->on('alu.carrera','=','c.carrera');
-            $join->where('alu.no_control','=',Auth::User()->no_control);
-        })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division','c.plan_de_estudios')->get();
+        $areaAlumno = CarrerasSitService::areaDeCarrera($sitAlumno->carrera_id);
+        $jefe_division = $areaAlumno
+            ? DB::table('constancia as c')->join('users as u','u.id','=','c.jefe_division')
+                ->where('c.carrera', $areaAlumno)
+                ->select('u.name','c.division_enunciado','c.profesion_jefe_division','c.plan_de_estudios')->get()
+            : collect();
         if($jefe_depto->count()==0 || $certificador->count()==0 || $jefe_division->count()==0 || $datos_globales->count()==0){
             Alert::error('Error','Falta de integridad en los datos de la constancia');
             return redirect()->back();
         }
-        $alumno = DB::table('alumnos')->join('areas','areas.id','=','alumnos.carrera')->where('alumnos.no_control','=',Auth::User()->no_control)->select('alumnos.nombre','alumnos.no_control','areas.nombre as carrera')->get();
-        $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.Auth::User()->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
+        $alumno = collect([(object) [
+            'nombre' => $sitAlumno->nombreCompleto,
+            'no_control' => $sitAlumno->no_control,
+            'carrera' => $sitAlumno->carrera?->nombre,
+        ]]);
+        $alumno_data = DB::table('creditos as c')
+            ->join('avance as av', 'av.id_credito', '=', 'c.id')
+            ->join('users as u', 'u.id', '=', 'c.credito_jefe')
+            ->where('av.no_control', $noControl)
+            ->where('av.por_credito', '>=', 100)
+            ->select('c.nombre as credito_nombre', 'u.name as credito_jefe')
+            ->orderBy('c.id')->limit(5)->get();
         if(count($alumno_data)<5){
             Alert::error('Error','Si ya tienes tus 5 créditos liberados y no se muestra tu constancia.<br>Probablemente falten datos de la misma.');
             return back();
         }
         sort($alumno_data);
-        $obtener_folio = Folio::where('no_control','=',Auth::User()->no_control)->get();
+        $obtener_folio = Folio::where('no_control','=',$this->noControlActual())->get();
         $folio = -1;
         if($obtener_folio->count() == 0){
             $datos_globales[0]->numero_oficio = $datos_globales[0]->numero_oficio+1;
             $datos_globales[0]->save();
             $folio_object = new Folio();
-            $folio_object->no_control = Auth::User()->no_control;
+            $folio_object->no_control = $this->noControlActual();
             $folio_object->no_folio = $datos_globales[0]->numero_oficio;
             $folio_object->save();
             $folio = $folio_object->no_folio;
@@ -160,10 +175,7 @@ class AlumnosRutasController extends Controller
     }
 
     public function verificarProgreso() {
-        $sitUser = Auth::guard('alumno')->user();
-        $sitAlumno = $sitUser
-            ? SitAlumno::where('user_id', $sitUser->getAuthIdentifier())->first()
-            : null;
+        $sitAlumno = app(AlumnoContextService::class)->actual();
 
         if (!$sitAlumno) {
             return false;
@@ -203,16 +215,22 @@ class AlumnosRutasController extends Controller
                 ++$creditos_liberados;
         }
 
-        return $creditos_liberados >= 5;
+        return app(AvanceCreditosService::class)->estaLiberado($no_control);
     }
 
     public function actividades(){
-        $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+        $sitAlumno = app(AlumnoContextService::class)->actual();
+        $perfil = $sitAlumno ? AlumnoCreditosPerfil::obtenerOCrear($sitAlumno->no_control) : null;
+        $alumno_data = collect($sitAlumno ? [(object) [
+            'alumno_id' => $sitAlumno->id,
+            'foto' => $perfil?->foto,
+            'estatus_creditos' => $perfil?->estatus_creditos,
+        ]] : []);
 
         $actividades = DB::table('participantes as p')
             ->join('actividad_evidencia as ae', function($join){
                 $join->on('ae.id','=','p.id_evidencia');
-                $join->where('p.no_control','=',Auth::User()->no_control);
+                $join->where('p.no_control','=',$this->noControlActual());
             })
             ->join('actividad as a','a.id','=','ae.actividad_id')
             ->join('creditos as c','a.id_actividad','=','c.id')
@@ -225,7 +243,8 @@ class AlumnosRutasController extends Controller
     }
 
     public function subirEvidencia(Request $request){
-        $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+        $sitAlumno = app(AlumnoContextService::class)->actual();
+        $alumno_data = collect($sitAlumno ? [(object) ['alumno_id' => $sitAlumno->id]] : []);
 
         $actividad_evidencia = DB::table('actividad_evidencia')->where([
             ['user_id','=',$request->id_responsable],
@@ -237,7 +256,7 @@ class AlumnosRutasController extends Controller
         }else if($actividad_evidencia[0]->validado == "true"){
             $participante = Participante::where([
                 ['id_evidencia','=',$actividad_evidencia[0]->id],
-                ['no_control','=',Auth::User()->no_control]
+                ['no_control','=',$this->noControlActual()]
                 ])->get()[0];
             if($actividad->alumnos == "true" && ($participante->momento_agregado == "anteriormente" || $participante->evidencia_validada == "si")){
                 Alert::error('Error','La actividad ya no acepta modificaciones, ya ha sido validada.');
@@ -293,7 +312,7 @@ class AlumnosRutasController extends Controller
       if ($actividad_evidencia->validado == 'true') {
           $participante = DB::table('participantes as p')
               ->join('actividad_evidencia as ae', 'ae.id', '=', 'p.id_evidencia')
-              ->where('p.no_control', '=', Auth::User()->no_control)
+              ->where('p.no_control', '=', $this->noControlActual())
               ->where('ae.actividad_id', '=', $actividad->id)
               ->first();
 
@@ -335,7 +354,8 @@ class AlumnosRutasController extends Controller
     }
 
     public function evidencia(Request $request){
-        $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+        $sitAlumno = app(AlumnoContextService::class)->actual();
+        $alumno_data = collect($sitAlumno ? [(object) ['alumno_id' => $sitAlumno->id]] : []);
 
         if(!$request->has('user_id') && !$request->has('actividad_id')){
             return redirect()->route('alumnos.home_avance');
@@ -347,12 +367,12 @@ class AlumnosRutasController extends Controller
         $join->on('e.id_asig_actividades','=','ae.id');
         $join->where('ae.user_id','=',$request->user_id);
         $join->where('ae.actividad_id','=',$request->actividad_id);
-        $join->where('e.alumno_no_control','=',Auth::User()->no_control);
+        $join->where('e.alumno_no_control','=',$this->noControlActual());
       })->join('actividad as a','a.id','=','ae.actividad_id')->join('users as u','u.id','=','ae.user_id')->select('a.nombre as actividad_nombre','a.id as actividad_id','e.nom_imagen as evidencia_nombre','ae.user_id','e.created_at as fecha','e.id as evidencia_id','u.name as usuario_nombre')->get();
       $actividad = Actividad::find($request->actividad_id);
       $responsable = User::find($request->user_id);
       $actividad_evidencia = DB::table('actividad_evidencia as ae')->join('participantes as p','p.id_evidencia','=','ae.id')->where([
-        ['p.no_control','=',Auth::User()->no_control],
+        ['p.no_control','=',$this->noControlActual()],
         ['ae.user_id','=',$request->user_id],
         ['ae.actividad_id','=',$request->actividad_id]
       ])->select('ae.id')->get();
@@ -363,7 +383,7 @@ class AlumnosRutasController extends Controller
         ])->select('validado','id')->get();
         $participante_data = Participante::where([
             ['id_evidencia','=',$validado[0]->id],
-            ['no_control','=',Auth::User()->no_control]
+            ['no_control','=',$this->noControlActual()]
         ])->get();
         if($participante_data->count() == 0){
             return redirect()->route('alumnos.actividades');
@@ -388,8 +408,8 @@ class AlumnosRutasController extends Controller
             ->join('participantes as p','p.id_evidencia','=','ae.id')
             ->where('ae.user_id','=',$request->responsable_id)
             ->where('ae.actividad_id','=',$request->actividad_id)
-            ->where('e.alumno_no_control','=',Auth::User()->no_control)
-            ->where('p.no_control','=',Auth::User()->no_control)
+            ->where('e.alumno_no_control','=',$this->noControlActual())
+            ->where('p.no_control','=',$this->noControlActual())
             ->select('e.nom_imagen',DB::raw('DATE_FORMAT(e.created_at, "%d-%m-%Y") as fecha_creacion'),
                 'a.nombre as actividad_nombre','e.id as evidencia_id', 'p.evidencia_validada as participante_evidencia_validada',
                 'ae.validado', 'e.nom_original', 'a.id as actividad_id', 'a.vigente', 'p.momento_agregado')
@@ -404,7 +424,7 @@ class AlumnosRutasController extends Controller
                 ->join('actividad_evidencia as ae', 'ae.id', '=', 'e.id_asig_actividades')
                 ->join('actividad as a', 'a.id', '=', 'ae.actividad_id')
                 ->where('e.id', '=', $request->get('archivo'))
-                ->where('e.alumno_no_control', '=', Auth::User()->no_control)
+                ->where('e.alumno_no_control', '=', $this->noControlActual())
                 ->where('a.id', '=', $request->get('actividad'))
                 ->select('a.nombre as actividad_nombre', 'e.nom_imagen as archivo_nombre', 'ae.validado',
                     'ae.user_id as responsable', 'ae.id as act_evidencia_id', 'a.id_user as owner_id', 'e.id as archivo', 'a.vigente')
@@ -426,7 +446,7 @@ class AlumnosRutasController extends Controller
                     $participante_data = Participante::where(
                         [
                             ['id_evidencia','=',$evidencia_data->act_evidencia_id],
-                            ['no_control','=',Auth::User()->no_control]
+                            ['no_control','=',$this->noControlActual()]
                         ])
                         ->first();
 
@@ -451,6 +471,11 @@ class AlumnosRutasController extends Controller
     private function eliminarEvidencia($actividad, $archivo_id, $archivo) {
         Evidencia::destroy($archivo_id);
         Storage::delete('public/evidencias/'.$actividad.'/'.$archivo);
+    }
+
+    private function noControlActual(): ?string
+    {
+        return app(AlumnoContextService::class)->noControlActual();
     }
 
 }

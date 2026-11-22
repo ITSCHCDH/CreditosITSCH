@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\Models\ConstanciaComplemento;
 use App\Models\Constancia;
-use App\Models\Alumno;
+use App\Models\Sit\Alumno as SitAlumno;
 use App\Models\Folio;
 use App\Models\Sit\Carrera as SitCarrera;
 use App\Models\Sit\PlanEstudio;
@@ -123,8 +123,10 @@ class ConstanciasController extends Controller
             Alert::error('Error','Estas intentando acceder de forma ilegal');
             return redirect('/home');
         }
-        $existe_alumno = Alumno::where('no_control','=',$request->no_control)->get()->count()>0? true: false;
-        if(!$existe_alumno){
+        $sitAlumno = SitAlumno::with(['user', 'carrera'])
+            ->where('no_control', $request->no_control)
+            ->first();
+        if(!$sitAlumno){
             Alert::error('Error','El número de control no existe');
             return redirect()->back();
         }
@@ -148,11 +150,10 @@ class ConstanciasController extends Controller
         $datos_globales = ConstanciaComplemento::all();
         $jefe_depto = DB::table('constancia_complemento  as cc')->join('users as u','u.id','=','cc.jefe_depto')->select('u.name','cc.jefe_depto_enunciado','cc.profesion_jefe_depto')->get();
         $certificador = DB::table('constancia_complemento as cc')->join('users as u','u.id','=','cc.certificador')->select('u.name','cc.profesion_certificador','cc.certificador_enunciado')->get();
-        $areaAlumno = Alumno::where('no_control', $request->no_control)->value('carrera');
-        $carreraSit = $areaAlumno ? CarrerasSitService::deArea($areaAlumno) : null;
-        $jefe_division = $carreraSit
+        $areaAlumno = CarrerasSitService::areaDeCarrera($sitAlumno->carrera_id);
+        $jefe_division = $areaAlumno
             ? DB::table('constancia as c')->join('users as u','u.id','=','c.jefe_division')
-                ->where('c.carrera', $carreraSit)
+                ->where('c.carrera', $areaAlumno)
                 ->select('u.name','c.division_enunciado','c.profesion_jefe_division','c.plan_de_estudios')
                 ->get()
             : collect();
@@ -160,7 +161,11 @@ class ConstanciasController extends Controller
             Alert::error('Error','Falta de integridad en los datos de la constancia');
             return redirect()->back();
         }
-        $alumno = DB::table('alumnos')->join('areas','areas.id','=','alumnos.carrera')->where('alumnos.no_control','=',$request->no_control)->select('alumnos.nombre','alumnos.no_control','areas.nombre as carrera')->get();
+        $alumno = collect([(object) [
+            'nombre' => $sitAlumno->nombreCompleto,
+            'no_control' => $sitAlumno->no_control,
+            'carrera' => $sitAlumno->carrera?->nombre,
+        ]]);
         $alumno_data = DB::select('select c.nombre as credito_nombre, u.name as credito_jefe from creditos as c join avance on avance.id_credito=c.id and avance.no_control = "'.$request->no_control.'" and avance.por_credito >= 100 join users as u on u.id = c.credito_jefe order by c.id limit 5');
         if(count($alumno_data)!=5){
             Alert::error('Error','El alumno aun no liberado todos sus credito complementarios');

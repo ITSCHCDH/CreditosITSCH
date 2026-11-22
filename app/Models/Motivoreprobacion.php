@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Sit\Alumno;
 
 class Motivoreprobacion extends Model
 {
@@ -13,4 +14,9 @@ class Motivoreprobacion extends Model
     protected $table="motivosreprobacion";
     //Datos que se mostraran en los objetos Jasón
     protected $fillable=['no_control','materia','grup_cla','lse_clave','num_tema','motivos','comentario'];
+
+    public function alumno()
+    {
+        return $this->belongsTo(Alumno::class, 'no_control', 'no_control');
+    }
 }

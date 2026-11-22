@@ -9,6 +9,7 @@ use App\Models\Motivoreprobacion;
 use App\Models\AsignacionTutores;
 use App\Models\Grupo;
 use App\Models\GpoTutorias;
+use App\Models\AlumnoCreditosPerfil;
 use App\Models\Sit\Alumno as SitAlumno;
 use App\Services\Sit\CarrerasSitService;
 use App\User;
@@ -371,7 +372,7 @@ class STAController extends Controller
             ->keyBy('no_control');
 
         // Consulta las fichas de los alumnos en una sola consulta
-        $fichas = DB::table('alumnos')
+        $fichas = AlumnoCreditosPerfil::query()
             ->whereIn('no_control', $noControles)
             ->get()
             ->keyBy('no_control');
@@ -388,7 +389,7 @@ class STAController extends Controller
 
             // Asigna la ficha correspondiente, o 0 si no existe
             if (isset($fichas[$alumno->no_Control])) {
-                $alumno->ficha = $fichas[$alumno->no_Control]->ficha;
+                $alumno->ficha = $fichas[$alumno->no_Control]->ficha_completada ? 1 : 0;
             } else {
                 $alumno->ficha = 0;
             }

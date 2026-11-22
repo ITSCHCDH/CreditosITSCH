@@ -74,21 +74,6 @@ Route::get('/system/update-status', function () {
 })->name('system.update-status')->middleware('web');
 
 
-Route::post('/getmsg','ExcelController@camMsg')->name('getmsg')->middleware('auth');
-
-Route::get('/fileUploadPost','ExcelController@fileUploadPost')->name('session_variable')->middleware('auth');
-
-/*Ruta para exportar hacia excel */
-//Route::get('/export-users', 'ExcelController@exportUsers');
-
-/*Ruta para importar desde excel*/
-Route::post('Import', 'ExcelController@importClaves')->name('excel.import');
-Route::get('Import','ExcelController@index')->name('ImportExcel.index');
-
-/*Ruta para dar de alta alumnos en masa*/
-Route::post('Import/alta', 'altaAlumnosController@altaAlumnos')->name('excel.aluImport');
-Route::get('Import/altas','altaAlumnosController@index')->name('ImportExcel.altaAlumnos');
-
 Route::get('/', function () {
     if (Auth::guard('web')->check()) {
         return redirect('/home');
@@ -151,14 +136,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     //Route::resource('alumnos','AlumnosController');
     Route::get('alumnos/cargar_alumnos_ajax', [AlumnosController::class, 'cargarAlumnosAjax'])->name('admin.alumnos.cargar.ajax');
     Route::get('/alumnos/index',[AlumnosController::class,'index'])->name('alumnos.index');
-    Route::get('/alumnos/{id}/edit',[AlumnosController::class,'edit'])->name('alumnos.edit');
-    Route::post('/alumnos/{id}/update',[AlumnosController::class,'update'])->name('alumnos.update');
-    Route::post('/alumnos/store',[AlumnosController::class,'store'])->name('alumnos.store');
-    Route::get('/alumnos/create',[AlumnosController::class,'create'])->name('alumnos.create');
-    Route::get('/alumnos/{id}/destroy',[AlumnosController::class,'destroy'])->name('alumnos.destroy');
-    Route::get('/alumnos/Bajas/view',[AlumnosController::class,'bajas'])->name('alumnos.bajas.view');
     Route::get('/alumnos/buscar',[AlumnosController::class,'buscar'])->name('alumnos.buscar');
-    Route::get('/alumnos/editarStatus',[AlumnosController::class,'editStatus'])->name('alumnos.editarStatus');
 
     /****Rutas para el controlador de creditos*****/
     //Route::resource('creditos','CreditosController');
@@ -345,9 +323,6 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::get('actividades/peticion_evidencia', [AlumnosRutasController::class, 'peticionEvidencia'])->name('alumnos.peticion_evidencia');
     Route::get('actividades/eliminar_evidencia', [AlumnosRutasController::class, 'peticionEliminar'])->name('alumnos.eliminar_evidencia');
     Route::get('constancias/imprimir','AlumnosRutasController@imprimir')->name('alumnos.constancias_imprimir');
-    Route::get('/{id}/perfil',[AlumnosController::class,'perfil'])->name('alumnos.perfil');
-    Route::post('/{id}/edit/perfil',[AlumnosController::class,'editPerfil'])->name('alumnos.edit.perfil');
-
     //Rutas STA alumnos
     Route::get('/ficha',[AlumnosStaController::class,'ficha'])->name('alumnos.sta.ficha');    
     Route::get('/ficha/guardar/{nc}',[AlumnosStaController::class,'guardarDatFam'])->name('alumnos.sta.ficha.guargar');
@@ -367,6 +342,10 @@ Route::group(['prefix' => 'alumnos', 'middleware' => 'auth:alumno'],function(){
     Route::post('/sta/paciente/alumno/destroy/cita/{id}',[PacienteController::class,'destroy'])->name('paciente.alumno.destroy.cita');
     Route::post('/sta/paciente/alumno/store/perfil',[PacienteController::class,'storePerfil'])->name('paciente.alumno.store.perfil');
     Route::get('/sta/paciente/alumno/editar/perfil',[PacienteController::class,'editPerfil'])->name('paciente.alumno.editar.perfil');
+
+    // Las rutas dinámicas del perfil se registran al final para no interceptar /ficha y otras rutas estáticas.
+    Route::get('/{id}/perfil',[AlumnosController::class,'perfil'])->name('alumnos.perfil');
+    Route::post('/{id}/edit/perfil',[AlumnosController::class,'editPerfil'])->name('alumnos.edit.perfil');
 });
 
 //Rutas compartidas entre alumnos y usuarios

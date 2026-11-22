@@ -2,299 +2,140 @@
 
 namespace App\Http\Controllers;
 
+use Alert;
 use App\Http\Controllers\Utilities\DataTableAttr;
 use App\Http\Controllers\Utilities\DataTableHelper;
-use Illuminate\Http\Request;
-use App\Models\Alumno;
-use App\Models\Area;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Alert;
 use App\Http\Controllers\Utilities\HttpCode;
+use App\Models\AlumnoCreditosPerfil;
+use App\Models\Sit\Alumno as SitAlumno;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
-use function PHPUnit\Framework\isEmpty;
 
 class AlumnosController extends Controller
 {
-    public function __construct(){
-        $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_ALUMNOS')->only(['index','show', 'cargarAlumnosAjax']);
-        $this->middleware('permission:VIP|CREAR_ALUMNOS')->only(['store','create']);
-        $this->middleware('permission:VIP|MODIFICAR_ALUMNOS')->only(['edit','update']);
-        $this->middleware('permission:VIP|ELIMINAR_ALUMNOS')->only(['destroy']);
+    public function __construct()
+    {
+        $this->middleware('permission:VIP|VIP_SOLO_LECTURA|VER_ALUMNOS')
+            ->only(['index', 'cargarAlumnosAjax', 'buscar']);
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
         return view('admin.alumnos.index');
     }
 
-    public function cargarAlumnosAjax(Request $request) {
+    public function cargarAlumnosAjax(Request $request)
+    {
         try {
-            $selectColumns = ['alu.nombre','alu.no_control','alu.email','alu.status','alu.id as alumno_id','a.nombre as carrera'];
+            $selectColumns = [
+                DB::raw("CONCAT_WS(' ', u.apellido_paterno, u.apellido_materno, u.nombre) as nombre"),
+                'alu.no_control',
+                'u.email',
+                'alu.estatus as status',
+                'alu.id as alumno_id',
+                'c.nombre as carrera',
+            ];
             $dtAttr = new DataTableAttr($request, $selectColumns);
 
-            $alumnos = DB::table('alumnos as alu')
-                ->join('areas as a','a.id','=','alu.carrera')
+            $alumnos = DB::connection('sit')
+                ->table('alumnos as alu')
+                ->join('users as u', 'u.id', '=', 'alu.user_id')
+                ->join('cat_carreras as c', 'c.id', '=', 'alu.carrera_id')
                 ->select($selectColumns);
 
             DataTableHelper::applyAllExcept($alumnos, $dtAttr, [DataTableHelper::PAGINATOR]);
 
+            $visibles = $alumnos instanceof LengthAwarePaginator
+                ? collect($alumnos->items())
+                : collect($alumnos);
+            $perfiles = AlumnoCreditosPerfil::whereIn(
+                'no_control',
+                $visibles->pluck('no_control')
+            )->pluck('estatus_creditos', 'no_control');
+
             foreach ($alumnos as $alumno) {
-                $alumno->status = ucwords($alumno->status);
-                $alumno->acciones = "";
-
-                if (Auth::User()->hasAnyPermission(['VIP','MODIFICAR_ALUMNOS'])) {
-                    $alumno->acciones = $alumno->acciones . '<a href="'.route('alumnos.edit',[$alumno->alumno_id]) .'"
-                        class="btn btn-warning btn-sm" title="Modificar alumno"><i class="fas fa-user-edit" style="font-size:14px"></i></a>';
-                }
-
-                if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS'])) {
-                    $alumno->acciones = $alumno->acciones . '<a  class="btn btn-danger btn-sm ml-1" onclick="undo_alumno(' .
-                        $alumno->alumno_id .','."'". $alumno->nombre . "'". ')" data-toggle="modal" data-target="#myModalMsg" title="Eliminar alumno">
-                        <i class="far fa-trash-alt" style="font-size:14px"></i></a>';
-                }
-
-                if (empty($alumno->acciones))
-                    $alumno->acciones = 'NA';
+                $alumno->status = $perfiles[$alumno->no_control] ?? 'pendiente';
+                $alumno->status = ucwords(str_replace('_', ' ', $alumno->status));
             }
 
-            $paginatorResponse = DataTableHelper::paginatorResponse($alumnos, $dtAttr);
-            return response()->json($paginatorResponse, HttpCode::SUCCESS);
-        } catch (Exception $e) {
-            return response()->json($e->getMessage(), HttpCode::NOT_ACCEPTABLE);
+            return response()->json(
+                DataTableHelper::paginatorResponse($alumnos, $dtAttr),
+                HttpCode::SUCCESS
+            );
+        } catch (Exception $exception) {
+            return response()->json($exception->getMessage(), HttpCode::NOT_ACCEPTABLE);
         }
-    }
-
-    public function create()
-    { 
-        $carreras = Area::where('tipo','=','carrera')->orderBy('nombre','ASC')->get();
-        return view('admin.alumnos.create')
-        ->with('carreras',$carreras);
-    }
-
-
-    public function store(Request $request)
-    {
-        //Recibimos los datos de la vista de altas y en este metodo es donde registramos los datos a la BD
-        $alumno = new Alumno($request->all());
-        //Para encriptar la contraseña ponemos lo siguiente
-        $alumno->password=bcrypt($request->password);
-        //Comando para guardar el registro
-        $no_control_existe = Alumno::where('no_control','=',$request->no_control)->select('no_control')->get();
-        if($no_control_existe->count()>0){
-            Alert::error('Error','El No de control ya existe');
-            return redirect()->back()->withInput();
-        }
-        $alumno->email=$request->email;
-        $alumno->save();
-
-        Alert::success('Correcto', 'El alumno  '.$alumno->name.' se ha registrado de forma exitosa');
-        return redirect()->route('alumnos.index');
-    }
-
-
-    public function edit($id)
-    {
-        //Codigo de modificaciones
-        $alumno=Alumno::find($id);//Busca el registro
-        if($alumno==null){
-            Alert::error('Error','El alumno no existe');
-            return redirect()->back();
-        }
-
-        $areas = Area::all();
-
-        return view('admin.alumnos.edit')
-        ->with('alumno',$alumno)
-        ->with('areas',$areas);
-    }
-
-
-
-
-    public function update(Request $request, $id)
-    {
-        //Ejecuta la modificacion       
-        $alumno= Alumno::find($id);
-        if($alumno==null){
-            Alert::error('Error','El alumno no existe');
-            return redirect()->back();
-        }
-        //$avance = DB::table('avance')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
-        //$participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true: false;
-        $alumno->nombre=$request->nombre;
-        $alumno->carrera=$request->carrera;
-        if($alumno->password!=$request->password)
-        {
-            if($request->password==$request->passwordV)
-            {
-                $alumno->password= bcrypt($request->password);
-            }
-            else
-            {
-                Alert::error('Error','Error de credenciales, las contraseñas deben ser iguales para el alumno: '.$alumno->nombre);
-                return redirect()->route('alumnos.index');
-
-            }
-        }
-        $alumno->email=$request->email;
-        $alumno->save();
-
-        Alert::warning('Alerta','El alumno '. $alumno->nombre .' a sido editado de forma exitosa');
-
-        return redirect()->route('alumnos.index');
-    }
-
-
-    public function destroy($id)
-    {   
-        //Codigo de bajas
-        $alumno=Alumno::find($id);//Busca el registro
-        if($alumno==null){
-            Alert::error('Error','El alumno no existe');
-            return redirect()->route('alumnos.index');;
-        }
-        $participante = DB::table('participantes')->where('no_control','=',$alumno->no_control)->get()->count()>0?true:false;
-        $evidencia = DB::table('evidencia')->where('alumno_no_control','=',$alumno->no_control)->get()->count()>0?true:false;
-        $avance = DB::table('avance')->where('no_control','=',$alumno->no_control)->get()->count()>0?true:false;
-        if($participante || $evidencia || $avance){
-            Alert::error('Error','El alumno '.$alumno->nombre.' no puede ser eliminado por que esta registrado en algunas actividades');
-            return redirect()->route('alumnos.index');
-        }
-        $alumno->delete();//Elimina el registro
-        Alert::success('Correcto','El alumno '. $alumno->nombre .' a sido borrado de forma exitosa');//Envia mensaje
-        return redirect()->route('alumnos.index');//llama a la pagina de consultas
     }
 
     public function perfil($id)
     {
-        $selectColumns = ['alu.nombre','alu.no_control','alu.foto','alu.id as alumno_id','alu.password','a.nombre as carrera'];      
+        $alumno = SitAlumno::with(['user', 'carrera'])->findOrFail($id);
+        $perfil = AlumnoCreditosPerfil::obtenerOCrear($alumno->no_control);
 
-        $alumno_data = DB::table('alumnos as alu')
-            ->join('areas as a','a.id','=','alu.carrera')
-            ->select($selectColumns)
-            ->where('alu.id',$id)->get();          
-
-        return view('alumnos.perfil')
-        ->with('alumno_data',$alumno_data);
+        return view('alumnos.perfil')->with('alumno_data', collect([
+            (object) [
+                'nombre' => $alumno->nombreCompleto,
+                'no_control' => $alumno->no_control,
+                'foto' => $perfil->foto,
+                'alumno_id' => $alumno->id,
+                'carrera' => $alumno->carrera?->nombre,
+            ],
+        ]));
     }
 
     public function editPerfil($id, Request $request)
     {
-        try
-        {
-            if(!Storage::has('public/alumnos/img')){
-                Storage::makeDirectory('public/alumnos/img');
+        $alumno = SitAlumno::findOrFail($id);
+        $request->validate([
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
+        ]);
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $size = getimagesize($file->getRealPath());
+
+            if (! $size || $size[0] < 200 || $size[1] < 200) {
+                Alert::error('Error', 'La fotografía debe medir al menos 200px de alto y 200px de ancho.');
+                return back()->withInput();
             }
-            $alumno = Alumno::find($id);
-            if($request->has('foto'))
-            {
-                // Creamos un arrelglo con las extensiones validas
-                $allowedfileExtension=['jpg','png','jpeg'];           
-                $file = $request->foto; 
-                // Obtenemos la extension original del archivo
-                $extension = strtolower($file->getClientOriginalExtension());
-                // Funcion para saber si la extension se encuentra dentro de las extensiones permitidas
-                $check=in_array($extension,$allowedfileExtension);
-                if(!$check){
-                    Alert::error('Error','La extensión '.$extension.' no es valida.');
-                    return back()->withInput();
-                }
-                //Verificamos  el ancho y largo de la imagen, antes de subirla:
 
-                $imgsize=getimagesize($file); 
+            Storage::disk('public')->makeDirectory('alumnos/img');
+            $name = 'foto_'.$alumno->no_control.'.'.strtolower($file->getClientOriginalExtension());
+            $file->storeAs('alumnos/img', $name, 'public');
 
-                $width=$imgsize[0];
-
-                $height=$imgsize[1];              
-
-                if($width<200  &&  $height<200 )
-                { 
-                    Alert::error('Error','El tamaño de las imagenes debe ser de mas de 200px de alto y 200px de ancho');
-                    return back()->withInput();
-                }
-                //Generamos la ruta donde se guardaran las imagenes de los articulos
-                $path=storage_path().'/app/public/alumnos/img';
-                $path_to_verify = 'public/alumnos/img';
-                if(!Storage::has($path_to_verify)){
-                    Storage::makeDirectory($path_to_verify);
-                }          
-                //Para evitar nombres repetidos en las imagenes, creamos un nombre antes de guardar
-                $name='foto_'.$alumno->no_control.'.'.strtolower($file->getClientOriginalExtension());
-                //Guardamos la imagen en la carpeta creada en la ruta que marcamos anteriormente
-                $file->move($path,$name);  
-                $alumno->foto=$name;//Obtiene el nombre de la imagen para guardarlo en la bd
-                $alumno->save();//Guarda el perfil del usuario                   
-            }  
-            if($request->txtPassword!=$alumno->password)
-            {
-                if($request->txtPassword==$request->txtConfirmPassword && strlen($request->txtPassword)>=6)
-                {                           
-                    $alumno->password=bcrypt($request->txtPassword);               
-                    $alumno->save();//Guarda el perfil del usuario          
-                }
-                else
-                {
-                    Alert::error('Error','Las contraseñas no son iguales y recuerda que minimo deben ser 6 caracteres');
-                    return back()->withInput();
-                }  
-            }          
-          
-          
+            $perfil = AlumnoCreditosPerfil::obtenerOCrear($alumno->no_control);
+            $perfil->foto = $name;
+            $perfil->save();
         }
-        catch (\Exception $e)
-        {    
-            Alert::error('Error','Ocurrio un error inesperado '.$e);
-            return back()->withInput();
-        }      
-        Alert::success('Correcto','Su perfil fue modificado con exito');
-        return redirect()->route('alumnos.perfil',$id);
-    }
 
-    public function bajas()
-    {
-        $alumno=[];
-        return view('admin.alumnos.bajas')
-        ->with('alumno',$alumno);
+        Alert::success('Correcto', 'Su perfil fue modificado con éxito.');
+        return redirect()->route('alumnos.perfil', $id);
     }
 
     public function buscar(Request $request)
     {
-        $selectColumns = ['alu.nombre','alu.no_control','alu.status','alu.id as alumno_id','a.nombre as carrera'];      
+        $sitAlumno = SitAlumno::with(['user', 'carrera'])
+            ->where('no_control', $request->input('control'))
+            ->first();
 
-        $alumno = DB::table('alumnos as alu')
-            ->join('areas as a','a.id','=','alu.carrera')
-            ->select($selectColumns)
-            ->where('alu.no_control',$request->control)->get();  
-
-        if($alumno->isEmpty())
-        {
-            Alert::error('Error','Alumno no encontrado');
-            return view('admin.alumnos.bajas')
-            ->with('alumno',$alumno);
+        if (! $sitAlumno) {
+            Alert::error('Error', 'Alumno no encontrado');
+            return view('admin.alumnos.bajas')->with('alumno', collect());
         }
-        else
-        {
-            return view('admin.alumnos.bajas')
-            ->with('alumno',$alumno);
-        }       
-    }
 
-    public function editStatus(Request $request)
-    {
-        $alumno=Alumno::where('no_control',$request->cont)->get();
-        $alumno[0]->status=$request->status;        
-        $alumno[0]->save();
+        $perfil = AlumnoCreditosPerfil::obtenerOCrear($sitAlumno->no_control);
+        $alumno = collect([
+            (object) [
+                'no_control' => $sitAlumno->no_control,
+                'nombre' => $sitAlumno->nombreCompleto,
+                'carrera' => $sitAlumno->carrera?->nombre,
+                'status' => $perfil->estatus_creditos,
+            ],
+        ]);
 
-        Alert::success('Correcto','El status del alumno se modifico con exito');
-            return view('admin.alumnos.bajas')
-            ->with('alumno',$alumno);
-
+        return view('admin.alumnos.bajas')->with('alumno', $alumno);
     }
 }

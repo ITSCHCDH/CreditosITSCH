@@ -7,20 +7,6 @@
 @endsection
 
 @section('contenido')
-    <div class="row">
-        <div class="col-sm-4"></div>
-        <div class="col-sm-4"></div>
-        <div class="col-sm-4">
-            <div style="text-align: right;">
-                @if (Auth::User()->hasAnyPermission(['VIP','CREAR_ALUMNOS']))
-                    <a href="{{route('alumnos.create')}}" class="btn btn-info btn-sm" title="Agregar alumno">
-                        <i class="fas fa-user-plus" style="font-size:20px"></i>
-                    </a>
-                @endif
-            </div>
-        </div>
-    </div>
-
     <div class="table-responsive">
         <table class="table" id="tabla-alumnos">
             <thead>
@@ -30,42 +16,11 @@
                 <th>Carrera</th>
                 <th>Correo</th>
                 <th>Estatus</th>
-                @if (Auth::User()->hasAnyPermission(['VIP','ELIMINAR_ALUMNOS','MODIFICAR_ALUMNOS']))
-                    <th>Acciónes</th>
-                @endif
             </thead>
             <tbody>
             </tbody>
         </table>
     </div>
-    
-    <!--Modal para mensajes del sistema-->
-    <div class="modal" id="myModalMsg">
-        <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-
-            <!-- Modal Header -->
-            <div class="modal-header">
-            <h4 class="modal-title">Mensaje</h4>
-            <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
-            </div>
-
-            <!-- Modal body -->
-            <div class="modal-body" id="uno">
-                ¿Estas seguro que deseas eliminar el alumno?
-                <input type="hidden" id="e_id" name="id"  readonly style="border: none">
-                <input type="text" id="e_name" readonly onFocus="this.blur()" style="border: none">
-            </div>
-
-            <!-- Modal footer -->
-            <div class="modal-footer">
-                <a  class="btn btn-danger" id="prueba">Aceptar</a>
-                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Cancelar</button>
-            </div>
-        </div>
-        </div>
-    </div>
-
     @section('js')
         <script>
             //Codigo para adornar las tablas con datatables
@@ -118,21 +73,10 @@
                         {data: 'nombre'},
                         {data: 'carrera'},
                         {data: 'email'},
-                        {data: 'status', orderable: true, searchable: false},
-                        {data: 'acciones', orderable: false, searchable: false}
+                        {data: 'status', orderable: true, searchable: false}
                     ],
                 });
             });
-
-
-            //Script para pasar el id del alumno a eliminar para que se use en el modal
-            function undo_alumno(i,n)
-            {
-                document.getElementById("e_id").value = i;
-                document.getElementById("e_name").value = n;  
-                ruta="{{ url('') }}/admin/alumnos/"+i+"/destroy";                            
-                document.getElementById("prueba").href =ruta;
-            }
         </script>
     @endsection
 @endsection

@@ -2,15 +2,98 @@
 
 Este archivo registra cronológicamente todos los cambios, decisiones y pendientes del proyecto de migración al esquema `sit`. Entradas más recientes arriba.
 
+### [2026-11-22 13:10] — Tarea 6 Fase 4: corte final de alumnos legacy
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Completar el corte final eliminando el modelo legacy, consolidando relaciones en Sit\Alumno con no_control, agregando perfilCreditos y retirando creditos.alumnos mediante una migración segura.
+
+**Archivos modificados:**
+- `app/Models/Sit/Alumno.php` (perfilCreditos, avances y participantes con no_control)
+- `app/Models/Avance.php` (perfilCreditos agregado)
+- `app/Models/Participante.php` (perfilCreditos agregado)
+- Modelos locales familiares, médicos y sociales (relación alumno por no_control)
+- `tests/Unit/Sit/ReadOnlyModelsTest.php` (pruebas de perfilCreditos, avances y participantes)
+- `docs/INVENTARIO_CODIGO.md` (corte final documentado)
+- `docs/BITACORA.md` (cierre de la tarea)
+
+**Archivos eliminados:**
+- `app/Models/Alumno.php` (modelo legacy eliminado)
+- `database/factories/AlumnosFactory.php` (factory que creaba alumnos legacy)
+- `database/seeds/GenerarAlumnos.php` (seeder que escribía alumnos legacy)
+
+**Consultas SQL nuevas o modificadas:**
+- Nueva migración `database/migrations/2026_11_22_999999_drop_legacy_alumnos_table.php` sobre conexión `creditos`.
+- Guard: exige `alumno_creditos_perfil` y ejecuta `Schema::dropIfExists('alumnos')`; `down()` solo deja comentario de respaldo.
+- Verificado en MySQL local: `alumno_creditos_perfil=true`, `alumnos=false`.
+
+**Decisiones tomadas:**
+- La identidad institucional continuará resolviéndose mediante App\Models\Sit\Alumno sobre la conexión sit.
+- El perfil propio permanecerá en creditos.alumno_creditos_perfil.
+- Las relaciones locales operativas usan `no_control` contra `App\Models\Sit\Alumno`; no se recrean joins hacia una tabla local legacy.
+- Los factory/seeder legacy fueron retirados porque ya no representan la fuente institucional.
+
+**Pendientes / Deuda técnica:**
+- Validar integración visual final con datos reales de staging.
+- Mantener disponibles únicamente búsquedas por `no_control` y nombre sobre SIT.
+
+**Tests ejecutados:**
+- ✅ `php artisan test` (24 passed, 115 assertions)
+- ✅ `php artisan route:cache` (Routes cached successfully)
+- ✅ `php artisan view:cache` (Blade templates cached successfully)
+- ✅ `php artisan migrate --force` (migración final aplicada)
+- ✅ Verificación con Schema: perfil presente y tabla legacy ausente
+
+**Referencias:**
+- Tarea 6 (Fase 4 - Corte Final).
+
+### [2026-11-22 12:54] — Tarea 4 Fase 3A: eliminación de alumnos legacy en controladores
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Migrar ConstanciasController, AlumnosRutasController y VerificaEvidenciaController para usar exclusivamente Sit\Alumno y el perfil local, eliminando referencias a creditos.alumnos y delegando el estatus de créditos.
+
+**Archivos modificados:**
+- `app/Services/Creditos/AvanceCreditosService.php` (creado)
+- `app/Http/Controllers/ConstanciasController.php` (SIT para identidad/carrera y bloqueo sin alumno SIT)
+- `app/Http/Controllers/AlumnosRutasController.php` (AlumnoContextService, perfil local y AvanceCreditosService)
+- `app/Http/Controllers/VerificaEvidenciaController.php` (búsqueda/reportes/avance sin modelo o tablas legacy)
+- `tests/Feature/Creditos/CreditosConstanciasSitTest.php` (creado)
+- `docs/BITACORA.md` (actualizado)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- `Avance::where('no_control', $noControl)->where('por_credito', '>=', 100)->count()` para sincronizar estatus en `creditos.alumno_creditos_perfil`.
+- Consultas separadas: avance/perfil en `creditos` y alumnos en `sit`, sin joins entre ambas bases.
+- `Sit\Alumno::with(['user','carrera'])->where('no_control', ...)->first()` en constancias y búsquedas.
+
+**Decisiones tomadas:**
+- La identidad académica se obtiene mediante `App\Models\Sit\Alumno` y `AlumnoContextService::actual()`.
+- El estatus se calcula desde `avance.por_credito` y se sincroniza únicamente en `AlumnoCreditosPerfil`; SIT permanece de solo lectura.
+- La equivalencia de carreras local/SIT se conserva mediante `CarrerasSitService`.
+
+**Pendientes / Deuda técnica:**
+- Validar integración con datos reales de ambas bases.
+
+**Tests ejecutados:**
+- ✅ `php artisan test tests/Feature/Creditos/CreditosConstanciasSitTest.php` (3 passed, 8 assertions)
+
+**Referencias:**
+- Tarea 4 (Fase 3A).
+
 ## Estado actual
 
-**Última entrada:** 2026-11-22 12:13 · **Entradas registradas:** 67 · **Último commit previo a esta sesión:** `2f38a76` (2026-11-22 12:11).
+**Última entrada:** 2026-11-22 12:39 · **Entradas registradas:** 69 · **Último commit previo a esta sesión:** `2f38a76` (2026-11-22 12:11).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
 | Verificación | Resultado |
 |---|---|
-| `php artisan test` (suite completa) | ✅ 17 passed, 62 assertions |
+| `php artisan test` (suite completa) | ✅ 19 passed, 98 assertions |
 | Migración `2026_11_21_120000_remove_legacy_alumno_foreign_keys_from_creditos` | ✅ Ejecutada (batch 3) |
 | FKs de `creditos` que apuntan a `creditos.alumnos` | ✅ 0 restantes (26 FK en total en el esquema) |
 | `public/storage` (enlaces de evidencias) | ✅ Existe |
@@ -26,14 +109,14 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 | # | Riesgo | Evidencia | Prioridad |
 |---|---|---|---|
-| 1 | Identidad académica aún duplicada: 11 controladores usan `App\Models\Alumno` para datos que ya existen en SIT; la conexión `contEsc` ya se eliminó | `app/Http/Controllers/*` | Alta |
+| 1 | Identidad académica aún duplicada: quedan 7 controladores usando `App\Models\Alumno` para datos operativos; la conexión `contEsc` ya se eliminó | `app/Http/Controllers/*` | Alta |
 | 2 | SQL crudo con concatenación de `$busqueda` en `VerificaEvidenciaController::avanceAlumno()` (8 consultas); el reporte ya migró a SIT | Inyección SQL latente | Alta |
-| 3 | Sin clave puente estable entre `sit.alumnos` y las tablas auxiliares de `creditos` (`personales`, `padres`, `direcciones`, `historiales_clinicos`); `id_alu` sobrevive sin FK | Verificación 2026-11-21 12:56 | Alta |
+| 3 | La clave puente `no_control` ya existe, pero varios controladores auxiliares aún leen/escriben mediante `id_alu` | Entrada 2026-11-22 12:39 | Alta |
 | 4 | Contraseña de prueba `Prueba123!` documentada y `PruebaActividadesSeeder` versionado | Entrada 2026-11-21 12:10 | Media |
 | 5 | El login depende del CDN `mdb-ui-kit@9.3.0` (jsdelivr) mientras el resto usa assets locales | `resources/views/auth/login.blade.php` | Media |
 | 6 | Cambios de interfaz sin validación en navegador autenticado | Lista siguiente | Media |
 | 7 | `creditos.areas` y `sit.cat_carreras` no comparten id; la equivalencia se resuelve por nombre | `mapaCarreras()` en `VerificaEvidenciaController` | Media |
-| 8 | `creditos.alumnos` está vacía (0 filas): el reporte ya usa `sit.alumnos`, pero avance, constancias y altas todavía leen esa tabla | Verificación 2026-11-21 13:45 | Alta |
+| 8 | `creditos.alumnos` está vacía (0 filas) y se conserva temporalmente; los 7 controladores restantes aún deben migrar al satélite | Entrada 2026-11-22 12:39 | Alta |
 
 ### Validación visual pendiente
 
@@ -181,6 +264,71 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-22 12:39] — Fase 2, Tarea 3: satélite local y limpieza de altas
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Crear el perfil satélite de alumnos en `creditos`, migrar datos locales, retirar altas/importaciones, adaptar consultas y agregar pruebas.
+
+**Archivos modificados:**
+- `config/database.php` (conexión explícita `creditos`)
+- `database/migrations/2026_11_22_130000_create_alumno_creditos_perfil_and_no_control_bridge.php`
+- `app/Models/AlumnoCreditosPerfil.php`
+- `app/Console/Commands/MigrarDatosAlumnosLocales.php`
+- `app/Models/{Familiar,Padres,Historial_clinico,Datos_familiares,Personales,Social,Paciente}.php`
+- `app/Http/Controllers/AlumnosController.php`
+- `app/Http/Controllers/AreasController.php`
+- `app/Http/Controllers/PerfilController.php`
+- `routes/web.php`
+- `resources/views/admin/alumnos/index.blade.php`
+- `resources/views/admin/alumnos/bajas.blade.php`
+- `resources/views/alumnos/perfil.blade.php`
+- `resources/views/template/partes/menu.blade.php`
+- `tests/Feature/Migration/TablaSateliteYLimpiezaTest.php`
+- `tests/Feature/Auth/UnifiedLoginTest.php`
+
+**Archivos eliminados:**
+- `app/Http/Controllers/altaAlumnosController.php`
+- `app/Http/Controllers/ExcelController.php`
+- `app/Imports/AlumnosAgregar.php`
+- `app/Imports/AlumnosImport.php`
+- `resources/views/admin/alumnos/create.blade.php`
+- `resources/views/admin/alumnos/edit.blade.php`
+- `resources/views/admin/ImportExcel/index.blade.php`
+- `resources/views/admin/ImportExcel/altAlumnos.blade.php`
+
+**Consultas SQL nuevas o modificadas:**
+- Nueva tabla `creditos.alumno_creditos_perfil`: `id`, `no_control` único/indexado, `estatus_creditos`, `ficha_completada`, `foto`, observaciones de tutoría/médica/psicológica, semáforos médico/psicológico y timestamps.
+- `no_control` nullable/indexado en `familiares`, `padres`, `historiales_clinicos`, `datos_familiares`, `personales`, `social` y `pacientes`.
+- Se quitaron, previa verificación en `information_schema`, las 10 FK legado indicadas en la tarea.
+- `creditos:migrar-datos-alumnos` usa `updateOrCreate` para el satélite y propaga `no_control` por `id_alu`/`user_id`.
+- La consulta y el perfil administrativo de alumnos ahora leen identidad y carrera desde `sit.alumnos`, `sit.users` y `sit.cat_carreras`; los datos editables quedan en `creditos`.
+
+**Decisiones tomadas:**
+- Se conservan `creditos.alumnos` y `App\Models\Alumno` para los controladores pendientes de fases posteriores.
+- El satélite se asocia a SIT por `no_control`; no se añadió ninguna FK ni escritura hacia SIT.
+- El perfil del alumno solo permite editar la fotografía local. La contraseña institucional permanece en SIT.
+- El estatus mostrado en consultas vive en `alumno_creditos_perfil.estatus_creditos`; se retiró el cambio manual desde bajas.
+- `AreasController` bloquea el borrado solo cuando una carrera SIT equivalente por nombre tiene alumnos.
+- La conexión `creditos` queda explícita en la migración, comando y modelos propios del puente, conservando `mysql` por compatibilidad.
+
+**Tests ejecutados:**
+- ✅ `php artisan migrate --database=creditos --path=database/migrations/2026_11_22_130000_create_alumno_creditos_perfil_and_no_control_bridge.php`
+- ✅ Verificación real: satélite presente, 7 columnas puente presentes y 0 de las 10 FK legado restantes.
+- ✅ `php artisan creditos:migrar-datos-alumnos` (0 registros porque `creditos.alumnos` está vacía en el entorno).
+- ✅ Consulta AJAX real contra SIT: HTTP 200 y 5 filas.
+- ✅ `php artisan view:cache`
+- ✅ `php artisan route:cache`
+- ✅ `php artisan test` (19 passed, 98 assertions).
+
+**Pendientes / Deuda técnica:**
+- La prueba usa SQLite; la validación de las diez FK MySQL se verificó además sobre la base local real.
+- Quedan otros controladores con dependencia de `App\Models\Alumno`, programados para la siguiente fase.
+
+**Referencias:**
+- Tarea 3, Fase 2.
 
 ### [2026-11-22 12:13] — UX de Ver permisos de un rol
 
@@ -2441,3 +2589,47 @@ Se inició el inventario sin modificaciones de código. Se tomaron como fuente `
 - ADR: mapeo de `creditos.alumnos` a `sit.alumnos`.
 - ADR: destino funcional de tablas legado sin equivalente directo.
 - ADR: conservación o migración de datos personales sensibles y credenciales.
+### [2026-11-22 13:02] — Migración completa de los controladores STA y médico a SIT/perfil satélite
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** tutorías
+- **Prompt/Tarea original:** Completar la Fase 3B eliminando referencias activas a `creditos.alumnos` en los cuatro controladores restantes y auditar app/routes/resources.
+
+**Archivos modificados:**
+- `app/Http/Controllers/AlumnosStaController.php` (eliminadas consultas legacy de Alumno; ficha, tutoría y PDF combinan SIT con registros creditos por no_control)
+- `app/Http/Controllers/JefesController.php` (fichas/perfil satélite y observaciones_tutoria por no_control)
+- `app/Http/Controllers/STAController.php` (fichas consultadas desde AlumnoCreditosPerfil)
+- `app/Http/Controllers/SistemaMedicoController.php` (pacientes alumno por no_control, semáforo/perfil satélite y anexado de observaciones)
+- `app/Http/Controllers/PacienteController.php` (alta/edición propaga no_control para pacientes alumno)
+- `app/Models/Avance.php` (compatibilidad mínima: relación hacia Sit\Alumno por no_control)
+- `app/Models/Participante.php` (compatibilidad mínima: relación hacia Sit\Alumno por no_control)
+- `tests/Feature/Sta/StaYMedicoSitTest.php` (creado; ficha/autorizar, observaciones tutoría y semáforo médico)
+- `docs/BITACORA.md` (cerrado y documentada la auditoría)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- AlumnoCreditosPerfil reemplaza consultas locales de ficha, observaciones, sem_med y observaciones_med.
+- Los modelos locales de tutoría consultan primero por no_control y conservan fallback histórico por id_alu.
+- STA deja de ejecutar DB::table('alumnos') y usa AlumnoCreditosPerfil::whereIn('no_control', ...).
+- SistemaMedico usa Sit\Alumno para identidad/nombre y AlumnoCreditosPerfil para semáforo y observaciones médicas.
+
+**Decisiones tomadas:**
+- SIT seguirá siendo solo lectura; los datos propios se resolverán por `no_control` en `AlumnoCreditosPerfil` y tablas locales.
+- No se creó ni modificó el esquema SIT.
+- No se eliminó App\Models\Alumno ni se ejecutaron DROP TABLE/migraciones adicionales.
+
+**Pendientes / Deuda técnica:**
+- Ninguno para el alcance de Tarea 5. Validación con datos reales de staging sigue recomendada.
+
+**Tests ejecutados:**
+- ✅ `php artisan test tests/Feature/Sta/StaYMedicoSitTest.php` (2 passed, 6 assertions)
+- ✅ `php artisan test` (24 passed, 112 assertions)
+- ✅ `php artisan route:list`
+- ✅ `php artisan view:cache`
+- ✅ Auditoría global: sin referencias activas a App\Models\Alumno, App\Alumno, DB::table('alumnos') ni Alumno::where en app/routes/resources.
+
+**Referencias:**
+- Tarea 5 (Fase 3B)

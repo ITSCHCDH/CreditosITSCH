@@ -5,13 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Alumno;
+use App\Models\AlumnoCreditosPerfil;
 use App\Models\Datos_familiares;
 use App\Models\Direccion;
 use App\Models\Familiar;
 use App\Models\Historial_clinico;
 use App\Models\Motivoreprobacion;
-use App\Models\ObservacionAlumno;
 use App\Models\Padres;
 use App\Models\Personales;
 use App\Models\Social;
@@ -84,14 +83,13 @@ class JefesController extends Controller
             return redirect()->back();
         }
 
-        // La ficha académica sigue viviendo en creditos mientras termina la migración
-        $fichas = Alumno::whereIn('no_control', $grupo->pluck('control'))
-            ->select('no_control', 'ficha')
+        $fichas = AlumnoCreditosPerfil::whereIn('no_control', $grupo->pluck('control'))
+            ->select('no_control', 'ficha_completada')
             ->get()
             ->keyBy('no_control');
 
         foreach ($grupo as $alu) {
-            $alu->ficha = optional($fichas->get($alu->control))->ficha ?? 0;
+            $alu->ficha = optional($fichas->get($alu->control))->ficha_completada ? 1 : 0;
             $alu->semaforos = self::calSemaforos($alu->control);
         }
 
@@ -122,8 +120,8 @@ class JefesController extends Controller
             'alu_SemestreAct' => $alumno->semestre_actual,
             'car_Nombre' => $alumno->carrera?->nombre,
             'alu_Sexo' => $alumno->genero === 'F' ? 'Femenino' : 'Masculino',
-            'observaciones' => ObservacionAlumno::where('no_control', $alumno->no_control)->value('observaciones')
-                ?: ($alumno->observaciones ?: 'Sin observaciones'),
+            'observaciones' => AlumnoCreditosPerfil::where('no_control', $alumno->no_control)
+                ->value('observaciones_tutoria') ?: 'Sin observaciones',
         ];
 
         $buscarAlumno->semaforos = self::calSemaforos($alumno->no_control);
@@ -374,23 +372,35 @@ class JefesController extends Controller
             $car = (object) ['car_NombreCorto' => $alumnoSit->carrera?->nombre_corto ?: $alumnoSit->carrera?->nombre];
             $alu2 = (object) ['alc_FechaNac' => $alumnoSit->fecha_nacimiento];
 
-            // Los datos socioeconómicos siguen en creditos y se enlazan por el id local
-            $alu = Alumno::where('no_control', $nc)->first();
-            $idAlu = $alu?->id;
+            $perfil = AlumnoCreditosPerfil::where('no_control', $nc)->first();
+            $alu = (object) [
+                'id' => $alumnoSit->id,
+                'no_control' => $alumnoSit->no_control,
+                'ficha_completada' => (bool) ($perfil?->ficha_completada),
+            ];
+            $idAlu = $alumnoSit->id;
 
-            $clinicos = $idAlu ? Historial_clinico::where('id_alu', $idAlu)->first() : null;
+            $clinicos = Historial_clinico::where('no_control', $nc)->first()
+                ?? ($idAlu ? Historial_clinico::where('id_alu', $idAlu)->first() : null);
             $padres = $idAlu
-                ? Padres::where('id_alu', $idAlu)->whereIn('parentesco', ['Padre', 'Madre'])->get()
+                ? Padres::where('no_control', $nc)->whereIn('parentesco', ['Padre', 'Madre'])->get()
                 : collect();
+            if ($padres->isEmpty() && $idAlu) {
+                $padres = Padres::where('id_alu', $idAlu)->whereIn('parentesco', ['Padre', 'Madre'])->get();
+            }
 
             if ($padres->count() == 2) {
                 $direccion = Direccion::where('id_alu', $idAlu)->first();
                 $direccionP = Direccion::where('id_fam', $padres[0]->id)->first();
                 $direccionM = Direccion::where('id_fam', $padres[1]->id)->first();
-                $familiares = Familiar::where('id_alu', $idAlu)->get();
-                $person = Personales::where('id_alu', $idAlu)->first();
-                $fam = Datos_familiares::where('id_alu', $idAlu)->first();
-                $soc = Social::where('id_alu', $idAlu)->first();
+                $familiares = Familiar::where('no_control', $nc)->get();
+                if ($familiares->isEmpty()) $familiares = Familiar::where('id_alu', $idAlu)->get();
+                $person = Personales::where('no_control', $nc)->first()
+                    ?? Personales::where('id_alu', $idAlu)->first();
+                $fam = Datos_familiares::where('no_control', $nc)->first()
+                    ?? Datos_familiares::where('id_alu', $idAlu)->first();
+                $soc = Social::where('no_control', $nc)->first()
+                    ?? Social::where('id_alu', $idAlu)->first();
 
                 return view('sta.analisis_alumnos.ficha', compact('familiares', 'alu1', 'alu2', 'car', 'padres', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu', 'clinicos', 'person', 'fam'));
             }
@@ -422,10 +432,9 @@ class JefesController extends Controller
                 ], 404);
             }
 
-            ObservacionAlumno::updateOrCreate(
-                ['no_control' => $noControl],
-                ['observaciones' => $request->observaciones]
-            );
+            $perfil = AlumnoCreditosPerfil::obtenerOCrear($noControl);
+            $perfil->observaciones_tutoria = $request->observaciones;
+            $perfil->save();
 
             return response()->json([
                 'mensaje' => 'Observaciones guardadas correctamente',

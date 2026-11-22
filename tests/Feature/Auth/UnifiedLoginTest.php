@@ -240,7 +240,9 @@ it('envia enlace local a un usuario administrativo', function () {
     Mail::assertSent(mail_res_pass::class);
 });
 
-it('redirige al alumno activo al portal institucional de recuperacion', function () {
+it('no inicia recuperacion administrativa para una cuenta de alumno', function () {
+    Mail::fake();
+
     DB::connection('sit')->table('users')->insert([
         'id' => 12,
         'nombre' => 'Alumno',
@@ -262,7 +264,11 @@ it('redirige al alumno activo al portal institucional de recuperacion', function
         'email' => 'alumno-reset@itsch.mx',
     ]);
 
-    $response->assertRedirect('https://sit.cdhidalgo.tecnm.mx/auth/recuperar-password');
+    $response->assertRedirect('/login');
+    $this->assertDatabaseMissing('password_resets', [
+        'email' => 'alumno-reset@itsch.mx',
+    ], 'mysql');
+    Mail::assertNothingSent();
 });
 
 it('restablece la contraseña de un usuario administrativo con contraseña segura', function () {

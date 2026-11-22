@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Historial_clinico;
 use App\Models\Datos_familiares;
-use App\Models\Alumno;
 use App\Models\Direccion;
 use App\Models\Familiar;
 use App\Models\Personales;
@@ -15,9 +14,14 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Console\View\Components\Alert;
 use Illuminate\Http\Request;
 use App\Models\Sit\Alumno as SitAlumno;
+use App\Models\AlumnoCreditosPerfil;
 
 class AlumnosStaController extends Controller
 {
+   private function perfil(string $nc): ?AlumnoCreditosPerfil
+   {
+      return AlumnoCreditosPerfil::where('no_control', $nc)->first();
+   }
    /**
     * Datos equivalentes a los que antes se leían de la conexión anterior:
     * alumno, su carrera y los datos de dirección/salud, ahora desde SIT.
@@ -103,20 +107,27 @@ class AlumnosStaController extends Controller
          'car_NombreCorto' => $sitAlumno->carrera?->nombre_corto,
       ];
 
-      $person = Personales::where('id_alu', $alu->id)->first();
+      $person = Personales::where('no_control', $no_cont)
+         ->when(!Personales::where('no_control', $no_cont)->exists(), fn ($q) => $q->where('id_alu', $alu->id))
+         ->first();
       if ($person == null) {
          $person = new Personales();
+         $person->no_control = $no_cont;
          $person->id_alu = $alu->id;
       }
-      $dPad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Padre')->first();
+      $dPad = Padres::where('no_control', $no_cont)->where('parentesco', 'Padre')->first()
+         ?? Padres::where('id_alu', $alu->id)->where('parentesco', 'Padre')->first();
       if ($dPad == null) {
          $dPad = new Padres();
+         $dPad->no_control = $no_cont;
          $dPad->id_alu = $alu->id;
          $dPad->parentesco = 'Padre';
       }
-      $dMad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Madre')->first();
+      $dMad = Padres::where('no_control', $no_cont)->where('parentesco', 'Madre')->first()
+         ?? Padres::where('id_alu', $alu->id)->where('parentesco', 'Madre')->first();
       if ($dMad == null) {
          $dMad = new Padres();
+         $dMad->no_control = $no_cont;
          $dMad->id_alu = $alu->id;
          $dMad->parentesco = 'Madre';
       }
@@ -138,9 +149,11 @@ class AlumnosStaController extends Controller
          $direccionM = new Direccion();
          $direccionM->id_fam = $dMad->id;
       }
-      $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
+      $clinicos = Historial_clinico::where('no_control', $no_cont)->first()
+         ?? Historial_clinico::where('id_alu', $alu->id)->first();
       if ($clinicos == null) {
          $clinicos = new Historial_clinico();
+         $clinicos->no_control = $no_cont;
          $clinicos->id_alu = $alu->id;
          $clinicos->sangre = $alu2->alc_TipoSangre;
       }     
@@ -154,20 +167,28 @@ class AlumnosStaController extends Controller
 
    public function guardarDatFam(Request $request, $nc)
    {
-      $alu = Alumno::where('no_control',$nc)->first();
-      $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
-      $person = Personales::where('id_alu', $alu->id)->first();
-      $dPad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Padre')->first();
-      $dMad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Madre')->first();
-      $direccion = Direccion::where('id_alu', $alu->id)->first();
+      $sit = SitAlumno::with(['user','carrera','alumnoComplemento','alumnoDatoMedico'])->where('no_control',$nc)->firstOrFail();
+      $alu = (object) [
+         'id' => $sit->id,
+         'no_control' => $sit->no_control,
+         'emailPer' => null,
+         'tel' => $sit->user?->celular,
+         'est_civ' => null,
+         'lug_pro' => null,
+         'grupo' => null,
+      ];
+      $clinicos = Historial_clinico::where('no_control',$nc)->first() ?? Historial_clinico::where('id_alu',$sit->id)->first();
+      $person = Personales::where('no_control',$nc)->first() ?? Personales::where('id_alu',$sit->id)->first();
+      $dPad = Padres::where('no_control',$nc)->where('parentesco','Padre')->first() ?? Padres::where('id_alu',$sit->id)->where('parentesco','Padre')->first();
+      $dMad = Padres::where('no_control',$nc)->where('parentesco','Madre')->first() ?? Padres::where('id_alu',$sit->id)->where('parentesco','Madre')->first();
+      $direccion = Direccion::where('id_alu',$sit->id)->first();
       $direccionP = Direccion::where('id_fam', $dPad->id)->first();
       $direccionM = Direccion::where('id_fam', $dMad->id)->first();
-      $alu->emailPer = $request->emailPer;
-      $alu->tel = $request->tel;
-      $alu->est_civ = $request->est_civ;
-      $alu->lug_pro = $request->lug;
-      $alu->grupo = $request->grupo;     
-      $alu->save();
+      foreach ([
+         'clinicos' => $clinicos, 'person' => $person, 'dPad' => $dPad, 'dMad' => $dMad,
+      ] as $name => $model) {
+         if (! $model) return redirect()->back()->withErrors('Completa primero la ficha del alumno.');
+      }
 
       $dPad->nombre = $request->nomPa;
       $dPad->edad = $request->EdadPa;
@@ -236,10 +257,12 @@ class AlumnosStaController extends Controller
 
    public function editDatSalud($nc)
    {
-      $alu = Alumno::where('no_control',$nc)->first();
+      $sit = SitAlumno::with(['user','carrera','alumnoComplemento','alumnoDatoMedico'])->where('no_control',$nc)->firstOrFail();
+      $alu = (object) ['id' => $sit->id, 'no_control' => $sit->no_control];
       $alu1 = $this->datosSitAlumno($nc)[0];
-      $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
-      $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+      $clinicos = Historial_clinico::where('no_control',$nc)->first()
+         ?? Historial_clinico::where('id_alu',$sit->id)->first();
+      $alumno_data = collect([(object) ['alumno_id' => $sit->id]]);
       return view('alumnos.sta.dsalud', compact('alu1', 'alu', 'clinicos','alumno_data'));
    }
 
@@ -247,8 +270,15 @@ class AlumnosStaController extends Controller
    {
         try
         {
-            $alu = Alumno::where('no_control',$nc)->first();
-            $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
+            $sit = SitAlumno::where('no_control',$nc)->firstOrFail();
+            $alu = (object) ['id' => $sit->id, 'no_control' => $sit->no_control];
+            $clinicos = Historial_clinico::where('no_control',$nc)->first()
+               ?? Historial_clinico::where('id_alu',$sit->id)->first();
+            if (! $clinicos) {
+                $clinicos = new Historial_clinico();
+                $clinicos->no_control = $nc;
+                $clinicos->id_alu = $sit->id;
+            }
             if ($request->alu_enf == 'No') {
                 $clinicos->enfermedad = $request->alu_enf;
                 $clinicos->diabetes = "";
@@ -330,15 +360,18 @@ class AlumnosStaController extends Controller
                 $clinicos->cuanto_med = $request->dx_medico_tm;
             }
             $clinicos->save();
-            $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();     
+            $alumno_data = collect([(object) ['alumno_id' => $sit->id]]);
             $alu1 = $this->datosSitAlumno($nc)[0];
-            $fam = Datos_familiares::where('id_alu', $alu->id)->first();
+            $fam = Datos_familiares::where('no_control',$nc)->first()
+               ?? Datos_familiares::where('id_alu',$sit->id)->first();
             if ($fam == null) {
                 $fam = new Datos_familiares();
+                $fam->no_control = $nc;
                 $fam->id_alu = $alu->id;
                 $fam->save();
             }
-            $familiares = Familiar::where('id_alu', $alu->id)->get();     
+            $familiares = Familiar::where('no_control',$nc)->get();
+            if ($familiares->isEmpty()) $familiares = Familiar::where('id_alu',$sit->id)->get();
             return view('alumnos.sta.dfamiliares', compact('alu1', 'alu', 'fam', 'familiares','alumno_data'));
         }
         catch(\Illuminate\Database\QueryException $e)
@@ -354,8 +387,10 @@ class AlumnosStaController extends Controller
         try
         {
             //Buscamos al alumno
-            $alu = Alumno::where('no_control',$nc)->first();
-            $familiares = Familiar::where('id_alu', $alu->id)->get();
+            $sit = SitAlumno::where('no_control',$nc)->firstOrFail();
+            $alu = (object) ['id' => $sit->id, 'no_control' => $sit->no_control];
+            $familiares = Familiar::where('no_control',$nc)->get();
+            if ($familiares->isEmpty()) $familiares = Familiar::where('id_alu',$sit->id)->get();
             foreach ($familiares as &$famil) {
                 $famil->delete();
             }
@@ -364,6 +399,7 @@ class AlumnosStaController extends Controller
             if (isset($request->nombre[0])  ) {
                 for ($i = 0; $i < count($request->edad); $i++) {
                     $familiar = new Familiar();
+                    $familiar->no_control = $nc;
                     $familiar->id_alu = $alu->id;
                     $familiar->nombre = $request->nombre[$i];
                     $familiar->edad = $request->edad[$i];
@@ -375,7 +411,13 @@ class AlumnosStaController extends Controller
             }
         
 
-            $fam = Datos_familiares::where('id_alu', $alu->id)->first();
+            $fam = Datos_familiares::where('no_control',$nc)->first()
+               ?? Datos_familiares::where('id_alu',$sit->id)->first();
+            if (! $fam) {
+                $fam = new Datos_familiares();
+                $fam->no_control = $nc;
+                $fam->id_alu = $sit->id;
+            }
             if ($request->dif == 'No') {
                 $fam->dificultades = $request->dif;
             } else {
@@ -390,13 +432,15 @@ class AlumnosStaController extends Controller
             
             
             $alu1 = $this->datosSitAlumno($nc)[0];
-            $soc = Social::where('id_alu', $alu->id)->first();
+            $soc = Social::where('no_control',$nc)->first()
+               ?? Social::where('id_alu',$sit->id)->first();
             if ($soc == null) {
                 $soc = new Social();
+                $soc->no_control = $nc;
                 $soc->id_alu = $alu->id;
                 $soc->save();
             }
-            $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();
+            $alumno_data = collect([(object) ['alumno_id' => $sit->id]]);
             return view('alumnos.sta.dsocial', compact('alu1', 'alu', 'soc','alumno_data'));
         }
         catch(\Illuminate\Database\QueryException $e)
@@ -411,8 +455,15 @@ class AlumnosStaController extends Controller
    { 
         try
         {   
-            $alu = Alumno::where('no_control',$nc)->first();           
-            $soc = Social::where('id_alu', $alu->id)->first();
+            $sit = SitAlumno::where('no_control',$nc)->firstOrFail();
+            $alu = (object) ['id' => $sit->id, 'no_control' => $sit->no_control];
+            $soc = Social::where('no_control',$nc)->first()
+               ?? Social::where('id_alu',$sit->id)->first();
+            if (! $soc) {
+                $soc = new Social();
+                $soc->no_control = $nc;
+                $soc->id_alu = $sit->id;
+            }
             $soc->rel_comp = $request->rel_comp;
             $soc->comp_por = $request->rel_comp_t;
             $soc->rel_amig = $request->rel_ami;
@@ -438,7 +489,7 @@ class AlumnosStaController extends Controller
             $soc->save();
 
             $alu1 = $this->datosSitAlumno($nc)[0];
-            $alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();          
+            $alumno_data = collect([(object) ['alumno_id' => $sit->id]]);
             return view('alumnos.sta.autorizar', compact('alu1', 'alu','alumno_data'));
         }
         catch(\Illuminate\Database\QueryException $e)
@@ -451,9 +502,10 @@ class AlumnosStaController extends Controller
 
    public function autorizar($nc)
    {     
-        $alu = Alumno::where('no_control',$nc)->first();  
-        $alu->ficha = 1;
-        $alu->save();
+        $sit = SitAlumno::where('no_control',$nc)->firstOrFail();
+        $perfil = AlumnoCreditosPerfil::obtenerOCrear($sit->no_control);
+        $perfil->ficha_completada = true;
+        $perfil->save();
         return redirect()->route('alumnos.sta.pdf', $nc);
    }
 
@@ -461,22 +513,34 @@ class AlumnosStaController extends Controller
     {
         try
         {
-            $alu = Alumno::where('no_control',$nc)->first();
+            $sit = SitAlumno::with(['user','carrera','alumnoComplemento','alumnoDatoMedico'])->where('no_control',$nc)->firstOrFail();
+            $alu = (object) [
+               'id' => $sit->id,
+               'no_control' => $sit->no_control,
+               'no_cont' => $sit->no_control,
+            ];
             [$alu1, $car, $alu2] = $this->datosSitAlumno($nc);
     
-            $clinicos = Historial_clinico::where('id_alu', $alu->id)->first();
+            $clinicos = Historial_clinico::where('no_control',$nc)->first()
+               ?? Historial_clinico::where('id_alu',$sit->id)->first();
     
-            $dPad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Padre')->first();
-            $dMad = Padres::where('id_alu', $alu->id)->where('parentesco', 'Madre')->first();
+            $dPad = Padres::where('no_control',$nc)->where('parentesco','Padre')->first()
+               ?? Padres::where('id_alu',$sit->id)->where('parentesco','Padre')->first();
+            $dMad = Padres::where('no_control',$nc)->where('parentesco','Madre')->first()
+               ?? Padres::where('id_alu',$sit->id)->where('parentesco','Madre')->first();
             $direccion = Direccion::where('id_alu', $alu->id)->first();
             $direccionP = Direccion::where('id_fam', $dPad->id)->first();
             $direccionM = Direccion::where('id_fam', $dMad->id)->first();
     
-            $familiares = Familiar::where('id_alu', $alu->id)->get();
+            $familiares = Familiar::where('no_control',$nc)->get();
+            if ($familiares->isEmpty()) $familiares = Familiar::where('id_alu',$sit->id)->get();
     
-            $person = Personales::where('id_alu', $alu->id)->first();
-            $fam = Datos_familiares::where('id_alu', $alu->id)->first();
-            $soc = Social::where('id_alu', $alu->id)->first();
+            $person = Personales::where('no_control',$nc)->first()
+               ?? Personales::where('id_alu',$sit->id)->first();
+            $fam = Datos_familiares::where('no_control',$nc)->first()
+               ?? Datos_familiares::where('id_alu',$sit->id)->first();
+            $soc = Social::where('no_control',$nc)->first()
+               ?? Social::where('id_alu',$sit->id)->first();
            
             $pdf = PDF::setOptions(['defaultFont' => 'sans-serif'])->loadView('alumnos.sta.pdf', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));       
             return $pdf->stream($alu->no_cont . ".pdf");    

@@ -8,6 +8,7 @@ use App\Models\Paciente;
 use App\User;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Sit\Alumno as SitAlumno;
 
 class PacienteController extends Controller
 {
@@ -128,10 +129,16 @@ class PacienteController extends Controller
             'contacto_emergencia' => 'nullable|string',
             'telefono_emergencia' => 'nullable|string',
         ]);
+        $noControl = null;
+        if (Auth::guard('alumno')->check()) {
+            $sitAlumno = SitAlumno::where('user_id', Auth::guard('alumno')->id())->first();
+            $noControl = $sitAlumno?->no_control;
+        }
         //Agregamos el perfil del paciente si no existe de lo contrario lo actualizamos       
         $paciente = Paciente::updateOrCreate(
             ['user_id' =>$request->input('user_id')],
             [
+                'no_control' => $noControl,
                 'tipo' => $request->input('tipo'),
                 'edad' => $request->input('edad'),
                 'alergias' => $request->input('alergias'),

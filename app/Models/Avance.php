@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Sit\Alumno as SitAlumno;
 
 class Avance extends Model
 {
@@ -20,6 +21,15 @@ class Avance extends Model
     //Relacion con la tablas de alumno(uno) a Avances(muchos)
     public function alumno()
     {
-        return $this->belongsTo('App\Alumno');
+        return $this->belongsTo(SitAlumno::class, 'no_control', 'no_control');
+    }
+
+    public function perfilCreditos()
+    {
+        return $this->belongsTo(
+            \App\Models\AlumnoCreditosPerfil::class,
+            'no_control',
+            'no_control'
+        );
     }
 }
