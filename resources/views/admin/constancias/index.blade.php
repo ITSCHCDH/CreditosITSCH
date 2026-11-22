@@ -326,7 +326,13 @@
 
                             <div class="col-12 col-md-6">
                                 <label class="form-label" for="plan_de_estudios">Plan de estudios</label>
-                                <input type="text" name="plan_de_estudios" id="plan_de_estudios" class="form-control" required placeholder="Ej. ISIC-2010-224">
+                                <select name="plan_de_estudios" id="plan_de_estudios" class="form-select" required>
+                                    <option value="">Seleccione un plan</option>
+                                    @foreach ($planes as $clave)
+                                        <option value="{{ $clave }}">{{ $clave }}</option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted">{{ count($planes) }} planes activos de SIT</small>
                             </div>
                         </div>
                     </div>
@@ -384,7 +390,12 @@
                 $('#jefe_division').val(response['jefe_division']);
                 $('#profesion_jefe_division').val(response['profesion_jefe_division']);
                 $('#division_enunciado').val(response['division_enunciado']);
-                $('#plan_de_estudios').val(response['plan_de_estudios']);
+                var planActual = response['plan_de_estudios'] || '';
+                var $plan = $('#plan_de_estudios');
+                if (planActual && $plan.find('option[value="' + planActual + '"]').length === 0) {
+                    $plan.append($('<option>', { value: planActual, text: planActual + ' (actual)' }));
+                }
+                $plan.val(planActual);
             } else {
                 $('#jefe_division').val('');
                 $('#profesion_jefe_division').val('');

@@ -12,6 +12,7 @@ use App\Models\Constancia;
 use App\Models\Alumno;
 use App\Models\Folio;
 use App\Models\Sit\Carrera as SitCarrera;
+use App\Models\Sit\PlanEstudio;
 use App\Services\Sit\CarrerasSitService;
 use PDF;
 use DB;
@@ -26,6 +27,9 @@ class ConstanciasController extends Controller
     }
     	
     public function index(){
+        // Planes de estudio activos de SIT (solo la clave)
+        $planes = PlanEstudio::where('activo', 1)->orderBy('clave')->pluck('clave');
+
     	if (Auth::User()->hasAnyPermission(['VIP','VIP_CONSTANCIAS'])) {
             //Cosuntamos si existen los datos globales
             $datos_globales = ConstanciaComplemento::where([
@@ -38,6 +42,7 @@ class ConstanciasController extends Controller
             $users = User::select('name','id')->where('email','<>','admin@itsch.com')->orderBy('name','ASC')->get();
             return view('admin.constancias.index')
             ->with('carreras',$carreras)
+            ->with('planes',$planes)
             ->with('abreviaturas',$abreviaturas)
             ->with('users',$users)
             ->with('datos_globales',$datos_globales);
@@ -57,6 +62,7 @@ class ConstanciasController extends Controller
             ])->orderBy('name','ASC')->get();
             return view('admin.constancias.index')
             ->with('carreras',$carreras)
+            ->with('planes',$planes)
             ->with('abreviaturas',$abreviaturas)
             ->with('users',$users)
             ->with('datos_globales',$datos_globales);

@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-22 11:35 · **Entradas registradas:** 58 · **Último commit previo a esta sesión:** `09f2c09` (2026-11-22 11:24).
+**Última entrada:** 2026-11-22 11:37 · **Entradas registradas:** 59 · **Último commit previo a esta sesión:** `79a86cb` (2026-11-22 11:36).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-22 11:37 — Plan de estudios de constancias desde SIT
 - 2026-11-22 11:35 — Carreras de constancias desde SIT
 - 2026-11-22 11:23 — UX de Constancias con tarjetas
 - 2026-11-21 16:44 — UX de Grupos de tutoría
@@ -143,7 +144,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 27 | 2026-11-21 11:49 – 2026-11-22 11:35 |
+| Créditos complementarios | `créditos` | 28 | 2026-11-21 11:49 – 2026-11-22 11:37 |
 | Trayectoria académica | `trayectoria` | 19 | 2026-11-20 18:59 – 2026-11-21 16:44 |
 | Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -172,6 +173,40 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-22 11:37] — Plan de estudios de constancias desde SIT
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Cambiar el campo de plan de estudios por un select conectado a los planes de estudio de SIT, mostrando la clave de todos los planes activos.
+
+**Archivos modificados:**
+- `app/Http/Controllers/ConstanciasController.php` (`index` carga los planes activos)
+- `resources/views/admin/constancias/index.blade.php` (select de plan y soporte de valores previos)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Se consultan las claves de `sit.cat_plan_estudios` con `activo = 1`, ordenadas por clave.
+
+**Decisiones tomadas:**
+- El campo de texto libre se reemplaza por un `select` cuyo valor es la **clave** del plan (ej. `ISIC-2010-224`).
+- Solo se listan planes activos (11 en SIT); se agregó el contador «N planes activos de SIT» como ayuda.
+- Si una constancia guardada tiene una clave que ya no está en el catálogo, el JavaScript la agrega como opción «(actual)» para no perder el dato al editar.
+- Se conserva el nombre del campo (`plan_de_estudios`) y la validación requerida del formulario.
+
+**Pendientes / Deuda técnica:**
+- `ConstanciasController@editarConstancia` sigue sin existir (ruta `constancias.editar`), pendiente previo a este cambio.
+
+**Tests ejecutados:**
+- ✅ 11 comprobaciones: planes desde SIT, solo activos, select sin input de texto, las 11 claves como opciones, contador, soporte de plan legado, guardado de la clave, lectura posterior y rollback.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura revisada.
+
+**Referencias:**
+- `docs/img/constancias-planes.png`
 
 ### [2026-11-22 11:35] — Carreras de constancias desde SIT
 
