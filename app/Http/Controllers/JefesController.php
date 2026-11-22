@@ -16,12 +16,16 @@ use App\Models\Personales;
 use App\Models\Social;
 use App\Models\Sit\Alumno as SitAlumno;
 use App\Services\Sit\CarrerasSitService;
+use App\Services\Sit\TrayectoriaAcademicaService;
 use Alert;
 use App\Services\Sta\FichaAlumnoService;
 
 class JefesController extends Controller
 {
-    public function __construct(private FichaAlumnoService $fichaAlumno)
+    public function __construct(
+        private FichaAlumnoService $fichaAlumno,
+        private TrayectoriaAcademicaService $trayectoria
+    )
     {
         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_COR_CARRERA')->only(['index']);
         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_TUTOR|STA_COR_CARRERA')->only(['generacion','diagnostico','calSemaforos','ficha','storeAlumnoObs']);
@@ -91,7 +95,7 @@ class JefesController extends Controller
 
         foreach ($grupo as $alu) {
             $alu->ficha = optional($fichas->get($alu->control))->ficha_completada ? 1 : 0;
-            $alu->semaforos = self::calSemaforos($alu->control);
+            $alu->semaforos = $this->calSemaforos($alu->control);
         }
 
         return view('sta.analisis_alumnos.index', [
@@ -125,7 +129,7 @@ class JefesController extends Controller
                 ->value('observaciones_tutoria') ?: 'Sin observaciones',
         ];
 
-        $buscarAlumno->semaforos = self::calSemaforos($alumno->no_control);
+        $buscarAlumno->semaforos = $this->calSemaforos($alumno->no_control);
 
         // Grupos en los que está inscrito el alumno
         $GetGrupos = DB::connection('sit')->table('listas')
@@ -136,30 +140,17 @@ class JefesController extends Controller
             ->orderBy('grupos.clave_grupo')
             ->get();
 
-        // Calificaciones parciales por unidad: todas las listas del alumno.
-        // LEFT JOIN porque una materia puede no tener unidades capturadas o
-        // no tener catedratico asignado, y aun asi debe aparecer.
-        $calificaciones = DB::connection('sit')->table('listas')
-            ->leftJoin('grupos', 'grupos.id', '=', 'listas.grupo_id')
-            ->leftJoin('cat_materias', 'cat_materias.id', '=', 'grupos.materia_id')
-            ->leftJoin('catedraticos', 'catedraticos.id', '=', 'listas.catedratico_id')
-            ->leftJoin('users as docente', 'docente.id', '=', 'catedraticos.user_id')
-            ->leftJoin('lista_unidades', 'lista_unidades.lista_id', '=', 'listas.id')
-            ->where('listas.alumno_id', $alumno->id)
-            ->orderBy('listas.id')
-            ->orderBy('lista_unidades.numero_unidad')
-            ->orderByDesc('lista_unidades.oportunidad')
-            ->orderByDesc('lista_unidades.id')
-            ->select(
-                DB::raw("CONCAT_WS(' ', docente.nombre, docente.apellido_paterno, docente.apellido_materno) as profesor"),
-                DB::raw("COALESCE(cat_materias.nombre, 'Materia sin registrar') as ret_NomCompleto"),
-                DB::raw('COALESCE(cat_materias.num_temas, 0) as ret_NumUnidades'),
-                'lista_unidades.calificacion as lsc_Calificacion',
-                'lista_unidades.numero_unidad as lsc_NumUnidad',
-                'lista_unidades.corte as lsc_Corte',
-                'listas.id as lse_clave'
-            )
-            ->get();
+        // Calificaciones parciales centralizadas en el servicio de trayectoria.
+        $calificaciones = $this->trayectoria->materiasUnidades($alumno)
+            ->map(fn ($fila) => (object) [
+                'profesor' => $fila->docente,
+                'ret_NomCompleto' => $fila->materia ?: 'Materia sin registrar',
+                'ret_NumUnidades' => (int) ($fila->num_unidades ?? 0),
+                'lsc_Calificacion' => $fila->calificacion,
+                'lsc_NumUnidad' => $fila->numero_unidad,
+                'lsc_Corte' => $fila->corte,
+                'lse_clave' => $fila->lista_id,
+            ]);
 
         // Una sola fila por unidad (la última oportunidad capturada)
         $unicaPorUnidad = [];
@@ -247,112 +238,21 @@ class JefesController extends Controller
      * (opcion_acreditacion_numerico) y el servicio social de las materias con
      * concepto 'servicio_social'.
      */
-    public static function calSemaforos($nc)
+    public function calSemaforos($nc)
     {
         $alumno = SitAlumno::where('no_control', $nc)->first();
-        $semaforos = [];
-        $status = $alumno ? self::estatusCorto($alumno->estatus) : null;
-
-        $indicesAcad = $alumno ? DB::connection('sit')->table('kardex')
-            ->where('alumno_id', $alumno->id)
-            ->select(
-                DB::raw('SUM(CASE WHEN opcion_acreditacion_numerico = 2 THEN 1 ELSE 0 END) AS nivelacionesOrdinario'),
-                DB::raw('SUM(CASE WHEN opcion_acreditacion_numerico = 3 THEN 1 ELSE 0 END) AS repeticiones'),
-                DB::raw('SUM(CASE WHEN opcion_acreditacion_numerico = 4 THEN 1 ELSE 0 END) AS nivelacionesRepe'),
-                DB::raw('SUM(CASE WHEN opcion_acreditacion_numerico = 5 THEN 1 ELSE 0 END) AS especiales'),
-                DB::raw('SUM(CASE WHEN opcion_acreditacion_numerico = 6 THEN 1 ELSE 0 END) AS nivelacionesEspecial')
-            )
-            ->first() : null;
-
-        if ($indicesAcad !== null && $indicesAcad->nivelacionesOrdinario !== null) {
-            $nivelaciones = (int) $indicesAcad->nivelacionesOrdinario
-                + (int) $indicesAcad->nivelacionesRepe
-                + (int) $indicesAcad->nivelacionesEspecial;
-
-            switch (true) {
-                case $status === 'BD':
-                    $semaforos['semaforoAcad'] = 'CirculoNegro';
-                    $semaforos['titleAcad'] = 'Ya no es posible realizar acciones de seguimiento con este alumno';
-                    break;
-                case (int) $indicesAcad->especiales > 0 || $nivelaciones >= 10 || (int) $indicesAcad->repeticiones > 2 || $status === 'BT':
-                    $semaforos['semaforoAcad'] = 'CirculoRojo';
-                    $semaforos['titleAcad'] = 'El alumno tiene problemas académicos graves, urgente dar seguimiento';
-                    break;
-                case ((int) $indicesAcad->repeticiones <= 2 && ($nivelaciones >= 3 && $nivelaciones < 10)):
-                    $semaforos['semaforoAcad'] = 'CirculoNaranja';
-                    $semaforos['titleAcad'] = 'El alumno tiene problemas académicos moderados, se recomienda dar seguimiento';
-                    break;
-                case $nivelaciones > 1 && $nivelaciones < 3:
-                    $semaforos['semaforoAcad'] = 'CirculoAmarillo';
-                    $semaforos['titleAcad'] = 'El alumno tiene problemas académicos leves, se recomienda observación';
-                    break;
-                case $nivelaciones <= 1:
-                    $semaforos['semaforoAcad'] = 'CirculoVerde';
-                    $semaforos['titleAcad'] = 'El alumno no tiene problemas académicos';
-                    break;
-                default:
-                    $semaforos['semaforoAcad'] = 'CirculoNegro';
-                    $semaforos['titleAcad'] = 'No se pudo calcular el semáforo académico';
-                    break;
-            }
-        } else {
-            $semaforos['semaforoAcad'] = 'CirculoNegro';
-            $semaforos['titleAcad'] = 'Este alumno aún no tiene indicadores académicos registrados';
+        if (! $alumno) {
+            return [
+                'semaforoAcad' => 'CirculoNegro',
+                'titleAcad' => 'Este alumno aún no tiene indicadores académicos registrados',
+                'semaforoPsico' => 'CirculoNegro',
+                'semaforoMedico' => 'CirculoNegro',
+                'semaforoServicio' => 'CirculoNegro',
+                'titleSS' => 'Este alumno no tiene registros de servicio social',
+            ];
         }
 
-        // Los semáforos médico y psicológico aún no tienen fuente en SIT
-        $semaforos['semaforoPsico'] = 'CirculoNegro';
-        $semaforos['semaforoMedico'] = 'CirculoNegro';
-
-        // Servicio social: materias con concepto 'servicio_social' en el kardex
-        $ssExists = $alumno && DB::connection('sit')->table('kardex')
-            ->join('cat_materias', 'cat_materias.id', '=', 'kardex.materia_id')
-            ->where('kardex.alumno_id', $alumno->id)
-            ->where('cat_materias.concepto', 'servicio_social')
-            ->exists();
-
-        if ($ssExists) {
-            $semaforos['semaforoServicio'] = 'CirculoVerde';
-            $semaforos['titleSS'] = 'El servicio social ya fue registrado';
-            return $semaforos;
-        }
-
-        $plan = $alumno?->planEstudio;
-        if (! $alumno || ! $plan) {
-            $semaforos['semaforoServicio'] = 'CirculoNegro';
-            $semaforos['titleSS'] = 'Este alumno no tiene registros de servicio social';
-            return $semaforos;
-        }
-
-        if ($status === 'BT' || $status === 'BD') {
-            $semaforos['semaforoServicio'] = 'CirculoNegro';
-            $semaforos['titleSS'] = 'El status del alumno es baja, consultar con servicios escolares';
-            return $semaforos;
-        }
-
-        $creditosAcumulados = (int) DB::connection('sit')->table('kardex')
-            ->where('alumno_id', $alumno->id)
-            ->where('acreditada', 1)
-            ->sum('creditos_materia');
-        $creditosTotales = max(1, (int) $plan->creditos_totales);
-        $credAvance = ($creditosAcumulados * 100) / $creditosTotales;
-        $semestre = (int) $alumno->semestre_actual;
-
-        if ($semestre <= 7) {
-            $semaforos['semaforoServicio'] = 'CirculoAzul';
-            $semaforos['titleSS'] = 'Este alumno aún no reune los requisitos para tramitar servicio social';
-        } elseif ($semestre == 8 && $credAvance >= 80) {
-            $semaforos['semaforoServicio'] = 'CirculoNaranja';
-            $semaforos['titleSS'] = 'Verificar que el alumno este realizando servicio social';
-        } elseif ($semestre >= 9) {
-            $semaforos['semaforoServicio'] = 'CirculoRojo';
-            $semaforos['titleSS'] = 'Servicio social retrasado, urgente dar seguimiento';
-        } else {
-            $semaforos['semaforoServicio'] = 'CirculoNegro';
-            $semaforos['titleSS'] = 'Este alumno no tiene registros de servicio social';
-        }
-
-        return $semaforos;
+        return $this->trayectoria->semaforos($alumno);
     }
 
     public function ficha($nc, $usr)
@@ -464,13 +364,7 @@ class JefesController extends Controller
     /** Generaciones disponibles según sit.alumnos.anio_ingreso. */
     private function generacionesParaVista()
     {
-        return SitAlumno::query()
-            ->select('anio_ingreso')
-            ->where('anio_ingreso', '>', 0)
-            ->whereNotNull('anio_ingreso')
-            ->distinct()
-            ->orderByDesc('anio_ingreso')
-            ->pluck('anio_ingreso')
+        return $this->trayectoria->generaciones()
             ->map(fn ($anio) => (object) ['Alu_AnioIngreso' => (int) $anio]);
     }
 

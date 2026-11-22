@@ -122,4 +122,14 @@ class Alumno extends Model
     {
         return $this->hasMany(Participante::class, 'no_control', 'no_control');
     }
+
+    public function servicioSocial(): HasOne
+    {
+        return $this->hasOne(ServicioSocialAlumno::class, 'alumno_id');
+    }
+
+    public function residencia(): HasOne
+    {
+        return $this->hasOne(ResidenciaAlumno::class, 'alumno_id');
+    }
 }

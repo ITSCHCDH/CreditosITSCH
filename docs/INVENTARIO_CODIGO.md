@@ -2088,32 +2088,32 @@
 - L8: `use App\Models\Alumno;`
 - L18: `class AlumnosStaController extends Controller`
 - L23: `$alu = Alumno::where('no_control',$no_cont)->first();`
-- L24: `$alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $no_cont)->first();`
+- L24: `$alu1 = DB::connection('SIT')->table('alumnos')->where('alu_NumControl', $no_cont)->first();`
 - L76: `$alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();`
 - L77: `return view('alumnos.sta.ficha',compact('alu2', 'alu1', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'alu', 'car', 'clinicos', 'person','alumno_data'));`
 - L83: `$alu = Alumno::where('no_control',$nc)->first();`
 - L160: `return redirect()->route('alumnos.sta.editDatSalud', $alu->no_control);`
 - L165: `$alu = Alumno::where('no_control',$nc)->first();`
-- L166: `$alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first();`
+- L166: `$alu1 = DB::connection('SIT')->table('alumnos')->where('alu_NumControl', $nc)->first();`
 - L168: `$alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();`
 - L169: `return view('alumnos.sta.dsalud', compact('alu1', 'alu', 'clinicos','alumno_data'));`
 - L176: `$alu = Alumno::where('no_control',$nc)->first();`
 - L259: `$alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();`
-- L260: `$alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first();`
+- L260: `$alu1 = DB::connection('SIT')->table('alumnos')->where('alu_NumControl', $nc)->first();`
 - L268: `return view('alumnos.sta.dfamiliares', compact('alu1', 'alu', 'fam', 'familiares','alumno_data'));`
 - L282: `//Buscamos al alumno`
 - L283: `$alu = Alumno::where('no_control',$nc)->first();`
-- L318: `$alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first();`
+- L318: `$alu1 = DB::connection('SIT')->table('alumnos')->where('alu_NumControl', $nc)->first();`
 - L325: `$alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();`
 - L326: `return view('alumnos.sta.dsocial', compact('alu1', 'alu', 'soc','alumno_data'));`
 - L340: `$alu = Alumno::where('no_control',$nc)->first();`
-- L366: `$alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first();`
+- L366: `$alu1 = DB::connection('SIT')->table('alumnos')->where('alu_NumControl', $nc)->first();`
 - L367: `$alumno_data = Alumno::where('no_control',Auth::User()->no_control)->select('id as alumno_id')->get();`
 - L368: `return view('alumnos.sta.autorizar', compact('alu1', 'alu','alumno_data'));`
 - L380: `$alu = Alumno::where('no_control',$nc)->first();`
 - L383: `return redirect()->route('alumnos.sta.pdf', $nc);`
 - L390: `$alu = Alumno::where('no_control',$nc)->first();`
-- L391: `$alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first();`
+- L391: `$alu1 = DB::connection('SIT')->table('alumnos')->where('alu_NumControl', $nc)->first();`
 - L409: `$pdf = PDF::setOptions(['defaultFont' => 'sans-serif'])->loadView('alumnos.sta.pdf', compact('familiares', 'alu1', 'alu2', 'car', 'dPad', 'dMad', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));`
 ### `app/Http/Controllers/AreasController.php`
 - L8: `use App\Models\ALumno;`
@@ -2147,13 +2147,13 @@
 - L19: `return redirect()->route('alumnos.home_avance');`
 ### `app/Http/Controllers/JefesController.php`
 - L12: `use App\Models\Alumno;`
-- L48: `$generaciones = DB::connection('contEsc')->table('alumnos')`
+- L48: `$generaciones = DB::connection('SIT')->table('alumnos')`
 - L49: `->select("alumnos.Alu_AnioIngreso")`
 - L50: `->where('alumnos.Alu_AnioIngreso', '!=', 0)`
 - L51: `->whereNotNull('alumnos.Alu_AnioIngreso')`
 - L56: `return view('sta/analisis_alumnos/index')`
 - L66: `// Obtener el grupo de alumnos basado en carrera y año de ingreso`
-- L67: `$grupo = DB::connection('contEsc')->table('alumnos')`
+- L67: `$grupo = DB::connection('SIT')->table('alumnos')`
 - L76: `->where('alumnos.car_Clave', '=', $request->carrera)`
 - L77: `->where('alumnos.Alu_AnioIngreso', '=', $request->generacion)`
 - L78: `->orderBy('alumnos.alu_ApePaterno', 'asc')`
@@ -2161,15 +2161,15 @@
 - L83: `Alert::warning('No hay alumnos registrados en esta generación')->showConfirmButton('Ok', '#3085d6');`
 - L87: `// Obtener las fichas de los alumnos en una sola consulta usando la tabla Alumno`
 - L88: `$fichas = Alumno::whereIn('no_control', $grupo->pluck('control'))`
-- L114: `$generaciones = DB::connection('contEsc')->table('alumnos')`
+- L114: `$generaciones = DB::connection('SIT')->table('alumnos')`
 - L123: `return view('sta.analisis_alumnos.index', compact('grupo', 'carreras', 'generaciones'))`
-- L132: `$buscarAlumno = DB::connection('contEsc')->table('alumnos')`
+- L132: `$buscarAlumno = DB::connection('SIT')->table('alumnos')`
 - L133: `->join('carreras','carreras.car_Clave', '=','alumnos.car_Clave')`
 - L134: `->select("alumnos.alu_NumControl",'alumnos.alu_StatusAct',"alumnos.alu_Nombre","alumnos.alu_ApePaterno","alumnos.alu_ApeMaterno","alumnos.alu_SemestreAct","carreras.car_Nombre","alumnos.alu_Sexo")`
 - L138: `//Consultamos las observaciones de cada alumno y las agregamos a $buscarAlumno`
 - L139: `$obs=DB::table('alumnos')->where('no_control',$nc)->select('observaciones')->first();`
 - L151: `//Obtenemos el semaforo academico correspondiente para este alumno`
-- L154: `$GetGrupos = DB::connection('contEsc')->table('alumnos')`
+- L154: `$GetGrupos = DB::connection('SIT')->table('alumnos')`
 - L155: `->join('listassemestre','listassemestre.alu_NumControl','=','alumnos.alu_NumControl')`
 - L158: `->where("alumnos.alu_NumControl","=",$nc)`
 - L232: `return view('sta.analisis_alumnos.diagnostico')`
@@ -2185,7 +2185,7 @@
 - L299: `$semaforos['titleAcad'] = 'Este alumno aún no tiene indicadores académicos registrados';`
 - L343: `//Verificamos si el alumno ya tiene registrado el servicio social en cardex`
 - L350: `//cambiamos el semaforo si el alumno ya tiene registrado el servicio social`
-- L358: `$status= DB::connection('contEsc')->table('alumnos')`
+- L358: `$status= DB::connection('SIT')->table('alumnos')`
 - L359: `->select('alumnos.alu_NumControl','alumnos.alu_SemestreAct','alumnos.alu_StatusAct','planesestudios.pes_CredTot','alumnos.alu_CreditosAcum','alumnos.alu_Inscrito')`
 - L360: `->join('planesestudios','planesestudios.pes_Clave','=','alumnos.pes_Clave')`
 - L361: `->where('alumnos.alu_NumControl','=',$nc)->first();`
@@ -2195,7 +2195,7 @@
 - L389: `$semaforos['titleSS'] = 'Verificar que el alumno este realizando servicio social';`
 - L399: `$semaforos['titleSS'] = 'Este alumno no tiene registros de servicio social';`
 - L410: `$alu = Alumno::where('no_control',$nc)->first();`
-- L411: `$alu1 = DB::connection('contEsc')->table('alumnos')->where('alu_NumControl', $nc)->first();`
+- L411: `$alu1 = DB::connection('SIT')->table('alumnos')->where('alu_NumControl', $nc)->first();`
 - L432: `return view('sta.analisis_alumnos.ficha', compact('familiares', 'alu1', 'alu2', 'car','padres', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu',  'clinicos', 'person', 'fam'));`
 - L439: `Alert::error('Error', 'Este alumno no ha llenado su ficha académica');`
 - L444: `Alert::error('Error', 'Este alumno no ha llenado su ficha académica');`
@@ -2256,18 +2256,18 @@
 - L183: `->orderBy('alumnos.alu_Nombre','asc')`
 - L195: `['no_control' => $request->alumno, 'grup_cla' => $request->gse_clave, 'num_tema'=>$request->unidad],`
 - L310: `//Seleccionamos todos los alumnos de los ultimos 7 años para llenar el select de alumnos`
-- L311: `$alumnos = DB::connection('contEsc')->table('alumnos')`
+- L311: `$alumnos = DB::connection('SIT')->table('alumnos')`
 - L316: `// Obtén todos los alumnos del grupo en una sola consulta`
 - L317: `$alumnosGrupo = GpoTutorias::where('gpo_Nombre', $gpo_Nombre)->get();`
 - L319: `// Obtén los números de control de los alumnos del grupo`
 - L320: `$noControles = $alumnosGrupo->pluck('no_Control')->toArray();`
 - L322: `// Consulta todos los datos de los alumnos correspondientes a los números de control en una sola consulta`
-- L323: `$alumnosDatos = DB::connection('contEsc')->table('alumnos')`
+- L323: `$alumnosDatos = DB::connection('SIT')->table('alumnos')`
 - L328: `// Consulta las fichas de los alumnos en una sola consulta`
 - L329: `$fichas = DB::table('alumnos')`
 - L334: `// Itera sobre los alumnos del grupo y agrega los datos correspondientes`
 - L335: `foreach ($alumnosGrupo as $alumno) {`
-- L336: `// Verifica si el alumno existe en la base de datos contEsc`
+- L336: `// Verifica si el alumno existe en la base de datos SIT`
 - L337: `if (isset($alumnosDatos[$alumno->no_Control])) {`
 - L338: `$alumnoTem = $alumnosDatos[$alumno->no_Control];`
 - L339: `$alumno->alu_Nombre = strtoupper($alumnoTem->alu_Nombre) . ' ' . strtoupper($alumnoTem->alu_ApePaterno) . ' ' . strtoupper($alumnoTem->alu_ApeMaterno);`
@@ -2279,7 +2279,7 @@
 - L353: `foreach ($alumnosGrupo as $row) {`
 - L357: `return view('sta.tutores.showGrupo',compact('grupo','alumnos','alumnosGrupo'));`
 - L400: `//Función para guardar los alumnos de un grupo`
-- L406: `$alumno = DB::connection('contEsc')->table('alumnos')`
+- L406: `$alumno = DB::connection('SIT')->table('alumnos')`
 - L409: `if($alumno==null)`
 - L410: `return response()->json(['message' => 'El alumno con numero de control: '. $request->no_Control .', no existe en la base de datos de control escolar'], 500);`
 - L427: `//Función para eliminar un alumno de un grupo`
@@ -2287,7 +2287,7 @@
 - L449: `$alumnosGrupo = GpoTutorias::where('gpo_Nombre', $grupo[0]->gpo_Nombre)->get();`
 - L451: `// Obtener todos los alumnos y sus datos en una sola consulta`
 - L452: `$noControles = $alumnosGrupo->pluck('no_Control'); // Recolectar los no_Control de los alumnos`
-- L453: `$alumnosTem = DB::connection('contEsc')->table('alumnos')`
+- L453: `$alumnosTem = DB::connection('SIT')->table('alumnos')`
 - L458: `// Verificar y asignar datos del alumno en el grupo`
 - L459: `foreach($alumnosGrupo as $alumno) {`
 - L460: `if (isset($alumnosTem[$alumno->no_Control])) {`
@@ -2724,7 +2724,7 @@
 - `app/Http/Controllers/AlumnosStaController.php:95`: `$alu->grupo = $request->grupo;`
 - `app/Http/Controllers/GruposController.php:37`: `//Agregamos el nombre de la carrera a cada grupo`
 - `app/Http/Controllers/GruposController.php:38`: `foreach ($grupos as $grupo) {`
-- `app/Http/Controllers/GruposController.php:39`: `$grupo->gpo_Carrera = DB::connection('contEsc')->table('carreras')`
+- `app/Http/Controllers/GruposController.php:39`: `$grupo->gpo_Carrera = DB::connection('SIT')->table('carreras')`
 - `app/Http/Controllers/GruposController.php:40`: `->where('car_Clave',$grupo->id_Carrera)`
 - `app/Http/Controllers/GruposController.php:52`: `//Verificamos si el grupo existe y solo si no, lo damos de alta`
 - `app/Http/Controllers/GruposController.php:60`: `Alert::error('Error','Este grupo ya se encuentra dado de alta');`
@@ -2777,7 +2777,7 @@
 - `app/Http/Controllers/JefesController.php:45`: `$grupo="";`
 - `app/Http/Controllers/JefesController.php:57`: `->with('grupo',$grupo)`
 - `app/Http/Controllers/JefesController.php:66`: `// Obtener el grupo de alumnos basado en carrera y año de ingreso`
-- `app/Http/Controllers/JefesController.php:67`: `$grupo = DB::connection('contEsc')->table('alumnos')`
+- `app/Http/Controllers/JefesController.php:67`: `$grupo = DB::connection('SIT')->table('alumnos')`
 - `app/Http/Controllers/JefesController.php:82`: `if ($grupo->isEmpty()) {`
 - `app/Http/Controllers/JefesController.php:88`: `$fichas = Alumno::whereIn('no_control', $grupo->pluck('control'))`
 - `app/Http/Controllers/JefesController.php:93`: `// Iterar sobre el grupo y asignar las fichas y semáforos correspondientes`

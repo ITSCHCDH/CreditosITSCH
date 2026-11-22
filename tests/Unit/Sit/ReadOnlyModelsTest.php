@@ -5,6 +5,8 @@ use App\Models\Sit\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\Sit\ServicioSocialAlumno;
+use App\Models\Sit\ResidenciaAlumno;
 
 it('prohibe save en Alumno y User', function () {
     foreach ([new Alumno(), new User()] as $model) {
@@ -50,7 +52,9 @@ it('expone correctamente las relaciones de Alumno', function () {
         ->and($alumno->bajas())->toBeInstanceOf(HasMany::class)
         ->and($alumno->perfilCreditos())->toBeInstanceOf(HasOne::class)
         ->and($alumno->avances())->toBeInstanceOf(HasMany::class)
-        ->and($alumno->participantes())->toBeInstanceOf(HasMany::class);
+        ->and($alumno->participantes())->toBeInstanceOf(HasMany::class)
+        ->and($alumno->servicioSocial())->toBeInstanceOf(HasOne::class)
+        ->and($alumno->residencia())->toBeInstanceOf(HasOne::class);
 });
 
 it('expone correctamente las relaciones de User', function () {
