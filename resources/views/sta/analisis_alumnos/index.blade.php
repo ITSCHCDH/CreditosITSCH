@@ -217,7 +217,11 @@
                                 <td><span class="badge rounded-pill {{ $estatusClase }}">{{ $estatusTexto }}</span></td>
                                 <td>
                                     <div class="sta-semaforos">
-                                        <span class="{{ $gru->semaforos['semaforoAcad'] }}" data-mdb-toggle="tooltip" title="Académico: {{ $gru->semaforos['titleAcad'] }}"></span>
+                                        <a href="{{ route('analisis.alumno', $gru->control) }}"
+                                           class="{{ $gru->semaforos['semaforoAcad'] }}"
+                                           data-mdb-toggle="tooltip"
+                                           title="Académico: {{ $gru->semaforos['titleAcad'] }}"
+                                           aria-label="Ver diagnóstico académico"></a>
                                         <span class="{{ $gru->semaforos['semaforoMedico'] }}" data-mdb-toggle="tooltip" title="Médico"></span>
                                         <span class="{{ $gru->semaforos['semaforoPsico'] }}" data-mdb-toggle="tooltip" title="Psicológico"></span>
                                         <span class="{{ $gru->semaforos['semaforoServicio'] }}" data-mdb-toggle="tooltip" title="Servicio social: {{ $gru->semaforos['titleSS'] }}"></span>
@@ -227,15 +231,12 @@
                                     <a href="{{ route('analisis.alumno', $gru->control) }}" class="btn btn-sm btn-primary" data-mdb-toggle="tooltip" title="Ver diagnóstico">
                                         <i class="fa-solid fa-magnifying-glass-chart"></i>
                                     </a>
-                                    @if ($gru->ficha == 1)
-                                        <a href="{{ route('analisis.ficha', [$gru->control, 1]) }}" class="btn btn-sm btn-outline-secondary" data-mdb-toggle="tooltip" title="Ver ficha">
-                                            <i class="fa-solid fa-file-invoice"></i>
-                                        </a>
-                                    @else
-                                        <button type="button" class="btn btn-sm btn-light" disabled data-mdb-toggle="tooltip" title="El alumno aún no llena su ficha">
-                                            <i class="fa-solid fa-file-invoice"></i>
-                                        </button>
-                                    @endif
+                                    <a href="{{ route('analisis.ficha', [$gru->control, 1]) }}"
+                                       class="btn btn-sm {{ $gru->ficha == 1 ? 'btn-outline-success' : 'btn-outline-secondary' }}"
+                                       data-mdb-toggle="tooltip"
+                                       title="{{ $gru->ficha == 1 ? 'Ver ficha completada' : 'Ver avance de llenado de ficha' }}">
+                                        <i class="fa-solid {{ $gru->ficha == 1 ? 'fa-file-circle-check' : 'fa-file-pen' }}"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

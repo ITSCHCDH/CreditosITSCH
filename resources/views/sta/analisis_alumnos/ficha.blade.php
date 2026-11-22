@@ -14,7 +14,9 @@
             </div>
         @endif
         <?php
-            $anios = \Carbon\Carbon::parse($alu2->alc_FechaNac)->age;
+            $anios = $alu2->alc_FechaNac
+                ? \Carbon\Carbon::parse($alu2->alc_FechaNac)->age
+                : 'No registrada';
             $enfermedades = "";
             $discapacidades = "";
             if($alu1->alu_Sexo =="M" ){

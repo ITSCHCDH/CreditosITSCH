@@ -288,27 +288,143 @@ class JefesController extends Controller
                 'id' => $alumnoSit->id,
                 'no_control' => $alumnoSit->no_control,
                 'ficha_completada' => (bool) ($perfil?->ficha_completada),
+                'foto' => $perfil?->foto,
+                'lug_pro' => $ficha['complemento']?->ciudad
+                    ?: ($ficha['complemento']?->municipio?->nombre ?: 'No registrado'),
+                'tel' => $alumnoSit->user?->celular,
+                'email' => $alumnoSit->email_institucional ?: $alumnoSit->user?->email,
+                'emailPer' => $ficha['complemento']?->email_personal,
+                'est_civ' => 'No registrada',
+                'grupo' => null,
             ];
             $idAlu = $alumnoSit->id;
 
-            $clinicos = $historico['clinicos'];
-            $padres = $historico['padres'];
-
-            if ($padres->count() == 2) {
-                $direccion = $historico['direccion'];
-                $direccionP = $historico['direccion_padre'];
-                $direccionM = $historico['direccion_madre'];
-                $familiares = $historico['familiares'];
-                $person = $historico['personales'];
-                $fam = $historico['datos_familiares'];
-                $soc = $historico['social'];
-                $discapacidades = $ficha['discapacidades'];
-
-                return view('sta.analisis_alumnos.ficha', compact('familiares', 'alu1', 'alu2', 'car', 'padres', 'direccion', 'direccionP', 'direccionM', 'soc', 'alu', 'clinicos', 'person', 'fam', 'sitUrl', 'discapacidades'));
+            $datoMedico = $ficha['dato_medico'];
+            $nombresDiscapacidades = collect($ficha['discapacidades'] ?? [])
+                ->pluck('nombre')
+                ->filter()
+                ->implode(', ');
+            $clinicos = $historico['clinicos'] ?: (object) [
+                'enfermedad' => $datoMedico?->enfermedades_cronicas ?: 'No registrada',
+                'diabetes' => '', 'hipertension' => '', 'epilepsia' => '',
+                'anorexia' => '', 'bulimia' => '', 'sexual' => '',
+                'depresion' => '', 'tristeza' => '',
+                'otra_enf' => $datoMedico?->medicamentos_controlados ?: '',
+                'cap_dif' => $datoMedico?->discapacidad ? 'Sí' : 'No',
+                'vista' => '', 'oido' => '', 'lenguaje' => '', 'motora' => '',
+                'otra_dif' => $nombresDiscapacidades ?: '',
+                'dia_med' => 'No registrada', 'cuanto_med' => '',
+                'dia_psico' => 'No registrada', 'cuanto_psico' => '',
+                'estatura' => '', 'peso' => '',
+                'sangre' => $alu2->alc_TipoSangre ?: 'No registrada',
+            ];
+            foreach ([
+                'enfermedad' => 'No registrada', 'diabetes' => '', 'hipertension' => '',
+                'epilepsia' => '', 'anorexia' => '', 'bulimia' => '', 'sexual' => '',
+                'depresion' => '', 'tristeza' => '', 'otra_enf' => '',
+                'cap_dif' => 'No', 'vista' => '', 'oido' => '', 'lenguaje' => '',
+                'motora' => '', 'otra_dif' => '',
+                'dia_med' => 'No registrada', 'cuanto_med' => '',
+                'dia_psico' => 'No registrada', 'cuanto_psico' => '',
+                'estatura' => '', 'peso' => '',
+                'sangre' => $alu2->alc_TipoSangre ?: 'No registrada',
+            ] as $propiedad => $valor) {
+                if (! property_exists($clinicos, $propiedad) || $clinicos->{$propiedad} === null) {
+                    $clinicos->{$propiedad} = $valor;
+                }
             }
+            $padres = collect($historico['padres'] ?? []);
+            $padre = $padres->firstWhere('parentesco', 'Padre') ?: (object) [
+                'nombre' => $ficha['complemento']?->nombre_padre ?: 'No registrado',
+                'edad' => '',
+                'tel' => $ficha['complemento']?->telefono_padre ?: '',
+                'profesion' => '',
+                'ocupacion' => $ficha['complemento']?->ocupacion_padre ?: 'No registrada',
+            ];
+            $madre = $padres->firstWhere('parentesco', 'Madre') ?: (object) [
+                'nombre' => $ficha['complemento']?->nombre_madre ?: 'No registrada',
+                'edad' => '',
+                'tel' => $ficha['complemento']?->telefono_madre ?: '',
+                'profesion' => '',
+                'ocupacion' => $ficha['complemento']?->ocupacion_madre ?: 'No registrada',
+            ];
+            $padres = collect([$padre, $madre]);
+            $direccion = $historico['direccion'] ?: (object) [
+                'estado' => $ficha['complemento']?->estado?->nombre,
+                'municipio' => $ficha['complemento']?->municipio?->nombre,
+                'cp' => $alu2->alc_CodPostal,
+                'colonia' => $alu2->alc_Colonia,
+                'direccion' => $alu2->alc_Direccion,
+            ];
+            $direccionP = $historico['direccion_padre'] ?? (object) [
+                'estado' => '', 'municipio' => '', 'cp' => '', 'colonia' => '', 'direccion' => '',
+            ];
+            $direccionM = $historico['direccion_madre'] ?? (object) [
+                'estado' => '', 'municipio' => '', 'cp' => '', 'colonia' => '', 'direccion' => '',
+            ];
+            $familiares = collect($historico['familiares'] ?? []);
+            $person = $historico['personales'] ?: (object) [
+                'trab' => 'No registrada',
+                'casa' => 'No registrada',
+                'num_person' => '',
+                'parentesco' => '',
+            ];
+            foreach (['trab' => 'No registrada', 'casa' => 'No registrada', 'num_person' => '', 'parentesco' => ''] as $propiedad => $valor) {
+                if (! property_exists($person, $propiedad) || $person->{$propiedad} === null) {
+                    $person->{$propiedad} = $valor;
+                }
+            }
+            $fam = $historico['datos_familiares'] ?: (object) [
+                'dificultades' => 'No registrada',
+                'ligado' => '',
+                'ligado_por' => '',
+                'edu' => '',
+                'carrera' => '',
+                'otro_dato' => '',
+            ];
+            foreach ([
+                'dificultades' => 'No registrada', 'ligado' => '', 'ligado_por' => '',
+                'edu' => '', 'carrera' => '', 'otro_dato' => '',
+            ] as $propiedad => $valor) {
+                if (! property_exists($fam, $propiedad) || $fam->{$propiedad} === null) {
+                    $fam->{$propiedad} = $valor;
+                }
+            }
+            $soc = $historico['social'] ?: (object) [
+                'rel_comp' => 'No registrada', 'comp_por' => '',
+                'rel_amig' => 'No registrada', 'amig_por' => '',
+                'pareja' => 'No registrada',
+                'rel_prof' => 'No registrada', 'prof_por' => '',
+                'rel_auto_ac' => 'No registrada', 'auto_ac_por' => '',
+                'tiempo_lib' => 'No registrado', 'recreativa' => 'No registrada',
+                'planes_in' => 'No registrados', 'metas_vida' => 'No registradas',
+                'yo_soy' => 'No registrado', 'caracter' => 'No registrado',
+                'me_gusta' => 'No registrado', 'aspiraciones' => 'No registradas',
+                'miedo' => 'No registrado',
+            ];
+            foreach ([
+                'rel_comp' => 'No registrada', 'comp_por' => '',
+                'rel_amig' => 'No registrada', 'amig_por' => '',
+                'pareja' => 'No registrada',
+                'rel_prof' => 'No registrada', 'prof_por' => '',
+                'rel_auto_ac' => 'No registrada', 'auto_ac_por' => '',
+                'tiempo_lib' => 'No registrado', 'recreativa' => 'No registrada',
+                'planes_in' => 'No registrados', 'metas_vida' => 'No registradas',
+                'yo_soy' => 'No registrado', 'caracter' => 'No registrado',
+                'me_gusta' => 'No registrado', 'aspiraciones' => 'No registradas',
+                'miedo' => 'No registrado',
+            ] as $propiedad => $valor) {
+                if (! property_exists($soc, $propiedad) || $soc->{$propiedad} === null) {
+                    $soc->{$propiedad} = $valor;
+                }
+            }
+            $discapacidades = $ficha['discapacidades'];
 
-            Alert::error('Error', 'Este alumno no ha llenado su ficha académica');
-            return $usr == 1 ? redirect()->route('analisis.index') : back();
+            return view('sta.analisis_alumnos.ficha', compact(
+                'familiares', 'alu1', 'alu2', 'car', 'padres', 'direccion',
+                'direccionP', 'direccionM', 'soc', 'alu', 'clinicos', 'person',
+                'fam', 'sitUrl', 'discapacidades'
+            ));
         } catch (\Throwable $e) {
             report($e);
             Alert::error('Error', 'Ocurrió un error al cargar la ficha: '.$e->getMessage());

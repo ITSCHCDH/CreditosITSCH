@@ -143,5 +143,7 @@ it('mantiene disponibles las rutas STA principales', function () {
     expect(Route::has('analisis.index'))->toBeTrue()
         ->and(Route::has('profesores.index'))->toBeTrue()
         ->and(Route::has('tutorias.index'))->toBeTrue()
-        ->and(Route::has('alumnos.sta.ficha'))->toBeTrue();
+        ->and(Route::has('alumnos.sta.ficha'))->toBeTrue()
+        ->and(Route::has('analisis.alumno'))->toBeTrue()
+        ->and(Route::has('analisis.ficha'))->toBeTrue();
 });
