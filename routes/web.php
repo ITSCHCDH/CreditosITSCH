@@ -257,6 +257,8 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::post('/sta/analisis/generación',[JefesController::class,'generacion'])->name('analisis.generacion');
     Route::get('/sta/analisis/alumno/{nc}',[JefesController::class,'diagnostico'])->name('analisis.alumno'); 
     Route::get('/sta/analisis/ficha/{nc}/{usr}',[JefesController::class,'ficha'])->name('analisis.ficha'); 
+    Route::post('/sta/analisis/ficha/{nc}/familiares/guardar',[JefesController::class,'guardarDatosFamiliares'])->name('analisis.ficha.familiares.guardar');
+    Route::post('/sta/analisis/ficha/{nc}/social/guardar',[JefesController::class,'guardarDatosSociales'])->name('analisis.ficha.social.guardar');
     Route::get('/sta/pdf/{nc}', [AlumnosStaController::class,'pdf'])->name('analisis.sta.pdf');      
 
     //Rutas profesores

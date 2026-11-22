@@ -255,6 +255,64 @@ class JefesController extends Controller
         return $this->trayectoria->semaforos($alumno);
     }
 
+    public function guardarDatosFamiliares(Request $request, $nc)
+    {
+        $alumno = SitAlumno::where('no_control', $nc)->first();
+        if (! $alumno) {
+            Alert::error('Error', 'El alumno no existe en SIT');
+            return back();
+        }
+
+        $dato = Datos_familiares::where('no_control', $nc)->first()
+            ?? Datos_familiares::where('id_alu', $alumno->id)->first();
+        if (! $dato) {
+            $dato = new Datos_familiares();
+            $dato->no_control = $nc;
+            $dato->id_alu = $alumno->id;
+        }
+        $dato->dificultades = $request->input('dificultades');
+        $dato->ligado = $request->input('ligado');
+        $dato->ligado_por = $request->input('ligado_por');
+        $dato->edu = $request->input('edu');
+        $dato->carrera = $request->input('carrera');
+        $dato->otro_dato = $request->input('otro_dato');
+        $dato->save();
+
+        Alert::success('Correcto', 'Los datos familiares fueron guardados en créditos');
+        return back();
+    }
+
+    public function guardarDatosSociales(Request $request, $nc)
+    {
+        $alumno = SitAlumno::where('no_control', $nc)->first();
+        if (! $alumno) {
+            Alert::error('Error', 'El alumno no existe en SIT');
+            return back();
+        }
+
+        $social = Social::where('no_control', $nc)->first()
+            ?? Social::where('id_alu', $alumno->id)->first();
+        if (! $social) {
+            $social = new Social();
+            $social->no_control = $nc;
+            $social->id_alu = $alumno->id;
+        }
+
+        $campos = [
+            'rel_comp', 'comp_por', 'rel_amig', 'amig_por', 'pareja',
+            'rel_prof', 'prof_por', 'rel_auto_ac', 'auto_ac_por',
+            'tiempo_lib', 'recreativa', 'planes_in', 'metas_vida',
+            'yo_soy', 'caracter', 'me_gusta', 'aspiraciones', 'miedo',
+        ];
+        foreach ($campos as $campo) {
+            $social->{$campo} = $request->input($campo);
+        }
+        $social->save();
+
+        Alert::success('Correcto', 'Los datos sociales fueron guardados en créditos');
+        return back();
+    }
+
     public function ficha($nc, $usr)
     {
         try {
