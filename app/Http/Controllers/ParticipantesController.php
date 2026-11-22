@@ -429,9 +429,15 @@ class ParticipantesController extends Controller
 
     public function participantesBusqueda(Request $request){
         if($request->peticion == 0){
+            $termino = trim((string) $request->nombre);
             $lista_alumnos = SitAlumno::with('user')
-                ->whereHas('user', function ($query) use ($request) {
-                    $query->where('nombre', 'like', "%{$request->nombre}%");
+                ->where(function ($query) use ($termino) {
+                    $query->where('no_control', 'like', "%{$termino}%")
+                        ->orWhereHas('user', function ($userQuery) use ($termino) {
+                            $userQuery->where('nombre', 'like', "%{$termino}%")
+                                ->orWhere('apellido_paterno', 'like', "%{$termino}%")
+                                ->orWhere('apellido_materno', 'like', "%{$termino}%");
+                        });
                 })
                 ->orderBy('no_control')
                 ->get()

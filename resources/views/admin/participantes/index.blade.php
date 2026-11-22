@@ -8,6 +8,8 @@
         .participant-control-card{margin-bottom:1rem;padding:1.25rem}
         .participant-control-card h1{margin:0;color:#102b4a;font-size:1.25rem;font-weight:700}
         .participant-control-card p{margin:.2rem 0 0;color:#6b7280;font-size:.88rem}
+        .participant-selection-divider{height:1px;margin:.25rem 0 .9rem;background:#edf1f5}
+        .participant-mass-field{height:100%;padding:1rem;border:1px solid #e7edf4;border-radius:1rem;background:#f8fafc}
         .participant-summary-card{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin-bottom:1rem}
         .participant-summary-item{padding:.9rem 1rem;border-right:1px solid #edf1f5}
         .participant-summary-item:last-child{border-right:0}
@@ -43,7 +45,7 @@
         @endif
     </div>
     <div class="row g-3">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <label class="form-label" for="actividades_id">Actividad</label>
             <select name="actividades_id" id="actividades_id" required class="form-select">
                 @foreach ($actividades as $act)
@@ -51,36 +53,53 @@
                 @endforeach
             </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <label class="form-label" for="responsables_id">Responsable</label>
             <select name="responsables_id[]" id="responsables_id" class="form-select" required></select>
         </div>
-        @if (Auth::User()->hasAnyPermission(['AGREGAR_PARTICIPANTES','VIP']))
-            <div class="col-md-4">
-                <label class="form-label" for="participante_nombre">Alumno</label>
-                <input id="participante_nombre" type="text" placeholder="Nombre del alumno" class="form-control">
-            </div>
-        @endif
     </div>
     @if (Auth::User()->hasAnyPermission(['AGREGAR_PARTICIPANTES','VIP']))
         <form id="frm" method="POST" class="mt-3">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-9">
-                    <label class="form-label" for="no_control">Número de control</label>
+            <div class="participant-selection-divider"></div>
+            <div class="row g-3 align-items-start">
+                <div class="col-md-7">
                     <input type="hidden" value="{{ csrf_token() }}" id="token">
                     <input type="hidden" name="id_actividad" id="id_actividad_oculto" value="-1">
                     <input type="hidden" name="id_responsable" id="responsable_oculto" value="-1">
-                    <input type="text" name="no_control" id="no_control" placeholder="Ej. 00030001" class="form-control" list="list_no_control">
+                    @include('template.partes.buscador_combobox', [
+                        'config' => [
+                            'id' => 'participante_cbx',
+                            'label' => 'Alumno',
+                            'placeholder' => 'Escribe nombre o número de control',
+                            'endpoint' => route('participantes.busqueda'),
+                            'field' => 'no_control',
+                            'bare' => true,
+                            'required' => true,
+                            'show_submit' => false,
+                            'show_value' => true,
+                            'min_chars' => 2,
+                            'limit' => 8,
+                            'query_param' => 'nombre',
+                            'params' => ['peticion' => 0],
+                            'keys' => ['value' => 'no_control', 'label' => 'nombre', 'meta' => ''],
+                        ],
+                    ])
                 </div>
-                <div class="col-md-3 d-grid">
-                    <button type="submit" class="btn btn-primary rounded-pill"><i class="fa-solid fa-user-plus me-2"></i>Agregar</button>
+                <div class="col-md-5">
+                    <div class="participant-mass-field">
+                        <label class="form-label" for="no_control_masa">Agregar varios números de control</label>
+                        <input type="text" id="no_control_masa" class="form-control"
+                            placeholder="Ej. S23001 S23002 S23003">
+                        <small class="text-muted">Separa los números con espacios o comas. Si se llena, tendrá prioridad sobre la selección individual.</small>
+                    </div>
                 </div>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="fa-solid fa-user-plus me-2"></i>Agregar participantes</button>
             </div>
         </form>
     @endif
 </div>
-
-<datalist id="list_no_control"></datalist>
 
 <div class="participant-summary-card">
     @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VIP_EVIDENCIA']))
@@ -358,9 +377,21 @@
         function agregaParticipante(){
             $('#frm').on('submit',function(event){
                 event.preventDefault();
-                //Guardamos los numeros de control en ua variable
-                var temp_no_control = $('#no_control').val();
-                var tk = temp_no_control.split(" "); //Este metodo parte en pedazos una cadena cada vez que encuentra un espacio y lo guarda en un arreglo
+                var masa = $.trim($('#no_control_masa').val());
+                var seleccion = $.trim($('#participante_cbx_value').val());
+                var entrada = masa !== '' ? masa : seleccion;
+                var tk = entrada === '' ? [] : entrada.split(/[\s,]+/).filter(function (noControl) {
+                    return noControl.trim() !== '';
+                });
+                if (tk.length === 0) {
+                    swal({
+                        title: 'Selecciona un alumno',
+                        text: 'Busca un alumno o captura uno o varios números de control.',
+                        icon: 'warning',
+                        button: 'Cerrar',
+                    });
+                    return;
+                }
                 var id_responsable = $('#responsables_id').val()!=null? $('#responsables_id').val(): -1;
                 var id_actividad = $('#actividades_id').val()!=null? $('#actividades_id').val(): -1;
                 for (var i = 0; i < tk.length; i++) {
@@ -397,8 +428,11 @@
                         }
                     });
                 }
-                $('#no_control').val('');
-                $('#participante_nombre').val('');
+                var combo = document.getElementById('participante_cbx_combo');
+                if (combo && typeof combo.cbxReset === 'function') {
+                    combo.cbxReset();
+                }
+                $('#no_control_masa').val('');
             });
         }
 
@@ -561,8 +595,7 @@
             agregaParticipante();
             var tiene_permisos = "{{ Auth::User()->hasAnyPermission(['VIP','AGREGAR_PARTICIPANTES']) }}"=="1"?true: false;
             if(tiene_permisos){
-                autocompletar(document.getElementById("participante_nombre"));
-                noControlParticipante(document.getElementById("no_control"));
+                // El buscador reutilizable administra su propia selección.
             }
             evidenciaTotal();
             evidenciaParcial();

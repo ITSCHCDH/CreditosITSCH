@@ -184,3 +184,15 @@ it('agrega un alumno SIT a una actividad y rechaza duplicados', function () {
     ])->assertOk()
         ->assertJsonPath('mensaje_tipo', 'Error');
 });
+
+it('busca alumnos por nombre y numero de control para el combobox', function () {
+    $this->withoutMiddleware();
+
+    $this->getJson('/admin/participantes/busqueda?peticion=0&nombre=S230')
+        ->assertOk()
+        ->assertJsonFragment(['no_control' => 'S23001', 'nombre' => 'Ana López Pérez']);
+
+    $this->getJson('/admin/participantes/busqueda?peticion=0&nombre=López')
+        ->assertOk()
+        ->assertJsonFragment(['no_control' => 'S23001']);
+});
