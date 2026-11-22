@@ -164,7 +164,9 @@ it('mantiene disponibles las rutas STA principales', function () {
         ->and(Route::has('analisis.ficha'))->toBeTrue()
         ->and(Route::has('analisis.ficha.familiares.guardar'))->toBeTrue()
         ->and(Route::has('analisis.ficha.social.guardar'))->toBeTrue()
-        ->and(Route::has('tutorias.catedraticos.busqueda'))->toBeTrue();
+        ->and(Route::has('tutorias.catedraticos.busqueda'))->toBeTrue()
+        ->and(Route::has('tutorias.updateGrupo'))->toBeTrue()
+        ->and(Route::has('tutorias.deleteGrupo'))->toBeTrue();
 });
 
 it('busca todos los catedraticos activos de SIT para tutorias', function () {

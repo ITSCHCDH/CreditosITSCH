@@ -196,10 +196,20 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="d-inline-flex gap-1">
-                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="modificarGrupo({{ $grupo }})" data-mdb-toggle="modal" data-mdb-target="#myModalUpdate" title="Editar grupo">
+                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                            class="btn btn-sm btn-outline-primary btn-edit-group"
+                                            data-grupo="{{ json_encode($grupo, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) }}"
+                                            data-action="{{ route('tutorias.updateGrupo', $grupo->id) }}"
+                                            data-bs-toggle="modal" data-bs-target="#myModalUpdate"
+                                            data-mdb-toggle="modal" data-mdb-target="#myModalUpdate" title="Editar grupo">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarGrupo({{ $grupo }})" data-mdb-toggle="modal" data-mdb-target="#myModalDelete" title="Eliminar grupo">
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                            class="btn btn-sm btn-outline-danger btn-delete-group"
+                                            data-grupo="{{ json_encode($grupo, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) }}"
+                                            data-action="{{ route('tutorias.deleteGrupo', $grupo->id) }}"
+                                            data-bs-toggle="modal" data-bs-target="#myModalDelete"
+                                            data-mdb-toggle="modal" data-mdb-target="#myModalDelete" title="Eliminar grupo">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </div>
@@ -225,7 +235,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="myModalUpdateLabel">Editar grupo</h5>
-                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Cerrar"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" data-mdb-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
@@ -252,7 +262,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-mdb-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-mdb-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa-solid fa-floppy-disk me-2"></i>Guardar cambios
                         </button>
@@ -269,13 +279,13 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="myModalDeleteLabel">Eliminar grupo</h5>
-                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Cerrar"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" data-mdb-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
                         <p class="mb-0" id="mensaje"></p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-mdb-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-mdb-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-danger">
                             <i class="fa-solid fa-trash-can me-2"></i>Eliminar
                         </button>
@@ -292,18 +302,31 @@
             $(this).val($(this).val().toUpperCase());
         });
 
-        function modificarGrupo(grupo) {
+        function modificarGrupo(button) {
+            const grupo = JSON.parse(button.dataset.grupo);
             $('#gpo_NombreMod').val(grupo.gpo_Nombre);
             $('#selCarrerasMod').val(grupo.id_Carrera);
             $('#status').val(grupo.gpo_Status);
             $('#selSemestreMod').val(grupo.gpo_Semestre);
-            $('#formUpdateGrupo').attr('action', "{{ URL::to('/admin/sta') }}/tutorias/grupos/" + grupo.id + "/update");
+            $('#formUpdateGrupo').attr('action', button.dataset.action);
+            $('#gpo_NombreMod').trigger('change');
+            $('#selCarrerasMod').trigger('change');
+            $('#selSemestreMod').trigger('change');
         }
 
-        function eliminarGrupo(grupo) {
+        function eliminarGrupo(button) {
+            const grupo = JSON.parse(button.dataset.grupo);
             $('#mensaje').html('¿Seguro que querés eliminar el grupo <strong>' + grupo.gpo_Nombre + '</strong>?');
-            $('#formDeleteGrupo').attr('action', "{{ URL::to('/admin/sta') }}/tutorias/grupos/" + grupo.id + "/delete");
+            $('#formDeleteGrupo').attr('action', button.dataset.action);
         }
+
+        $(document).on('click', '.btn-edit-group', function () {
+            modificarGrupo(this);
+        });
+
+        $(document).on('click', '.btn-delete-group', function () {
+            eliminarGrupo(this);
+        });
 
         $(document).ready(function () {
             if (!$('#tabGrupos').length) {
