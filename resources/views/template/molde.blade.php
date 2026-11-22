@@ -331,7 +331,7 @@
                 <div class="system-footer-brand">
                     <img class="system-footer-logo" src="{{ asset('images/itsch.jpg') }}" alt="ITSCH" loading="lazy">
                     <div>
-                        <strong>Creditsch · ITSCH</strong>
+                        <strong>STA · ITSCH</strong>
                         <span>Créditos complementarios y trayectoria académica</span>
                     </div>
                 </div>
