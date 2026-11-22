@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-22 12:03 · **Entradas registradas:** 62 · **Último commit previo a esta sesión:** `cdc575e` (2026-11-22 11:59).
+**Última entrada:** 2026-11-22 12:06 · **Entradas registradas:** 63 · **Último commit previo a esta sesión:** `f1ecf44` (2026-11-22 12:03).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-22 12:06 — UX de Usuarios: listado y alta con tarjetas
 - 2026-11-22 12:03 — UX de Créditos / Altas con áreas de SIT
 - 2026-11-22 11:59 — UX de Créditos con MDB, Font Awesome y tarjetas
 - 2026-11-22 11:44 — Pie de página de la constancia alineado a la izquierda
@@ -147,7 +148,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 31 | 2026-11-21 11:49 – 2026-11-22 12:03 |
+| Créditos complementarios | `créditos` | 32 | 2026-11-21 11:49 – 2026-11-22 12:06 |
 | Trayectoria académica | `trayectoria` | 19 | 2026-11-20 18:59 – 2026-11-21 16:44 |
 | Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -176,6 +177,44 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-22 12:06] — UX de Usuarios: listado y alta con tarjetas
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la UX de `admin/usuarios/index` y `create` con MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/usuarios/index.blade.php` (rediseño)
+- `resources/views/admin/usuarios/registrar.blade.php` (alta con tarjetas)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; se conservan las consultas del controlador.
+
+**Decisiones tomadas:**
+- Listado con encabezado, cuatro tarjetas KPI (usuarios, activos, inactivos y tutores) y tarjeta de tabla.
+- DataTables restilizado (10 registros, exportar, columnas y registros) con badges de activo y tutor, área como etiqueta y acciones agrupadas.
+- Se conservan `#tabUsuarios`, `eliminarUsr(id)`, `#formEliminarUsr` y las rutas de edición/roles.
+- Alta dividida en tarjetas: datos personales, acceso y área/estado; roles dentro de la última.
+- Se agregó mostrar/ocultar contraseña, ayudas de longitud, `old()` en los campos y aviso de errores de validación.
+- `active` y `tutor` ahora son obligatorios en el formulario (coinciden con `UserRequest`).
+
+**Pendientes / Deuda técnica:**
+- El `select` múltiple de roles conserva el plugin Chosen; podría cambiarse a checkboxes como en créditos.
+- La pantalla de edición de usuario no se rediseñó en este cambio.
+
+**Tests ejecutados:**
+- ✅ 18 comprobaciones: KPIs, tabla con una fila por usuario, badges, DataTables en español, borrado, alta con tarjetas y campos, roles, mostrar/ocultar contraseña y alcance por área para usuarios no VIP.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Capturas revisadas.
+
+**Referencias:**
+- `docs/img/usuarios-desktop.png`
+- `docs/img/usuarios-create-desktop.png`
 
 ### [2026-11-22 12:03] — UX de Créditos / Altas con áreas de SIT
 
