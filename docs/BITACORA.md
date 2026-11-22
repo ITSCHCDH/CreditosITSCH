@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-21 16:44 · **Entradas registradas:** 56 · **Último commit previo a esta sesión:** `edc6e5e` (2026-11-21 16:43).
+**Última entrada:** 2026-11-22 11:23 · **Entradas registradas:** 57 · **Último commit previo a esta sesión:** `0728d62` (2026-11-21 16:45).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-22 11:23 — UX de Constancias con tarjetas
 - 2026-11-21 16:44 — UX de Grupos de tutoría
 - 2026-11-21 16:43 — Menú: tipografía delgada y menú móvil corregido
 - 2026-11-21 16:28 — UX del Departamento de tutorías
@@ -141,7 +142,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 25 | 2026-11-21 11:49 – 14:57 |
+| Créditos complementarios | `créditos` | 26 | 2026-11-21 11:49 – 2026-11-22 11:23 |
 | Trayectoria académica | `trayectoria` | 19 | 2026-11-20 18:59 – 2026-11-21 16:44 |
 | Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -170,6 +171,41 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-22 11:23] — UX de Constancias con tarjetas
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la UX de la vista `admin/constancias` con MDB y Font Awesome, usando tarjetas para separar las secciones.
+
+**Archivos modificados:**
+- `resources/views/admin/constancias/index.blade.php` (rediseño con tarjetas MDB)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; se conservan `$datos_globales`, `$users`, `$abreviaturas` y `$carreras`.
+
+**Decisiones tomadas:**
+- Los datos globales se separan en cuatro tarjetas: Jefe de Servicios Escolares, Vo.Bo, Encabezado y Pie de página, todas dentro del mismo formulario.
+- Los datos por carrera se separan en dos tarjetas: Carrera (selector) y Datos de la carrera (jefe de división, enunciado y plan).
+- Encabezado de sección con badge de estatus (Registrados / Pendientes) y descripción, más el aviso de datos faltantes como tarjeta de alerta.
+- Las imágenes actuales se muestran como vista previa dentro de su tarjeta.
+- Se conservan todos los IDs, formularios, rutas y el JavaScript (cookie de carrera, faltantes, abreviaturas «otro-», vista previa y guardado AJAX).
+
+**Pendientes / Deuda técnica:**
+- La vista sigue dependiendo de `storage/constancia_imagenes` para las imágenes; si faltan los archivos, la vista previa aparece vacía.
+- En móvil las tarjetas se apilan a una columna.
+
+**Tests ejecutados:**
+- ✅ 16 comprobaciones: estado vacío (aviso, badge, formularios, IDs) y con datos temporales en transacción (badge registrados, puestos, imágenes, formulario específico y vista previa), con rollback verificado.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura revisada con datos simulados.
+
+**Referencias:**
+- `docs/img/constancias-desktop.png`
 
 ### [2026-11-21 16:44] — UX de Grupos de tutoría
 
