@@ -4,19 +4,46 @@ use App\Models\Sit\Alumno;
 use App\Models\Sit\ResidenciaAlumno;
 use App\Models\Sit\ServicioSocialAlumno;
 use App\Services\Sit\TrayectoriaAcademicaService;
+use App\Http\Controllers\GruposController;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
 beforeEach(function () {
+    config()->set('database.connections.creditos', [
+        'driver' => 'sqlite',
+        'database' => ':memory:',
+        'prefix' => '',
+        'foreign_key_constraints' => true,
+    ]);
     config()->set('database.connections.sit', [
         'driver' => 'sqlite',
         'database' => ':memory:',
         'prefix' => '',
         'foreign_key_constraints' => true,
     ]);
+    DB::purge('creditos');
     DB::purge('sit');
+    DB::setDefaultConnection('creditos');
+
+    Schema::connection('creditos')->create('grupos', function (Blueprint $table) {
+        $table->id();
+        $table->string('gpo_Nombre');
+        $table->unsignedBigInteger('id_Carrera')->nullable();
+        $table->string('gpo_Semestre')->nullable();
+        $table->integer('gpo_Status')->default(0);
+    });
+    Schema::connection('creditos')->create('asignaciones_tutores', function (Blueprint $table) {
+        $table->id();
+        $table->unsignedBigInteger('gpo_Id');
+        $table->unsignedBigInteger('tut_Clave');
+        $table->unsignedBigInteger('car_Clave');
+        $table->string('gtu_Tipo')->nullable();
+        $table->string('gtu_Semestre')->nullable();
+        $table->integer('gtu_Año')->nullable();
+        $table->timestamps();
+    });
 
     Schema::connection('sit')->create('alumnos', function (Blueprint $table) {
         $table->id();
@@ -81,6 +108,12 @@ beforeEach(function () {
         $table->string('apellido_paterno')->nullable();
         $table->string('apellido_materno')->nullable();
     });
+    Schema::connection('sit')->create('cat_carreras', function (Blueprint $table) {
+        $table->id();
+        $table->string('nombre')->nullable();
+        $table->string('nombre_corto')->nullable();
+        $table->boolean('activo')->default(true);
+    });
     Schema::connection('sit')->create('lista_unidades', function (Blueprint $table) {
         $table->id();
         $table->unsignedBigInteger('lista_id');
@@ -118,6 +151,28 @@ beforeEach(function () {
         'numero_empleado' => 'CAT-001',
         'departamento_adscripcion' => 'Sistemas',
         'activo' => true,
+    ]);
+    DB::connection('sit')->table('cat_carreras')->insert([
+        'id' => 10,
+        'nombre' => 'Ingeniería en Sistemas Computacionales',
+        'nombre_corto' => 'ISC',
+        'activo' => true,
+    ]);
+    DB::connection('creditos')->table('grupos')->insert([
+        'id' => 1,
+        'gpo_Nombre' => '7A',
+        'id_Carrera' => 10,
+        'gpo_Semestre' => 'Ago-Dic',
+        'gpo_Status' => 1,
+    ]);
+    DB::connection('creditos')->table('asignaciones_tutores')->insert([
+        'id' => 1,
+        'gpo_Id' => 1,
+        'tut_Clave' => 3,
+        'car_Clave' => 10,
+        'gtu_Tipo' => 'Permanencia',
+        'gtu_Semestre' => 'Ago-Dic',
+        'gtu_Año' => 2026,
     ]);
 });
 
@@ -166,7 +221,10 @@ it('mantiene disponibles las rutas STA principales', function () {
         ->and(Route::has('analisis.ficha.social.guardar'))->toBeTrue()
         ->and(Route::has('tutorias.catedraticos.busqueda'))->toBeTrue()
         ->and(Route::has('tutorias.updateGrupo'))->toBeTrue()
-        ->and(Route::has('tutorias.deleteGrupo'))->toBeTrue();
+        ->and(Route::has('tutorias.deleteGrupo'))->toBeTrue()
+        ->and(Route::has('tutorias.destroy'))->toBeTrue()
+        ->and(Route::has('tutorias.asigTutPDF'))->toBeTrue()
+        ->and(Route::has('tutorias.libTutPDF'))->toBeTrue();
 });
 
 it('busca todos los catedraticos activos de SIT para tutorias', function () {
@@ -181,4 +239,11 @@ it('busca todos los catedraticos activos de SIT para tutorias', function () {
     expect($response->getStatusCode())->toBe(200)
         ->and($response->getData(true)[0]['cat_Clave'])->toBe(3)
         ->and($response->getData(true)[0]['nombre_completo'])->toContain('Ana');
+});
+
+it('genera la constancia PDF de asignacion con datos SIT', function () {
+    $response = app(GruposController::class)->asigTutPDF(1);
+
+    expect($response->getStatusCode())->toBe(200)
+        ->and($response->headers->get('content-type'))->toContain('application/pdf');
 });

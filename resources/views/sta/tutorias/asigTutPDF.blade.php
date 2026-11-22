@@ -35,9 +35,9 @@
             <tbody>
                 <tr>
                     <td style="width: 50px;"></td>
-                    <td style="width: 100px;"><img src="{{ asset('images/itsch.jpg') }}" alt="ISTCH" style="max-width: 40px;"></td>
+                    <td style="width: 100px;"><img src="file://{{ str_replace('\\','/', public_path('images/itsch.jpg')) }}" alt="ISTCH" style="max-width: 40px;"></td>
                     <td><h6>INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO</h6></td>
-                    <td style="width: 100px; text-align:right;"><img src="{{ asset('images/LogoTecNM.png') }}" alt="TECNM" style="max-width: 80px;"></td>
+                    <td style="width: 100px; text-align:right;"><img src="file://{{ str_replace('\\','/', public_path('images/LogoTecNM.png')) }}" alt="TECNM" style="max-width: 80px;"></td>
                 </tr>
             </tbody>
          </table>
@@ -63,11 +63,11 @@
     <br>
     <br>
     <br>
-    <b>MTRO. JAVIER IREPAN HACHA</b>
+    <b>ING. Omar Pérez Álcantar</b>
     <p>DIRECTOR GENERAL</p>
     <p>INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO</p>
     <br>
-    <p><small>C.C.P LPE. María de Lourdes Sanchez Mora, Jefa del departamento de Tutorías y Servicios Psicopedagógicos</small></p>
+    <p><small>C.C.P LP. Citlalli Marín Trejo Jefa del departamento de Desarrollo Académico</small></p>
     <p><small>C.C.P Para el archivo</small></p>
 
     <footer class="footer"><p style="text-align: right">Julio 2023</p></footer>

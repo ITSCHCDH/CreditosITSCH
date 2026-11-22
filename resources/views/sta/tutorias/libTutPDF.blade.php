@@ -35,15 +35,15 @@
             <tbody>
                 <tr>
                     <td style="width: 50px;"></td>
-                    <td style="width: 100px;"><img src="{{ asset('images/itsch.jpg') }}" alt="ISTCH" style="max-width: 40px;"></td>
+                    <td style="width: 100px;"><img src="file://{{ str_replace('\\','/', public_path('images/itsch.jpg')) }}" alt="ISTCH" style="max-width: 40px;"></td>
                     <td><h6>INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO</h6></td>
-                    <td style="width: 100px; text-align:right;"><img src="{{ asset('images/LogoTecNM.png') }}" alt="TECNM" style="max-width: 80px;"></td>
+                    <td style="width: 100px; text-align:right;"><img src="file://{{ str_replace('\\','/', public_path('images/LogoTecNM.png')) }}" alt="TECNM" style="max-width: 80px;"></td>
                 </tr>
             </tbody>
          </table>
     </head>
     <h5>A QUIEN CORRESPONDA: </h5>
-    <p style="line-height:3;">LOS QUE SUSCRIBEN, LA DRA. MARIA DE LOURDES SÁNCHEZ MORA. ENCARGADA DEL DEPARTAMENTO DE DESARROLLO ACADÉMICO Y EL ISC. OSCAR DELGADO CAMACHO, SUBDIRECTOR ACADÉMICO DEL INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO: </p>
+    <p style="line-height:3;">LOS QUE SUSCRIBEN, LA LP. CITLALLI MARÍN TREJO, JEFA DEL DEPARTAMENTO DE DESARROLLO ACADÉMICO Y EL ING. OMAR PÉREZ ÁLCANTAR, DIRECTOR GENERAL DEL INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO: </p>
     <div style="text-align: center;">
         <b>HACEN CONSTAR</b>
     </div>
@@ -72,8 +72,8 @@
                     <br>
                     <br>
                     <br>
-                    <b><small>DRA. MARÍA DE LOURDES SÁNCHEZ MORA</small></b>
-                    <p><small>ENCARGADA DEL DEPARTAMENTO DE DESARROLLO ACADÉMICO</small></p>
+                    <b><small>LP. CITLALLI MARÍN TREJO</small></b>
+                    <p><small>JEFA DEL DEPARTAMENTO DE DESARROLLO ACADÉMICO</small></p>
                     <p><small>INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO</small></p>
                 </td>
                 <td style="width: 40px;"></td>
@@ -85,8 +85,8 @@
                     <br>
                     <br>
                     <br>
-                    <b><small>ISC. OSCAR DELGADO CAMACHO</small></b>
-                    <p><small>SUBDIRECTOR ACADÉMICO</small></p>
+                    <b><small>ING. OMAR PÉREZ ÁLCANTAR</small></b>
+                    <p><small>DIRECTOR GENERAL</small></p>
                     <p><small>INSTITUTO TECNOLÓGICO SUPERIOR DE CIUDAD HIDALGO</small></p>
                 </td>               
             </tr>

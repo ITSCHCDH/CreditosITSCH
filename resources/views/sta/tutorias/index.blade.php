@@ -253,7 +253,13 @@
                                         <a href="{{ route('tutorias.libTutPDF', $grupo->id) }}" class="btn btn-sm btn-outline-secondary" target="_blank" data-mdb-toggle="tooltip" title="Constancia de liberación">
                                             <i class="fa-solid fa-file-signature"></i>
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" data-mdb-toggle="modal" data-mdb-target="#modalEliminar" onclick="eliminarGrupo({{ $grupo }})" title="Eliminar asignación">
+                                        <button type="button"
+                                            class="btn btn-sm btn-outline-danger btn-eliminar-asignacion"
+                                            data-grupo="{{ json_encode($grupo, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) }}"
+                                            data-action="{{ route('tutorias.destroy', $grupo->id) }}"
+                                            data-bs-toggle="modal" data-bs-target="#modalEliminar"
+                                            data-mdb-toggle="modal" data-mdb-target="#modalEliminar"
+                                            title="Eliminar asignación">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </div>
@@ -278,7 +284,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalEliminarLabel">Eliminar asignación</h5>
-                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Cerrar"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" data-mdb-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
                         <p class="mb-3" id="mensaje"></p>
@@ -286,7 +292,7 @@
                         <input type="hidden" name="gpo_Nombre" id="gpo_Nombre">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-mdb-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-mdb-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-danger">
                             <i class="fa-solid fa-trash-can me-2"></i>Eliminar
                         </button>
@@ -346,13 +352,18 @@
             });
         });
 
-        function eliminarGrupo(grupo) {
+        function eliminarAsignacion(button) {
+            const grupo = JSON.parse(button.dataset.grupo);
             $('#modalEliminarLabel').text('Eliminar asignación de tutoría');
             $('#mensaje').text('¿Seguro que querés eliminar la asignación con el grupo ' + grupo.gpo_Nombre + '?');
-            $('#formEliminar').attr('action', "{{ URL::to('/admin/sta') }}/tutorias/tutoriasDestroy/" + grupo.id);
+            $('#formEliminar').attr('action', button.dataset.action);
             $('#idGrupo').val(grupo.gpo_Id);
             $('#gpo_Nombre').val(grupo.gpo_Nombre);
         }
+
+        $(document).on('click', '.btn-eliminar-asignacion', function () {
+            eliminarAsignacion(this);
+        });
 
         $(document).ready(function () {
             if (typeof mdb !== 'undefined' && mdb.Tooltip) {

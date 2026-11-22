@@ -186,12 +186,18 @@ class GruposController extends Controller
         try {
             //Obtenemos el grupo a eliminar
             $grupoTut = AsignacionTutores::find($id);
+            if (! $grupoTut) {
+                Alert::error('Error','La asignación ya no existe');
+                return redirect()->route('tutorias.index');
+            }
             //Eliminamos el grupo
             $grupoTut->delete();
             // Cambiamos el status del grupo a 0
-            $grupo = Grupo::find($request->gpo_Id); 
-            $grupo->gpo_Status = 0;    
-            $grupo->save(); 
+            $grupo = Grupo::find($request->gpo_Id ?: $grupoTut->gpo_Id);
+            if ($grupo) {
+                $grupo->gpo_Status = 0;
+                $grupo->save();
+            }
             //Quitamos los alumnos asignados a este grupo de la tabla gpo_tutorias
             DB::table('gpo_tutorias')->where('gpo_Nombre',$request->gpo_Nombre)->delete();            
             Alert::success('Correcto',"El grupo se ha eliminado correctamente");
@@ -213,6 +219,9 @@ class GruposController extends Controller
         ->select('asignaciones_tutores.*','grupos.gpo_Nombre')
         ->where('asignaciones_tutores.id',$id)
         ->first();
+        if (! $data) {
+            abort(404, 'La asignación de tutoría no existe');
+        }
         $catedratico = Catedratico::with('user')->whereKey($data->tut_Clave)->first();
         $data->name = $catedratico
             ? trim(implode(' ', array_filter([$catedratico->user?->nombre, $catedratico->user?->apellido_paterno, $catedratico->user?->apellido_materno])))
@@ -234,6 +243,9 @@ class GruposController extends Controller
         ->select('asignaciones_tutores.*','grupos.gpo_Nombre')
         ->where('asignaciones_tutores.id',$id)
         ->first();
+        if (! $data) {
+            abort(404, 'La asignación de tutoría no existe');
+        }
         $catedratico = Catedratico::with('user')->whereKey($data->tut_Clave)->first();
         $data->name = $catedratico
             ? trim(implode(' ', array_filter([$catedratico->user?->nombre, $catedratico->user?->apellido_paterno, $catedratico->user?->apellido_materno])))
