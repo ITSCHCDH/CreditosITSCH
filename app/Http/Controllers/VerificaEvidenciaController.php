@@ -203,7 +203,10 @@ class VerificaEvidenciaController extends Controller
     			return redirect()->route('verifica_evidencia.avance_alumno');
 
     		}else{
-                if(!Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO']) && $sitAlumno->carrera_id != Auth::User()->area){
+                $puedeConsultarCarrera = Auth::User()->hasAnyPermission(['VIP','VIP_AVANCE_ALUMNO'])
+                    || (Auth::User()->sit_carrera_id && (int) Auth::User()->sit_carrera_id === (int) $sitAlumno->carrera_id);
+
+                if(! $puedeConsultarCarrera){
                     Alert::error('Error','No puedes consultar avances de alumnos de otras carreras');
                     return redirect()->route('verifica_evidencia.avance_alumno');
                 }

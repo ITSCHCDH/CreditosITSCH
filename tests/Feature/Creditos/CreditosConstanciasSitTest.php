@@ -52,6 +52,28 @@ beforeEach(function () {
         $table->id();
         $table->string('nombre');
     });
+    Schema::connection('creditos')->create('participantes', function (Blueprint $table) {
+        $table->id();
+        $table->string('no_control', 20);
+        $table->unsignedBigInteger('id_evidencia');
+        $table->string('evidencia_validada')->nullable();
+    });
+    Schema::connection('creditos')->create('actividad_evidencia', function (Blueprint $table) {
+        $table->id();
+        $table->unsignedBigInteger('actividad_id');
+        $table->string('validado')->default('false');
+    });
+    Schema::connection('creditos')->create('evidencia', function (Blueprint $table) {
+        $table->id();
+        $table->unsignedBigInteger('id_asig_actividades');
+        $table->string('alumno_no_control', 20)->nullable();
+    });
+    Schema::connection('creditos')->create('actividad', function (Blueprint $table) {
+        $table->id();
+        $table->string('nombre');
+        $table->unsignedBigInteger('id_actividad');
+        $table->integer('por_cred_actividad')->default(0);
+    });
 
     Schema::connection('sit')->create('users', function (Blueprint $table) {
         $table->id();
@@ -123,4 +145,21 @@ it('consulta avance y bloquea constancia cuando el alumno no existe en sit', fun
     );
 
     expect($response->getStatusCode())->toBe(302);
+});
+
+it('permite abrir el avance cuando la carrera del usuario coincide por sit_carrera_id', function () {
+    $admin = Mockery::mock();
+    $admin->sit_carrera_id = 10;
+    $admin->area = 999;
+    $admin->shouldReceive('hasAnyPermission')->andReturn(false);
+    Auth::shouldReceive('User')->andReturn($admin);
+
+    $controller = Mockery::mock(VerificaEvidenciaController::class)->makePartial();
+    $controller->shouldReceive('verificarProgreso')->andReturn(false);
+
+    $response = $controller->avanceAlumno(
+        new Illuminate\Http\Request(['no_control' => 'S23001'])
+    );
+
+    expect($response)->toBeInstanceOf(Illuminate\View\View::class);
 });

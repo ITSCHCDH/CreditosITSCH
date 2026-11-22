@@ -54,6 +54,25 @@
     .report-empty p{margin:0;color:#64748b;font-size:.88rem;max-width:32rem}
     .report-detail-item{display:flex;flex-direction:column;gap:.35rem;padding:.75rem 0;border-bottom:1px solid #edf1f5}
     .report-detail-item:last-child{border-bottom:0}
+    .report-detail-modal .modal-content{border:0;border-radius:1.15rem;box-shadow:0 1.25rem 2.5rem rgba(16,43,74,.22);overflow:hidden}
+    .report-detail-modal .modal-header{align-items:flex-start;padding:1.1rem 1.25rem;border-bottom:1px solid #edf1f5;background:#f8fafc}
+    .report-detail-modal .modal-header-icon{width:42px;height:42px;display:grid;place-items:center;flex:0 0 42px;border-radius:.75rem;color:#173c66;background:#edf3f8}
+    .report-detail-modal .modal-title{font-size:1.05rem;font-weight:700;color:#102b4a}
+    .report-detail-modal .modal-body{padding:1.15rem 1.25rem}
+    .report-detail-modal .modal-footer{gap:.5rem;padding:.9rem 1.25rem;border-top:1px solid #edf1f5;background:#f8fafc}
+    .report-detail-modal .btn-close{width:.85rem;height:.85rem;opacity:.65}
+    .report-detail-modal .btn-close:hover{opacity:1}
+    .report-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+    .report-detail-credit{padding:.9rem;border:1px solid #e7edf4;border-radius:.85rem;background:#fff;box-shadow:0 .35rem .8rem rgba(29,78,116,.055)}
+    .report-detail-credit.is-complete{border-color:#cfe7d5;background:#f7fbf8}
+    .report-detail-credit-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:.65rem}
+    .report-detail-credit-name{display:flex;align-items:flex-start;gap:.55rem;min-width:0;color:#102b4a;font-size:.88rem;font-weight:700}
+    .report-detail-credit-name i{margin-top:.12rem;color:#2d6da3}
+    .report-detail-credit-value{flex:0 0 auto;font-size:.82rem;font-weight:800;color:#173c66;background:#edf3f8;border-radius:999px;padding:.25rem .55rem}
+    .report-detail-credit.is-complete .report-detail-credit-value{color:#1b7a3d;background:#e6f4ea}
+    .report-detail-empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:1.5rem 1rem;border:1px dashed #d8e1ea;border-radius:.85rem;background:#f8fafc;color:#64748b}
+    .report-detail-empty i{font-size:1.75rem;color:#94a3b8;margin-bottom:.65rem}
+    .report-detail-empty strong{color:#102b4a;margin-bottom:.2rem}
     .report-detail-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;font-size:.9rem;font-weight:600;color:#102b4a}
     .report-pagination{padding:.9rem 1.25rem}
     .report-pager{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
@@ -61,7 +80,7 @@
     .report-pager-btn:hover,.report-pager-btn:focus-visible{background:#eef3f8;border-color:#b9c8d8;color:#102b4a}
     .report-pager-btn.is-disabled{color:#94a3b8;background:#f8fafc;border-color:#e7edf4;pointer-events:none}
     .report-pager-info{font-size:.82rem;color:#64748b}
-    @media(max-width:575.98px){.report-actions .btn{flex:1 1 auto}}
+    @media(max-width:575.98px){.report-actions .btn{flex:1 1 auto}.report-detail-grid{grid-template-columns:1fr}}
 </style>
 @endsection
 
@@ -228,7 +247,11 @@
                 </div>
 
                 <div class="report-actions">
-                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" data-mdb-toggle="modal" data-mdb-target="#{{ $modalId }}"><i class="fa-solid fa-eye me-2" aria-hidden="true"></i>Ver detalle</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3"
+                        data-bs-toggle="modal" data-bs-target="#{{ $modalId }}"
+                        data-mdb-toggle="modal" data-mdb-target="#{{ $modalId }}">
+                        <i class="fa-solid fa-eye me-2" aria-hidden="true"></i>Ver detalle
+                    </button>
 
                     @if (Auth::User()->hasAnyPermission(['VIP','VIP_SOLO_LECTURA','VER_AVANCE_ALUMNO']))
                         <form action="{{ route('verifica_evidencia.avance_alumno') }}" method="get">
@@ -249,33 +272,51 @@
                 </div>
             </article>
 
-            <div class="modal fade" id="{{ $modalId }}" tabindex="-1" aria-labelledby="{{ $modalId }}Label" aria-hidden="true">
+            <div class="modal fade report-detail-modal" id="{{ $modalId }}" tabindex="-1" aria-labelledby="{{ $modalId }}Label" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <div>
-                                <h5 class="modal-title" id="{{ $modalId }}Label">Detalle del alumno</h5>
-                                <div class="text-muted small">{{ $alumno->nombre }} · {{ $alumno->no_control }}</div>
+                            <div class="d-flex align-items-start gap-3">
+                                <span class="modal-header-icon"><i class="fa-solid fa-chart-column" aria-hidden="true"></i></span>
+                                <div>
+                                    <h5 class="modal-title" id="{{ $modalId }}Label">Detalle del alumno</h5>
+                                    <div class="text-muted small mt-1">{{ $alumno->nombre }} · {{ $alumno->no_control }}</div>
+                                </div>
                             </div>
-                            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Cerrar"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" data-mdb-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
                         <div class="modal-body">
                             @if($detalle->isEmpty())
-                                <p class="text-muted mb-0">Este alumno no tiene créditos registrados en el reporte.</p>
+                                <div class="report-detail-empty">
+                                    <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+                                    <strong>Sin avance registrado</strong>
+                                    <span class="small">Este alumno todavía no tiene créditos registrados en el reporte.</span>
+                                </div>
                             @else
-                                @foreach($detalle as $registro)
-                                    @php $porCredito = min(100, max(0, (int) $registro->por_credito)); @endphp
-                                    <div class="report-detail-item">
-                                        <div class="report-detail-head"><span>{{ $registro->nombre_credito }}</span><span>{{ $porCredito }}%</span></div>
-                                        <div class="progress" role="progressbar" aria-label="{{ $registro->nombre_credito }}" aria-valuenow="{{ $porCredito }}" aria-valuemin="0" aria-valuemax="100">
-                                            <div class="progress-bar" style="width:{{ $porCredito }}%"></div>
+                                <div class="report-detail-grid">
+                                    @foreach($detalle as $registro)
+                                        @php $porCredito = min(100, max(0, (int) $registro->por_credito)); @endphp
+                                        <div class="report-detail-credit {{ $porCredito >= 100 ? 'is-complete' : '' }}">
+                                            <div class="report-detail-credit-head">
+                                                <div class="report-detail-credit-name">
+                                                    <i class="fa-solid {{ $porCredito >= 100 ? 'fa-circle-check' : 'fa-circle-half-stroke' }}" aria-hidden="true"></i>
+                                                    <span>{{ $registro->nombre_credito }}</span>
+                                                </div>
+                                                <span class="report-detail-credit-value">{{ $porCredito }}%</span>
+                                            </div>
+                                            <div class="progress" role="progressbar" aria-label="{{ $registro->nombre_credito }}" aria-valuenow="{{ $porCredito }}" aria-valuemin="0" aria-valuemax="100">
+                                                <div class="progress-bar {{ $porCredito >= 100 ? 'bg-success' : '' }}" style="width:{{ $porCredito }}%"></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                @endforeach
+                                    @endforeach
+                                </div>
                             @endif
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary rounded-pill" data-mdb-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                                data-bs-dismiss="modal" data-mdb-dismiss="modal">
+                                <i class="fa-solid fa-xmark me-2" aria-hidden="true"></i>Cerrar
+                            </button>
                         </div>
                     </div>
                 </div>
