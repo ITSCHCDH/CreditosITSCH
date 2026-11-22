@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\Models\ConstanciaComplemento;
 use App\Models\Constancia;
-use App\Models\Area;
 use App\Models\Alumno;
 use App\Models\Folio;
+use App\Models\Sit\Carrera as SitCarrera;
+use App\Services\Sit\CarrerasSitService;
 use PDF;
 use DB;
 use Alert;
@@ -32,7 +33,7 @@ class ConstanciasController extends Controller
                 ['imagen_encabezado','<>',null],
                 ['imagen_encabezado','<>',null]
             ])->get();
-            $carreras = Area::where('tipo','=','carrera')->get();
+            $carreras = CarrerasSitService::visibles(null, true);
             $abreviaturas = $this->obternerAbreviaturas();
             $users = User::select('name','id')->where('email','<>','admin@itsch.com')->orderBy('name','ASC')->get();
             return view('admin.constancias.index')
@@ -48,10 +49,7 @@ class ConstanciasController extends Controller
                 ['imagen_encabezado','<>',null]
             ])->get();
 
-            $carreras = Area::where([
-                ['tipo','=','carrera'],
-                ['id','=',Auth::User()->area]
-            ])->get();
+            $carreras = CarrerasSitService::visibles(collect([Auth::User()->area]), true);
             $abreviaturas = $this->obternerAbreviaturas();
             $users = User::select('name','id')->where([
                 ['email','<>','admin@itsch.com'],
@@ -144,10 +142,14 @@ class ConstanciasController extends Controller
         $datos_globales = ConstanciaComplemento::all();
         $jefe_depto = DB::table('constancia_complemento  as cc')->join('users as u','u.id','=','cc.jefe_depto')->select('u.name','cc.jefe_depto_enunciado','cc.profesion_jefe_depto')->get();
         $certificador = DB::table('constancia_complemento as cc')->join('users as u','u.id','=','cc.certificador')->select('u.name','cc.profesion_certificador','cc.certificador_enunciado')->get();
-        $jefe_division = DB::table('alumnos as alu')->join('constancia as c', function($join) use($request){
-            $join->on('alu.carrera','=','c.carrera');
-            $join->where('alu.no_control','=',$request->no_control);
-        })->join('users as u','u.id','=','c.jefe_division')->select('u.name','c.division_enunciado','c.profesion_jefe_division','c.plan_de_estudios')->get();
+        $areaAlumno = Alumno::where('no_control', $request->no_control)->value('carrera');
+        $carreraSit = $areaAlumno ? CarrerasSitService::deArea($areaAlumno) : null;
+        $jefe_division = $carreraSit
+            ? DB::table('constancia as c')->join('users as u','u.id','=','c.jefe_division')
+                ->where('c.carrera', $carreraSit)
+                ->select('u.name','c.division_enunciado','c.profesion_jefe_division','c.plan_de_estudios')
+                ->get()
+            : collect();
         if($jefe_depto->count()==0 || $certificador->count()==0 || $jefe_division->count()==0 || $datos_globales->count()==0){
             Alert::error('Error','Falta de integridad en los datos de la constancia');
             return redirect()->back();
@@ -284,12 +286,9 @@ class ConstanciasController extends Controller
     }
 
     public function guardarDatosEspecificos($carrera,Request $request){
-        $area = Area::find($carrera);
-        if($area==null){
+        $carreraSit = SitCarrera::where('id', $carrera)->where('activo', 1)->first();
+        if($carreraSit==null){
             return response()->json(array('data' => [],'mensaje' => 'La carrera no existe','mensaje_tipo' => 'error'));
-        }
-        if($area->tipo!="carrera"){
-            return response()->json(array('data' => [],'mensaje' => 'No es una carrera','mensaje_tipo' => 'error'));
         }
         $constancia_existe = Constancia::where('carrera','=',$carrera)->select('id')->get();
         if($constancia_existe->count()>0){
@@ -306,7 +305,7 @@ class ConstanciasController extends Controller
     public function constanciasFaltantes(){
         $constancias_existentes = Constancia::all();
         $constancias_faltantes = array();
-        $carreras_lista= Area::where('tipo','=','carrera')->get();
+        $carreras_lista = CarrerasSitService::visibles(null, true);
         foreach ($carreras_lista as $carrera) {
             $existe = false;
             foreach ($constancias_existentes as $constancia) {
@@ -508,3 +507,4 @@ class ConstanciasController extends Controller
         return $abreviaturas;
     }
 }
+

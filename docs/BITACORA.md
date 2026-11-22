@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-22 11:23 · **Entradas registradas:** 57 · **Último commit previo a esta sesión:** `0728d62` (2026-11-21 16:45).
+**Última entrada:** 2026-11-22 11:35 · **Entradas registradas:** 58 · **Último commit previo a esta sesión:** `09f2c09` (2026-11-22 11:24).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-22 11:35 — Carreras de constancias desde SIT
 - 2026-11-22 11:23 — UX de Constancias con tarjetas
 - 2026-11-21 16:44 — UX de Grupos de tutoría
 - 2026-11-21 16:43 — Menú: tipografía delgada y menú móvil corregido
@@ -142,7 +143,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 26 | 2026-11-21 11:49 – 2026-11-22 11:23 |
+| Créditos complementarios | `créditos` | 27 | 2026-11-21 11:49 – 2026-11-22 11:35 |
 | Trayectoria académica | `trayectoria` | 19 | 2026-11-20 18:59 – 2026-11-21 16:44 |
 | Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -171,6 +172,43 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-22 11:35] — Carreras de constancias desde SIT
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Obtener el listado de carreras de las constancias desde la base de datos de SIT.
+
+**Archivos modificados:**
+- `app/Http/Controllers/ConstanciasController.php` (`index`, `constanciasFaltantes`, `guardarDatosEspecificos` e `imprimir`)
+
+**Archivos nuevos:**
+- `database/migrations/2026_11_22_120000_drop_constancia_carrera_foreign.php`
+
+**Consultas SQL nuevas o modificadas:**
+- El listado y los faltantes usan `sit.cat_carreras` mediante `CarrerasSitService`.
+- Se elimina la llave foránea `constancia_carrera_foreign` que apuntaba a `creditos.areas`.
+
+**Decisiones tomadas:**
+- El catálogo de carreras se toma de SIT (solo activas) y el select usa el `id` de `sit.cat_carreras`.
+- Para usuarios sin privilegios se limita a las carreras SIT equivalentes a su área.
+- `guardarDatosEspecificos` valida la carrera contra `SitCarrera` activa en lugar de `Area`.
+- `constanciasFaltantes` recorre el mismo catálogo SIT para que la lista y los avisos coincidan.
+- Como `constancia` estaba vacía, se elimina la FK hacia `areas`; la columna `carrera` ahora guarda el id de SIT.
+- `imprimir` resuelve el área del alumno a su carrera SIT (`CarrerasSitService::deArea`) antes de buscar la constancia.
+
+**Pendientes / Deuda técnica:**
+- `ConstanciasController@editarConstancia` no existe y la ruta `constancias.editar` fallaría; `visualizar` redirige ahí en caso de error (preexistente, fuera de este cambio).
+- `imprimir` sigue leyendo el nombre de la carrera del alumno desde `creditos.areas` porque el alumno pertenece a esa base.
+
+**Tests ejecutados:**
+- ✅ 12 comprobaciones: listado con las carreras activas de SIT, exclusión de «PENDIENTE», carrera nueva que no existía en áreas, select con ids de SIT, faltantes con nombres SIT, guardado/lectura con id de SIT (FK eliminada), rechazo de carrera inexistente y faltantes descontando la carrera guardada, con rollback verificado.
+- ✅ `php artisan migrate`, `view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura revisada.
+
+**Referencias:**
+- `docs/img/constancias-desktop.png`
 
 ### [2026-11-22 11:23] — UX de Constancias con tarjetas
 
