@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-22 11:37 · **Entradas registradas:** 59 · **Último commit previo a esta sesión:** `79a86cb` (2026-11-22 11:36).
+**Última entrada:** 2026-11-22 11:44 · **Entradas registradas:** 60 · **Último commit previo a esta sesión:** `e1c3087` (2026-11-22 11:38).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-22 11:44 — Pie de página de la constancia alineado a la izquierda
 - 2026-11-22 11:37 — Plan de estudios de constancias desde SIT
 - 2026-11-22 11:35 — Carreras de constancias desde SIT
 - 2026-11-22 11:23 — UX de Constancias con tarjetas
@@ -144,7 +145,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 28 | 2026-11-21 11:49 – 2026-11-22 11:37 |
+| Créditos complementarios | `créditos` | 29 | 2026-11-21 11:49 – 2026-11-22 11:44 |
 | Trayectoria académica | `trayectoria` | 19 | 2026-11-20 18:59 – 2026-11-21 16:44 |
 | Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -173,6 +174,39 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-22 11:44] — Pie de página de la constancia alineado a la izquierda
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** La vista previa de la constancia mostraba el pie de página corrido a la derecha; alinearlo desde la izquierda.
+
+**Archivos modificados:**
+- `resources/views/admin/constancias/constancia.blade.php`
+- `resources/views/admin/constancias/constancia_alumno.blade.php`
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna.
+
+**Decisiones tomadas:**
+- `#pie-pagina` ahora define `left: 0`, `width: 100%`, `margin: 0` y `padding: 0`, y su imagen `display: block` con `width: 100%`.
+- El bloque del pie se movió al **inicio del documento**, justo después del `<style>`: dompdf posicionaba el elemento `fixed` a partir de la coordenada del flujo (después de las firmas flotantes), por eso aparecía desplazado a la derecha aunque se indicara `left: 0`.
+- El mismo ajuste se aplicó a la constancia del alumno para que ambas se impriman igual.
+
+**Pendientes / Deuda técnica:**
+- Ninguno relacionado.
+
+**Tests ejecutados:**
+- ✅ PDF real generado con dompdf y renderizado: el pie inicia en el margen izquierdo y abarca el ancho de la página.
+- ✅ Medición en navegador del bloque del pie en ambas vistas: `left=0`, `width=800` de una página de 800.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+
+**Referencias:**
+- `docs/img/constancia-pie-izquierda.png`
 
 ### [2026-11-22 11:37] — Plan de estudios de constancias desde SIT
 

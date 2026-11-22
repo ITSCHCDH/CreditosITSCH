@@ -105,9 +105,23 @@
 	#pie-pagina{
 		position:fixed;
 		bottom:0;
+		left:0;
+		width:100%;
 		height: 90px;
+		margin:0;
+		padding:0;
+	}
+	#pie-pagina img{
+		display:block;
+		width:100%;
+		height:90px;
+		margin:0;
 	}
 </style>
+<div id="pie-pagina">
+	<img src="{{ $data['raiz'].public_path().'/storage/constancia_imagenes/pie_de_pagina/'.$data['datos_globales']->imagen_pie }}" width="100%" height="90px">
+</div>
+
 <div class="heading">
 		<div>
 			<img src="{{ $data['raiz'].public_path()."/storage/constancia_imagenes/encabezado/".$data['datos_globales']->imagen_encabezado }}" width="100%" height="135px;">
@@ -218,7 +232,4 @@
 			<p class="jefa no-margen-izq">{{ mb_strtoupper($data['certificador']->certificador_enunciado) }}</p>
 		</div>
 	</div>
-	<div id="pie-pagina">
-		<img src="{{ $data['raiz'].public_path()."/storage/constancia_imagenes/pie_de_pagina/".$data['datos_globales']->imagen_pie }}" width="100%" height="90px">
 	</div>
-</div>
