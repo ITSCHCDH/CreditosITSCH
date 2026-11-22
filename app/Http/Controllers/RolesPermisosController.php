@@ -77,10 +77,14 @@ class RolesPermisosController extends Controller
         if($request->has('user_id')) $user_id=$request->user_id;
         $role = Role::findById($id);
         $permisos = $role->permissions;
+        $totalPermisos = Permission::count();
+        $usuarios = $role->users()->count();
         return view('admin.roles.role_ver_permisos')
         ->with('permisos',$permisos)
         ->with('role',$role)
-        ->with('user_id',$user_id);
+        ->with('user_id',$user_id)
+        ->with('totalPermisos',$totalPermisos)
+        ->with('usuarios',$usuarios);
     }
     public function editarRole($id){
         $role = Role::findById($id);

@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-22 12:11 · **Entradas registradas:** 66 · **Último commit previo a esta sesión:** `5bc032b` (2026-11-22 12:09).
+**Última entrada:** 2026-11-22 12:13 · **Entradas registradas:** 67 · **Último commit previo a esta sesión:** `2f38a76` (2026-11-22 12:11).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-22 12:13 — UX de Ver permisos de un rol
 - 2026-11-22 12:11 — UX de Editar rol con tarjetas
 - 2026-11-22 12:09 — UX de Asignar permisos a un rol
 - 2026-11-22 12:08 — UX de Roles y permisos: listado y alta con tarjetas
@@ -151,7 +152,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 35 | 2026-11-21 11:49 – 2026-11-22 12:11 |
+| Créditos complementarios | `créditos` | 36 | 2026-11-21 11:49 – 2026-11-22 12:13 |
 | Trayectoria académica | `trayectoria` | 19 | 2026-11-20 18:59 – 2026-11-21 16:44 |
 | Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -180,6 +181,41 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-22 12:13] — UX de Ver permisos de un rol
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la UX de `admin/roles/{id}/ver_permisos` con MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/roles/role_ver_permisos.blade.php` (rediseño)
+- `app/Http/Controllers/RolesPermisosController.php` (`roleVerPermisos` calcula totales)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- `roleVerPermisos` agrega el total de permisos y el conteo de usuarios del rol.
+
+**Decisiones tomadas:**
+- Tarjeta de resumen del rol (id, permisos asignados, usuarios y última actualización) con acciones de volver, editar y asignar permisos.
+- Los permisos asignados se muestran como lista de solo lectura agrupada por módulo, con buscador y contador.
+- Se conservan las migas de pan cuando llega `user_id` (Usuarios / Asignación de roles / Permisos).
+- Estado vacío con acceso directo a asignar permisos cuando el rol no tiene ninguno.
+
+**Pendientes / Deuda técnica:**
+- La agrupación por último segmento puede mezclar módulos (p. ej. «ALUMNO» y «ALUMNOS»).
+- Sigue sin commitear el cambio de footer en `template/molde.blade.php`, ajeno a esta tarea.
+
+**Tests ejecutados:**
+- ✅ 12 comprobaciones: rol y permisos, conteos, tarjetas, un elemento por permiso, grupos, buscador, acciones, sin tabla vieja, enlace de regreso, migas con `user_id` y estado vacío.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura revisada.
+
+**Referencias:**
+- `docs/img/roles-ver-permisos.png`
 
 ### [2026-11-22 12:11] — UX de Editar rol con tarjetas
 
