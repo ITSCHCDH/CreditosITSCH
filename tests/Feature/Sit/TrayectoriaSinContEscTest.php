@@ -71,6 +71,9 @@ beforeEach(function () {
     Schema::connection('sit')->create('catedraticos', function (Blueprint $table) {
         $table->id();
         $table->unsignedBigInteger('user_id')->nullable();
+        $table->string('numero_empleado')->nullable();
+        $table->string('departamento_adscripcion')->nullable();
+        $table->boolean('activo')->default(true);
     });
     Schema::connection('sit')->create('users', function (Blueprint $table) {
         $table->id();
@@ -88,6 +91,12 @@ beforeEach(function () {
     });
 
     DB::connection('sit')->table('cat_plan_estudios')->insert(['id' => 10, 'creditos_totales' => 260]);
+    DB::connection('sit')->table('users')->insert([
+        'id' => 1,
+        'nombre' => 'Ana',
+        'apellido_paterno' => 'López',
+        'apellido_materno' => 'Soto',
+    ]);
     DB::connection('sit')->table('alumnos')->insert([
         'id' => 100,
         'no_control' => 'S26001',
@@ -102,6 +111,13 @@ beforeEach(function () {
         'opcion_acreditacion_numerico' => 1,
         'acreditada' => true,
         'creditos_materia' => 52,
+    ]);
+    DB::connection('sit')->table('catedraticos')->insert([
+        'id' => 3,
+        'user_id' => 1,
+        'numero_empleado' => 'CAT-001',
+        'departamento_adscripcion' => 'Sistemas',
+        'activo' => true,
     ]);
 });
 
@@ -147,5 +163,20 @@ it('mantiene disponibles las rutas STA principales', function () {
         ->and(Route::has('analisis.alumno'))->toBeTrue()
         ->and(Route::has('analisis.ficha'))->toBeTrue()
         ->and(Route::has('analisis.ficha.familiares.guardar'))->toBeTrue()
-        ->and(Route::has('analisis.ficha.social.guardar'))->toBeTrue();
+        ->and(Route::has('analisis.ficha.social.guardar'))->toBeTrue()
+        ->and(Route::has('tutorias.catedraticos.busqueda'))->toBeTrue();
+});
+
+it('busca todos los catedraticos activos de SIT para tutorias', function () {
+    $admin = Mockery::mock();
+    $admin->shouldReceive('hasAnyPermission')->andReturn(true);
+    Illuminate\Support\Facades\Auth::shouldReceive('User')->andReturn($admin);
+
+    $response = app(App\Http\Controllers\STAController::class)->buscarCatedraticosTutorias(
+        new Illuminate\Http\Request(['nombre' => 'Ana'])
+    );
+
+    expect($response->getStatusCode())->toBe(200)
+        ->and($response->getData(true)[0]['cat_Clave'])->toBe(3)
+        ->and($response->getData(true)[0]['nombre_completo'])->toContain('Ana');
 });

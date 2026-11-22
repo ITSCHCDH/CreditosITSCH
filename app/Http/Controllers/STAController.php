@@ -11,6 +11,7 @@ use App\Models\Grupo;
 use App\Models\GpoTutorias;
 use App\Models\AlumnoCreditosPerfil;
 use App\Models\Sit\Alumno as SitAlumno;
+use App\Models\Sit\Catedratico;
 use App\Services\Sit\CarrerasSitService;
 use App\User;
 
@@ -20,7 +21,7 @@ class STAController extends Controller
     public function __construct()
     {
         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_PROFESOR')->only(['indexProfesores','findProfesores','buscarProfesores','findMaterias','findListaCali','saveComent']);
-        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA')->only(['indexTutorias']);       
+        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA')->only(['indexTutorias','buscarCatedraticosTutorias']);       
         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_TUTOR')->only(['indexTutores','showGrupo','storeGrupo','deleteAlumno']);
     }  
 
@@ -52,6 +53,38 @@ class STAController extends Controller
     }
 
     /** Búsqueda de profesores activos para el buscador combobox. */
+    public function buscarCatedraticosTutorias(Request $request)
+    {
+        $termino = trim((string) $request->query('nombre', ''));
+        if (mb_strlen($termino) < 2) {
+            return response()->json([]);
+        }
+
+        $like = '%'.$termino.'%';
+        $catedraticos = Catedratico::with('user')
+            ->where('activo', 1)
+            ->whereHas('user', function ($query) use ($like) {
+                $query->where('nombre', 'like', $like)
+                    ->orWhere('apellido_paterno', 'like', $like)
+                    ->orWhere('apellido_materno', 'like', $like);
+            })
+            ->orderBy('numero_empleado')
+            ->limit(8)
+            ->get()
+            ->map(fn ($catedratico) => [
+                'cat_Clave' => (int) $catedratico->id,
+                'nombre_completo' => trim(implode(' ', array_filter([
+                    $catedratico->user?->nombre,
+                    $catedratico->user?->apellido_paterno,
+                    $catedratico->user?->apellido_materno,
+                ]))),
+                'departamento' => $catedratico->departamento_adscripcion ?: 'Catedrático activo',
+                'numero_empleado' => $catedratico->numero_empleado,
+            ]);
+
+        return response()->json($catedraticos);
+    }
+
     public function buscarProfesores(Request $request)
     {
         $termino = trim((string) $request->query('nombre', ''));
@@ -252,13 +285,18 @@ class STAController extends Controller
     //Funciones para el modulo del departamento de tutorias
     public function indexTutorias()
     {
-        // Obtener los profesores activos y que sean tutores (desde MySQL)
-        $profesores = User::select('id', DB::raw('UPPER(name) as nombre'))
-        ->where('active', 'true')
-        ->where('tutor', '1')
-        ->orderBy('name', 'asc')
-        ->get()
-        ->keyBy('id'); // Para acceso rápido
+        // Catedráticos activos del catálogo institucional SIT
+        $profesores = Catedratico::with('user')
+            ->where('activo', 1)
+            ->get()
+            ->mapWithKeys(function ($catedratico) {
+                $nombre = trim(implode(' ', array_filter([
+                    $catedratico->user?->nombre,
+                    $catedratico->user?->apellido_paterno,
+                    $catedratico->user?->apellido_materno,
+                ])));
+                return [$catedratico->id => (object) ['nombre' => $nombre ?: 'Catedrático '.$catedratico->numero_empleado]];
+            });
 
         // Carreras equivalentes en SIT, con la clave de área que guardan las tablas propias
         $carreras = CarrerasSitService::opcionesPorArea()->keyBy('car_Clave');
@@ -303,8 +341,11 @@ class STAController extends Controller
         $tutClaves = $grupos->pluck('tut_Clave')->toArray();
         $gpoIds = $grupos->pluck('gpo_Id')->toArray();
     
-        // Consultar los tutores y grupos en bloque
-        $tutores = User::whereIn('id', $tutClaves)->get()->keyBy('id');
+        // Consultar los catedráticos institucionales y grupos en bloque
+        $tutores = Catedratico::with('user')
+            ->whereIn('id', $tutClaves)
+            ->get()
+            ->keyBy('id');
         $gruposInfo = Grupo::whereIn('id', $gpoIds)->get()->keyBy('id');
         $carreras = CarrerasSitService::opcionesPorArea()->keyBy('car_Clave');
     
@@ -312,7 +353,12 @@ class STAController extends Controller
         foreach ($grupos as $gru) {
             // Asignar nombre del tutor
             if (isset($tutores[$gru->tut_Clave])) {
-                $gru->name = strtoupper($tutores[$gru->tut_Clave]->name);
+                $catedratico = $tutores[$gru->tut_Clave];
+                $gru->name = strtoupper(trim(implode(' ', array_filter([
+                    $catedratico->user?->nombre,
+                    $catedratico->user?->apellido_paterno,
+                    $catedratico->user?->apellido_materno,
+                ]))));
             }
     
             // Asignar nombre del grupo
@@ -413,7 +459,7 @@ class STAController extends Controller
         $carClaves = $grupo->pluck('car_Clave')->toArray();
     
         // Obtener los datos de los tutores, grupos y carreras en una sola consulta
-        $tutores = User::whereIn('id', $tutClaves)->get()->keyBy('id');
+        $tutores = Catedratico::with('user')->whereIn('id', $tutClaves)->get()->keyBy('id');
         $grupos = Grupo::whereIn('id', $gpoIds)->get()->keyBy('id');
         $carreras = CarrerasSitService::opcionesPorArea()->keyBy('car_Clave');
     
@@ -421,7 +467,12 @@ class STAController extends Controller
         foreach ($grupo as $gru) {
             // Asignar el nombre del tutor
             if (isset($tutores[$gru->tut_Clave])) {
-                $gru->nomTutor = strtoupper($tutores[$gru->tut_Clave]->name);
+                $catedratico = $tutores[$gru->tut_Clave];
+                $gru->nomTutor = strtoupper(trim(implode(' ', array_filter([
+                    $catedratico->user?->nombre,
+                    $catedratico->user?->apellido_paterno,
+                    $catedratico->user?->apellido_materno,
+                ]))));
             }
     
             // Asignar el nombre del grupo

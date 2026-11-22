@@ -7,6 +7,7 @@ use App\Models\Grupo;
 use Illuminate\Support\Facades\DB;
 use App\Models\AsignacionTutores;
 use App\Models\Sit\Carrera;
+use App\Models\Sit\Catedratico;
 use App\Services\Sit\CarrerasSitService;
 use Alert;
 use PDF;
@@ -144,9 +145,13 @@ class GruposController extends Controller
     {    
         $request->validate([
             'gpo_Id' => ['required','integer','exists:grupos,id'],
-            'tut_Clave' => ['required','integer','exists:users,id'],
+            'tut_Clave' => ['required','integer'],
             'car_Clave' => ['required','integer'],
         ]);
+        if (! Catedratico::where('activo', 1)->whereKey($request->tut_Clave)->exists()) {
+            Alert::error('Error','El catedrático SIT no existe o está inactivo');
+            return redirect()->back();
+        }
         if (! Carrera::where('activo',1)->whereKey($request->car_Clave)->exists()) {
             Alert::error('Error','La carrera SIT no existe');
             return redirect()->back();
@@ -204,11 +209,14 @@ class GruposController extends Controller
     {
         //Obtenemos los datos de la asignacion del tutor
         $data = DB::table('asignaciones_tutores')
-        ->join('users','asignaciones_tutores.tut_Clave','=','users.id') 
         ->join('grupos','asignaciones_tutores.gpo_Id','=','grupos.id')       
-        ->select('asignaciones_tutores.*','users.name','grupos.gpo_Nombre')
+        ->select('asignaciones_tutores.*','grupos.gpo_Nombre')
         ->where('asignaciones_tutores.id',$id)
-        ->first();         
+        ->first();
+        $catedratico = Catedratico::with('user')->whereKey($data->tut_Clave)->first();
+        $data->name = $catedratico
+            ? trim(implode(' ', array_filter([$catedratico->user?->nombre, $catedratico->user?->apellido_paterno, $catedratico->user?->apellido_materno])))
+            : 'Catedrático no encontrado';
         //Obtenemos el nombre de la carrera y se lo asignamos a la variable
         $data->car_Nombre = CarrerasSitService::nombreDeArea($data->car_Clave);
         //Abrimos el editor de PDF y le enviamos la vista que diseñamos para la impresión              
@@ -222,11 +230,14 @@ class GruposController extends Controller
     {
         //Obtenemos los datos de la asignacion del tutor
         $data = DB::table('asignaciones_tutores')
-        ->join('users','asignaciones_tutores.tut_Clave','=','users.id') 
         ->join('grupos','asignaciones_tutores.gpo_Id','=','grupos.id')       
-        ->select('asignaciones_tutores.*','users.name','grupos.gpo_Nombre')
+        ->select('asignaciones_tutores.*','grupos.gpo_Nombre')
         ->where('asignaciones_tutores.id',$id)
-        ->first();         
+        ->first();
+        $catedratico = Catedratico::with('user')->whereKey($data->tut_Clave)->first();
+        $data->name = $catedratico
+            ? trim(implode(' ', array_filter([$catedratico->user?->nombre, $catedratico->user?->apellido_paterno, $catedratico->user?->apellido_materno])))
+            : 'Catedrático no encontrado';
         //Obtenemos el nombre de la carrera y se lo asignamos a la variable
         $data->car_Nombre = CarrerasSitService::nombreDeArea($data->car_Clave);
         //Abrimos el editor de PDF y le enviamos la vista que diseñamos para la impresión              

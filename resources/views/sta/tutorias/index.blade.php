@@ -140,13 +140,22 @@
                 @csrf
                 <div class="row g-3">
                     <div class="col-12 col-md-4 col-xl-3">
-                        <label class="form-label" for="selProfesores">Profesor</label>
-                        <select name="tut_Clave" id="selProfesores" class="form-select" required>
-                            <option value="">Seleccione un profesor</option>
-                            @foreach ($profesores as $profesor)
-                                <option value="{{ $profesor->id }}">{{ $profesor->nombre }}</option>
-                            @endforeach
-                        </select>
+                        @include('template.partes.buscador_combobox', [
+                            'config' => [
+                                'id' => 'tutorCatedratico',
+                                'bare' => true,
+                                'show_submit' => false,
+                                'required' => true,
+                                'field' => 'tut_Clave',
+                                'label' => 'Catedrático / Profesor',
+                                'placeholder' => 'Escribe nombre o apellidos',
+                                'endpoint' => route('tutorias.catedraticos.busqueda'),
+                                'query_param' => 'nombre',
+                                'min_chars' => 2,
+                                'limit' => 8,
+                                'keys' => ['value' => 'cat_Clave', 'label' => 'nombre_completo', 'meta' => 'departamento'],
+                            ],
+                        ])
                     </div>
                     <div class="col-12 col-md-4 col-xl-2">
                         <label class="form-label" for="gtu_Semestre">Semestre</label>

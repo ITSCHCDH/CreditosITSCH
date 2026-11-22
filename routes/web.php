@@ -272,6 +272,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
 
     //Rutas departamento de tutorias
     Route::get('/sta/tutorias',[STAController::class,'indexTutorias'])->name('tutorias.index');
+    Route::get('/sta/tutorias/catedraticos/busqueda',[STAController::class,'buscarCatedraticosTutorias'])->name('tutorias.catedraticos.busqueda');
     Route::post('/sta/tutorias/get/grupos',[GruposController::class,'getGruposCar'])->name('tutorias.getGruposCar');
     Route::post('/sta/tutorias/save/grupo',[GruposController::class,'saveGrupo'])->name('tutorias.saveGrupo');
     Route::get('/sta/tutorias/grupos',[GruposController::class,'getGruposAll'])->name('tutorias.getGruposAll');    
