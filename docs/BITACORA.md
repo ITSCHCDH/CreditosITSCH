@@ -4,7 +4,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 ## Estado actual
 
-**Última entrada:** 2026-11-22 11:44 · **Entradas registradas:** 60 · **Último commit previo a esta sesión:** `e1c3087` (2026-11-22 11:38).
+**Última entrada:** 2026-11-22 11:59 · **Entradas registradas:** 61 · **Último commit previo a esta sesión:** `ba0951f` (2026-11-22 11:46).
 
 **Verificaciones de cierre (última: 2026-11-21 13:45):**
 
@@ -39,6 +39,7 @@ Este archivo registra cronológicamente todos los cambios, decisiones y pendient
 
 Estas entradas están marcadas como completadas pero su verificación en navegador sigue abierta:
 
+- 2026-11-22 11:59 — UX de Créditos con MDB, Font Awesome y tarjetas
 - 2026-11-22 11:44 — Pie de página de la constancia alineado a la izquierda
 - 2026-11-22 11:37 — Plan de estudios de constancias desde SIT
 - 2026-11-22 11:35 — Carreras de constancias desde SIT
@@ -145,7 +146,7 @@ Notas de implementación:
 
 | Módulo | Etiqueta en entradas | Entradas | Rango |
 |---|---|---|---|
-| Créditos complementarios | `créditos` | 29 | 2026-11-21 11:49 – 2026-11-22 11:44 |
+| Créditos complementarios | `créditos` | 30 | 2026-11-21 11:49 – 2026-11-22 11:59 |
 | Trayectoria académica | `trayectoria` | 19 | 2026-11-20 18:59 – 2026-11-21 16:44 |
 | Infraestructura | `infraestructura` | 12 | 2026-11-20 18:32 – 2026-11-21 16:43 |
 | Tutorías | — | 0 | Sin entradas registradas |
@@ -174,6 +175,41 @@ Las entradas históricas no citan hash de commit; esta tabla permite cruzarlas p
 ## Bitácora cronológica
 
 <!-- Las entradas van aquí, más recientes arriba -->
+
+### [2026-11-22 11:59] — UX de Créditos con MDB, Font Awesome y tarjetas
+
+- **Estatus:** ✅ completado
+- **Agente:** lead
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Mejorar la UX de la vista `admin/creditos/index` con MDB, Font Awesome y cards.
+
+**Archivos modificados:**
+- `resources/views/admin/creditos/index.blade.php` (rediseño completo)
+
+**Archivos eliminados:**
+- Ninguno.
+
+**Consultas SQL nuevas o modificadas:**
+- Ninguna; se conserva la consulta del controlador.
+
+**Decisiones tomadas:**
+- Encabezado con icono y tarjetas KPI: créditos, vigentes, no vigentes y sin jefe.
+- El aviso de créditos sin jefe pasa a una tarjeta de alerta con icono.
+- Tarjeta de tabla con DataTables (10 registros, exportar, columnas y registros), badges de vigencia y de «Sin jefe», y acciones agrupadas.
+- El botón de eliminar pasa el id y el nombre por `data-*`; `undoCredito(boton)` actualiza el modal y la URL de borrado.
+- El modal se moderniza con MDB y conserva los ids `e_id`, `e_name` y `eliminar`.
+- Etiquetas de DataTables en español embebidas y estado vacío con acceso al alta.
+
+**Pendientes / Deuda técnica:**
+- En móvil la tabla se desplaza horizontalmente.
+
+**Tests ejecutados:**
+- ✅ 14 comprobaciones: encabezado, KPIs, tabla con una fila por crédito, nombres, badges, aviso de jefes, modal, DataTables en español, botón de alta y estado vacío.
+- ✅ `php artisan view:cache` y `php artisan test` (17 passed, 62 assertions).
+- ✅ Captura revisada.
+
+**Referencias:**
+- `docs/img/creditos-desktop.png`
 
 ### [2026-11-22 11:44] — Pie de página de la constancia alineado a la izquierda
 
