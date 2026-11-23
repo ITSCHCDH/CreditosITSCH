@@ -34,6 +34,13 @@
 @endpush
 
 @section('contenido')
+    @php
+        $datosGlobales = $datos_globales->first();
+        $jefeDeptoActual = $users->first(fn ($user) => (string) $user->id === (string) old('jefe_depto', $datosGlobales?->jefe_depto));
+        $certificadorActual = $users->first(fn ($user) => (string) $user->id === (string) old('certificador', $datosGlobales?->certificador));
+        $firmantes = $users->map(fn ($user) => ['id' => (string) $user->id, 'name' => $user->name])->values();
+    @endphp
+
     <input type="hidden" name="" id="variable-ocultar" value="@if ($datos_globales->count()==0){{ 0 }}@else{{ 1 }}@endif">
 
     @if (Auth::User()->hasAnyPermission(['VIP','VIP_CONSTANCIAS']))
@@ -104,19 +111,25 @@
                                     </select>
                                 </div>
                                 <div class="col-7">
-                                    <label class="form-label" for="jefe_depto">Nombre</label>
-                                    <select name="jefe_depto" id="jefe_depto" class="form-select" required>
-                                        <option value="">Nombre del jefe de departamento</option>
-                                        @if ($datos_globales->count() > 0)
-                                            @foreach ($users as $user)
-                                                <option value="{{ $user->id }}" @selected($datos_globales[0]->jefe_depto == $user->id)>{{ strtoupper($user->name) }}</option>
-                                            @endforeach
-                                        @else
-                                            @foreach ($users as $user)
-                                                <option value="{{ $user->id }}">{{ strtoupper($user->name) }}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
+                                    @include('template.partes.buscador_combobox', [
+                                        'config' => [
+                                            'id' => 'jefeDepto',
+                                            'bare' => true,
+                                            'show_submit' => false,
+                                            'show_value' => false,
+                                            'required' => true,
+                                            'field' => 'jefe_depto',
+                                            'label' => 'Nombre',
+                                            'placeholder' => 'Buscar jefe de servicios escolares',
+                                            'endpoint' => route('constancias.firmantes_busqueda'),
+                                            'query_param' => 'nombre',
+                                            'min_chars' => 1,
+                                            'limit' => 10,
+                                            'keys' => ['value' => 'id', 'label' => 'name', 'meta' => ''],
+                                            'initial' => $jefeDeptoActual ? ['id' => (string) $jefeDeptoActual->id, 'name' => $jefeDeptoActual->name] : null,
+                                            'matches_label' => 'Jefes disponibles',
+                                        ],
+                                    ])
                                 </div>
                             </div>
                             <label class="form-label" for="jefe_depto_enunciado">Puesto</label>
@@ -167,19 +180,25 @@
                                     </select>
                                 </div>
                                 <div class="col-7">
-                                    <label class="form-label" for="certificador">Nombre</label>
-                                    <select name="certificador" id="certificador" class="form-select" required>
-                                        <option value="">Nombre de quién certifica el documento</option>
-                                        @if ($datos_globales->count() > 0)
-                                            @foreach ($users as $user)
-                                                <option value="{{ $user->id }}" @selected($datos_globales[0]->certificador == $user->id)>{{ strtoupper($user->name) }}</option>
-                                            @endforeach
-                                        @else
-                                            @foreach ($users as $user)
-                                                <option value="{{ $user->id }}">{{ strtoupper($user->name) }}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
+                                    @include('template.partes.buscador_combobox', [
+                                        'config' => [
+                                            'id' => 'certificador',
+                                            'bare' => true,
+                                            'show_submit' => false,
+                                            'show_value' => false,
+                                            'required' => true,
+                                            'field' => 'certificador',
+                                            'label' => 'Nombre',
+                                            'placeholder' => 'Buscar persona que certifica',
+                                            'endpoint' => route('constancias.firmantes_busqueda'),
+                                            'query_param' => 'nombre',
+                                            'min_chars' => 1,
+                                            'limit' => 10,
+                                            'keys' => ['value' => 'id', 'label' => 'name', 'meta' => ''],
+                                            'initial' => $certificadorActual ? ['id' => (string) $certificadorActual->id, 'name' => $certificadorActual->name] : null,
+                                            'matches_label' => 'Certificadores disponibles',
+                                        ],
+                                    ])
                                 </div>
                             </div>
                             <label class="form-label" for="certificador_enunciado">Puesto del Vo.Bo</label>
@@ -297,9 +316,9 @@
                     <div class="const-card-body">
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
-                                <label class="form-label" for="jefe_division">Jefe de división</label>
                                 <div class="row g-2">
                                     <div class="col-5">
+                                        <label class="form-label" for="profesion_jefe_division">Abreviatura</label>
                                         <select class="form-select" name="profesion_jefe_division" id="profesion_jefe_division">
                                             <option value="">Abreviatura</option>
                                             <option value="otro-" id="otro-jefe-division">Otro (especificar)</option>
@@ -309,12 +328,24 @@
                                         </select>
                                     </div>
                                     <div class="col-7">
-                                        <select name="jefe_division" id="jefe_division" class="form-select" required>
-                                            <option value="">Nombre del jefe de división</option>
-                                            @foreach ($users as $user)
-                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        @include('template.partes.buscador_combobox', [
+                                            'config' => [
+                                                'id' => 'jefeDivision',
+                                                'bare' => true,
+                                                'show_submit' => false,
+                                                'show_value' => false,
+                                                'required' => true,
+                                                'field' => 'jefe_division',
+                                                'label' => 'Jefe de división',
+                                                'placeholder' => 'Buscar jefe de división',
+                                                'endpoint' => route('constancias.firmantes_busqueda'),
+                                                'query_param' => 'nombre',
+                                                'min_chars' => 1,
+                                                'limit' => 10,
+                                                'keys' => ['value' => 'id', 'label' => 'name', 'meta' => ''],
+                                                'matches_label' => 'Jefes disponibles',
+                                            ],
+                                        ])
                                     </div>
                                 </div>
                             </div>
@@ -374,6 +405,26 @@
             }
         }
 
+        function seleccionarJefeDivision(id) {
+            var combo = document.getElementById('jefeDivision_combo');
+            if (!combo) {
+                return;
+            }
+
+            var firmante = @json($firmantes).find(function (item) {
+                return String(item.id) === String(id || '');
+            });
+
+            if (firmante) {
+                combo.cbxSetSelection({
+                    value: firmante.id,
+                    label: firmante.name
+                });
+            } else {
+                combo.cbxReset();
+            }
+        }
+
         function abreviaturasEspeciales(abreviatura, option_id) {
             var token = abreviatura.substring(0, 5);
             if (token == 'otro-') {
@@ -387,7 +438,7 @@
         function actualizarDatosEspecificos(response, accion = 'llenar') {
             if (accion == 'llenar') {
                 abreviaturasEspeciales(response['profesion_jefe_division'], 'otro-jefe-division');
-                $('#jefe_division').val(response['jefe_division']);
+                seleccionarJefeDivision(response['jefe_division']);
                 $('#profesion_jefe_division').val(response['profesion_jefe_division']);
                 $('#division_enunciado').val(response['division_enunciado']);
                 var planActual = response['plan_de_estudios'] || '';
@@ -397,7 +448,7 @@
                 }
                 $plan.val(planActual);
             } else {
-                $('#jefe_division').val('');
+                seleccionarJefeDivision('');
                 $('#profesion_jefe_division').val('');
                 $('#division_enunciado').val('');
                 $('#plan_de_estudios').val('');
@@ -446,7 +497,7 @@
                     $('#constancia-vista-previa').css('visibility', 'hidden');
                     $('#form-datos-especificos input').attr('disabled', 'disabled');
                     $('#form-datos-especificos select').attr('disabled', 'disabled');
-                    $('#jefe_division').val('');
+                    seleccionarJefeDivision('');
                     $('#profesion_jefe_division').val('');
                     $('#carrera').removeAttr('disabled');
                 }
@@ -456,6 +507,11 @@
         function guardarDatosEspecificos() {
             $(document).on('submit', '#form-datos-especificos', function (event) {
                 event.preventDefault();
+                if (!$('#jefeDivision_value').val()) {
+                    $('#jefeDivision_input').focus();
+                    $('#jefeDivision_status').text('Selecciona un jefe de división de la lista.').attr('data-state', 'error');
+                    return;
+                }
                 var constancia_data = $('#form-datos-especificos').serialize();
                 var ruta = "{{ route('constancias.guardar_datos_especificos', 'aux') }}";
                 var carrera_nombre = $('#carrera').val();
@@ -570,6 +626,18 @@
         }
 
         $(document).ready(function () {
+            $('[action="{{ route('constancias.guardar_datos_globales') }}"]').on('submit', function (event) {
+                var jefeDepartamento = $('#jefeDepto_value').val();
+                var certificador = $('#certificador_value').val();
+
+                if (!jefeDepartamento || !certificador) {
+                    event.preventDefault();
+                    var campo = !jefeDepartamento ? 'jefeDepto' : 'certificador';
+                    $('#' + campo + '_input').focus();
+                    $('#' + campo + '_status').text('Selecciona una persona de la lista.').attr('data-state', 'error');
+                }
+            });
+
             ocultarDatosEspecificosConstancia();
             comboCarrera();
             guardarDatosEspecificos();
