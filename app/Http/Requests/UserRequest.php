@@ -29,6 +29,8 @@ class UserRequest extends FormRequest
             'area' => 'required',
             'sit_carrera_id' => 'nullable|integer',
             'active' => 'required',
+            'roles_id' => 'nullable|array',
+            'roles_id.*' => 'integer|distinct|exists:roles,id',
             'password' => 'required|min:4|max:60',
             'password_confirmation' => 'required_with:password|same:password|min:4|max:60|required'
         ];

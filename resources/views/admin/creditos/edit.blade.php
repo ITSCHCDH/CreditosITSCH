@@ -168,7 +168,7 @@
                                 <input type="search" class="form-control border-start-0" id="areasBuscar" placeholder="Buscar área" aria-label="Buscar área">
                             </div>
                             <button type="button" class="btn btn-sm btn-outline-primary" id="areasTodas">
-                                <i class="fa-solid fa-check-double me-1"></i>Seleccionar visibles
+                                <i class="fa-solid fa-check-double me-1"></i>Seleccionar todas
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-secondary" id="areasNinguna">
                                 <i class="fa-solid fa-xmark me-1"></i>Limpiar
