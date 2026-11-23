@@ -1,151 +1,179 @@
 <?php
 
-use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use Illuminate\Support\Facades\DB;
 use App\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RolesPermisos extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         app()['cache']->forget('spatie.permission.cache');
 
-        //Permisos relacionados a evidencias
-        Permission::create(['name' => 'CREAR_EVIDENCIA']);
-        Permission::create(['name' => 'ELIMINAR_EVIDENCIA']);
-        Permission::create(['name' => 'VER_EVIDENCIA']);
-        Permission::create(['name' => 'VERIFICAR_EVIDENCIA']);
-        Permission::create(['name' => 'VIP_EVIDENCIA']);
-        Permission::create(['name' => 'VIP_EVIDENCIA_SOLO_LECTURA']);
+        $permisos = [
+            'CREAR_EVIDENCIA',
+            'ELIMINAR_EVIDENCIA',
+            'VER_EVIDENCIA',
+            'VERIFICAR_EVIDENCIA',
+            'VIP_EVIDENCIA',
+            'VIP_EVIDENCIA_SOLO_LECTURA',
+            'CREAR_ACTIVIDAD',
+            'ELIMINAR_ACTIVIDAD',
+            'VER_ACTIVIDAD',
+            'MODIFICAR_ACTIVIDAD',
+            'CREAR_ACTIVIDAD_ALUMNOS',
+            'VIP_ACTIVIDAD',
+            'VIP_ACTIVIDAD_SOLO_LECTURA',
+            'CREAR_ALUMNOS',
+            'ELIMINAR_ALUMNOS',
+            'MODIFICAR_ALUMNOS',
+            'VER_ALUMNOS',
+            'VIP_ALUMNOS',
+            'VIP_ALUMNOS_SOLO_LECTURA',
+            'CREAR_USUARIOS',
+            'ELIMINAR_USUARIOS',
+            'MODIFICAR_USUARIOS',
+            'VER_USUARIOS',
+            'AGREGAR_PARTICIPANTES',
+            'ELIMINAR_PARTICIPANTES',
+            'VER_PARTICIPANTES',
+            'AGREGAR_RESPONSABLES',
+            'ELIMINAR_RESPONSABLES',
+            'VER_RESPONSABLES',
+            'CREAR_CREDITOS',
+            'ELIMINAR_CREDITOS',
+            'VER_CREDITOS',
+            'MODIFICAR_CREDITOS',
+            'VER_REPORTES_CARRERA',
+            'VIP_REPORTES',
+            'VER_AVANCE_ALUMNO',
+            'VIP_AVANCE_ALUMNO',
+            'ASIGNAR_REMOVER_ROLES_USUARIOS',
+            'CREAR_ROLES',
+            'ELIMINAR_ROLES',
+            'MODIFICAR_ROLES',
+            'VER_ROLES',
+            'VER_ROLES_USUARIOS',
+            'ASIGNAR_REMOVER_PERMISOS_A_ROLES',
+            'MODIFICAR_CONSTANCIAS_CARRERA',
+            'VIP_CONSTANCIAS',
+            'IMPRIMIR_CONSTANCIAS',
+            'CREAR_AREAS',
+            'ELIMINAR_AREAS',
+            'VER_AREAS',
+            'MODIFICAR_AREAS',
+            'CREAR_MENSAJES',
+            'VIP',
+            'VIP_SOLO_LECTURA',
+            'VIP_STA',
+            'STA_DEP_TUTORIA',
+            'STA_TUTOR',
+            'STA_COR_CARRERA',
+            'STA_PROFESOR',
+            'VER_CITAS_MEDICAS',
+            'CREAR_CITAS_MEDICAS',
+            'MODIFICAR_CITAS_MEDICAS',
+            'VIP_MEDICO',
+            'VIP_PSICOLOGO',
+            'ELIMINAR_CITAS_MEDICAS',
+        ];
 
-        //Permisos relacionados a actividades
-        Permission::create(['name' => 'CREAR_ACTIVIDAD']);
-        Permission::create(['name' => 'ELIMINAR_ACTIVIDAD']);
-        Permission::create(['name' => 'VER_ACTIVIDAD']);
-        Permission::create(['name' => 'MODIFICAR_ACTIVIDAD']);  
-        Permission::create(['name' => 'CREAR_ACTIVIDAD_ALUMNOS']);
-        Permission::create(['name' => 'VIP_ACTIVIDAD']);
-        Permission::create(['name' => 'VIP_ACTIVIDAD_SOLO_LECTURA']);
+        foreach ($permisos as $permiso) {
+            Permission::findOrCreate($permiso, 'web');
+        }
 
-       	//Permisos relacionados con alumnos
-        Permission::create(['name' => 'CREAR_ALUMNOS']);
-        Permission::create(['name' => 'ELIMINAR_ALUMNOS']);
-        Permission::create(['name' => 'MODIFICAR_ALUMNOS']);
-        Permission::create(['name' => 'VER_ALUMNOS']);
-        Permission::create(['name' => 'VIP_ALUMNOS']);
-        Permission::create(['name' => 'VIP_ALUMNOS_SOLO_LECTURA']);
-       	//Permisos relacionado con usuarios
-       	Permission::create(['name' => 'CREAR_USUARIOS']);
-       	Permission::create(['name' => 'ELIMINAR_USUARIOS']);
-       	Permission::create(['name' => 'MODIFICAR_USUARIOS']);
-       	Permission::create(['name' => 'VER_USUARIOS']);
-       	
-       	//Permisos relacionados con participantes
-        Permission::create(['name' => 'AGREGAR_PARTICIPANTES']);
-        Permission::create(['name' => 'ELIMINAR_PARTICIPANTES']);
-        Permission::create(['name' => 'VER_PARTICIPANTES']);
-		    
-        //Permisos relacionados con responsables
-        Permission::create(['name' => 'AGREGAR_RESPONSABLES']);
-        Permission::create(['name' => 'ELIMINAR_RESPONSABLES']);
-        Permission::create(['name' => 'VER_RESPONSABLES']);
+        $areaId = DB::table('areas')->where('tipo', 'otro')->orderBy('id')->value('id');
+        if (! $areaId) {
+            $areaId = DB::table('areas')->insertGetId([
+                'nombre' => 'Administrativo',
+                'tipo' => 'otro',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
-        //Permisos relacionados con creditos
-        Permission::create(['name' => 'CREAR_CREDITOS']);
-        Permission::create(['name' => 'ELIMINAR_CREDITOS']);
-        Permission::create(['name' => 'VER_CREDITOS']);
-        Permission::create(['name' => 'MODIFICAR_CREDITOS']);
-        
-        //Permisos relacionados a reportes
-        Permission::create(['name' => 'VER_REPORTES_CARRERA']);
-        Permission::create(['name' => 'VIP_REPORTES']);
+        $administrador = User::firstOrCreate(
+            ['email' => 'admin@itsch.com'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('Jaguares'),
+                'area' => $areaId,
+                'active' => 'true',
+            ]
+        );
+        $administrador->givePermissionTo(['VIP', 'VIP_STA']);
 
-        //Permisos relacionados a ver los avances de los alumnos
-        Permission::create(['name' => 'VER_AVANCE_ALUMNO']);
-        Permission::create(['name' => 'VIP_AVANCE_ALUMNO']);
+        $roles = [
+            'Responsable' => [
+                'VER_EVIDENCIA',
+                'ELIMINAR_EVIDENCIA',
+                'AGREGAR_PARTICIPANTES',
+                'ELIMINAR_PARTICIPANTES',
+                'VER_PARTICIPANTES',
+                'CREAR_EVIDENCIA',
+            ],
+            'Administrador' => [
+                'VIP',
+            ],
+            'SubAdministrador de Actividades' => [
+                'CREAR_ACTIVIDAD',
+                'VER_ACTIVIDAD',
+                'ELIMINAR_ACTIVIDAD',
+                'AGREGAR_RESPONSABLES',
+                'ELIMINAR_RESPONSABLES',
+                'VER_RESPONSABLES',
+                'MODIFICAR_ACTIVIDAD',
+                'CREAR_MENSAJES',
+                'VERIFICAR_EVIDENCIA',
+                'VER_EVIDENCIA',
+            ],
+            'Administrador de Actividades' => [
+                'VIP_ACTIVIDAD',
+                'CREAR_MENSAJES',
+                'VERIFICAR_EVIDENCIA',
+            ],
+            'Administrador de Evidencias' => [
+                'VIP_EVIDENCIA',
+                'VERIFICAR_EVIDENCIA',
+            ],
+            'SubAdministrador de Usuarios' => [
+                'CREAR_USUARIOS',
+                'ELIMINAR_USUARIOS',
+                'MODIFICAR_USUARIOS',
+                'VER_USUARIOS',
+            ],
+            'Jefe de Carrera' => [
+                'VER_ALUMNOS',
+                'MODIFICAR_ALUMNOS',
+                'CREAR_ALUMNOS',
+                'ELIMINAR_ALUMNOS',
+                'CREAR_ACTIVIDAD',
+                'ELIMINAR_ACTIVIDAD',
+                'VER_ACTIVIDAD',
+                'MODIFICAR_ACTIVIDAD',
+                'VERIFICAR_EVIDENCIA',
+                'VER_EVIDENCIA',
+                'AGREGAR_RESPONSABLES',
+                'ELIMINAR_RESPONSABLES',
+                'ELIMINAR_EVIDENCIA',
+                'VER_REPORTES_CARRERA',
+                'IMPRIMIR_CONSTANCIAS',
+                'VER_AVANCE_ALUMNO',
+                'CREAR_MENSAJES',
+                'AGREGAR_PARTICIPANTES',
+                'ELIMINAR_PARTICIPANTES',
+                'MODIFICAR_CONSTANCIAS_CARRERA',
+            ],
+        ];
 
-        //Permisos relacionado a roles
-        Permission::create(['name' => 'ASIGNAR_REMOVER_ROLES_USUARIOS']);
-        Permission::create(['name' => 'CREAR_ROLES']);
-        Permission::create(['name' => 'ELIMINAR_ROLES']);
-        Permission::create(['name' => 'MODIFICAR_ROLES']);
-        Permission::create(['name' => 'VER_ROLES']);
-        Permission::create(['name' => 'VER_ROLES_USUARIOS']);
-        Permission::create(['name' => 'ASIGNAR_REMOVER_PERMISOS_A_ROLES']);
-       	
-       	//Permisos relacionados a constancias
-       	Permission::create(['name' => 'MODIFICAR_CONSTANCIAS_CARRERA']);
-       	Permission::create(['name' => 'VIP_CONSTANCIAS']);
-       	Permission::create(['name' => 'IMPRIMIR_CONSTANCIAS']);
+        foreach ($roles as $nombre => $permisosRol) {
+            $rol = Role::findOrCreate($nombre, 'web');
+            $rol->givePermissionTo($permisosRol);
+        }
 
-        //Permisos relacionados a areas
-        Permission::create(['name' => 'CREAR_AREAS']);
-        Permission::create(['name' => 'ELIMINAR_AREAS']);
-        Permission::create(['name' => 'VER_AREAS']);
-        Permission::create(['name' => 'MODIFICAR_AREAS']);
-
-        //Permisos relacionado con mensajes
-        Permission::create(['name' => 'CREAR_MENSAJES']);
-        
-       	//Permisos relacionado a administrador
-       	Permission::create(['name' => 'VIP']);
-       	Permission::create(['name' => 'VIP_SOLO_LECTURA']);
-
-        //Permisos relacionados con STA
-        Permission::create(['name' => 'VIP_STA']);
-        Permission::create(['name' => 'STA_DEP_TUTORIA']);
-        Permission::create(['name' => 'STA_TUTOR']);
-        Permission::create(['name' => 'STA_COR_CARRERA']);
-        Permission::create(['name' => 'STA_PROFESOR']);
-
-        //Permisos relacionados con el sistema medico
-        Permission::create(['name' => 'VER_CITAS_MEDICAS']);
-        Permission::create(['name' => 'CREAR_CITAS_MEDICAS']);
-        Permission::create(['name' => 'MODIFICAR_CITAS_MEDICAS']);
-        Permission::create(['name' => 'VIP_MEDICO']);
-        Permission::create(['name' => 'VIP_PSICOLOGO']);
-        Permission::create(['name' => 'ELIMINAR_CITAS_MEDICAS']);        
-
-       	//Creacion de un administrador por defecto
-       	DB::table('users')->insert([
-          'id' => 1,
-       		'name' => 'Admin',
-       		'email' => 'admin@itsch.com',
-       		'password' => bcrypt('Jaguares'),
-       		'area' => 1,
-       		'active' => 'true',
-       	]);
-        $user = User::find(1);
-        $user->givePermissionTo('VIP');
-
-        $user->givePermissionTo('VIP_STA');
-
-        $role = Role::create(['name' => 'Responsable']);
-        $role->givePermissionTo(['VER_EVIDENCIA','ELIMINAR_EVIDENCIA','AGREGAR_PARTICIPANTES','ELIMINAR_PARTICIPANTES','VER_PARTICIPANTES','CREAR_EVIDENCIA']);
-        $role = Role::create(['name' => 'Administrador']);
-        $role->givePermissionTo(['VIP']);
-
-        $role = Role::create(['name' => 'SubAdministrador de Actividades']);
-        $role->givePermissionTo(['CREAR_ACTIVIDAD','VER_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','ELIMINAR_RESPONSABLES','VER_RESPONSABLES','MODIFICAR_ACTIVIDAD','CREAR_MENSAJES','VERIFICAR_EVIDENCIA','VER_EVIDENCIA']);
-
-        $role = Role::create(['name' => 'Administrador de Actividades']);
-        $role->givePermissionTo(['VIP_ACTIVIDAD','CREAR_MENSAJES','VERIFICAR_EVIDENCIA']);
-
-        $role = Role::create(['name' => 'Administrador de Evidencias']);
-        $role->givePermissionTo(['VIP_EVIDENCIA','VERIFICAR_EVIDENCIA']);
-
-        $role = Role::create(['name' => 'SubAdministrador de Usuarios']);
-        $role->givePermissionTo(['CREAR_USUARIOS','ELIMINAR_USUARIOS','MODIFICAR_USUARIOS','VER_USUARIOS']);
-
-        $role = Role::create(['name' => 'Jefe de Carrera']);
-        $role->givePermissionTo(['VER_ALUMNOS','MODIFICAR_ALUMNOS','CREAR_ALUMNOS','ELIMINAR_ALUMNOS','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','VER_ACTIVIDAD','MODIFICAR_ACTIVIDAD','VERIFICAR_EVIDENCIA','VER_EVIDENCIA','AGREGAR_RESPONSABLES','ELIMINAR_RESPONSABLES','ELIMINAR_EVIDENCIA','VER_REPORTES_CARRERA','IMPRIMIR_CONSTANCIAS','VER_AVANCE_ALUMNO','CREAR_MENSAJES','AGREGAR_PARTICIPANTES','ELIMINAR_PARTICIPANTES','MODIFICAR_CONSTANCIAS_CARRERA']);
-
+        app()['cache']->forget('spatie.permission.cache');
     }
 }

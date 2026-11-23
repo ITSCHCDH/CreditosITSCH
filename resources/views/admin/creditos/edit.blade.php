@@ -45,6 +45,12 @@
             'areas',
             $areas->filter(fn ($area) => $area->credito_id !== null)->pluck('id')
         ))->map(fn ($id) => (string) $id)->all();
+        $jefeId = (string) old('credito_jefe', $credito->credito_jefe);
+        $jefeActual = $usuarios->first(fn ($usuario) => (string) $usuario->id === $jefeId);
+        $jefeInicial = $jefeActual ? [
+            'id' => (string) $jefeActual->id,
+            'name' => $jefeActual->name,
+        ] : null;
     @endphp
 
     @if (isset($errors) && $errors->any())
@@ -98,26 +104,25 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label" for="credito_jefe">Jefe del crédito</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fa-solid fa-user-tie"></i></span>
-                                <select
-                                    name="credito_jefe"
-                                    id="credito_jefe"
-                                    class="form-select @error('credito_jefe') is-invalid @enderror"
-                                    required
-                                >
-                                    <option value="">Seleccione un jefe</option>
-                                    @foreach ($usuarios as $usuario)
-                                        <option
-                                            value="{{ $usuario->id }}"
-                                            @selected((string) old('credito_jefe', $credito->credito_jefe) === (string) $usuario->id)
-                                        >
-                                            {{ $usuario->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            @include('template.partes.buscador_combobox', [
+                                'config' => [
+                                    'id' => 'creditoJefe',
+                                    'bare' => true,
+                                    'show_submit' => false,
+                                    'show_value' => false,
+                                    'required' => true,
+                                    'field' => 'credito_jefe',
+                                    'label' => 'Jefe del crédito',
+                                    'placeholder' => 'Escribe nombre o apellidos',
+                                    'endpoint' => route('creditos.jefes_busqueda'),
+                                    'query_param' => 'nombre',
+                                    'min_chars' => 1,
+                                    'limit' => 10,
+                                    'keys' => ['value' => 'id', 'label' => 'name', 'meta' => ''],
+                                    'initial' => $jefeInicial,
+                                    'matches_label' => 'Jefes disponibles',
+                                ],
+                            ])
                             @error('credito_jefe')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
@@ -256,6 +261,13 @@
             });
 
             $('#formCredito').on('submit', function (evento) {
+                if (!$('#creditoJefe_value').val()) {
+                    evento.preventDefault();
+                    $('#creditoJefe_input').focus();
+                    $('#creditoJefe_status').text('Selecciona un jefe de la lista antes de continuar.').attr('data-state', 'error');
+                    return;
+                }
+
                 if ($('input[name="areas[]"]:checked').length === 0) {
                     evento.preventDefault();
                     swal('Faltan áreas', 'Selecciona al menos una carrera para el crédito.', 'info');

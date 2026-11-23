@@ -144,6 +144,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('/creditos/index',[CreditosController::class,'index'])->name('creditos.index');
     Route::get('/creditos/create',[CreditosController::class,'create'])->name('creditos.create');
     Route::post('/creditos/store',[CreditosController::class,'store'])->name('creditos.store');
+    Route::get('/creditos/jefes/busqueda',[CreditosController::class,'buscarJefes'])->name('creditos.jefes_busqueda');
     Route::get('/creditos/{id}/edit',[CreditosController::class,'edit'])->name('creditos.edit');
     Route::post('/creditos/{id}/update',[CreditosController::class,'update'])->name('creditos.update');
     Route::get('/creditos/{id}/destroy',[CreditosController::class,'destroy'])->name('creditos.destroy');

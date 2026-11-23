@@ -7,6 +7,7 @@ use App\Models\Credito; //Es el nombre del modelo con el que va a trabajar el co
 use App\Models\CreditoArea;
 use App\Services\Sit\CarrerasSitService;
 use App\User;
+use Illuminate\Support\Str;
 use DB;
 use Alert;
 
@@ -90,11 +91,38 @@ class CreditosController extends Controller
             Alert::error('Error','El credito no existe');
             return redirect()->route('creditos.index');
         }
-        $usuarios = User::where('active','=','true')->orwhere('id','=',$credito->credito_jefe)->get();
+        $usuarios = User::where('active','=','true')
+            ->orWhere('id','=',$credito->credito_jefe)
+            ->orderBy('name')
+            ->get()
+            ->map(function ($usuario) {
+                $usuario->name = Str::upper($usuario->name);
+                return $usuario;
+            });
         return view('admin.creditos.edit')
         ->with('credito',$credito)
         ->with('areas',$areas)
         ->with('usuarios',$usuarios);
+    }
+
+    public function buscarJefes(Request $request)
+    {
+        $texto = trim((string) $request->get('nombre'));
+        $consulta = User::where('active','=','true');
+
+        if ($texto !== '') {
+            $consulta->where('name','like',"%{$texto}%");
+        }
+
+        return response()->json(
+            $consulta->orderBy('name')
+                ->limit(20)
+                ->get(['id','name'])
+                ->map(function ($usuario) {
+                    $usuario->name = Str::upper($usuario->name);
+                    return $usuario;
+                })
+        );
     }
 
   

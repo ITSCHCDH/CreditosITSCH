@@ -1,84 +1,46 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\Area;
+use Illuminate\Support\Facades\DB;
 
 class CrearAreas extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
-    	//Carreras
-        $area = new Area();
-        $area->nombre = "Ingeniería en Sistemas Computacionales";
-        $area->tipo = "carrera";
-        $area->save();
+        $areas = [
+            'Administrativo',
+            'Ciencias Básicas',
+            'Clubes',
+            'Dirección Académica',
+            'Extensión Educativa',
+            'Tutorías',
+            'Vinculación',
+        ];
 
-        $area = new Area();
-        $area->nombre = "Ingeniería en Tecnologías de la Información y Comunicaciones";
-        $area->tipo = "carrera";
-        $area->save();
+        DB::table('areas')
+            ->where('nombre', 'Dirección Academica')
+            ->where('tipo', 'otro')
+            ->update([
+                'nombre' => 'Dirección Académica',
+                'updated_at' => now(),
+            ]);
 
-        $area = new Area();
-        $area->nombre = "Ingeniería en Nanotecnología";
-        $area->tipo = "carrera";
-        $area->save();
+        foreach ($areas as $nombre) {
+            $area = DB::table('areas')->where('nombre', $nombre)->first();
 
-        $area = new Area();
-        $area->nombre = "Ingeniería Industrial";
-        $area->tipo = "carrera";
-        $area->save();
-
-        $area = new Area();
-        $area->nombre = "Ingeniería en Gestión Empresarial";
-        $area->tipo = "carrera";
-        $area->save();
-
-        $area = new Area();
-        $area->nombre = "Ingeniería Mecatrónica";
-        $area->tipo = "carrera";
-        $area->save();
-
-        $area = new Area();
-        $area->nombre = "Ingeniería Bioquímica";
-        $area->tipo = "carrera";
-        $area->save();
-
-        //Otras areas diferentes a las de carrera
-
-        $area = new Area();
-        $area->nombre = "Ciencias Básicas";
-        $area->tipo = "otro";
-        $area->save();
-
-        $area = new Area();
-        $area->nombre = "Tutorías";
-        $area->tipo = "otro";
-        $area->save();
-
-        $area = new Area();
-        $area->nombre = "Extensión Educativa";
-        $area->tipo = "otro";
-        $area->save();
-
-        $area = new Area();
-        $area->nombre = "Dirección Academica";
-        $area->tipo = "otro";
-        $area->save();
-
-        $area = new Area();
-        $area->nombre = "Vinculación";
-        $area->tipo = "otro";
-        $area->save();
-
-        $area = new Area();
-        $area->nombre = "Clubes";
-        $area->tipo = "otro";
-        $area->save();
-
+            if ($area) {
+                DB::table('areas')->where('id', $area->id)->update([
+                    'tipo' => 'otro',
+                    'updated_at' => now(),
+                ]);
+            } else {
+                DB::table('areas')->insert([
+                    'nombre' => $nombre,
+                    'tipo' => 'otro',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
     }
 }
