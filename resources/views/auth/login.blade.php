@@ -237,7 +237,7 @@
                     <img src="{{ asset('images/itsch.jpg') }}" class="brand-logo" alt="Instituto Tecnológico Superior de Huetamo">
 
                     <div class="brand-copy">
-                        <span class="brand-eyebrow">Instituto Tecnológico Superior de Huetamo</span>
+                        <span class="brand-eyebrow">Instituto Tecnológico Superior de Ciudad Hidalgo</span>
                         <h1>Tu trayectoria académica</h1>
                         <p>Consulta tus actividades, avances y servicios institucionales desde un solo acceso.</p>
                     </div>
