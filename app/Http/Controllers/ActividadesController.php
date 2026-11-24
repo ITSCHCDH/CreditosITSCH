@@ -138,9 +138,10 @@ class ActividadesController extends Controller
                 if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD'])) {
                     $actividad->acciones .= '<a href="' . route('verifica_evidencia.index',
                         [
-                            'validadas=on',
-                            'busqueda=' . $actividad->actividad_nombre,
-                            'actividades_link=true'
+                            'validadas' => 'false',
+                            'actividad_id' => $actividad->id,
+                            'busqueda' => $actividad->actividad_nombre,
+                            'actividades_link' => 'true',
                         ]) .
                         '" class="btn btn-success btn-sm ms-1 mb-1" title="Verificar evidencias de esta actividad">' .
                         '<i class="far fa-edit" style="font-size:14px"></i></a>';
