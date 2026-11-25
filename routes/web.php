@@ -17,6 +17,7 @@ use App\Http\Controllers\ActividadesController;
 use App\Http\Controllers\AlumnosController;
 use App\Http\Controllers\AlumnosRutasController;
 use App\Http\Controllers\CreditosController;
+use App\Http\Controllers\ConstanciasController;
 use App\Http\Controllers\EvidenciasController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\UsersController;
@@ -144,6 +145,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('/creditos/index',[CreditosController::class,'index'])->name('creditos.index');
     Route::get('/creditos/create',[CreditosController::class,'create'])->name('creditos.create');
     Route::post('/creditos/store',[CreditosController::class,'store'])->name('creditos.store');
+    Route::get('/creditos/jefes/busqueda',[CreditosController::class,'buscarJefes'])->name('creditos.jefes_busqueda');
     Route::get('/creditos/{id}/edit',[CreditosController::class,'edit'])->name('creditos.edit');
     Route::post('/creditos/{id}/update',[CreditosController::class,'update'])->name('creditos.update');
     Route::get('/creditos/{id}/destroy',[CreditosController::class,'destroy'])->name('creditos.destroy');
@@ -208,6 +210,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('constancias/visualizar','ConstanciasController@visualizar')->name('constancias.visualizar');
     Route::get('constancias','ConstanciasController@index')->name('constancias.index');
     Route::get('constancias/editar','ConstanciasController@editarConstancia')->name('constancias.editar');
+    Route::get('constancias/firmantes/busqueda',[ConstanciasController::class,'buscarFirmantes'])->name('constancias.firmantes_busqueda');
     Route::post('constancias/guardar_datos_globales','ConstanciasController@guardarDatosGlobales')->name('constancias.guardar_datos_globales');
     Route::get('constancias/{carrera}/obtener_datos_especificos','ConstanciasController@obtenerDatosEspecificos')->name('constancias.obtener_datos_especificos');
     Route::post('constancias/{carrera}/guardar','ConstanciasController@guardarDatosEspecificos')->name('constancias.guardar_datos_especificos');

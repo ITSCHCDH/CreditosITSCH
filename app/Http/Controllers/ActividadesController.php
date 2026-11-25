@@ -39,17 +39,18 @@ class ActividadesController extends Controller
     public function cargarActividadesAjax(Request $request)
     {
         try {
-            $chkVigencia = $request->input('vigente');
+            $mostrarCerradas = $request->boolean('vigente');
 
             $selectColumns = [
                 'a.nombre as actividad_nombre','a.id','a.por_cred_actividad','a.vigente',
                 'a.alumnos','c.nombre as credito_nombre','u.name as administrador','a.id_user',
+                'a.fecCierre as fec_cierre_iso',
                 DB::raw('count(par.id) as no_alumnos'), DB::raw('DATE_FORMAT(a.created_at, "%d-%m-%Y") as fecha_creacion'), DB::raw('DATE_FORMAT(a.fecCierre,"%d-%m-%Y") as fecCierre')
             ];
 
             $dtAttr = new DataTableAttr($request, $selectColumns);
 
-            $fecHoy = Carbon::now();
+            $fecHoy = Carbon::today()->toDateString();
 
             $actividades = DB::table('actividad as a')
                 ->leftjoin('users as u','u.id', '=','a.id_user')
@@ -63,15 +64,7 @@ class ActividadesController extends Controller
 
             DataTableHelper::applyOnly($actividades, $dtAttr, [DataTableHelper::WHERE, DataTableHelper::ORDER_BY]);
 
-            if($chkVigencia=='false')
-            {
-                $actividades->where('a.vigente','<>', $chkVigencia)->where('fecCierre','>=',$fecHoy);
-            }
-            else
-            {
-                $actividades->where('a.vigente','<>', $chkVigencia)->where('fecCierre','<',$fecHoy);
-               
-            }
+            $this->aplicarFiltroCierre($actividades, $mostrarCerradas, $fecHoy);
 
             DataTableHelper::applyOnly($actividades, $dtAttr, [DataTableHelper::PAGINATE]);
 
@@ -87,6 +80,27 @@ class ActividadesController extends Controller
         }
     }
 
+    private function aplicarFiltroCierre($actividadQuery, bool $mostrarCerradas, string $fechaHoy)
+    {
+        if ($mostrarCerradas) {
+            $actividadQuery->where(function ($query) use ($fechaHoy) {
+                $query->where('a.vigente', 'false')
+                    ->orWhere(function ($fecha) use ($fechaHoy) {
+                        $fecha->whereNotNull('a.fecCierre')
+                            ->where('a.fecCierre', '<', $fechaHoy);
+                    });
+            });
+
+            return;
+        }
+
+        $actividadQuery->where('a.vigente', 'true')
+            ->where(function ($query) use ($fechaHoy) {
+                $query->whereNull('a.fecCierre')
+                    ->orWhere('a.fecCierre', '>=', $fechaHoy);
+            });
+    }
+
     private function applicarActividadFiltro($actividad_query)
     {   
         if (!Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','VIP_SOLO_LECTURA'])) {
@@ -98,9 +112,12 @@ class ActividadesController extends Controller
     {
         foreach ($actividades as $actividad) {
             $actividad->acciones = "";
+            $actividadAbierta = $actividad->vigente === 'true'
+                && ($actividad->fec_cierre_iso === null
+                    || $actividad->fec_cierre_iso >= Carbon::today()->toDateString());
 
             if (Auth::User()->hasAnyPermission(['VIP','VIP_ACTIVIDAD','MODIFICAR_ACTIVIDAD','CREAR_ACTIVIDAD','ELIMINAR_ACTIVIDAD','AGREGAR_RESPONSABLES','VIP_SOLO_LECTURA'])) {
-                if ($actividad->vigente == 'true' && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD'])) {
+                if ($actividadAbierta && Auth::User()->hasAnyPermission(['VIP','CREAR_ACTIVIDAD','VIP_ACTIVIDAD'])) {
                     $actividad->acciones .= '<a href="#" class="btn btn-info btn-sm ms-1 mb-1" ' .
                         'onclick="redireccionar(' . $actividad->id . ');" title="Agregar participantes (Alumnos) a la actividad">' .
                         '<i class="fas fa-users" style="font-size:12px"></i></a>';
@@ -121,9 +138,10 @@ class ActividadesController extends Controller
                 if (Auth::User()->hasAnyPermission(['VIP','VIP_EVIDENCIA','VERIFICAR_EVIDENCIA','VIP_ACTIVIDAD'])) {
                     $actividad->acciones .= '<a href="' . route('verifica_evidencia.index',
                         [
-                            'validadas=on',
-                            'busqueda=' . $actividad->actividad_nombre,
-                            'actividades_link=true'
+                            'validadas' => 'false',
+                            'actividad_id' => $actividad->id,
+                            'busqueda' => $actividad->actividad_nombre,
+                            'actividades_link' => 'true',
                         ]) .
                         '" class="btn btn-success btn-sm ms-1 mb-1" title="Verificar evidencias de esta actividad">' .
                         '<i class="far fa-edit" style="font-size:14px"></i></a>';

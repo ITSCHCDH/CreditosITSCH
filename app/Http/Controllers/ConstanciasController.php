@@ -14,6 +14,7 @@ use App\Models\Folio;
 use App\Models\Sit\Carrera as SitCarrera;
 use App\Models\Sit\PlanEstudio;
 use App\Services\Sit\CarrerasSitService;
+use Illuminate\Support\Str;
 use PDF;
 use DB;
 use Alert;
@@ -23,7 +24,8 @@ class ConstanciasController extends Controller
     public function __construct(){
 
         $this->middleware('permission:VIP|VIP_CONSTANCIAS')->only('guardarDatosGlobales');
-        $this->middleware('permission:VIP|VIP_CONSTANCIAS|MODIFICAR_CONSTANCIAS_CARRERA')->only('guardarDatosEspecificos','visualizar','editarConstancia');
+        $this->middleware('permission:VIP|VIP_CONSTANCIAS|MODIFICAR_CONSTANCIAS_CARRERA')
+            ->only('guardarDatosEspecificos','visualizar','editarConstancia','buscarFirmantes');
     }
     	
     public function index(){
@@ -39,7 +41,11 @@ class ConstanciasController extends Controller
             ])->get();
             $carreras = CarrerasSitService::visibles(null, true);
             $abreviaturas = $this->obternerAbreviaturas();
-            $users = User::select('name','id')->where('email','<>','admin@itsch.com')->orderBy('name','ASC')->get();
+            $users = User::select('name','id')->where('email','<>','admin@itsch.com')->orderBy('name','ASC')->get()
+                ->map(function ($user) {
+                    $user->name = Str::upper($user->name);
+                    return $user;
+                });
             return view('admin.constancias.index')
             ->with('carreras',$carreras)
             ->with('planes',$planes)
@@ -59,7 +65,11 @@ class ConstanciasController extends Controller
             $users = User::select('name','id')->where([
                 ['email','<>','admin@itsch.com'],
                 ['area','=',Auth::User()->area]
-            ])->orderBy('name','ASC')->get();
+            ])->orderBy('name','ASC')->get()
+                ->map(function ($user) {
+                    $user->name = Str::upper($user->name);
+                    return $user;
+                });
             return view('admin.constancias.index')
             ->with('carreras',$carreras)
             ->with('planes',$planes)
@@ -67,6 +77,32 @@ class ConstanciasController extends Controller
             ->with('users',$users)
             ->with('datos_globales',$datos_globales);
         }
+    }
+
+    public function buscarFirmantes(Request $request)
+    {
+        $texto = trim((string) $request->get('nombre'));
+        $consulta = User::query()
+            ->select('id', 'name')
+            ->where('email', '<>', 'admin@itsch.com');
+
+        if (! Auth::User()->hasAnyPermission(['VIP', 'VIP_CONSTANCIAS'])) {
+            $consulta->where('area', Auth::User()->area);
+        }
+
+        if ($texto !== '') {
+            $consulta->where('name', 'like', "%{$texto}%");
+        }
+
+        return response()->json(
+            $consulta->orderBy('name')
+                ->limit(20)
+                ->get()
+                ->map(function ($usuario) {
+                    $usuario->name = Str::upper($usuario->name);
+                    return $usuario;
+                })
+        );
     }
 
     public function visualizar(Request $request){

@@ -1,36 +1,22 @@
 <?php
 
-use Illuminate\Database\Seeder;
 use App\Models\Credito;
-
+use Illuminate\Database\Seeder;
 
 class CrearCreditos extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
-        $credito = new Credito();
-        $credito->nombre = "Clubes";
-        $credito->save();
-        
-		$credito = new Credito();
-		$credito->nombre = "Tutorías";
-		$credito->save();
+        $creditos = [
+            'Clubes',
+            'Tutorías',
+            'Concursos',
+            'Congresos y Jornadas',
+            'Comunitario',
+        ];
 
-		$credito = new Credito();
-		$credito->nombre = "Concursos";
-		$credito->save();
-
-		$credito = new Credito();
-		$credito->nombre = "Congresos y Jornadas";
-		$credito->save();
-
-		$credito = new Credito();
-		$credito->nombre = "Comunitario";
-		$credito->save();        
+        foreach ($creditos as $nombre) {
+            Credito::firstOrCreate(['nombre' => $nombre]);
+        }
     }
 }

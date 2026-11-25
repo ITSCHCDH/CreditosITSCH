@@ -35,6 +35,7 @@ class VerificaEvidenciaController extends Controller
     public function index(Request $request){
         $validadas = 'true'; // Variable para filtrar las activides no validadas de las validadas
         $busqueda = $request->busqueda;
+        $actividadId = $request->filled('actividad_id') ? (int) $request->actividad_id : null;
         $actividades_link = 'false';
         if($request->has('actividades_link') && $request->actividades_link == 'true'){
             $actividades_link = 'true';
@@ -53,11 +54,16 @@ class VerificaEvidenciaController extends Controller
             ->join('creditos as c','a.id_actividad','=','c.id')
             ->join('users as validador','validador.id','=','ae.validador_id')
             ->join('participantes as p','p.id_evidencia','=','ae.id')
-            ->where(function($query) use($request){
-                $query->where('a.nombre','LIKE',"%$request->busqueda%")
-                ->orwhere('c.nombre','LIKE',"%$request->busqueda%")
-                ->orwhere('u.name','LIKE',"%$request->busqueda%")
-                ->orwhere('validador.name','LIKE',"%$request->busqueda%");
+            ->when($actividadId, function ($query) use ($actividadId) {
+                $query->where('a.id', $actividadId);
+            })
+            ->when(trim((string) $busqueda) !== '' && ! $actividadId, function ($query) use ($busqueda) {
+                $query->where(function ($busquedaQuery) use ($busqueda) {
+                    $busquedaQuery->where('a.nombre','LIKE',"%{$busqueda}%")
+                        ->orWhere('c.nombre','LIKE',"%{$busqueda}%")
+                        ->orWhere('u.name','LIKE',"%{$busqueda}%")
+                        ->orWhere('validador.name','LIKE',"%{$busqueda}%");
+                });
             })
             ->where('ae.validado','=',$validadas)
             ->select('e.nom_imagen','e.id','ae.validado','u.name','a.nombre','a.por_cred_actividad','c.nombre as nombre_credito','c.id as id_credito','ae.id as actividad_evidencia_id','validador.name as validador_nombre','validador.id as validador_id','c.vigente')
@@ -70,11 +76,16 @@ class VerificaEvidenciaController extends Controller
             ->join('creditos as c','a.id_actividad','=','c.id')
             ->join('users as validador','validador.id','=','ae.validador_id')
             ->join('participantes as p','p.id_evidencia','=','ae.id')
-            ->where(function($query) use($request){
-                $query->where('a.nombre','LIKE',"%$request->busqueda%")
-                ->orwhere('c.nombre','LIKE',"%$request->busqueda%")
-                ->orwhere('u.name','LIKE',"%$request->busqueda%")
-                ->orwhere('validador.name','LIKE',"%$request->busqueda%");
+            ->when($actividadId, function ($query) use ($actividadId) {
+                $query->where('a.id', $actividadId);
+            })
+            ->when(trim((string) $busqueda) !== '' && ! $actividadId, function ($query) use ($busqueda) {
+                $query->where(function ($busquedaQuery) use ($busqueda) {
+                    $busquedaQuery->where('a.nombre','LIKE',"%{$busqueda}%")
+                        ->orWhere('c.nombre','LIKE',"%{$busqueda}%")
+                        ->orWhere('u.name','LIKE',"%{$busqueda}%")
+                        ->orWhere('validador.name','LIKE',"%{$busqueda}%");
+                });
             })
             ->where([
                 ['validador.id','=',Auth::User()->id],
@@ -87,7 +98,8 @@ class VerificaEvidenciaController extends Controller
         ->with('evidencias_data',$evidencias_data)
         ->with('validadas',$validadas)
         ->with('actividades_link',$actividades_link)
-        ->with('busqueda',$busqueda);
+        ->with('busqueda',$busqueda)
+        ->with('actividad_id',$actividadId);
     }
 
     public function eliminarAlumnosSinEvidencia($todos_los_alumnos, $alumnos_con_evidencia){
@@ -168,7 +180,11 @@ class VerificaEvidenciaController extends Controller
                 $validar_evidencia->save();
             }
         }
-    	return redirect()->route('verifica_evidencia.index');
+        return redirect()->route('verifica_evidencia.index', array_filter([
+            'actividades_link' => $request->actividades_link === 'true' ? 'true' : null,
+            'actividad_id' => $request->filled('actividad_id') ? $request->actividad_id : null,
+            'busqueda' => $request->busqueda,
+        ]));
     }
 
 

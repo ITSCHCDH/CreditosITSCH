@@ -47,6 +47,9 @@
     </div>
     <form action="{{ route('verifica_evidencia.index') }}" method="get" id="actividades-submit" class="d-flex align-items-center gap-2 flex-wrap">
         <input type="hidden" name="actividades_link" value="{{ $actividades_link }}">
+        @if($actividad_id)
+            <input type="hidden" name="actividad_id" value="{{ $actividad_id }}">
+        @endif
         <div class="form-check form-switch mb-0">
             <input type="checkbox" id="checkbox5" class="form-check-input" name="validadas" @checked($validadas == 'false')>
             <label for="checkbox5" class="form-check-label">Actividades sin validar</label>
@@ -67,6 +70,10 @@
 <form action="{{ route('verifica_evidencia.store') }}" method="post">
     @csrf
     <input type="hidden" name="actividades_link" value="{{ $actividades_link }}">
+    @if($actividad_id)
+        <input type="hidden" name="actividad_id" value="{{ $actividad_id }}">
+    @endif
+    <input type="hidden" name="busqueda" value="{{ $busqueda }}">
 
     <article class="verification-table-card">
         <div class="verification-table-card-head">

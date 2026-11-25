@@ -95,19 +95,29 @@ class UsersController extends Controller
         }
     }
     public function store(UserRequest $request){
-    	$user = new User($request->all());
+        $user = new User($request->all());
         $correo_duplicado = User::where('email','=',$user->email)->get()->count() > 0;
         if($correo_duplicado){
             Alert::error('Error','El correo '.$user->email.' ya se encuentra en uso');
             return back()->withInput();
         }
-    	$user->password = bcrypt($request->password);
-        $user->tutor=$request->tutor;
-        $user->sit_carrera_id = $request->filled('sit_carrera_id') ? $request->sit_carrera_id : null;
-        $user->save();
-        if($request->has('roles_id')){
-            $user->syncRoles($request->roles_id);
-        }
+
+        DB::transaction(function () use ($request, $user) {
+            $user->password = bcrypt($request->password);
+            $user->tutor = $request->tutor;
+            $user->sit_carrera_id = $request->filled('sit_carrera_id') ? $request->sit_carrera_id : null;
+            $user->save();
+
+            if ($request->has('roles_id')) {
+                $roleNames = Role::where('guard_name', 'web')
+                    ->whereIn('id', $request->roles_id)
+                    ->pluck('name')
+                    ->all();
+
+                $user->syncRoles($roleNames);
+            }
+        });
+
         Alert::success('Correcto','El usuario '.$user->name.' has sido registrado exitosamente!');
     	return redirect()->route('usuarios.index');
     }
