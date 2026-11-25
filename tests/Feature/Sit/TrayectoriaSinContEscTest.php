@@ -5,6 +5,7 @@ use App\Models\Sit\ResidenciaAlumno;
 use App\Models\Sit\ServicioSocialAlumno;
 use App\Services\Sit\TrayectoriaAcademicaService;
 use App\Http\Controllers\GruposController;
+use App\Models\Grupo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -224,7 +225,8 @@ it('mantiene disponibles las rutas STA principales', function () {
         ->and(Route::has('tutorias.deleteGrupo'))->toBeTrue()
         ->and(Route::has('tutorias.destroy'))->toBeTrue()
         ->and(Route::has('tutorias.asigTutPDF'))->toBeTrue()
-        ->and(Route::has('tutorias.libTutPDF'))->toBeTrue();
+        ->and(Route::has('tutorias.libTutPDF'))->toBeTrue()
+        ->and(Route::has('tutorias.deleteAllGrupos'))->toBeTrue();
 });
 
 it('busca todos los catedraticos activos de SIT para tutorias', function () {
@@ -246,4 +248,38 @@ it('genera la constancia PDF de asignacion con datos SIT', function () {
 
     expect($response->getStatusCode())->toBe(200)
         ->and($response->headers->get('content-type'))->toContain('application/pdf');
+});
+
+it('elimina un grupo por la ruta de accion sin dejarlo registrado', function () {
+    expect(Grupo::count())->toBe(1);
+
+    $response = app(GruposController::class)->deleteGrupo(1);
+
+    expect($response->getStatusCode())->toBe(302)
+        ->and(Grupo::count())->toBe(0);
+});
+
+it('elimina todos los grupos y sus asignaciones mediante la accion masiva', function () {
+    DB::connection('creditos')->table('grupos')->insert([
+        'id' => 2,
+        'gpo_Nombre' => '8A',
+        'id_Carrera' => 10,
+        'gpo_Semestre' => 'Ago-Dic',
+        'gpo_Status' => 0,
+    ]);
+    DB::connection('creditos')->table('asignaciones_tutores')->insert([
+        'id' => 2,
+        'gpo_Id' => 2,
+        'tut_Clave' => 3,
+        'car_Clave' => 10,
+        'gtu_Tipo' => 'Ingreso',
+        'gtu_Semestre' => 'Ago-Dic',
+        'gtu_Año' => 2026,
+    ]);
+
+    $response = app(GruposController::class)->deleteAllGrupos();
+
+    expect($response->getStatusCode())->toBe(302)
+        ->and(Grupo::count())->toBe(0)
+        ->and(DB::table('asignaciones_tutores')->count())->toBe(0);
 });

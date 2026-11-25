@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Grupo;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Models\AsignacionTutores;
 use App\Models\Sit\Carrera;
 use App\Models\Sit\Catedratico;
@@ -93,6 +94,10 @@ class GruposController extends Controller
         {
             //Obtenemos el grupo a eliminar
             $grupo = Grupo::find($id);
+            if (! $grupo) {
+                Alert::error('Error', 'El grupo no existe');
+                return redirect()->route('tutorias.getGruposAll');
+            }
             //Eliminamos el grupo
             $grupo->delete();
             Alert::success('Correcto',"El grupo se ha eliminado correctamente");
@@ -104,7 +109,32 @@ class GruposController extends Controller
             Alert::error('Error','Ocurrio un error al eliminar el grupo, ya que tiene un tutor asignado');
             return redirect()->back();
         }
-       
+    }
+
+    public function deleteAllGrupos()
+    {
+        try {
+            DB::transaction(function () {
+                $nombres = Grupo::query()->pluck('gpo_Nombre')->filter()->unique()->values();
+
+                AsignacionTutores::query()->delete();
+
+                if (Schema::hasTable('gpo_tutorias')) {
+                    DB::table('gpo_tutorias')
+                        ->whereIn('gpo_Nombre', $nombres)
+                        ->delete();
+                }
+
+                Grupo::query()->delete();
+            });
+
+            Alert::success('Correcto', 'Todos los grupos de tutoría fueron eliminados');
+        } catch (\Throwable $e) {
+            report($e);
+            Alert::error('Error', 'No fue posible eliminar todos los grupos');
+        }
+
+        return redirect()->route('tutorias.getGruposAll');
     }
 
     //Función para modificar un grupo

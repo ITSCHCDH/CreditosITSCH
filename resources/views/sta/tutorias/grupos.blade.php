@@ -159,9 +159,18 @@
                 <h2><i class="fa-solid fa-table-list me-2"></i>Grupos registrados</h2>
                 <span class="badge rounded-pill bg-light text-dark">{{ $totalGrupos }}</span>
             </div>
-            <a href="{{ route('tutorias.index') }}" class="btn btn-sm btn-outline-primary">
-                <i class="fa-solid fa-arrow-left me-2"></i>Volver a tutorías
-            </a>
+            <div class="d-flex flex-wrap justify-content-end gap-2">
+                @if($totalGrupos > 0)
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                        data-bs-toggle="modal" data-bs-target="#modalEliminarTodos"
+                        data-mdb-toggle="modal" data-mdb-target="#modalEliminarTodos">
+                        <i class="fa-solid fa-trash-can me-2"></i>Eliminar todos
+                    </button>
+                @endif
+                <a href="{{ route('tutorias.index') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Volver a tutorías
+                </a>
+            </div>
         </div>
 
         @if ($totalGrupos > 0)
@@ -196,16 +205,14 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="d-inline-flex gap-1">
-                                        <button type="button" class="btn btn-sm btn-outline-primary"
-                                            class="btn btn-sm btn-outline-primary btn-edit-group"
+                                        <button type="button" class="btn btn-sm btn-outline-primary btn-edit-group"
                                             data-grupo="{{ json_encode($grupo, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) }}"
                                             data-action="{{ route('tutorias.updateGrupo', $grupo->id) }}"
                                             data-bs-toggle="modal" data-bs-target="#myModalUpdate"
                                             data-mdb-toggle="modal" data-mdb-target="#myModalUpdate" title="Editar grupo">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger"
-                                            class="btn btn-sm btn-outline-danger btn-delete-group"
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete-group"
                                             data-grupo="{{ json_encode($grupo, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) }}"
                                             data-action="{{ route('tutorias.deleteGrupo', $grupo->id) }}"
                                             data-bs-toggle="modal" data-bs-target="#myModalDelete"
@@ -294,6 +301,32 @@
             </form>
         </div>
     </div>
+
+    <div class="modal fade" id="modalEliminarTodos" tabindex="-1" aria-labelledby="modalEliminarTodosLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form action="{{ route('tutorias.deleteAllGrupos') }}" method="POST">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="modalEliminarTodosLabel">
+                            <i class="fa-solid fa-triangle-exclamation me-2"></i>Eliminar todos los grupos
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" data-mdb-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-2">¿Estás seguro de eliminar <strong>todos los {{ $totalGrupos }} grupos</strong>?</p>
+                        <p class="text-danger mb-0"><strong>Esta acción también eliminará las asignaciones y vinculaciones asociadas.</strong></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-mdb-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fa-solid fa-trash-can me-2"></i>Eliminar todos
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @section('js')
@@ -322,6 +355,13 @@
 
         $(document).on('click', '.btn-edit-group', function () {
             modificarGrupo(this);
+        });
+
+        $('#myModalUpdate').on('shown.bs.modal shown.mdb.modal', function () {
+            const activeButton = $(document.activeElement).closest('.btn-edit-group')[0];
+            if (activeButton) {
+                modificarGrupo(activeButton);
+            }
         });
 
         $(document).on('click', '.btn-delete-group', function () {
