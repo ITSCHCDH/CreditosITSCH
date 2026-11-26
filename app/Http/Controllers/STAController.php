@@ -333,8 +333,11 @@ class STAController extends Controller
         // Obtener los grupos dependiendo de los permisos
         if ($user->can('VIP_STA')) {        
             $grupos = AsignacionTutores::all();        
-        } else {       
-            $grupos = AsignacionTutores::where('tut_Clave', $user->id)->get();        
+        } else {
+            $claveCatedratico = $this->obtCatClave();
+            $grupos = $claveCatedratico > 0
+                ? AsignacionTutores::where('tut_Clave', $claveCatedratico)->get()
+                : AsignacionTutores::whereRaw('1 = 0')->get();
         }
     
         // Extraer las claves necesarias
