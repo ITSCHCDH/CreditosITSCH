@@ -22,10 +22,36 @@ class STAController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_PROFESOR')->only(['indexProfesores','findProfesores','buscarProfesores','findMaterias','findListaCali','saveComent']);
+        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA')->only(['indexProfesores','findProfesores','buscarProfesores']);
+        $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_PROFESOR')->only(['misGrupos','findMaterias','findUnits','findListaCali','saveComent']);
         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA')->only(['indexTutorias','buscarCatedraticosTutorias']);       
         $this->middleware('permission:VIP_STA|STA_DEP_TUTORIA|STA_TUTOR')->only(['indexTutores','showGrupo','storeGrupo','deleteAlumno']);
     }  
+
+    public function misGrupos()
+    {
+        $docente = app(DocenteSitResolverService::class)->resolverCatedratico(Auth::user());
+
+        $grupos = collect();
+        $periodoActivo = null;
+        if ($docente) {
+            $grupos = SitGrupo::with(['materia', 'periodoEscolar'])
+                ->withCount('listas')
+                ->where('activo', 1)
+                ->where('catedratico_id', $docente->id)
+                ->whereHas('periodoEscolar', fn ($periodo) => $periodo->where('activo', 1))
+                ->orderBy('clave_grupo')
+                ->get();
+            $periodoActivo = $grupos->first()?->periodoEscolar;
+        }
+
+        return view('sta.profesores.mis_grupos', [
+            'docenteSit' => $docente,
+            'docenteSitPendiente' => $docente === null,
+            'gruposAsignados' => $grupos,
+            'periodoActivo' => $periodoActivo,
+        ]);
+    }
 
     public function indexProfesores()
     {
@@ -174,6 +200,15 @@ class STAController extends Controller
         $usuario = Auth::user();
         $docente = app(DocenteSitResolverService::class)->resolverCatedratico($usuario);
         $privilegiado = $usuario->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA']);
+        if (! $privilegiado && ! $docente) {
+            return response()->json([
+                'error' => '403',
+                'message' => 'Tu usuario no tiene vínculo con un catedrático activo de SIT.',
+            ], 403);
+        }
+        if (! $privilegiado && $request->filled('profesor') && (int) $request->profesor !== (int) $docente->id) {
+            return response()->json(['error' => 'Materia ajena al docente'], 403);
+        }
         $catedraticoId = $privilegiado
             ? (int) $request->profesor
             : (int) ($docente?->id ?: 0);
@@ -219,6 +254,12 @@ class STAController extends Controller
         $usuario = Auth::user();
         $docente = app(DocenteSitResolverService::class)->resolverCatedratico($usuario);
         $privilegiado = $usuario->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA']);
+        if (! $privilegiado && ! $docente) {
+            return response()->json(['error' => 'Materia ajena al docente'], 403);
+        }
+        if (! $privilegiado && $request->filled('profesor') && (int) $request->profesor !== (int) $docente->id) {
+            return response()->json(['error' => 'Materia ajena al docente'], 403);
+        }
         $catedraticoId = $privilegiado
             ? (int) $request->profesor
             : (int) ($docente?->id ?: 0);
@@ -250,6 +291,9 @@ class STAController extends Controller
         $usuario = Auth::user();
         $docente = app(DocenteSitResolverService::class)->resolverCatedratico($usuario);
         $privilegiado = $usuario->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA']);
+        if (! $privilegiado && ! $docente) {
+            return response()->json(['listaCali' => [], 'coment' => []], 403);
+        }
         $catedraticoId = $privilegiado
             ? (int) $request->profesor
             : (int) ($docente?->id ?: 0);
@@ -301,6 +345,29 @@ class STAController extends Controller
 
     public function saveComent(Request $request)
     {
+        $usuario = Auth::user();
+        $docente = app(DocenteSitResolverService::class)->resolverCatedratico($usuario);
+        $privilegiado = $usuario->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA']);
+
+        if (! $privilegiado) {
+            if (! $docente) {
+                return response()->json(['error' => 'Materia ajena al docente'], 403);
+            }
+
+            $grupoId = $request->filled('grupo') ? $request->grupo : $request->gse_clave;
+            $grupoValido = SitGrupo::query()
+                ->whereKey($grupoId)
+                ->where('activo', 1)
+                ->where('materia_id', $request->materia)
+                ->where('catedratico_id', $docente->id)
+                ->whereHas('periodoEscolar', fn ($periodo) => $periodo->where('activo', 1))
+                ->exists();
+
+            if (! $grupoValido) {
+                return response()->json(['error' => 'Materia ajena al docente'], 403);
+            }
+        }
+
         Motivoreprobacion::updateOrCreate(
             ['no_control' => $request->alumno, 'grup_cla' => $request->gse_clave, 'num_tema'=>$request->unidad],
             ['materia' =>  $request->materia, 'lse_clave' => $request->lse_clave,'motivos'=>$request->motivos,'comentario'=>$request->comentario]

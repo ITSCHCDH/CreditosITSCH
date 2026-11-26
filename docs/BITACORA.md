@@ -2,6 +2,45 @@
 
 Este archivo registra cronológicamente todos los cambios, decisiones y pendientes del proyecto de migración al esquema `sit`. Entradas más recientes arriba.
 
+### [2026-11-26 10:09] — Fase 8B: Mis grupos de docentes STA
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Implementar la vista docente de mis grupos, restringir consulta administrativa de profesores y exigir propiedad SIT en las operaciones AJAX de calificaciones.
+
+**Archivos modificados:**
+- `routes/web.php` (nueva ruta `admin/sta/mis-grupos`, restricción de consulta administrativa y permisos por controlador)
+- `app/Http/Controllers/STAController.php` (método `misGrupos` y validaciones de propiedad SIT en AJAX)
+- `resources/views/sta/profesores/mis_grupos.blade.php` (vista docente de materias, grupos, unidades y calificaciones)
+- `resources/views/sta/profesores/index.blade.php` (corrección de envío de `gse_clave`/`grupo`)
+- `resources/views/template/partes/menu.blade.php` (Mis Grupos y Consulta de Profesores separados por permisos)
+- `tests/Feature/Sta/MisGruposDocenteTest.php` (creado)
+- `docs/BITACORA.md` (entrada cerrada)
+
+**Archivos eliminados:**
+- Ninguno al iniciar.
+
+**Consultas SQL nuevas o modificadas:**
+- `Sit\Grupo::with(['materia','periodoEscolar'])->withCount('listas')` filtrado por `catedratico_id`, `activo=1` y periodo activo.
+- Validaciones de propiedad en `findUnits`, `findListaCali` y `saveComent` mediante `sit.grupos.catedratico_id`, `materia_id` y periodo activo.
+- `findMaterias` restringe a la identidad resuelta para usuarios sin `VIP_STA`/`STA_DEP_TUTORIA`.
+
+**Decisiones tomadas:**
+- No se escribieron datos en `sit`; la resolución docente persiste únicamente vínculos locales si el resolver los obtiene.
+- Los comentarios conservan su almacenamiento local en `creditos.motivosreprobacion`.
+- Usuarios privilegiados conservan el selector administrativo; docentes usan únicamente sus grupos asignados.
+
+**Pendientes / Deuda técnica:**
+- Validación visual y funcional adicional con grupos reales de staging.
+
+**Tests ejecutados:**
+- ✅ Sintaxis PHP de controlador y prueba enfocada.
+- ✅ `php artisan test tests/Feature/Sta/MisGruposDocenteTest.php` (4 passed, 9 assertions).
+
+**Referencias:**
+- Fase 8B — Mis grupos docentes.
+
 ### [2026-11-26 09:39] — Fase 8: vinculación de docentes con SIT
 
 - **Estatus:** ✅ completado

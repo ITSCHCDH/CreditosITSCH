@@ -265,6 +265,7 @@ Route::group(['prefix'=>'admin', 'middleware' => 'auth'],function(){
     Route::get('/sta/pdf/{nc}', [AlumnosStaController::class,'pdf'])->name('analisis.sta.pdf');      
 
     //Rutas profesores
+    Route::get('/sta/mis-grupos',[STAController::class,'misGrupos'])->name('profesores.mis_grupos');
     Route::get('/sta/profesores',[STAController::class,'indexProfesores'])->name('profesores.index'); 
     Route::get('/sta/profesores/busqueda',[STAController::class,'buscarProfesores'])->name('profesores.busqueda');
     Route::post('/sta/units/find',[STAController::class,'findUnits'])->name('units.find');  

@@ -235,8 +235,11 @@
                                 @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_COR_CARRERA') || Auth::User()->can('VIP'))
                                     <li><a class="dropdown-item" href="{{ route('analisis.index') }}"><i class="fa-solid fa-building-columns"></i>Jefes de carrera</a></li>
                                 @endif
-                                @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_PROFESOR') || Auth::User()->can('VIP'))
-                                    <li><a class="dropdown-item" href="{{ route('profesores.index') }}"><i class="fa-solid fa-chalkboard-user"></i>Profesor</a></li>
+                                @if (Auth::User()->hasAnyPermission(['VIP_STA','STA_PROFESOR','VIP']))
+                                    <li><a class="dropdown-item" href="{{ route('profesores.mis_grupos') }}"><i class="fa-solid fa-chalkboard-user"></i>Mis Grupos</a></li>
+                                @endif
+                                @if (Auth::User()->hasAnyPermission(['VIP_STA','STA_DEP_TUTORIA']))
+                                    <li><a class="dropdown-item" href="{{ route('profesores.index') }}"><i class="fa-solid fa-magnifying-glass"></i>Consulta de Profesores</a></li>
                                 @endif
                                 @if (Auth::User()->can('VIP_STA') || Auth::User()->can('STA_TUTOR') || Auth::User()->can('VIP'))
                                     <li><a class="dropdown-item" href="{{ route('tutores.index') }}"><i class="fa-solid fa-user-tie"></i>Tutor</a></li>

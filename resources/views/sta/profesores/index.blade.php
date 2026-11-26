@@ -370,7 +370,8 @@
                     materia: jsnMateria.ret_Clave,
                     unidad: $('#unidad').text(),
                     lse_clave: $('#lse_clave' + r).val(),
-                    gse_clave: jsnMateria.ret_Clave
+                    gse_clave: jsnMateria.gse_Clave,
+                    grupo: jsnMateria.gse_Clave
                 },
                 success: function () {
                     swal('Éxito', 'Los comentarios se guardaron correctamente', 'success');
