@@ -44,7 +44,7 @@
 								</tr>
 								<tr>
 									<td>Área:</td>
-									<td>{{ $area->nombre }}</td>
+									<td>{{ $area?->nombre ?? 'Sin área asignada' }}</td>
 								</tr>
 								<tr>
 									<td>Status:</td>
@@ -67,6 +67,7 @@
 	@if ($user!=null)
 		<form action="{{ route('usuarios.guardar_roles') }}" method="post" style="margin-bottom: 50px;">
 			{{ csrf_field() }}
+			<input type="hidden" name="user_id" value="{{ $user->id }}">
 			<table class="table table-striped" id="tabRoles">
 			   <thead>
 			       <th>ID</th>
@@ -81,7 +82,6 @@
 			   			<td>{{ $rol->name }}</td>
 			   			<td class="formulario">
 			   				<a href="{{ route('roles.role_ver_permisos',['id'=>$rol->id,'user_id' => $user->id]) }}">
-			   					<input type="hidden" name="user_id" value="{{ $user->id }}">
 			   					<span>
 			   						<img src="{{ asset('images/role_permissions.png') }}" style="width: 26px; height: 28px;">
 			   					</span>

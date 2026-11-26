@@ -237,7 +237,12 @@ class UsersController extends Controller
 
     public function asignarRoles($id){
         $user = User::find($id);
-        $area = Area::find($user->area);
+        if (! $user) {
+            Alert::error('Error', 'El usuario no existe');
+            return redirect()->route('usuarios.index');
+        }
+
+        $area = Area::withoutGlobalScopes()->find($user->area);
         if(Auth::User()->can('VIP')){
             $roles_data = DB::table('roles')->leftjoin('model_has_roles as model',function($join) use($id){
                 $join->on('model.role_id','=','roles.id');
