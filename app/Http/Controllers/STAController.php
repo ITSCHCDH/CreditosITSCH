@@ -504,18 +504,70 @@ class STAController extends Controller
     {
         try
         {
-            //Verificamos que el numero de control exista en SIT
-            $existe = SitAlumno::where('no_control', $request->no_Control)->exists();
-            if(! $existe)
-                return response()->json(['message' => 'El alumno con numero de control: '. $request->no_Control .', no existe en la base de datos de SIT'], 500);
+            $grupoNombre = strtoupper(trim((string) $request->gpo_Nombre));
+            if ($grupoNombre === '') {
+                return response()->json([
+                    'message' => 'El nombre del grupo no es válido.',
+                    'agregados' => [],
+                    'existentes' => [],
+                    'invalidos' => [],
+                ], 422);
+            }
 
-            //Guardamos el numero de control y grupo en la tabla gpoTutorias            
-            GpoTutorias::updateOrCreate(
-                ['no_Control' => $request->no_Control],
-                ['gpo_Nombre' => $request->gpo_Nombre]
-            );
-            //Retornamos status 200 y el mensaje de que se guardo correctamente
-            return response()->json(['message' => 'Correcto'], 200);  
+            $entrada = $request->input('no_Control', $request->input('controles', []));
+            $controles = is_array($entrada)
+                ? $entrada
+                : preg_split('/[\s,;]+/', (string) $entrada, -1, PREG_SPLIT_NO_EMPTY);
+
+            $controles = collect($controles)
+                ->map(fn ($control) => strtoupper(trim((string) $control)))
+                ->filter()
+                ->unique()
+                ->values();
+
+            if ($controles->isEmpty()) {
+                return response()->json([
+                    'message' => 'No se proporcionaron números de control.',
+                    'agregados' => [],
+                    'existentes' => [],
+                    'invalidos' => [],
+                ], 422);
+            }
+
+            $agregados = [];
+            $existentes = [];
+            $invalidos = [];
+
+            foreach ($controles as $noControl) {
+                if (! SitAlumno::where('no_control', $noControl)->exists()) {
+                    $invalidos[] = $noControl;
+                    continue;
+                }
+
+                $asignacion = GpoTutorias::where('no_Control', $noControl)->first();
+                if ($asignacion && strtoupper((string) $asignacion->gpo_Nombre) === $grupoNombre) {
+                    $existentes[] = $noControl;
+                    continue;
+                }
+
+                GpoTutorias::updateOrCreate(
+                    ['no_Control' => $noControl],
+                    ['gpo_Nombre' => $grupoNombre]
+                );
+                $agregados[] = $noControl;
+            }
+
+            $cantidad = count($agregados);
+            $message = $cantidad === 1
+                ? 'Se agregó 1 alumno nuevo al grupo.'
+                : "Se agregaron {$cantidad} alumnos nuevos al grupo.";
+
+            return response()->json([
+                'message' => $message,
+                'agregados' => $agregados,
+                'existentes' => $existentes,
+                'invalidos' => $invalidos,
+            ], 200);
         }
         catch(\Exception $e)
         {

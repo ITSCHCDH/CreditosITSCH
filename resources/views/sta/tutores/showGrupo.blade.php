@@ -197,7 +197,7 @@
         const seleccion = $.trim($('#grupoAlumno_value').val());
         const lista = $.trim($('#grupoListaNoControl').val());
         const entrada = lista !== '' ? lista : seleccion;
-        const controles = entrada === '' ? [] : entrada.split(/[\\s,;]+/).filter(Boolean).map(function (control) {
+        const controles = entrada === '' ? [] : entrada.split(/[\s,;]+/).filter(Boolean).map(function (control) {
             return control.trim().toUpperCase();
         });
 
@@ -206,52 +206,48 @@
             return;
         }
 
-        const existentes = {};
-        $('#tabGrupoTut tbody tr').each(function () {
-            existentes[$.trim($(this).find('td').eq(1).text()).toUpperCase()] = true;
-        });
+        const botones = $('.tgs-actions button');
+        botones.prop('disabled', true);
 
-        let enviados = 0;
-        let pendientes = controles.length;
-        controles.forEach(function (noControl) {
-            if (existentes[noControl]) {
-                pendientes--;
-                return;
+        $.ajax({
+            url: "{{ route('tutores.storeGrupo') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                gpo_Nombre: "{{ $grupo[0]->gpo_Nombre }}",
+                controles: controles
+            },
+            traditional: true,
+            success: function (response) {
+                const agregados = response.agregados || [];
+                const existentes = response.existentes || [];
+                const invalidos = response.invalidos || [];
+                let detalle = [];
+
+                if (agregados.length) detalle.push(agregados.length + ' agregado(s)');
+                if (existentes.length) detalle.push(existentes.length + ' ya estaba(n) en el grupo');
+                if (invalidos.length) detalle.push(invalidos.length + ' no existe(n): ' + invalidos.join(', '));
+
+                swal({
+                    title: agregados.length ? 'Éxito' : 'Información',
+                    text: detalle.length ? detalle.join('. ') + '.' : response.message,
+                    icon: agregados.length ? 'success' : 'info',
+                    button: 'Cerrar'
+                }).then(function () {
+                    if (agregados.length || existentes.length) window.location.reload();
+                });
+            },
+            error: function (xhr) {
+                const mensaje = xhr.responseJSON?.message || 'No fue posible agregar los números de control.';
+                swal('Error', mensaje, 'error');
+            },
+            complete: function () {
+                botones.prop('disabled', false);
+                $('#grupoListaNoControl').val('');
+                const combo = document.getElementById('grupoAlumno_combo');
+                if (combo && typeof combo.cbxReset === 'function') combo.cbxReset();
             }
-            $.ajax({
-                url: "{{ route('tutores.storeGrupo') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    gpo_Nombre: "{{ $grupo[0]->gpo_Nombre }}",
-                    no_Control: noControl
-                },
-                success: function () {
-                    enviados++;
-                },
-                complete: function () {
-                    pendientes--;
-                    if (pendientes === 0) {
-                        swal({
-                            title: enviados > 0 ? 'Éxito' : 'Información',
-                            text: enviados > 0 ? 'Alumnos agregados al grupo de tutorías' : 'No se agregaron alumnos nuevos',
-                            icon: enviados > 0 ? 'success' : 'info',
-                            button: 'Cerrar'
-                        }).then(function () {
-                            window.location.reload();
-                        });
-                    }
-                },
-                error: function (xhr) {
-                    const mensaje = xhr.responseJSON?.message || 'No fue posible agregar el número de control '+noControl;
-                    swal('Error', mensaje, 'error');
-                }
-            });
         });
-
-        $('#grupoListaNoControl').val('');
-        const combo = document.getElementById('grupoAlumno_combo');
-        if (combo && typeof combo.cbxReset === 'function') combo.cbxReset();
     }
 
     function eliminarAlumnoGrupo(noControl) {
