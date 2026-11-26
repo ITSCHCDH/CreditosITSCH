@@ -7,11 +7,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Sit\Carrera;
+use App\Models\Sit\Catedratico;
+use App\Models\Sit\User as SitUser;
 
 class User extends Authenticatable
 {
     use Notifiable;
     use HasRoles;
+    protected $connection = 'creditos';
     /**
      * The attributes that are mass assignable.
      *
@@ -21,8 +24,16 @@ class User extends Authenticatable
     
     protected $table ="users";
     protected $fillable = [
-        'name', 'email', 'password','area','sit_carrera_id','active','tutor'
+        'name', 'email', 'password','area','sit_carrera_id','sit_user_id','sit_catedratico_id','active','tutor'
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'sit_user_id' => 'integer',
+            'sit_catedratico_id' => 'integer',
+        ];
+    }
 
     /**
      * The attributes that should be hidden for arrays.
@@ -49,5 +60,15 @@ class User extends Authenticatable
     public function sitCarrera(): BelongsTo
     {
         return $this->belongsTo(Carrera::class, 'sit_carrera_id', 'id');
+    }
+
+    public function sitUser(): BelongsTo
+    {
+        return $this->belongsTo(SitUser::class, 'sit_user_id');
+    }
+
+    public function sitCatedratico(): BelongsTo
+    {
+        return $this->belongsTo(Catedratico::class, 'sit_catedratico_id');
     }
 }

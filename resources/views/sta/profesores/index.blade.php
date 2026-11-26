@@ -40,6 +40,16 @@
 @endpush
 
 @section('contenido')
+    @if(($docenteSitPendiente ?? false))
+        <div class="alert alert-warning d-flex align-items-center gap-2 mb-3" role="alert">
+            <i class="fa-solid fa-link-slash"></i>
+            <div>
+                <strong>Vínculo docente pendiente.</strong>
+                Tu usuario no está vinculado con un catedrático activo en SIT.
+            </div>
+        </div>
+    @endif
+
     <input type="hidden" name="gse_clave" id="gse_clave" readonly>
     <input type="hidden" name="grupo" id="grupo" readonly>
 

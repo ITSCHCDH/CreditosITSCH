@@ -12,7 +12,9 @@ use App\Models\GpoTutorias;
 use App\Models\AlumnoCreditosPerfil;
 use App\Models\Sit\Alumno as SitAlumno;
 use App\Models\Sit\Catedratico;
+use App\Models\Sit\Grupo as SitGrupo;
 use App\Services\Sit\CarrerasSitService;
+use App\Services\Sit\DocenteSitResolverService;
 use App\User;
 
 
@@ -27,9 +29,11 @@ class STAController extends Controller
 
     public function indexProfesores()
     {
-        // Opción C: SIT no relaciona profesor con carrera, así que se listan
-        // todos los profesores activos y el filtro real es materia + grupo.
-        return view('sta.profesores.index'); 
+        $docente = app(DocenteSitResolverService::class)->resolverCatedratico(Auth::user());
+        return view('sta.profesores.index', [
+            'docenteSit' => $docente,
+            'docenteSitPendiente' => $docente === null,
+        ]);
     }
 
     public function findProfesores(Request $request)
@@ -46,7 +50,8 @@ class STAController extends Controller
 
         // Un profesor solo se ve a sí mismo
         if (! Auth::User()->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA'])) {
-            $consulta->where('c.id', $this->obtCatClave());
+            $docente = app(DocenteSitResolverService::class)->resolverCatedratico(Auth::user());
+            $consulta->where('c.id', $docente?->id ?: 0);
         }
 
         return response()->json($consulta->orderBy('u.apellido_paterno')->get());       
@@ -135,24 +140,8 @@ class STAController extends Controller
     /** Catedrático de SIT que corresponde al usuario autenticado (por nombre). */
     public function obtCatClave()
     {
-        $userName = strtolower($this->quitarCaracteres(Auth::User()->name));
-
-        $catedraticos = DB::connection('sit')->table('catedraticos as c')
-            ->join('users as u', 'u.id', '=', 'c.user_id')
-            ->where('c.activo', 1)
-            ->select('c.id as cat_Clave', 'u.nombre as cat_Nombre', 'u.apellido_paterno as cat_ApePat', 'u.apellido_materno as cat_ApeMat')
-            ->get();
-
-        foreach ($catedraticos as $catedratico) {
-            $catNombre = strtolower($this->quitarCaracteres("{$catedratico->cat_Nombre} {$catedratico->cat_ApePat} {$catedratico->cat_ApeMat}"));
-
-            similar_text($userName, $catNombre, $similarity);
-            if ($similarity >= 85) {
-                return $catedratico->cat_Clave;
-            }
-        }
-
-        return 0;
+        $docente = app(DocenteSitResolverService::class)->resolverCatedratico(Auth::user());
+        return (int) ($docente?->id ?: 0);
     }
 
     //Función para quitar caracteres especiales a una cadena
@@ -181,66 +170,103 @@ class STAController extends Controller
     }
 
     public function findMaterias(Request $request)
-    {          
-        //Materias (grupos) que imparte el profesor en SIT
-        $materias = DB::connection('sit')->table('grupos')
-            ->join('cat_materias as m', 'm.id', '=', 'grupos.materia_id')
-            ->leftJoin('cat_periodos_escolares as p', 'p.id', '=', 'grupos.periodo_id')
-            ->where('grupos.catedratico_id', $request->profesor)
-            ->select(
-                'm.nombre as ret_NomCompleto',
-                'm.num_temas as ret_NumUnidades',
-                'm.id as ret_Clave',
-                'p.nombre as gse_Anio',
-                'grupos.clave_grupo as gse_Observaciones',
-                'grupos.id as gse_Clave'
-            )
-            ->orderBy('m.nombre', 'asc')
+    {
+        $usuario = Auth::user();
+        $docente = app(DocenteSitResolverService::class)->resolverCatedratico($usuario);
+        $privilegiado = $usuario->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA']);
+        $catedraticoId = $privilegiado
+            ? (int) $request->profesor
+            : (int) ($docente?->id ?: 0);
+
+        $periodoId = $request->filled('periodo') ? (int) $request->periodo : null;
+        $grupos = SitGrupo::with(['materia', 'periodoEscolar'])
+            ->withCount('listas')
+            ->where('activo', true)
+            ->where('catedratico_id', $catedraticoId)
+            ->periodoActivoOSeleccionado($periodoId)
+            ->orderBy('clave_grupo')
             ->get();
 
-        // Respaldo: materias de las listas del profesor cuando no tiene
-        // grupos en el periodo (por ejemplo, grupos aún sin crear).
-        if ($materias->isEmpty()) {
-            $materias = DB::connection('sit')->table('listas')
-                ->join('grupos', 'grupos.id', '=', 'listas.grupo_id')
-                ->join('cat_materias as m', 'm.id', '=', 'grupos.materia_id')
-                ->leftJoin('cat_periodos_escolares as p', 'p.id', '=', 'grupos.periodo_id')
-                ->where('listas.catedratico_id', $request->profesor)
-                ->select(
-                    'm.nombre as ret_NomCompleto',
-                    'm.num_temas as ret_NumUnidades',
-                    'm.id as ret_Clave',
-                    'p.nombre as gse_Anio',
-                    'grupos.clave_grupo as gse_Observaciones',
-                    'grupos.id as gse_Clave'
-                )
-                ->distinct()
-                ->orderBy('m.nombre', 'asc')
-                ->get();
-        }
+        $materias = $grupos->map(function (SitGrupo $grupo) {
+            return (object) [
+                'ret_NomCompleto' => $grupo->materia?->nombre,
+                'ret_NumUnidades' => $grupo->materia?->num_temas,
+                'ret_Clave' => $grupo->materia_id,
+                'gse_Anio' => $grupo->periodoEscolar?->nombre,
+                'gse_Observaciones' => $grupo->clave_grupo,
+                'gse_Clave' => $grupo->id,
+                'listas_count' => $grupo->listas_count,
+            ];
+        });
 
         if($materias->isEmpty()){
-            $materias = array(
-                'error' => '500',
-                'message' => 'El profesor no tiene materias asignadas'
-            );
+            $materias = $docente === null
+                ? [
+                    'error' => '500',
+                    'message' => 'Tu usuario no tiene vínculo con un catedrático de SIT. Solicita la vinculación al administrador.',
+                ]
+                : [
+                    'error' => '500',
+                    'message' => 'El profesor no tiene materias asignadas en el periodo vigente.',
+                ];
         }       
 
         return response()->json($materias);
     }
 
     public function findUnits(Request $request)
-    {    
-        $units = DB::connection('sit')->table('cat_materias')
-            ->where('id', $request->materia)
-            ->select('nombre as ret_NomCompleto', 'num_temas as ret_NumUnidades')
-            ->first();
+    {
+        $usuario = Auth::user();
+        $docente = app(DocenteSitResolverService::class)->resolverCatedratico($usuario);
+        $privilegiado = $usuario->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA']);
+        $catedraticoId = $privilegiado
+            ? (int) $request->profesor
+            : (int) ($docente?->id ?: 0);
 
-        return response()->json($units);            
+        $periodoId = $request->filled('periodo') ? (int) $request->periodo : null;
+        $grupoValido = SitGrupo::query()
+            ->where('activo', true)
+            ->where('materia_id', $request->materia)
+            ->when($catedraticoId > 0, fn ($query) => $query->where('catedratico_id', $catedraticoId))
+            ->periodoActivoOSeleccionado($periodoId)
+            ->exists();
+
+        $units = $grupoValido
+            ? DB::connection('sit')->table('cat_materias')
+                ->where('activo', true)
+                ->where('id', $request->materia)
+                ->select('nombre as ret_NomCompleto', 'num_temas as ret_NumUnidades')
+                ->first()
+            : null;
+
+        if (! $units) {
+            return response()->json(['error' => 'Materia no asignada al docente'], 403);
+        }
+        return response()->json($units);
     }
 
     public function findListaCali(Request $request)
     {
+        $usuario = Auth::user();
+        $docente = app(DocenteSitResolverService::class)->resolverCatedratico($usuario);
+        $privilegiado = $usuario->hasAnyPermission(['VIP_STA', 'STA_DEP_TUTORIA']);
+        $catedraticoId = $privilegiado
+            ? (int) $request->profesor
+            : (int) ($docente?->id ?: 0);
+
+        $periodoId = $request->filled('periodo') ? (int) $request->periodo : null;
+        $grupoValido = SitGrupo::query()
+            ->whereKey($request->grupo)
+            ->where('activo', true)
+            ->where('materia_id', $request->materia)
+            ->when($catedraticoId > 0, fn ($query) => $query->where('catedratico_id', $catedraticoId))
+            ->periodoActivoOSeleccionado($periodoId)
+            ->exists();
+
+        if (! $grupoValido) {
+            return response()->json(['listaCali' => [], 'coment' => []], 403);
+        }
+
         // Calificaciones por unidad de un grupo de SIT
         $listaCali = DB::connection('sit')->table('listas')
             ->join('grupos', 'grupos.id', '=', 'listas.grupo_id')
@@ -514,7 +540,10 @@ class STAController extends Controller
                 ], 422);
             }
 
-            $entrada = $request->input('no_Control', $request->input('controles', []));
+            $entrada = $request->input(
+                'controles',
+                $request->input('no_Control', $request->input('lista', []))
+            );
             $controles = is_array($entrada)
                 ? $entrada
                 : preg_split('/[\s,;]+/', (string) $entrada, -1, PREG_SPLIT_NO_EMPTY);

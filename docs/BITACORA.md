@@ -2,6 +2,52 @@
 
 Este archivo registra cronológicamente todos los cambios, decisiones y pendientes del proyecto de migración al esquema `sit`. Entradas más recientes arriba.
 
+### [2026-11-26 09:39] — Fase 8: vinculación de docentes con SIT
+
+- **Estatus:** ✅ completado
+- **Agente:** creditos-backend
+- **Módulo:** créditos
+- **Prompt/Tarea original:** Implementar la vinculación persistente entre usuarios locales y catedráticos SIT, resolver identidad por correo/nombre y aplicar filtros docentes en STA sin escribir en SIT.
+
+**Archivos modificados:**
+- `database/migrations/2026_11_26_093900_add_sit_links_to_users.php` (creada y aplicada)
+- `app/User.php` (conexión `creditos`, casts y relaciones `sitUser`/`sitCatedratico`)
+- `app/Models/Sit/Grupo.php` (relación `listas`, scope de periodo activo/seleccionado y scope de clave)
+- `app/Services/Sit/DocenteSitResolverService.php` (creado)
+- `app/Console/Commands/VincularDocentesSit.php` (creado)
+- `app/Http/Controllers/STAController.php` (métodos STA de profesores/materias/unidades/calificaciones adaptados al resolver)
+- `tests/Feature/Sit/VincularDocenteSitTest.php` (creado)
+- `docs/BITACORA.md` (actualizado)
+
+**Archivos eliminados:**
+- Ninguno al iniciar.
+
+**Consultas SQL nuevas o modificadas:**
+- Alta en `creditos.users` de `sit_user_id` y `sit_catedratico_id`, ambos nullable e indexados.
+- Búsqueda exacta por correo en `sit.users` y fallback por nombre sobre `sit.catedraticos` activos.
+- Persistencia exclusiva de ambos vínculos en `creditos.users`.
+- `Sit\Grupo` filtrado por `catedratico_id`, `activo`, periodo activo o `periodo_id` seleccionado, con `materia`, `periodoEscolar` y `withCount('listas')`.
+
+**Decisiones tomadas:**
+- `sit` conserva sus modelos solo lectura y no recibió escrituras.
+- La coincidencia exacta de correo prevalece; el fallback normaliza prefijos académicos y requiere al menos 82% de similaridad.
+- Los usuarios privilegiados conservan la selección de catedrático; usuarios sin permisos VIP/departamento quedan restringidos al catedrático resuelto.
+- La migración global completa no se pudo aplicar por tablas existentes sin historial de migraciones; se aplicó únicamente la migración específica nueva.
+
+**Pendientes / Deuda técnica:**
+- Validar visualmente los filtros en los grupos reales de STA.
+- Ejecutar una revisión manual asistida por `php artisan creditos:vincular-docentes-sit` sobre datos reales de staging.
+- Aplicar el resto del historial de migraciones solo si el entorno recibe una importación limpia o se estabiliza el orden del esquema existente.
+
+**Tests ejecutados:**
+- ✅ Sintaxis PHP de servicio, comando, controlador, modelo y migración.
+- ✅ `php artisan test tests/Feature/Sit/VincularDocenteSitTest.php` (4 passed, 10 assertions).
+- ✅ `php artisan migrate --path=database/migrations/2026_11_26_093900_add_sit_links_to_users.php --force` (aplicada).
+- ✅ `php artisan list --raw | Select-String "creditos:vincular-docentes-sit"` (comando registrado).
+
+**Referencias:**
+- Fase 8 — Vinculación de Docentes con SIT.
+
 ### [2026-11-22 14:02] — Tarea 9 Fase 7: auditoría final sin conexión legacy
 
 - **Estatus:** ✅ completado

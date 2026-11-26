@@ -212,12 +212,12 @@
         $.ajax({
             url: "{{ route('tutores.storeGrupo') }}",
             type: "POST",
-            data: {
+            contentType: "application/json",
+            data: JSON.stringify({
                 _token: "{{ csrf_token() }}",
                 gpo_Nombre: "{{ $grupo[0]->gpo_Nombre }}",
                 controles: controles
-            },
-            traditional: true,
+            }),
             success: function (response) {
                 const agregados = response.agregados || [];
                 const existentes = response.existentes || [];
