@@ -31,8 +31,12 @@ class UserRequest extends FormRequest
             'active' => 'required',
             'roles_id' => 'nullable|array',
             'roles_id.*' => 'integer|distinct|exists:roles,id',
-            'password' => 'required|min:4|max:60',
-            'password_confirmation' => 'required_with:password|same:password|min:4|max:60|required'
+            'password' => $this->routeIs('usuarios.store')
+                ? 'required|min:4|max:60'
+                : 'nullable|min:4|max:60',
+            'password_confirmation' => $this->routeIs('usuarios.store')
+                ? 'required_with:password|same:password|min:4|max:60'
+                : 'nullable|required_with:password|same:password|min:4|max:60'
         ];
     }
 }

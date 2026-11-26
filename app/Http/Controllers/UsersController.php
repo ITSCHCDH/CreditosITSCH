@@ -166,21 +166,15 @@ class UsersController extends Controller
         $user->sit_carrera_id = $request->filled('sit_carrera_id') ? $request->sit_carrera_id : null;
         $user->active = $request->active;
         $user->tutor=$request->tutor;
-        $correo_duplicado = User::where('email','=',$request->email)->get()->count() > 1;
+        $correo_duplicado = User::where('email','=',$request->email)
+            ->where('id','<>',$user->id)
+            ->exists();
         if($correo_duplicado){
             Alert::error('Error','El correo '.$request->email.' ya se encuentra en uso por otro usuario');
             return back()->withInput();
         }
-        if($user->password!=$request->password) {
-            if($request->password==$request->password_confirmation)
-            {
-                $user->password=bcrypt($request->password);
-            }
-            else
-            {
-                Alert::error('Error','Error de credenciales, las contraseñas deben ser iguales para el usuario: '.$user->nombre);
-                return redirect()->route('alumnos.index');
-            }
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
         }
         $user->save();
 
