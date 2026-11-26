@@ -222,11 +222,13 @@
                 const agregados = response.agregados || [];
                 const existentes = response.existentes || [];
                 const invalidos = response.invalidos || [];
+                const errores = response.errores || [];
                 let detalle = [];
 
                 if (agregados.length) detalle.push(agregados.length + ' agregado(s)');
                 if (existentes.length) detalle.push(existentes.length + ' ya estaba(n) en el grupo');
                 if (invalidos.length) detalle.push(invalidos.length + ' no existe(n): ' + invalidos.join(', '));
+                if (errores.length) detalle.push(errores.length + ' no pudo(dieron) insertarse: ' + errores.join(', '));
 
                 swal({
                     title: agregados.length ? 'Éxito' : 'Información',

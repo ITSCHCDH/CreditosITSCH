@@ -537,24 +537,38 @@ class STAController extends Controller
             $agregados = [];
             $existentes = [];
             $invalidos = [];
+            $errores = [];
+
+            $controlesValidos = SitAlumno::whereIn('no_control', $controles->all())
+                ->pluck('no_control')
+                ->map(fn ($control) => strtoupper(trim((string) $control)))
+                ->flip();
+
+            $asignaciones = GpoTutorias::whereIn('no_Control', $controles->all())
+                ->get(['no_Control', 'gpo_Nombre'])
+                ->keyBy(fn ($asignacion) => strtoupper(trim((string) $asignacion->no_Control)));
 
             foreach ($controles as $noControl) {
-                if (! SitAlumno::where('no_control', $noControl)->exists()) {
+                if (! $controlesValidos->has($noControl)) {
                     $invalidos[] = $noControl;
                     continue;
                 }
 
-                $asignacion = GpoTutorias::where('no_Control', $noControl)->first();
-                if ($asignacion && strtoupper((string) $asignacion->gpo_Nombre) === $grupoNombre) {
+                $asignacion = $asignaciones->get($noControl);
+                if ($asignacion && strtoupper(trim((string) $asignacion->gpo_Nombre)) === $grupoNombre) {
                     $existentes[] = $noControl;
                     continue;
                 }
 
-                GpoTutorias::updateOrCreate(
-                    ['no_Control' => $noControl],
-                    ['gpo_Nombre' => $grupoNombre]
-                );
-                $agregados[] = $noControl;
+                try {
+                    GpoTutorias::updateOrCreate(
+                        ['no_Control' => $noControl],
+                        ['gpo_Nombre' => $grupoNombre]
+                    );
+                    $agregados[] = $noControl;
+                } catch (\Throwable $e) {
+                    $errores[] = $noControl;
+                }
             }
 
             $cantidad = count($agregados);
@@ -567,6 +581,7 @@ class STAController extends Controller
                 'agregados' => $agregados,
                 'existentes' => $existentes,
                 'invalidos' => $invalidos,
+                'errores' => $errores,
             ], 200);
         }
         catch(\Exception $e)
